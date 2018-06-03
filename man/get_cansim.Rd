@@ -2,10 +2,12 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim}
 \alias{get_cansim}
-\title{Get cansim table into tidy dataframe}
+\title{Get cansim table into tidy dataframe
+Caches the table data for the current session}
 \usage{
-get_cansim(cansimTableNumber, english = TRUE)
+get_cansim(cansimTableNumber, language = "english")
 }
 \description{
 Get cansim table into tidy dataframe
+Caches the table data for the current session
 }
