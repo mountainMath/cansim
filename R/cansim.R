@@ -48,21 +48,44 @@ get_cansim_old <- function(cansimTableNumber,language="english"){
 #' French part does not work, probably encoding issues
 #' @export
 adjust_cansim_values_by_variable <-function(data,var){
- if("Valeur" %in% names(data))
-   data <- data %>%
-    mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
-    mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
-    mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
-    mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
- else
-   data <- data %>%
-     mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
-     mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
-     mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
-     mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
+  normailze_cansim_values(data)
+}
+
+#' normailzes cancsim values by setting all units to counts/dollars instead of millions, etc.
+#' if "replace" is true, it will replace the VALUE field with normailzed values and drop the scale columns,
+#' otherwise it keeps the scale columns and creased a new column names "NORMALIZED_VALUE" with the normalized value
+#' @export
+normailze_cansim_values <- function(data,replace=TRUE){
+  if (replace) {
+    data %>%
+      mutate(VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID)))) %>%
+      select(-SCALAR_FACTOR,-SCALAR_ID)
+  } else {
+    data %>%
+      mutate(NORMALIZED_VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID))))
+  }
+}
+
+#' Adjust Cansim Value by scaled amount
+#' French part does not work, probably encoding issues
+#' @export
+adjust_cansim_values_by_variable_old <-function(data,var){
+  if("Valeur" %in% names(data))
+    data <- data %>%
+      mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
+      mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
+      mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
+      mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
+  else
+    data <- data %>%
+      mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
+      mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
+      mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
+      mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
 
   data
 }
+
 
 #' translate from old table number to NDM table number
 #' @export
