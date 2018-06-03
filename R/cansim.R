@@ -64,12 +64,31 @@ adjust_cansim_values_by_variable <-function(data,var){
   data
 }
 
-
 #' translate from old table number to NDM table number
 #' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
+  path <- file.path(tempdir(),"cansim-correspondence.csv")
+  if (!file.exists(path)){
+    url="https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv"
+    data <- readr::read_csv(url)
+    saveRDS(data,file=path)
+  }
+  data <-readRDS(path)
   cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
-  cleaned_number <- paste0(substr(cleaned_number,0,3),"-",substr(cleaned_number,4,30))
+
+  new_number <- data %>% filter(CANSIM_ID==as.integer(cleaned_number)) %>% pull(PRODUCT_ID)
+  if (identical(new_number, integer(0))) {
+    stop(paste0("Unable to match old CANSIM table number ",cleaned_number))
+  }
+  n=as.character(new_number)
+  new_table <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+}
+
+#' translate from old table number to NDM table number by web search and scraping
+#' @export
+cansim_old_to_new2 <- function(oldCansimTableNumber){
+  cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
+  cleaned_number <- paste0(substr(cleaned_number,1,3),"-",substr(cleaned_number,4,30))
 
   p <- xml2::read_html(paste0("https://www150.statcan.gc.ca/n1/en/type/data?text=",cleaned_number))
   new_table <- p %>%
@@ -97,11 +116,12 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 get_cansim_ndm <- function(cansimTableNumber,language="english"){
   lang_ext=ifelse(tolower(language)=="english","-eng",ifelse(tolower(language) %in% c("french"),"-fra",NA))
   if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  url_table <- gsub("-","",cansimTableNumber)
-  base_table <- url_table %>% substr(.,0,(nchar(.)-2))
-  path <- file.path(tempdir(),paste0(url_table,"_",lang_ext))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  message(paste0("Accessing CANSIM NDM product ",cleaned_number))
+  base_table <- gsub("-","",cleaned_number)
+  path <- file.path(tempdir(),paste0(base_table,"_",lang_ext))
   if (!file.exists(path)){
-    url=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/downloadView!downloadTableInCSV.action?pid=",base_table,"&defaultView=false&file=",url_table,lang_ext,".csv")
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",base_table,lang_ext,".zip")
     download.file(url, path, quiet = TRUE)
     data <- NA
@@ -111,9 +131,6 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
     dl_url <- paste0(urltools::scheme(url),"://",urltools::domain(url),dl)
     download.file(dl_url,path)
     if(lang_ext=="-eng")
-      #td <- tempdir()
-      #unzip(path, exdir = td)
-      #filename <- paste0(url_table,"_", lang_ext)
       data <- readr::read_csv(unz(path, paste0(base_table, ".csv")),
                               na=na_strings,
                               locale=readr::locale(encoding="Windows-1254"),
