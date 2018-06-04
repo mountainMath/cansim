@@ -8,4 +8,17 @@ as numeric/character as appropriate. On read it uses "Windows-1254" ecoding to a
 with R. The package also contains a convenience function that will re-scale and
 re-label variables that are reported in thousands or millions.
 
-I contains a stub for support for french language data, although the code still faces issues with encodings.
+Caches data for the duration of the current R session.
+
+It contains a stub for support for french language data, although the code still faces issues with encodings.
+
+# Basic Usage
+Use old or new table number to download entire cansim tables into a tidy dataframe. 
+
+    data <- get_cansim("051-0057")
+    data <- get_cansim("510057")
+    data <- get_cansim("17-10-0079")
+    data <- get_cansim("17-10-0079-01")
+    
+all load the same data.
+    

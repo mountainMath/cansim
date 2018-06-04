@@ -58,11 +58,11 @@ adjust_cansim_values_by_variable <-function(data,var){
 normailze_cansim_values <- function(data,replace=TRUE){
   if (replace) {
     data %>%
-      mutate(VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID)))) %>%
-      select(-SCALAR_FACTOR,-SCALAR_ID)
+      dplyr::mutate(VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID)))) %>%
+      dplyr::select(-SCALAR_FACTOR,-SCALAR_ID)
   } else {
     data %>%
-      mutate(NORMALIZED_VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID))))
+      dplyr::mutate(NORMALIZED_VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID))))
   }
 }
 
@@ -72,16 +72,16 @@ normailze_cansim_values <- function(data,replace=TRUE){
 adjust_cansim_values_by_variable_old <-function(data,var){
   if("Valeur" %in% names(data))
     data <- data %>%
-      mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
-      mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
-      mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
-      mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
+      dplyr::mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
+      dplyr::mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
+      dplyr::mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
+      dplyr::mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
   else
     data <- data %>%
-      mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
-      mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
-      mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
-      mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
+      dplyr::mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
+      dplyr::mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
+      dplyr::mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
+      dplyr::mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
 
   data
 }
@@ -99,7 +99,9 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   data <-readRDS(path)
   cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
 
-  new_number <- data %>% filter(CANSIM_ID==as.integer(cleaned_number)) %>% pull(PRODUCT_ID)
+  new_number <- data %>%
+    dplyr::filter(CANSIM_ID==as.integer(cleaned_number)) %>%
+    dplyr::pull(PRODUCT_ID)
   if (identical(new_number, integer(0))) {
     stop(paste0("Unable to match old CANSIM table number ",cleaned_number))
   }
@@ -167,3 +169,10 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
   }
   readRDS(file=path)
 }
+
+
+#' @importFrom dplyr %>%
+#' @importFrom rlang .data
+NULL
+
+
