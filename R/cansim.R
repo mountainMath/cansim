@@ -9,7 +9,7 @@ get_cansim <- function(cansimTableNumber,language="english"){
     message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
     cansimTableNumber=tt
   }
-  get_cansim_ndm(cansimTableNumber)
+  get_cansim_ndm(cansimTableNumber,language)
 }
 
 #' Legacy method, get cansim tables based on old table names
@@ -56,14 +56,18 @@ adjust_cansim_values_by_variable <-function(data,var){
 #' otherwise it keeps the scale columns and creased a new column names "NORMALIZED_VALUE" with the normalized value
 #' @export
 normailze_cansim_values <- function(data,replace=TRUE){
+  scale_string <- ifelse("VALEUR" %in% names(data),"IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse("VALEUR" %in% names(data),"FACTEUR SCALAIRE","SCALAR_FACTOR")
+  value_string <- ifelse("VALEUR" %in% names(data),"VALEUR","VALUE")
   if (replace) {
-    data %>%
-      dplyr::mutate(VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID)))) %>%
-      dplyr::select(-SCALAR_FACTOR,-SCALAR_ID)
+    data <- data %>%
+      dplyr::mutate(!!as.name(value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string))))) %>%
+      dplyr::select(-one_of(scale_string,scale_string2))
   } else {
-    data %>%
-      dplyr::mutate(NORMALIZED_VALUE=VALUE*(`^`(10,as.integer(SCALAR_ID))))
+    data <- data %>%
+      dplyr::mutate(NORMALIZED_VALUE=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
   }
+  data
 }
 
 #' Adjust Cansim Value by scaled amount
@@ -139,13 +143,13 @@ cansim_old_to_new2 <- function(oldCansimTableNumber){
 #' Get cansim table via NDM
 #' @export
 get_cansim_ndm <- function(cansimTableNumber,language="english"){
-  lang_ext=ifelse(tolower(language)=="english","-eng",ifelse(tolower(language) %in% c("french"),"-fra",NA))
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
   if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
   n=as.character(gsub("-","",cansimTableNumber))
   cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
   message(paste0("Accessing CANSIM NDM product ",cleaned_number))
   base_table <- gsub("-","",cleaned_number)
-  path <- file.path(tempdir(),paste0(base_table,"_",lang_ext))
+  path <- file.path(tempdir(),paste0(base_table,lang_ext))
   if (!file.exists(path)){
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",base_table,lang_ext,".zip")
     download.file(url, path, quiet = TRUE)
@@ -158,13 +162,15 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
     if(lang_ext=="-eng")
       data <- readr::read_csv(unz(path, paste0(base_table, ".csv")),
                               na=na_strings,
-                              locale=readr::locale(encoding="Windows-1254"),
-                              col_types = list(.default = "c",VALUE="d"))
+                              locale=readr::locale(encoding="UTF8"),
+                              col_types = list(.default = "c")) %>%
+      mutate(VALUE=as.numeric(VALUE))
     else
-      data <- readr::read_csv2(unz(path, paste0(url_table, ".csv")),
+      data <- readr::read_csv2(unz(path, paste0(base_table, ".csv")),
                                na=na_strings,
-                               locale=readr::locale(encoding="Windows-1254"),
-                               col_types = list(.default = "c",VALEUR="d"))
+                               locale=readr::locale(encoding="UTF8"),
+                               col_types = list(.default = "c")) %>%
+      mutate(VALEUR=as.numeric(VALEUR))
     saveRDS(data,file=path)
   }
   readRDS(file=path)
