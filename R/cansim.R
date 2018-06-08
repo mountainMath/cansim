@@ -26,7 +26,7 @@ get_cansim_old <- function(cansimTableNumber,language="english"){
     cansimTableNumberString <- cleaned_number # pad with zeros if needed
     filename <- paste0("0", cansimTableNumberString, lang_ext)
     url <- paste0(url, filename, ".zip")
-    download.file(url, path, quiet = TRUE)
+    utils::download.file(url, path, quiet = TRUE)
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     if(lang_ext=="-eng")
@@ -55,7 +55,7 @@ adjust_cansim_values_by_variable <-function(data,var){
 #' if "replace" is true, it will replace the VALUE field with normailzed values and drop the scale columns,
 #' otherwise it keeps the scale columns and creased a new column names "NORMALIZED_VALUE" with the normalized value
 #' @export
-normailze_cansim_values <- function(data,replace=TRUE){
+normalize_cansim_values <- function(data,replace=TRUE){
   scale_string <- ifelse("VALEUR" %in% names(data),"IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse("VALEUR" %in% names(data),"FACTEUR SCALAIRE","SCALAR_FACTOR")
   value_string <- ifelse("VALEUR" %in% names(data),"VALEUR","VALUE")
@@ -149,16 +149,12 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
   cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
   message(paste0("Accessing CANSIM NDM product ",cleaned_number))
   base_table <- gsub("-","",cleaned_number)
-  path <- file.path(tempdir(),paste0(base_table,lang_ext))
+  path <- file.path(tempdir(),paste0(base_table,lang_ext,".zip"))
   if (!file.exists(path)){
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",base_table,lang_ext,".zip")
-    download.file(url, path, quiet = TRUE)
+    httr::GET(url,httr::write_disk(path, overwrite = TRUE))
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
-    p <- xml2::read_html(url)
-    dl <- p %>% rvest::html_nodes(".item-list a") %>% rvest::html_attr("href")
-    dl_url <- paste0(urltools::scheme(url),"://",urltools::domain(url),dl)
-    download.file(dl_url,path)
     if(lang_ext=="-eng")
       data <- readr::read_csv(unz(path, paste0(base_table, ".csv")),
                               na=na_strings,

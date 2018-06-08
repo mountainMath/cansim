@@ -15,5 +15,6 @@ Imports: dplyr (>= 0.7),
     readr,
     rlang,
     xml2,
-    rvest
+    rvest,
+    utils
 RoxygenNote: 6.0.1
