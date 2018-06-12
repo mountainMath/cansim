@@ -160,13 +160,13 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
                               na=na_strings,
                               locale=readr::locale(encoding="UTF8"),
                               col_types = list(.default = "c")) %>%
-      mutate(VALUE=as.numeric(VALUE))
+      dplyr::mutate(VALUE=as.numeric(VALUE))
     else
       data <- readr::read_csv2(unz(path, paste0(base_table, ".csv")),
                                na=na_strings,
                                locale=readr::locale(encoding="UTF8"),
                                col_types = list(.default = "c")) %>%
-      mutate(VALEUR=as.numeric(VALEUR))
+      dplyr::mutate(VALEUR=as.numeric(VALEUR))
     saveRDS(data,file=path)
   }
   readRDS(file=path)
