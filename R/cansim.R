@@ -84,7 +84,10 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
   }
   date_field=ifelse(language=="fr","PÉRIODE DE RÉFÉRENCE","REF_DATE")
   sample_date <- data[[date_field]] %>% na.omit %>% dplyr::first()
-  if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
+  if (grepl("^\\d{4}$",sample_date)) {
+    # year
+    data <- data %>% dplyr::mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
+  } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
     # year range, use second year as anchor
     data <- data %>% dplyr::mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
   } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
