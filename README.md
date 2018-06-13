@@ -50,14 +50,13 @@ For example, values in the VALUE field may be reported in "millions", so a VALUE
 data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values
 ``` 
 
-To retain the original VALUE field and create a new NORMALIZED_VALUE field to contain the normailzed value, pass the `replace=FALSE` option.
+To retain the original VALUE field pass the *replacement_value = <your field name>* option to create a field to contain the normailzed value.
 ```r
-data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replace=FALSE)
+data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replacement_value="normalized value")
 ```
 
-### Encoding
+By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set *normalize_percent=FALSE*.
 
-Tables are downloaded using the "raw" option is the default and variables are automatically read as numeric/character as appropriate. "Windows-1254" encoding is used during data reading to avoid issues with some labels messing with R.
 
 ### Contributing
 

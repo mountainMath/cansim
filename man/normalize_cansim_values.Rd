@@ -2,14 +2,28 @@
 % Please edit documentation in R/cansim.R
 \name{normalize_cansim_values}
 \alias{normalize_cansim_values}
-\title{normailzes cancsim values by setting all units to counts/dollars instead of millions, etc.
-if "replace" is true, it will replace the VALUE field with normailzed values and drop the scale columns,
-otherwise it keeps the scale columns and creased a new column names "NORMALIZED_VALUE" with the normalized value}
+\title{normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
+if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
+otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
+It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)}
 \usage{
-normalize_cansim_values(data, replace = TRUE)
+normalize_cansim_values(data, replacement_value = NA,
+  normalize_percent = TRUE, default_month = "01", default_day = "01")
+}
+\arguments{
+\item{data}{A cansim table as returned from *get_cansim*.}
+
+\item{replacement_value}{Optional name of the column the manipulated value should be returned in. Defaults to replacing the current value field.}
+
+\item{normalize_percent}{Optional normailze percentages by changing them to rates. *TRUE* by default.}
+
+\item{default_month}{The default month that should be used when creating Date objects for annual data.}
+
+\item{default_day}{The defauly day of the month that should be used when creating Date objects for monthly data.}
 }
 \description{
-normailzes cancsim values by setting all units to counts/dollars instead of millions, etc.
-if "replace" is true, it will replace the VALUE field with normailzed values and drop the scale columns,
-otherwise it keeps the scale columns and creased a new column names "NORMALIZED_VALUE" with the normalized value
+normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
+if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
+otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
+It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)
 }

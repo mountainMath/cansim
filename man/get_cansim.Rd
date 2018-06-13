@@ -7,6 +7,11 @@ Caches the table data for the current session}
 \usage{
 get_cansim(cansimTableNumber, language = "english")
 }
+\arguments{
+\item{cansimTableNumber}{the table number to load, accepts old or new NDM table numbers}
+
+\item{language}{"en" or "fr" for english or french language version. Defaults to english.}
+}
 \description{
 Get cansim table into tidy dataframe
 Caches the table data for the current session
