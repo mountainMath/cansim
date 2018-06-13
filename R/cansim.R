@@ -201,6 +201,7 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
 
 #' @importFrom dplyr %>%
 #' @importFrom rlang .data
+#' @importFrom stats na.omit
 NULL
 
 
