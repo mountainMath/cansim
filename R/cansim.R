@@ -2,6 +2,8 @@
 #' Get cansim table into tidy dataframe
 #' Caches the table data for the current session
 #' @export
+#' @param cansimTableNumber the table number to load, accepts old or new NDM table numbers
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
 get_cansim <- function(cansimTableNumber,language="english"){
   t<-gsub("-","",as.character(cansimTableNumber))
   if (nchar(t)<=7) {
@@ -52,22 +54,46 @@ adjust_cansim_values_by_variable <-function(data,var){
 }
 
 #' normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
-#' if "replace" is true, it will replace the VALUE field with normailzed values and drop the scale columns,
-#' otherwise it keeps the scale columns and creased a new column names "NORMALIZED_VALUE" with the normalized value
+#' if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
+#' otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
+#' It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)
 #' @export
-normalize_cansim_values <- function(data,replace=TRUE){
-  scale_string <- ifelse("VALEUR" %in% names(data),"IDENTIFICATEUR SCALAIRE","SCALAR_ID")
-  scale_string2 <- ifelse("VALEUR" %in% names(data),"FACTEUR SCALAIRE","SCALAR_FACTOR")
-  value_string <- ifelse("VALEUR" %in% names(data),"VALEUR","VALUE")
-  if (replace) {
-    data <- data %>%
-      dplyr::mutate(!!as.name(value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string))))) %>%
-      dplyr::select(-one_of(scale_string,scale_string2))
-  } else {
-    data <- data %>%
-      dplyr::mutate(NORMALIZED_VALUE=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
+#' @param data A cansim table as returned from *get_cansim*.
+#' @param replacement_value Optional name of the column the manipulated value should be returned in. Defaults to replacing the current value field.
+#' @param normalize_percent Optional normailze percentages by changing them to rates. *TRUE* by default.
+#' @param default_month The default month that should be used when creating Date objects for annual data.
+#' @param default_day The defauly day of the month that should be used when creating Date objects for monthly data.
+normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=TRUE,default_month="01",default_day="01"){
+  language <- ifelse("VALEUR" %in% names(data),"fr","en")
+  value_string <- ifelse(language=="fr","VALEUR","VALUE")
+  scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
+  uom_string=ifelse(language=="fr","UNITÉ DE MESURE","UOM")
+  percentage_string=ifelse(language=="fr","Pourcentage","Percentage")
+  replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
+  data <- data %>%
+    dplyr::mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
+  if (is.na(replacement_value)) { # remove scale columns
+      data <- data %>% dplyr::select(-dplyr::one_of(scale_string,scale_string2))
   }
-  data
+  if (normalize_percent) {
+    # divide numbers that are percentages by 100 and convert the unit field to "rate"
+    data <- data %>%
+      dplyr::mutate(!!as.name(replacement_value_string):=ifelse(!!as.name(uom_string)==percentage_string,!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
+      dplyr::mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
+  }
+  date_field=ifelse(language=="fr","PÉRIODE DE RÉFÉRENCE","REF_DATE")
+  sample_date <- data[[date_field]] %>% na.omit %>% dplyr::first()
+  if (grepl("^\\d{4}$",sample_date)) {
+    # year
+    data <- data %>% dplyr::mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
+  } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
+    # year range, use second year as anchor
+    data <- data %>% dplyr::mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
+  } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
+    # year and month
+    data <- data %>% dplyr::mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
+  }
 }
 
 #' Adjust Cansim Value by scaled amount
@@ -173,8 +199,58 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
 }
 
 
+generate_table_metadata <- function(){
+  url_for_page <-function(page){paste0("https://www150.statcan.gc.ca/n1/en/type/data?p=",page,"-data/tables#tables")}
+  parse_table_data <- function(item){
+    product <- item %>% rvest::html_node(".ndm-result-productid") %>% rvest::html_text() %>% sub("^Table: ","",.)
+    if (grepl("^\\d{2}-\\d{2}-\\d{4}",product)) {
+      result = tibble(
+        title=item %>% rvest::html_node(".ndm-result-title") %>% rvest::html_text() %>% sub("^\\d+\\. ","",.),
+        table=product,
+        former = item %>% rvest::html_node(".ndm-result-formerid") %>% rvest::html_text() %>% trimws %>% gsub("^\\(formerly: CANSIM |\\)$","",.),
+        geo = item %>% rvest::html_node(".ndm-result-geo") %>% rvest::html_text() %>% sub("Geography: ","",.),
+        description = item %>% rvest::html_node(".ndm-result-description") %>% rvest::html_text() %>% sub("Description: ","",.),
+        release_date = item %>% rvest::html_node(".ndm-result-date .ndm-result-date") %>% rvest::html_text() %>% as.Date()
+      )
+    } else {
+      result=tibble()
+    }
+    result
+  }
+  p <- (xml2::read_html(url_for_page(0)) %>% rvest::html_nodes(".pagination"))[2]
+  l <- p %>% rvest::html_nodes("li")
+  max_page = (l[length(l)-1] %>% rvest::html_node("a") %>% rvest::html_text() %>% str_extract(.,"^(\\d+)") %>% as.integer)-1
+  pb <- utils::txtProgressBar(0,max_page)
+  dplyr::bind_rows(lapply(seq(0,max_page),function(page){
+    utils::setTxtProgressBar(pb, page)
+    p <- xml2::read_html(url_for_page(page))
+    l <- p %>%
+      rvest::html_nodes("#ndm-results #tables .ndm-item") %>%
+      map(parse_table_data) %>% bind_rows
+  }))
+}
+
+#' Get overview list for all CANSIM tables
+#' Will generate the table in case it does not exist or refresh option is set
+#' @param refresh Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
+#' hundred we pages to gather the data
+#' if option *cache_path* is set it will look for and store the overview table in that directory. Otherwise file will be stored in *tempdir*
+#' @export
+list_cansim_tables <- function(refresh=FALSE){
+  directory <- getOption("cache_path")
+  if (is.na(directory)) directory = tempdir()
+  path <- file.path(directory,"cansim_table_list.Rda")
+  if (refresh | !file.exists(path)) {
+    data <- generate_table_metadata()
+    saveRDS(data,path)
+  }
+  readRDS(path)
+}
+
+
 #' @importFrom dplyr %>%
 #' @importFrom rlang .data
+#' @importFrom stats na.omit
 NULL
 
 

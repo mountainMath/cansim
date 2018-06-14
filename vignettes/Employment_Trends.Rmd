@@ -1,0 +1,42 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+A simple example using employment data for economic regions, showing unemployment rate and standard error ranges for three select regions in BC.
+
+```{r message=FALSE}
+library(tidyverse)
+#devtools::install_github("mountainmath/cansim")
+library(cansim)
+data <-get_cansim("14-10-0293-01") %>% 
+  normalize_cansim_values() %>%
+  filter(grepl("Mainland|Vancouver Island|Okanagan",GEO),
+         Date>=as.Date("2015-01-01"),
+         `Labour force characteristics`=="Unemployment rate") %>%
+  select(Date,GEO,Statistics,VALUE) %>%
+  spread(key="Statistics",value=VALUE)
+ggplot(data,aes(x=Date,group=GEO,y=Estimate)) +
+  geom_ribbon(aes(ymin=Estimate-`Standard error of estimate`,
+                  ymax=Estimate+`Standard error of estimate`),
+              fill="grey80",alpha=0.8) +
+  geom_line(aes(color=GEO)) +
+  theme_bw() +
+  scale_y_continuous(labels=scales::percent) +
+  labs(y="Unemployment Rate",x="",fill="Economic Region",caption="CANSIM 14-10-0293")
+```
+
+
