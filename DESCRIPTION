@@ -16,6 +16,8 @@ Imports: dplyr (>= 0.7),
     rlang,
     xml2,
     rvest,
+    stringr,
+    purrr,
     utils
 RoxygenNote: 6.0.1
 Suggests: knitr,

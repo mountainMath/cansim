@@ -72,27 +72,27 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
   percentage_string=ifelse(language=="fr","Pourcentage","Percentage")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
   data <- data %>%
-    dplyr::mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
+    mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
   if (is.na(replacement_value)) { # remove scale columns
-      data <- data %>% dplyr::select(-dplyr::one_of(scale_string,scale_string2))
+    data <- data %>% select(-one_of(scale_string,scale_string2))
   }
   if (normalize_percent) {
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
-      dplyr::mutate(!!as.name(replacement_value_string):=ifelse(!!as.name(uom_string)==percentage_string,!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
-      dplyr::mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
+      mutate(!!as.name(replacement_value_string):=ifelse(!!as.name(uom_string)==percentage_string,!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
+      mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
   }
   date_field=ifelse(language=="fr","PÉRIODE DE RÉFÉRENCE","REF_DATE")
-  sample_date <- data[[date_field]] %>% na.omit %>% dplyr::first()
+  sample_date <- data[[date_field]] %>% na.omit %>% first()
   if (grepl("^\\d{4}$",sample_date)) {
     # year
-    data <- data %>% dplyr::mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
+    data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
   } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
     # year range, use second year as anchor
-    data <- data %>% dplyr::mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
+    data <- data %>% mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
   } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
     # year and month
-    data <- data %>% dplyr::mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
+    data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
   }
 }
 
@@ -102,16 +102,16 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
 adjust_cansim_values_by_variable_old <-function(data,var){
   if("Valeur" %in% names(data))
     data <- data %>%
-      dplyr::mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
-      dplyr::mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
-      dplyr::mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
-      dplyr::mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
+      mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
+      mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
+      mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
+      mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
   else
     data <- data %>%
-      dplyr::mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
-      dplyr::mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
-      dplyr::mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
-      dplyr::mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
+      mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
+      mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
+      mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
+      mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
 
   data
 }
@@ -130,8 +130,8 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
 
   new_number <- data %>%
-    dplyr::filter(CANSIM_ID==as.integer(cleaned_number)) %>%
-    dplyr::pull(PRODUCT_ID)
+    filter(CANSIM_ID==as.integer(cleaned_number)) %>%
+    pull(PRODUCT_ID)
   if (identical(new_number, integer(0))) {
     stop(paste0("Unable to match old CANSIM table number ",cleaned_number))
   }
@@ -147,17 +147,17 @@ cansim_old_to_new2 <- function(oldCansimTableNumber){
 
   p <- xml2::read_html(paste0("https://www150.statcan.gc.ca/n1/en/type/data?text=",cleaned_number))
   new_table <- p %>%
-    rvest::html_node(".ndm-result-productid") %>%
-    rvest::html_text() %>%
+    html_node(".ndm-result-productid") %>%
+    html_text() %>%
     sub("^Table:\\s*","",.)
-  warning <- p %>% rvest::html_node(".alert.alert-warning") %>% rvest::html_text()
+  warning <- p %>% html_node(".alert.alert-warning") %>% html_text()
   if (grepl(cleaned_number,warning)) {
     warning(paste0("Unable to match old CANSIM table number ",cleaned_number))
     stop(warning)
   }
   old_table <-  p %>%
-    rvest::html_node(".ndm-result-formerid") %>%
-    rvest::html_text() %>%
+    html_node(".ndm-result-formerid") %>%
+    html_text() %>%
     sub("^\\s*\\(formerly: CANSIM ","",.) %>%
     sub("\\)$","",.)
   if (old_table!=cleaned_number) {
@@ -186,13 +186,13 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
                               na=na_strings,
                               locale=readr::locale(encoding="UTF8"),
                               col_types = list(.default = "c")) %>%
-      dplyr::mutate(VALUE=as.numeric(VALUE))
+      mutate(VALUE=as.numeric(VALUE))
     else
       data <- readr::read_csv2(unz(path, paste0(base_table, ".csv")),
                                na=na_strings,
                                locale=readr::locale(encoding="UTF8"),
                                col_types = list(.default = "c")) %>%
-      dplyr::mutate(VALEUR=as.numeric(VALEUR))
+      mutate(VALEUR=as.numeric(VALEUR))
     saveRDS(data,file=path)
   }
   readRDS(file=path)
@@ -202,31 +202,53 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
 generate_table_metadata <- function(){
   url_for_page <-function(page){paste0("https://www150.statcan.gc.ca/n1/en/type/data?p=",page,"-data/tables#tables")}
   parse_table_data <- function(item){
-    product <- item %>% rvest::html_node(".ndm-result-productid") %>% rvest::html_text() %>% sub("^Table: ","",.)
+    product <- item %>%
+      html_node(".ndm-result-productid") %>%
+      html_text() %>%
+      sub("^Table: ","",.)
     if (grepl("^\\d{2}-\\d{2}-\\d{4}",product)) {
       result = tibble(
-        title=item %>% rvest::html_node(".ndm-result-title") %>% rvest::html_text() %>% sub("^\\d+\\. ","",.),
+        title=item %>%
+          html_node(".ndm-result-title") %>%
+          html_text() %>% sub("^\\d+\\. ","",.),
         table=product,
-        former = item %>% rvest::html_node(".ndm-result-formerid") %>% rvest::html_text() %>% trimws %>% gsub("^\\(formerly: CANSIM |\\)$","",.),
-        geo = item %>% rvest::html_node(".ndm-result-geo") %>% rvest::html_text() %>% sub("Geography: ","",.),
-        description = item %>% rvest::html_node(".ndm-result-description") %>% rvest::html_text() %>% sub("Description: ","",.),
-        release_date = item %>% rvest::html_node(".ndm-result-date .ndm-result-date") %>% rvest::html_text() %>% as.Date()
+        former = item %>%
+          html_node(".ndm-result-formerid") %>%
+          html_text() %>% trimws %>%
+          gsub("^\\(formerly: CANSIM |\\)$","",.),
+        geo = item %>%
+          html_node(".ndm-result-geo") %>%
+          html_text() %>%
+          sub("Geography: ","",.),
+        description = item %>%
+          html_node(".ndm-result-description") %>%
+          html_text() %>%
+          sub("Description: ","",.),
+        release_date = item %>%
+          html_node(".ndm-result-date .ndm-result-date") %>%
+          html_text() %>%
+          as.Date()
       )
     } else {
       result=tibble()
     }
     result
   }
-  p <- (xml2::read_html(url_for_page(0)) %>% rvest::html_nodes(".pagination"))[2]
-  l <- p %>% rvest::html_nodes("li")
-  max_page = (l[length(l)-1] %>% rvest::html_node("a") %>% rvest::html_text() %>% str_extract(.,"^(\\d+)") %>% as.integer)-1
+  p <- (xml2::read_html(url_for_page(0)) %>%
+          html_nodes(".pagination"))[2]
+  l <- p %>% html_nodes("li")
+  max_page = (l[length(l)-1] %>%
+                html_node("a") %>%
+                html_text() %>%
+                stringr::str_extract(.,"^(\\d+)") %>%
+                as.integer)-1
   pb <- utils::txtProgressBar(0,max_page)
-  dplyr::bind_rows(lapply(seq(0,max_page),function(page){
+  bind_rows(lapply(seq(0,max_page),function(page){
     utils::setTxtProgressBar(pb, page)
     p <- xml2::read_html(url_for_page(page))
     l <- p %>%
-      rvest::html_nodes("#ndm-results #tables .ndm-item") %>%
-      map(parse_table_data) %>% bind_rows
+      html_nodes("#ndm-results #tables .ndm-item") %>%
+      purrr::map(parse_table_data) %>% bind_rows
   }))
 }
 
@@ -238,19 +260,23 @@ generate_table_metadata <- function(){
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
   directory <- getOption("cache_path")
-  if (is.na(directory)) directory = tempdir()
+  if (is.null(directory)) directory = tempdir()
   path <- file.path(directory,"cansim_table_list.Rda")
   if (refresh | !file.exists(path)) {
-    data <- generate_table_metadata()
+    data <- cansim:::generate_table_metadata()
     saveRDS(data,path)
   }
   readRDS(path)
 }
 
 
-#' @importFrom dplyr %>%
+#' @import dplyr
+#' @importFrom rvest html_node
+#' @importFrom rvest html_nodes
+#' @importFrom rvest html_text
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
+
 NULL
 
 
