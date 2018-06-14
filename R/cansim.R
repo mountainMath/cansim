@@ -199,6 +199,55 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
 }
 
 
+generate_table_metadata <- function(){
+  url_for_page <-function(page){paste0("https://www150.statcan.gc.ca/n1/en/type/data?p=",page,"-data/tables#tables")}
+  parse_table_data <- function(item){
+    product <- item %>% rvest::html_node(".ndm-result-productid") %>% rvest::html_text() %>% sub("^Table: ","",.)
+    if (grepl("^\\d{2}-\\d{2}-\\d{4}",product)) {
+      result = tibble(
+        title=item %>% rvest::html_node(".ndm-result-title") %>% rvest::html_text() %>% sub("^\\d+\\. ","",.),
+        table=product,
+        former = item %>% rvest::html_node(".ndm-result-formerid") %>% rvest::html_text() %>% trimws %>% gsub("^\\(formerly: CANSIM |\\)$","",.),
+        geo = item %>% rvest::html_node(".ndm-result-geo") %>% rvest::html_text() %>% sub("Geography: ","",.),
+        description = item %>% rvest::html_node(".ndm-result-description") %>% rvest::html_text() %>% sub("Description: ","",.),
+        release_date = item %>% rvest::html_node(".ndm-result-date .ndm-result-date") %>% rvest::html_text() %>% as.Date()
+      )
+    } else {
+      result=tibble()
+    }
+    result
+  }
+  p <- (xml2::read_html(url_for_page(0)) %>% rvest::html_nodes(".pagination"))[2]
+  l <- p %>% rvest::html_nodes("li")
+  max_page = (l[length(l)-1] %>% rvest::html_node("a") %>% rvest::html_text() %>% str_extract(.,"^(\\d+)") %>% as.integer)-1
+  pb <- utils::txtProgressBar(0,max_page)
+  dplyr::bind_rows(lapply(seq(0,max_page),function(page){
+    utils::setTxtProgressBar(pb, page)
+    p <- xml2::read_html(url_for_page(page))
+    l <- p %>%
+      rvest::html_nodes("#ndm-results #tables .ndm-item") %>%
+      map(parse_table_data) %>% bind_rows
+  }))
+}
+
+#' Get overview list for all CANSIM tables
+#' Will generate the table in case it does not exist or refresh option is set
+#' @param refresh Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
+#' hundred we pages to gather the data
+#' if option *cache_path* is set it will look for and store the overview table in that directory. Otherwise file will be stored in *tempdir*
+#' @export
+list_cansim_tables <- function(refresh=FALSE){
+  directory <- getOption("cache_path")
+  if (is.na(directory)) directory = tempdir()
+  path <- file.path(directory,"cansim_table_list.Rda")
+  if (refresh | !file.exists(path)) {
+    data <- generate_table_metadata()
+    saveRDS(data,path)
+  }
+  readRDS(path)
+}
+
+
 #' @importFrom dplyr %>%
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
