@@ -176,26 +176,68 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
   message(paste0("Accessing CANSIM NDM product ",cleaned_number))
   base_table <- gsub("-","",cleaned_number)
   path <- file.path(tempdir(),paste0(base_table,lang_ext,".zip"))
-  if (!file.exists(path)){
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda"))
+  if (!file.exists(data_path)){
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",base_table,lang_ext,".zip")
     httr::GET(url,httr::write_disk(path, overwrite = TRUE))
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
-    if(lang_ext=="-eng")
+    exdir=file.path(tempdir(),paste0(base_table,lang_ext))
+    utils::unzip(path,exdir=exdir)
+    if(lang_ext=="-eng") {
       data <- readr::read_csv(unz(path, paste0(base_table, ".csv")),
                               na=na_strings,
                               locale=readr::locale(encoding="UTF8"),
                               col_types = list(.default = "c")) %>%
       mutate(VALUE=as.numeric(VALUE))
-    else
+      meta <- suppressWarnings(readr::read_csv(file.path(exdir, paste0(base_table, "_MetaData.csv")),
+                              na=na_strings,
+                              #col_names=FALSE,
+                              locale=readr::locale(encoding="UTF8"),
+                              col_types = list(.default = "c")))
+      cut_indices <- grep("Dimension ID",meta$`Cube Title`)
+      cut_indices <- c(cut_indices,grep("Symbol Legend",meta$`Cube Title`))
+      meta1 <- meta[seq(1,cut_indices[1]-1),]
+      names2 <- meta[cut_indices[1],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
+      meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>% set_names(names2)
+      names3 <- meta[cut_indices[2],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
+      meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>% set_names(names3) %>%
+        mutate(Hierarchy=`Member ID`)
+      added=TRUE
+      while (added) {
+        old <- meta3$Hierarchy
+        meta3 <- meta3 %>% mutate(Hierarchy=ifelse(
+          !is.na(`Member ID`) & !is.na(`Parent Member ID`) & `Parent Member ID` != strsplit(Hierarchy,"\\.") %>% map(dplyr::first) %>% unlist,
+          paste0(`Parent Member ID`,".",Hierarchy),Hierarchy))
+        added <- sum(old != meta3$Hierarchy)>0
+      }
+      for (column_index in seq(1:nrow(meta2))) {
+        column=meta2[column_index,]
+        meta_x <- meta3 %>% filter(`Dimension ID`==column$`Dimension ID`)
+        classification_lookup <- set_names(meta_x$`Classification Code`,meta_x$`Member Name`)
+        hierarchy_lookup <- set_names(meta_x$Hierarchy,meta_x$`Member Name`)
+        if (grepl("Geography",column$`Dimension name`) &  !(column$`Dimension name` %in% names(data))) {
+          data <- data %>% mutate(GeoUID=as.character(classification_lookup[GEO]))
+        } else if (column$`Dimension name` %in% names(data)){
+          classification_name <- paste0("Classification Code for ",column$`Dimension name`) %>% as.name
+          hierarchy_name <- paste0("Hierarchy for ",column$`Dimension name`) %>% as.name
+          data <- data %>%
+            mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column$`Dimension name`)]),
+                   !!hierarchy_name:=as.character(hierarchy_lookup[!!as.name(column$`Dimension name`)]))
+        } else {
+          warning(paste0("Don't know how to add metadata for ",column$`Dimension name`,"! Ignoring this dimension."))
+        }
+      }
+    } else {
       data <- readr::read_csv2(unz(path, paste0(base_table, ".csv")),
                                na=na_strings,
                                locale=readr::locale(encoding="UTF8"),
                                col_types = list(.default = "c")) %>%
       mutate(VALEUR=as.numeric(VALEUR))
-    saveRDS(data,file=path)
+    }
+    saveRDS(data,file=data_path)
   }
-  readRDS(file=path)
+  readRDS(file=data_path)
 }
 
 
