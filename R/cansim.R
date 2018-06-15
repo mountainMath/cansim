@@ -210,7 +210,7 @@ generate_table_metadata <- function(){
       result = tibble(
         title=item %>%
           html_node(".ndm-result-title") %>%
-          html_text() %>% sub("^\\d+\\. ","",.),
+          html_text() %>% sub("^(\\d|,)+\\. ","",.),
         table=product,
         former = item %>%
           html_node(".ndm-result-formerid") %>%
