@@ -4,14 +4,15 @@
 #' @export
 #' @param cansimTableNumber the table number to load, accepts old or new NDM table numbers
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
-get_cansim <- function(cansimTableNumber,language="english"){
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
   t<-gsub("-","",as.character(cansimTableNumber))
   if (nchar(t)<=7) {
     tt<-cansim_old_to_new(t)
     message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
     cansimTableNumber=tt
   }
-  get_cansim_ndm(cansimTableNumber,language)
+  get_cansim_ndm(cansimTableNumber,language,refresh)
 }
 
 #' Legacy method, get cansim tables based on old table names
@@ -119,6 +120,7 @@ adjust_cansim_values_by_variable_old <-function(data,var){
 
 #' translate from old table number to NDM table number
 #' @export
+#' @param oldCansimTableNumber the old cansim table number. Returns the corresponding NDM number
 cansim_old_to_new <- function(oldCansimTableNumber){
   path <- file.path(tempdir(),"cansim-correspondence.csv")
   if (!file.exists(path)){
@@ -168,7 +170,10 @@ cansim_old_to_new2 <- function(oldCansimTableNumber){
 
 #' Get cansim table via NDM
 #' @export
-get_cansim_ndm <- function(cansimTableNumber,language="english"){
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
   lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
   if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
   n=as.character(gsub("-","",cansimTableNumber))
@@ -177,19 +182,22 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
   base_table <- gsub("-","",cleaned_number)
   path <- file.path(tempdir(),paste0(base_table,lang_ext,".zip"))
   data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda"))
-  if (!file.exists(data_path)){
+  if (refresh | !file.exists(data_path)){
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",base_table,lang_ext,".zip")
     httr::GET(url,httr::write_disk(path, overwrite = TRUE))
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     exdir=file.path(tempdir(),paste0(base_table,lang_ext))
     utils::unzip(path,exdir=exdir)
+    unlink(path)
     if(lang_ext=="-eng") {
-      data <- readr::read_csv(unz(path, paste0(base_table, ".csv")),
+      message("Parsing data")
+      data <- readr::read_csv(file.path(exdir, paste0(base_table, ".csv")),
                               na=na_strings,
                               locale=readr::locale(encoding="UTF8"),
                               col_types = list(.default = "c")) %>%
       mutate(VALUE=as.numeric(VALUE))
+      message("Folding in metadata")
       meta <- suppressWarnings(readr::read_csv(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                               na=na_strings,
                               #col_names=FALSE,
@@ -204,14 +212,14 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
       meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>% set_names(names3) %>%
         mutate(Hierarchy=`Member ID`)
       added=TRUE
-      while (added) {
+      while (added) { # generate hierarchy data from member id and parent member id data
         old <- meta3$Hierarchy
         meta3 <- meta3 %>% mutate(Hierarchy=ifelse(
           !is.na(`Member ID`) & !is.na(`Parent Member ID`) & `Parent Member ID` != strsplit(Hierarchy,"\\.") %>% map(dplyr::first) %>% unlist,
           paste0(`Parent Member ID`,".",Hierarchy),Hierarchy))
         added <- sum(old != meta3$Hierarchy)>0
       }
-      for (column_index in seq(1:nrow(meta2))) {
+      for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
         column=meta2[column_index,]
         meta_x <- meta3 %>% filter(`Dimension ID`==column$`Dimension ID`)
         classification_lookup <- set_names(meta_x$`Classification Code`,meta_x$`Member Name`)
@@ -229,13 +237,14 @@ get_cansim_ndm <- function(cansimTableNumber,language="english"){
         }
       }
     } else {
-      data <- readr::read_csv2(unz(path, paste0(base_table, ".csv")),
+      data <- readr::read_csv2(file.path(exdir, paste0(base_table, ".csv")),
                                na=na_strings,
                                locale=readr::locale(encoding="UTF8"),
                                col_types = list(.default = "c")) %>%
       mutate(VALEUR=as.numeric(VALEUR))
     }
     saveRDS(data,file=data_path)
+    unlink(exdir,recursive = TRUE)
   }
   readRDS(file=data_path)
 }

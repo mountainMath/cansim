@@ -4,7 +4,14 @@
 \alias{get_cansim_ndm}
 \title{Get cansim table via NDM}
 \usage{
-get_cansim_ndm(cansimTableNumber, language = "english")
+get_cansim_ndm(cansimTableNumber, language = "english", refresh = FALSE)
+}
+\arguments{
+\item{cansimTableNumber}{the NDM table number to load}
+
+\item{language}{"en" or "fr" for english or french language version. Defaults to english.}
+
+\item{refresh}{Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only}
 }
 \description{
 Get cansim table via NDM
