@@ -318,6 +318,8 @@ list_cansim_tables <- function(refresh=FALSE){
 #' @importFrom rvest html_text
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
+#' @importFrom rlang set_names
+#' @importFrom purrr map
 
 NULL
 
