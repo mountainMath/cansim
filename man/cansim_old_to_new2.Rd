@@ -6,6 +6,9 @@
 \usage{
 cansim_old_to_new2(oldCansimTableNumber)
 }
+\arguments{
+\item{oldCansimTableNumber}{the old cansim table number}
+}
 \description{
 translate from old table number to NDM table number by web search and scraping
 }

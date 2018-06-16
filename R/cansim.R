@@ -18,7 +18,7 @@ get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
 #' Legacy method, get cansim tables based on old table names
 #' Get cansim table into tidy dataframe
 #' Caches the table data for the current session
-#' @export
+#'
 get_cansim_old <- function(cansimTableNumber,language="english"){
   lang_ext=ifelse(tolower(language)=="english","-eng",ifelse(tolower(language) %in% c("french"),"-fra",NA))
   if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
@@ -49,9 +49,10 @@ get_cansim_old <- function(cansimTableNumber,language="english"){
 
 #' Adjust Cansim Value by scaled amount
 #' French part does not work, probably encoding issues
+#' Legacy function
 #' @export
 adjust_cansim_values_by_variable <-function(data,var){
-  normailze_cansim_values(data)
+  normalize_cansim_values(data)
 }
 
 #' normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
@@ -99,7 +100,7 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
 
 #' Adjust Cansim Value by scaled amount
 #' French part does not work, probably encoding issues
-#' @export
+#'
 adjust_cansim_values_by_variable_old <-function(data,var){
   if("Valeur" %in% names(data))
     data <- data %>%
@@ -139,10 +140,12 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   }
   n=as.character(new_number)
   new_table <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  new_table
 }
 
 #' translate from old table number to NDM table number by web search and scraping
-#' @export
+#'
+#' @param oldCansimTableNumber the old cansim table number
 cansim_old_to_new2 <- function(oldCansimTableNumber){
   cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
   cleaned_number <- paste0(substr(cleaned_number,1,3),"-",substr(cleaned_number,4,30))
@@ -196,7 +199,7 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
                               na=na_strings,
                               locale=readr::locale(encoding="UTF8"),
                               col_types = list(.default = "c")) %>%
-      mutate(VALUE=as.numeric(VALUE))
+        dplyr::mutate(VALUE=as.numeric(VALUE))
       message("Folding in metadata")
       meta <- suppressWarnings(readr::read_csv(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                               na=na_strings,
@@ -209,28 +212,44 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
       names2 <- meta[cut_indices[1],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
       meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>% set_names(names2)
       names3 <- meta[cut_indices[2],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
-      meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>% set_names(names3) %>%
-        mutate(Hierarchy=`Member ID`)
-      added=TRUE
-      while (added) { # generate hierarchy data from member id and parent member id data
-        old <- meta3$Hierarchy
-        meta3 <- meta3 %>% mutate(Hierarchy=ifelse(
-          !is.na(`Member ID`) & !is.na(`Parent Member ID`) & `Parent Member ID` != strsplit(Hierarchy,"\\.") %>% map(dplyr::first) %>% unlist,
-          paste0(`Parent Member ID`,".",Hierarchy),Hierarchy))
-        added <- sum(old != meta3$Hierarchy)>0
+      meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>% set_names(names3)
+      add_hierarchy <- function(meta_x){
+        parent_lookup <- rlang::set_names(meta_x$`Parent Member ID`,meta_x$`Member ID`)
+        current_top <- function(c){
+          strsplit(c,"\\.") %>% purrr::map(dplyr::first) %>% unlist
+        }
+        parent_for_current_top <- function(c){
+          as.character(parent_lookup[current_top(c)])
+        }
+        meta_x <- meta_x %>% dplyr::mutate(Hierarchy=`Member ID`)
+        added=TRUE
+        max_depth=100
+        count=0
+        while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
+          old <- meta_x$Hierarchy
+          meta_x <- meta_x %>%
+            dplyr::mutate(p=parent_for_current_top(Hierarchy)) %>%
+            dplyr::mutate(Hierarchy=ifelse(is.na(p),Hierarchy,paste0(p,".",Hierarchy))) %>%
+            dplyr::select(-p)
+          added <- sum(old != meta_x$Hierarchy)>0
+          count=count+1
+        }
+        if (added) warning("Exceeded max depth for hierarchy, hierarchy information may be faulty.")
+        meta_x
       }
       for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
         column=meta2[column_index,]
-        meta_x <- meta3 %>% filter(`Dimension ID`==column$`Dimension ID`)
+        meta_x <- meta3 %>% dplyr::filter(`Dimension ID`==column$`Dimension ID`) %>%
+          add_hierarchy
         classification_lookup <- set_names(meta_x$`Classification Code`,meta_x$`Member Name`)
         hierarchy_lookup <- set_names(meta_x$Hierarchy,meta_x$`Member Name`)
         if (grepl("Geography",column$`Dimension name`) &  !(column$`Dimension name` %in% names(data))) {
-          data <- data %>% mutate(GeoUID=as.character(classification_lookup[GEO]))
+          data <- data %>% dplyr::mutate(GeoUID=as.character(classification_lookup[GEO]))
         } else if (column$`Dimension name` %in% names(data)){
           classification_name <- paste0("Classification Code for ",column$`Dimension name`) %>% as.name
           hierarchy_name <- paste0("Hierarchy for ",column$`Dimension name`) %>% as.name
           data <- data %>%
-            mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column$`Dimension name`)]),
+            dplyr::mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column$`Dimension name`)]),
                    !!hierarchy_name:=as.character(hierarchy_lookup[!!as.name(column$`Dimension name`)]))
         } else {
           warning(paste0("Don't know how to add metadata for ",column$`Dimension name`,"! Ignoring this dimension."))
@@ -241,12 +260,41 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
                                na=na_strings,
                                locale=readr::locale(encoding="UTF8"),
                                col_types = list(.default = "c")) %>%
-      mutate(VALEUR=as.numeric(VALEUR))
+        dplyr::mutate(VALEUR=as.numeric(VALEUR))
     }
     saveRDS(data,file=data_path)
     unlink(exdir,recursive = TRUE)
   }
   readRDS(file=data_path)
+}
+
+#' Use metadate to extract categories for column of specific level.
+#' @param data the cansim data as returned from *get_cansim*
+#' @param column_name the name of the column to extract categories from
+#' @param level the hierarchy level depth to which to extract categories, 0 is top category
+#' @param strict flag, *FALSE* by default. If true, only extract that speficit level.
+#' @param remove_duplicates flag, *TRUE* by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.
+#' @export
+categories_for_level <- function(data,column_name,level=NA,strict=FALSE,remove_duplicates=TRUE){
+  hierarchy_name=paste0("Hierarchy for ",column_name)
+  h <- data %>% dplyr::select(column_name,hierarchy_name) %>%
+    unique %>%
+    dplyr::mutate(hierarchy_level=(strsplit(!!as.name(hierarchy_name),"\\.") %>% purrr::map(length) %>% unlist)-1)
+  max_level=max(h$hierarchy_level,na.rm = TRUE)
+  if (is.na(level) | level>max_level) level=max_level
+  h <- h %>%
+    dplyr::mutate(`Member ID`=strsplit(!!as.name(hierarchy_name),"\\.") %>% purrr::map(last) %>% as.integer) %>%
+    dplyr::filter(hierarchy_level<=level)
+  strict_hierarchy=h %>% dplyr::filter(hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
+  if (strict) {
+    h <- h %>% dplyr::filter(hierarchy_level==level)
+  } else if (remove_duplicates) {
+    higher_ids <- strict_hierarchy %>% strsplit("\\.") %>%
+      purrr::map(function(x){utils::head(as.integer(x),-1)}) %>%
+      unlist %>% unique() %>% as.integer()
+    h <- h %>% dplyr::filter(!(`Member ID` %in% higher_ids))
+  }
+  h[[column_name]]
 }
 
 
