@@ -50,7 +50,7 @@ get_cansim_old <- function(cansimTableNumber,language="english"){
 #' French part does not work, probably encoding issues
 #' @export
 adjust_cansim_values_by_variable <-function(data,var){
-  normailze_cansim_values(data)
+  normalize_cansim_values(data)
 }
 
 #' normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
