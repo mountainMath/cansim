@@ -2,8 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim}
 \alias{get_cansim}
-\title{Get cansim table into tidy dataframe
-Caches the table data for the current session}
+\title{Get cansim table into tidy dataframe}
 \usage{
 get_cansim(cansimTableNumber, language = "english", refresh = FALSE)
 }
@@ -14,7 +13,9 @@ get_cansim(cansimTableNumber, language = "english", refresh = FALSE)
 
 \item{refresh}{Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only}
 }
+\value{
+a tibble with the cansim table data
+}
 \description{
-Get cansim table into tidy dataframe
 Caches the table data for the current session
 }

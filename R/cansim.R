@@ -1,18 +1,29 @@
-
-#' Get cansim table into tidy dataframe
-#' Caches the table data for the current session
-#' @export
-#' @param cansimTableNumber the table number to load, accepts old or new NDM table numbers
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
-get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
+cleaned_ndm_table_number <- function(cansimTableNumber){
   t<-gsub("-","",as.character(cansimTableNumber))
   if (nchar(t)<=7) {
     tt<-cansim_old_to_new(t)
     message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
     cansimTableNumber=tt
   }
-  get_cansim_ndm(cansimTableNumber,language,refresh)
+  cansimTableNumber
+  n=as.character(gsub("-","",cansimTableNumber))
+  paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+}
+
+
+#' Get cansim table into tidy dataframe
+#'
+#' Caches the table data for the current session
+#'
+#' @param cansimTableNumber the table number to load, accepts old or new NDM table numbers
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#'
+#' @return a tibble with the cansim table data
+#'
+#' @export
+get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
+  get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber),language,refresh)
 }
 
 #' Legacy method, get cansim tables based on old table names
@@ -56,15 +67,20 @@ adjust_cansim_values_by_variable <-function(data,var){
 }
 
 #' normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
+#'
 #' if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
 #' otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
 #' It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)
-#' @export
+#'
 #' @param data A cansim table as returned from *get_cansim*.
 #' @param replacement_value Optional name of the column the manipulated value should be returned in. Defaults to replacing the current value field.
 #' @param normalize_percent Optional normailze percentages by changing them to rates. *TRUE* by default.
 #' @param default_month The default month that should be used when creating Date objects for annual data.
 #' @param default_day The defauly day of the month that should be used when creating Date objects for monthly data.
+#'
+#' @return tibble with adjusted values
+#'
+#' @export
 normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=TRUE,default_month="01",default_day="01"){
   language <- ifelse("VALEUR" %in% names(data),"fr","en")
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
@@ -104,24 +120,28 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
 adjust_cansim_values_by_variable_old <-function(data,var){
   if("Valeur" %in% names(data))
     data <- data %>%
-      mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
-      mutate(!!var:=sub(" \\(x 1 000 000\\)$","",UQ(as.name(var)))) %>%
-      mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",UQ(as.name(var))),1000*Valeur,Valeur)) %>%
-      mutate(!!var:=sub(" \\(x 1 000\\)$","",UQ(as.name(var))))
+      mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",rlang::UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
+      mutate(!!var:=sub(" \\(x 1 000 000\\)$","",rlang::UQ(as.name(var)))) %>%
+      mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",rlang::UQ(as.name(var))),1000*Valeur,Valeur)) %>%
+      mutate(!!var:=sub(" \\(x 1 000\\)$","",rlang::UQ(as.name(var))))
   else
     data <- data %>%
-      mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",UQ(as.name(var))),1000000*Value,Value)) %>%
-      mutate(!!var:=sub(" \\(x 1,000,000\\)$","",UQ(as.name(var)))) %>%
-      mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",UQ(as.name(var))),1000*Value,Value)) %>%
-      mutate(!!var:=sub(" \\(x 1,000\\)$","",UQ(as.name(var))))
+      mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",rlang::UQ(as.name(var))),1000000*Value,Value)) %>%
+      mutate(!!var:=sub(" \\(x 1,000,000\\)$","",rlang::UQ(as.name(var)))) %>%
+      mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",rlang::UQ(as.name(var))),1000*Value,Value)) %>%
+      mutate(!!var:=sub(" \\(x 1,000\\)$","",rlang::UQ(as.name(var))))
 
   data
 }
 
 
 #' translate from old table number to NDM table number
-#' @export
+#'
 #' @param oldCansimTableNumber the old cansim table number. Returns the corresponding NDM number
+#'
+#' @return cansim ndm table number
+#'
+#' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
   path <- file.path(tempdir(),"cansim-correspondence.csv")
   if (!file.exists(path)){
@@ -172,7 +192,6 @@ cansim_old_to_new2 <- function(oldCansimTableNumber){
 }
 
 #' Get cansim table via NDM
-#' @export
 #' @param cansimTableNumber the NDM table number to load
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
@@ -269,11 +288,15 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
 }
 
 #' Use metadate to extract categories for column of specific level.
+#'
 #' @param data the cansim data as returned from *get_cansim*
 #' @param column_name the name of the column to extract categories from
 #' @param level the hierarchy level depth to which to extract categories, 0 is top category
 #' @param strict flag, *FALSE* by default. If true, only extract that speficit level.
 #' @param remove_duplicates flag, *TRUE* by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.
+#'
+#' @return A vector of categories
+#'
 #' @export
 categories_for_level <- function(data,column_name,level=NA,strict=FALSE,remove_duplicates=TRUE){
   hierarchy_name=paste0("Hierarchy for ",column_name)
@@ -352,10 +375,15 @@ generate_table_metadata <- function(){
 }
 
 #' Get overview list for all CANSIM tables
+#'
 #' Will generate the table in case it does not exist or refresh option is set
+#'
 #' @param refresh Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
 #' hundred we pages to gather the data
 #' if option *cache_path* is set it will look for and store the overview table in that directory. Otherwise file will be stored in *tempdir*
+#'
+#' @return A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
+#'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
   directory <- getOption("cache_path")
@@ -368,6 +396,21 @@ list_cansim_tables <- function(refresh=FALSE){
   readRDS(path)
 }
 
+#' open cansim table information in browser
+#'
+#' useful for getting furthe info on cansim table and survey methods
+#'
+#' @param cansimTableNumber cansim table number
+#' @param browser optionally a browser to open the page in
+#'
+#' @return none
+#'
+#' @export
+view_cansim_webpage <- function(cansimTableNumber,browser = getOption("browser")){
+  cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
+  url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",gsub("-","",cansimTableNumber))
+  utils::browseURL(url,browser)
+}
 
 #' @import dplyr
 #' @importFrom rvest html_node

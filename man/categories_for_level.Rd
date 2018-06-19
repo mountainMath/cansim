@@ -18,6 +18,9 @@ categories_for_level(data, column_name, level = NA, strict = FALSE,
 
 \item{remove_duplicates}{flag, *TRUE* by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.}
 }
+\value{
+A vector of categories
+}
 \description{
 Use metadate to extract categories for column of specific level.
 }
