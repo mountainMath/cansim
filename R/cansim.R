@@ -10,6 +10,24 @@ cleaned_ndm_table_number <- function(cansimTableNumber){
   paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
 }
 
+naked_ndm_table_number <- function(cansimTableNumber){
+  as.character(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)))
+}
+
+cleaned_ndm_language <- function(language){
+  ifelse(tolower(language) %in% c("english","eng","en"),"eng",ifelse(tolower(language) %in% c("fra","french","fr"),"fra",NA))
+}
+
+file_path_for_table_language <- function(cansimTableNumber,language){
+  language <- cleaned_ndm_language(language)
+  if (is.na(language)) stop(paste0("Unkown Lanaguage ",language))
+  base_table <- naked_ndm_table_number(cansimTableNumber)
+  file.path(paste0(base_table,"-",language))
+}
+
+base_path_for_table_language <- function(cansimTableNumber,language){
+  file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
+}
 
 #' Get cansim table into tidy dataframe
 #'
@@ -196,23 +214,21 @@ cansim_old_to_new2 <- function(oldCansimTableNumber){
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  cleaned_language=cleaned_ndm_language(language)
   message(paste0("Accessing CANSIM NDM product ",cleaned_number))
-  base_table <- gsub("-","",cleaned_number)
-  path <- file.path(tempdir(),paste0(base_table,lang_ext,".zip"))
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda"))
+  base_table=naked_ndm_table_number(cansimTableNumber)
+  path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
   if (refresh | !file.exists(data_path)){
-    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",base_table,lang_ext,".zip")
+    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
     httr::GET(url,httr::write_disk(path, overwrite = TRUE))
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
-    exdir=file.path(tempdir(),paste0(base_table,lang_ext))
+    exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
     utils::unzip(path,exdir=exdir)
     unlink(path)
-    if(lang_ext=="-eng") {
+    if(cleaned_language=="eng") {
       message("Parsing data")
       data <- readr::read_csv(file.path(exdir, paste0(base_table, ".csv")),
                               na=na_strings,
@@ -305,12 +321,7 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_table_info <- function(cansimTableNumber,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
-  base_table <- gsub("-","",cleaned_number)
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda1"))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda1")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
   }
@@ -323,12 +334,7 @@ get_cansim_table_info <- function(cansimTableNumber,language="english",refresh=F
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_table_survey <- function(cansimTableNumber,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
-  base_table <- gsub("-","",cleaned_number)
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda3"))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
   }
@@ -340,12 +346,7 @@ get_cansim_table_survey <- function(cansimTableNumber,language="english",refresh
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_table_subject <- function(cansimTableNumber,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
-  base_table <- gsub("-","",cleaned_number)
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda4"))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda4")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
   }
@@ -357,12 +358,7 @@ get_cansim_table_subject <- function(cansimTableNumber,language="english",refres
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
-  base_table <- gsub("-","",cleaned_number)
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda5"))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
   }
@@ -375,12 +371,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_column_list <- function(cansimTableNumber,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
-  base_table <- gsub("-","",cleaned_number)
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda2"))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
   }
@@ -392,20 +383,43 @@ get_cansim_column_list <- function(cansimTableNumber,language="english",refresh=
 #' @param language "en" or "fr" for english or french language version. Defaults to english.
 #' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
 get_cansim_column_categories <- function(cansimTableNumber,column,language="english",refresh=FALSE){
-  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  n=as.character(gsub("-","",cansimTableNumber))
-  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
-  base_table <- gsub("-","",cleaned_number)
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda2"))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
   }
-  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda_column_",column))
+  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda_column_",column)
   if (!file.exists(data_path)){
     stop(paste0("Unkown column ",column))
   }
   readRDS(file=data_path)
+}
+
+#' Get cansim table overview text
+#'
+#' Needs to load the whole cansim table in order to dusplay overview information. Prints overview as message
+#'
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#'
+#' @return none
+#'
+#' @export
+get_cansim_table_overview <- function(cansimTableNumber,column,language="english",refresh=FALSE){
+  info <- cansim:::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
+  refresh=FALSE
+  text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cansim:::cleaned_ndm_table_number(cansimTableNumber),"\n",
+                 "Start Date: ",info$`Start Reference Period`,", End Date: ",info$`End Reference Period`,", Frequency: ",info$Frequency,"\n")
+  columns <- cansim:::get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
+  for (column in columns$`Dimension name`) {
+    text <- paste0(text,"\n","Column ",column)
+    categories <- cansim:::get_cansim_column_categories(cansimTableNumber,column,language=language,refresh=refresh)
+    text <- paste0(text, " (",nrow(categories),")","\n")
+    text <- paste0(text, paste(head(categories$`Member Name`,10),collapse=", "))
+    if (nrow(categories)>10) text <- paste0(text, ", ...")
+    text <- paste0(text,"\n")
+  }
+  message(text)
 }
 
 
