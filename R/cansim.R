@@ -228,10 +228,22 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
       cut_indices <- grep("Dimension ID",meta$`Cube Title`)
       cut_indices <- c(cut_indices,grep("Symbol Legend",meta$`Cube Title`))
       meta1 <- meta[seq(1,cut_indices[1]-1),]
+      saveRDS(meta1,file=paste0(data_path,"1"))
       names2 <- meta[cut_indices[1],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
       meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>% set_names(names2)
+      saveRDS(meta2,file=paste0(data_path,"2"))
       names3 <- meta[cut_indices[2],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
       meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>% set_names(names3)
+      additional_indices=c(grep("Survey Code",meta$`Cube Title`),
+                           grep("Subject Code",meta$`Cube Title`),
+                           grep("Note ID",meta$`Cube Title`),
+                           grep("Correction ID",meta$`Cube Title`))
+      saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
+                set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
+      saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
+                set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
+      saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
+                set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
       add_hierarchy <- function(meta_x){
         parent_lookup <- rlang::set_names(meta_x$`Parent Member ID`,meta_x$`Member ID`)
         current_top <- function(c){
@@ -260,6 +272,7 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
         column=meta2[column_index,]
         meta_x <- meta3 %>% dplyr::filter(`Dimension ID`==column$`Dimension ID`) %>%
           add_hierarchy
+        saveRDS(meta_x,file=paste0(data_path,"_column_",column$`Dimension name`))
         classification_lookup <- set_names(meta_x$`Classification Code`,meta_x$`Member Name`)
         hierarchy_lookup <- set_names(meta_x$Hierarchy,meta_x$`Member Name`)
         if (grepl("Geography",column$`Dimension name`) &  !(column$`Dimension name` %in% names(data))) {
@@ -286,6 +299,115 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
   }
   readRDS(file=data_path)
 }
+
+#' Get cansim table info
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_table_info <- function(cansimTableNumber,language="english",refresh=FALSE){
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
+  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  base_table <- gsub("-","",cleaned_number)
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda1"))
+  if (refresh | !file.exists(data_path)){
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+  }
+  readRDS(file=data_path)
+}
+
+
+#' Get cansim table survey
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_table_survey <- function(cansimTableNumber,language="english",refresh=FALSE){
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
+  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  base_table <- gsub("-","",cleaned_number)
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda3"))
+  if (refresh | !file.exists(data_path)){
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+  }
+  readRDS(file=data_path)
+}
+
+#' Get cansim table subject
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_table_subject <- function(cansimTableNumber,language="english",refresh=FALSE){
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
+  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  base_table <- gsub("-","",cleaned_number)
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda4"))
+  if (refresh | !file.exists(data_path)){
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+  }
+  readRDS(file=data_path)
+}
+
+#' Get cansim table notes
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=FALSE){
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
+  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  base_table <- gsub("-","",cleaned_number)
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda5"))
+  if (refresh | !file.exists(data_path)){
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+  }
+  readRDS(file=data_path)
+}
+
+
+#' Get cansim table column list
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_column_list <- function(cansimTableNumber,language="english",refresh=FALSE){
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
+  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  base_table <- gsub("-","",cleaned_number)
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda2"))
+  if (refresh | !file.exists(data_path)){
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+  }
+  readRDS(file=data_path)
+}
+
+#' Get cansim table column categories
+#' @param cansimTableNumber the NDM table number to load
+#' @param language "en" or "fr" for english or french language version. Defaults to english.
+#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+get_cansim_column_categories <- function(cansimTableNumber,column,language="english",refresh=FALSE){
+  lang_ext=ifelse(tolower(language) %in% c("english","eng","en"),"-eng",ifelse(tolower(language) %in% c("fra","french","fr"),"-fra",NA))
+  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
+  n=as.character(gsub("-","",cansimTableNumber))
+  cleaned_number <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+  base_table <- gsub("-","",cleaned_number)
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda2"))
+  if (refresh | !file.exists(data_path)){
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+  }
+  data_path <- file.path(tempdir(),paste0(base_table,lang_ext,".Rda_column_",column))
+  if (!file.exists(data_path)){
+    stop(paste0("Unkown column ",column))
+  }
+  readRDS(file=data_path)
+}
+
 
 #' Use metadate to extract categories for column of specific level.
 #'
