@@ -1,0 +1,117 @@
+---
+title: "NAICS"
+author: "Jens von Bergmann"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+In this vignette we show how to utilize the metadata information by drilling into NAICS categories. Let's take a look what's in the table we are interested in.
+
+```{r}
+library(dplyr)
+library(cansim)
+table_id="36-10-0402"
+
+get_cansim_table_overview(table_id)
+```
+
+
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and select "Chained (2007) dollars".
+
+```{r}
+selected_value="Chained (2007) dollars"
+data <- get_cansim(table_id) %>% 
+  normalize_cansim_values() %>%
+  filter(Value==selected_value)
+```
+
+
+
+This makes working with the whole data cumbersome, we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let's first get an overview of the data. For simplicity we focus entirely on the British Columbia region. We can also use this to easily compute shares instead of totals.
+
+```{r}
+data <- data %>% 
+  left_join((.) %>% 
+              filter(`North American Industry Classification System (NAICS)` %in%
+                       categories_for_level(.,"North American Industry Classification System (NAICS)",0)) %>%
+              rename(Total=VALUE) %>%
+              select("Date","GEO","Total")) %>%
+  mutate(Share=VALUE/Total)
+```
+
+
+```{r}
+cut_data <- data %>% filter(
+  !grepl("^T",`Classification Code for North American Industry Classification System (NAICS)`),
+  `North American Industry Classification System (NAICS)` %in% 
+    categories_for_level(.,"North American Industry Classification System (NAICS)",1))
+length(cut_data$`North American Industry Classification System (NAICS)` %>% unique)
+```
+
+There are still too many level 1 categories to sensibly visualize at the same time.
+
+```{r fig.height=3, fig.width=4.5}
+regions = "British Columbia"
+top_categories <- cut_data %>% filter(GEO %in% regions,
+                                  Date==(.)$Date %>% sort %>% last) %>% 
+  top_n(8,Share) %>% pull("North American Industry Classification System (NAICS)")
+
+plot_data <- cut_data %>% 
+  mutate(NAICS=ifelse(`North American Industry Classification System (NAICS)` %in% top_categories,`North American Industry Classification System (NAICS)`,"Rest")) %>%
+  select(Date,GEO,NAICS,VALUE,Share) %>%
+  group_by(Date,GEO,NAICS) %>%
+  summarise(VALUE=sum(VALUE,na.rm=TRUE),
+            Share=sum(Share,na.rm=TRUE))
+
+library(ggplot2)
+ggplot(plot_data %>% filter(GEO %in% regions),aes(x=Date,y=Share,fill=NAICS)) +
+  geom_area(position="stack") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_bw() +
+  theme(legend.position = "bottom",legend.direction ="vertical") +
+  guides(fill=guide_legend(ncol=2)) +
+  labs(title="Gross domestic product (GDP) at basic prices",subtitle=selected_value,x="",caption=paste0("CANSIM ",table_id))
+
+```
+
+Let's have a closer look at the "Real estate end reantal and leasing" and "Construction" categories. We grab all leaves under that sub-category.
+
+```{r fig.height=4, fig.width=4.5}
+real_construction <- c("Construction","Real estate and rental and leasing")
+rrl_hierarchy <- data %>% 
+  filter(`North American Industry Classification System (NAICS)` %in% real_construction) %>% 
+  pull("Hierarchy for North American Industry Classification System (NAICS)") %>% 
+  unique
+
+rrl_data <- data %>% 
+  filter(grepl(paste(rrl_hierarchy,collapse="|"),`Hierarchy for North American Industry Classification System (NAICS)`)) %>%
+  filter(
+  `North American Industry Classification System (NAICS)` %in% 
+    categories_for_level(.,"North American Industry Classification System (NAICS)")) %>%
+  rename(NAICS=`North American Industry Classification System (NAICS)`)
+#length(rrl_data$`North American Industry Classification System (NAICS)` %>% unique)
+
+
+ggplot(rrl_data %>% filter(GEO %in% regions),aes(x=Date,y=Share,fill=NAICS)) +
+  geom_area(position="stack") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_bw() +
+  theme(legend.position = "bottom",legend.direction ="vertical") +
+  guides(fill=guide_legend(ncol=2)) +
+  labs(title="Gross domestic product (GDP) at basic prices",subtitle=selected_value,x="",caption=paste0("CANSIM ",table_id))
+
+```
+
+We see that the largest portions are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction. 
+

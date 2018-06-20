@@ -2,10 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{normalize_cansim_values}
 \alias{normalize_cansim_values}
-\title{normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
-if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
-otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
-It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)}
+\title{normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.}
 \usage{
 normalize_cansim_values(data, replacement_value = NA,
   normalize_percent = TRUE, default_month = "01", default_day = "01")
@@ -21,8 +18,10 @@ normalize_cansim_values(data, replacement_value = NA,
 
 \item{default_day}{The defauly day of the month that should be used when creating Date objects for monthly data.}
 }
+\value{
+tibble with adjusted values
+}
 \description{
-normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
 if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
 otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
 It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)
