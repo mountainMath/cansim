@@ -16,19 +16,30 @@ knitr::opts_chunk$set(
 )
 ```
 
-A simple example using employment data for economic regions, showing unemployment rate and standard error ranges for three select regions in BC.
+A simple example using employment data for economic regions. We can use the internal table search function. At this point the table search function scrapes the CANSIM webpage, so it takes some time the first time it runs. Make sure the set the `option(cache_path="your chache path")` option so that the information is cached across R sessions.
 
 ```{r message=FALSE}
-library(tidyverse)
+library(dplyr)
 #devtools::install_github("mountainmath/cansim")
 library(cansim)
-data <-get_cansim("14-10-0293-01") %>% 
+
+tables <- list_cansim_tables() %>% 
+  filter(grepl("Labour force characteristics",title),grepl("economic region",title))
+tables$title
+```
+
+The search came up with three tables, we choose the second one.
+
+```{r}
+data <-get_cansim(tables$table[2]) %>% 
   normalize_cansim_values() %>%
   filter(grepl("Mainland|Vancouver Island|Okanagan",GEO),
          Date>=as.Date("2015-01-01"),
          `Labour force characteristics`=="Unemployment rate") %>%
   select(Date,GEO,Statistics,VALUE) %>%
   spread(key="Statistics",value=VALUE)
+
+library(ggplot2)
 ggplot(data,aes(x=Date,group=GEO,y=Estimate)) +
   geom_ribbon(aes(ymin=Estimate-`Standard error of estimate`,
                   ymax=Estimate+`Standard error of estimate`),
@@ -36,7 +47,6 @@ ggplot(data,aes(x=Date,group=GEO,y=Estimate)) +
   geom_line(aes(color=GEO)) +
   theme_bw() +
   scale_y_continuous(labels=scales::percent) +
-  labs(y="Unemployment Rate",x="",fill="Economic Region",caption="CANSIM 14-10-0293")
+  labs(y="Unemployment Rate",x="",fill="Economic Region",caption=paste0("CANSIM ",tables$table[2]))
 ```
-
 

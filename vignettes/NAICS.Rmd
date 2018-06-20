@@ -16,30 +16,37 @@ knitr::opts_chunk$set(
 )
 ```
 
-In this vignette we show how to utilize the metadata information by drilling into NAICS categories.
+In this vignette we show how to utilize the metadata information by drilling into NAICS categories. Let's take a look what's in the table we are interested in.
 
 ```{r}
-library(tidyverse)
+library(dplyr)
 library(cansim)
 table_id="36-10-0402"
+
+get_cansim_table_overview(table_id)
+```
+
+
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and select "Chained (2007) dollars".
+
+```{r}
 selected_value="Chained (2007) dollars"
 data <- get_cansim(table_id) %>% 
   normalize_cansim_values() %>%
   filter(Value==selected_value)
 ```
 
-There are a lot of NAICS categories in this dataset.
-```{r}
-data$`North American Industry Classification System (NAICS)` %>% unique %>% length
-```
+
 
 This makes working with the whole data cumbersome, we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let's first get an overview of the data. For simplicity we focus entirely on the British Columbia region. We can also use this to easily compute shares instead of totals.
 
 ```{r}
-data <- data %>% left_join((.) %>% filter(`North American Industry Classification System (NAICS)` %in%
-                             categories_for_level(.,"North American Industry Classification System (NAICS)",0)) %>%
-                             rename(Total=VALUE) %>%
-                             select("Date","GEO","Total")) %>%
+data <- data %>% 
+  left_join((.) %>% 
+              filter(`North American Industry Classification System (NAICS)` %in%
+                       categories_for_level(.,"North American Industry Classification System (NAICS)",0)) %>%
+              rename(Total=VALUE) %>%
+              select("Date","GEO","Total")) %>%
   mutate(Share=VALUE/Total)
 ```
 
@@ -67,7 +74,7 @@ plot_data <- cut_data %>%
   summarise(VALUE=sum(VALUE,na.rm=TRUE),
             Share=sum(Share,na.rm=TRUE))
 
-
+library(ggplot2)
 ggplot(plot_data %>% filter(GEO %in% regions),aes(x=Date,y=Share,fill=NAICS)) +
   geom_area(position="stack") +
   scale_y_continuous(labels = scales::percent) +
