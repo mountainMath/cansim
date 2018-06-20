@@ -2,12 +2,14 @@ Package: cansim
 Type: Package
 Title: Convenience function to download Cansim tables
 Version: 0.1.0
-Author: Jens von Bergmann <jens@mountainmath.ca>
+Authors@R: c(
+    person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
+    person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
 Maintainer: Jens von Bergmann <jens@mountainmath.ca>
 Description: Downloads Cansim data into a tidy data frame,
     deals with encoding, allows for English or French language data,
     has a convenience function to scale numerical values
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: dplyr (>= 0.7),
@@ -21,5 +23,7 @@ Imports: dplyr (>= 0.7),
     utils
 RoxygenNote: 6.0.1
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    tidyr,
+    ggplot2
 VignetteBuilder: knitr

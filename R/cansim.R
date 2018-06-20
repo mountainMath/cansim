@@ -44,37 +44,6 @@ get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
   get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber),language,refresh)
 }
 
-#' Legacy method, get cansim tables based on old table names
-#' Get cansim table into tidy dataframe
-#' Caches the table data for the current session
-#'
-get_cansim_old <- function(cansimTableNumber,language="english"){
-  lang_ext=ifelse(tolower(language)=="english","-eng",ifelse(tolower(language) %in% c("french"),"-fra",NA))
-  if (is.na(lang_ext)) stop(paste0("Unkown Lanaguage ",language))
-  cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(cansimTableNumber))))
-  path <- file.path(tempdir(),paste0(cleaned_number,lang_ext))
-  if (!file.exists(path)){
-    url <- "http://www20.statcan.gc.ca/tables-tableaux/cansim/csv/"
-    cansimTableNumberString <- cleaned_number # pad with zeros if needed
-    filename <- paste0("0", cansimTableNumberString, lang_ext)
-    url <- paste0(url, filename, ".zip")
-    utils::download.file(url, path, quiet = TRUE)
-    data <- NA
-    na_strings=c("<NA>",NA,"NA","","F")
-    if(lang_ext=="-eng")
-      data <- readr::read_csv(unz(path, paste0(filename, ".csv")),
-                              na=na_strings,
-                              locale=readr::locale(encoding="Windows-1254"),
-                              col_types = list(.default = "c",Value="d"))
-    else
-      data <- readr::read_csv2(unz(path, paste0(filename, ".csv")),
-                               na=na_strings,
-                               locale=readr::locale(encoding="Windows-1254"),
-                               col_types = list(.default = "c",Valeur="d"))
-    saveRDS(data,file=path)
-  }
-  readRDS(file=path)
-}
 
 #' Adjust Cansim Value by scaled amount
 #' French part does not work, probably encoding issues
@@ -132,25 +101,6 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
   }
 }
 
-#' Adjust Cansim Value by scaled amount
-#' French part does not work, probably encoding issues
-#'
-adjust_cansim_values_by_variable_old <-function(data,var){
-  if("Valeur" %in% names(data))
-    data <- data %>%
-      mutate(Valeur=ifelse(grepl(" \\(x 1 000 000\\)$",rlang::UQ(as.name(var))),1000000*Valeur,Valeur)) %>%
-      mutate(!!var:=sub(" \\(x 1 000 000\\)$","",rlang::UQ(as.name(var)))) %>%
-      mutate(Valeur=ifelse(grepl(" \\(x 1 000\\)$",rlang::UQ(as.name(var))),1000*Valeur,Valeur)) %>%
-      mutate(!!var:=sub(" \\(x 1 000\\)$","",rlang::UQ(as.name(var))))
-  else
-    data <- data %>%
-      mutate(Value=ifelse(grepl(" \\(x 1,000,000\\)$",rlang::UQ(as.name(var))),1000000*Value,Value)) %>%
-      mutate(!!var:=sub(" \\(x 1,000,000\\)$","",rlang::UQ(as.name(var)))) %>%
-      mutate(Value=ifelse(grepl(" \\(x 1,000\\)$",rlang::UQ(as.name(var))),1000*Value,Value)) %>%
-      mutate(!!var:=sub(" \\(x 1,000\\)$","",rlang::UQ(as.name(var))))
-
-  data
-}
 
 
 #' translate from old table number to NDM table number
@@ -181,33 +131,6 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   new_table
 }
 
-#' translate from old table number to NDM table number by web search and scraping
-#'
-#' @param oldCansimTableNumber the old cansim table number
-cansim_old_to_new2 <- function(oldCansimTableNumber){
-  cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
-  cleaned_number <- paste0(substr(cleaned_number,1,3),"-",substr(cleaned_number,4,30))
-
-  p <- xml2::read_html(paste0("https://www150.statcan.gc.ca/n1/en/type/data?text=",cleaned_number))
-  new_table <- p %>%
-    html_node(".ndm-result-productid") %>%
-    html_text() %>%
-    sub("^Table:\\s*","",.)
-  warning <- p %>% html_node(".alert.alert-warning") %>% html_text()
-  if (grepl(cleaned_number,warning)) {
-    warning(paste0("Unable to match old CANSIM table number ",cleaned_number))
-    stop(warning)
-  }
-  old_table <-  p %>%
-    html_node(".ndm-result-formerid") %>%
-    html_text() %>%
-    sub("^\\s*\\(formerly: CANSIM ","",.) %>%
-    sub("\\)$","",.)
-  if (old_table!=cleaned_number) {
-    stop(paste0("Unable to match old CANSIM table number ",cleaned_number))
-  }
-  new_table
-}
 
 #' Get cansim table via NDM
 #' @param cansimTableNumber the NDM table number to load
@@ -415,7 +338,7 @@ get_cansim_table_overview <- function(cansimTableNumber,column,language="english
     text <- paste0(text,"\n","Column ",column)
     categories <- cansim:::get_cansim_column_categories(cansimTableNumber,column,language=language,refresh=refresh)
     text <- paste0(text, " (",nrow(categories),")","\n")
-    text <- paste0(text, paste(head(categories$`Member Name`,10),collapse=", "))
+    text <- paste0(text, paste(utils::head(categories$`Member Name`,10),collapse=", "))
     if (nrow(categories)>10) text <- paste0(text, ", ...")
     text <- paste0(text,"\n")
   }
@@ -516,20 +439,37 @@ generate_table_metadata <- function(){
 #'
 #' @param refresh Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
 #' hundred we pages to gather the data
-#' if option *cache_path* is set it will look for and store the overview table in that directory. Otherwise file will be stored in *tempdir*
+#' if option *cache_path* is set it will look for and store the overview table in that directory.
 #'
 #' @return A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
 #'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
   directory <- getOption("cache_path")
-  if (is.null(directory)) directory = tempdir()
-  path <- file.path(directory,"cansim_table_list.Rda")
-  if (refresh | !file.exists(path)) {
-    data <- cansim:::generate_table_metadata()
-    saveRDS(data,path)
+  if (is.null(directory)) {
+    result=cansim:::cansim_table_list
+    age=(Sys.Date()-attr(result,"date")) %>% as.integer
+    if (age>3) {
+      message(paste0("Your cansim table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
+    }
+    if (refresh==TRUE) {
+      message("The table won't be able to refresh if options(cache_path=\"your cache path\") is not set.")
+    }
+  } else {
+    path <- file.path(directory,"cansim_table_list.Rda")
+    if (refresh | !file.exists(path)) {
+      message("Generating the table overview data, this may take a while. 15 minutes is not unusual.")
+      data <- cansim:::generate_table_metadata()
+      attr(data,"date") <- Sys.Date()
+      saveRDS(data,path)
+    }
+    result=readRDS(path)
+    age=(Sys.Date()-attr(result,"date")) %>% as.integer
+    if (age>3) {
+      message(paste0("Your cansim table overview data is ",age," days old.\nConsider refreshing the table via list_cansim_tables(refresh=TRUE)"))
+    }
   }
-  readRDS(path)
+  result
 }
 
 #' open cansim table information in browser
@@ -556,6 +496,7 @@ view_cansim_webpage <- function(cansimTableNumber,browser = getOption("browser")
 #' @importFrom stats na.omit
 #' @importFrom rlang set_names
 #' @importFrom purrr map
+#' @importFrom rlang :=
 
 NULL
 

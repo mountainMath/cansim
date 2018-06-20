@@ -9,7 +9,7 @@ list_cansim_tables(refresh = FALSE)
 \arguments{
 \item{refresh}{Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
 hundred we pages to gather the data
-if option *cache_path* is set it will look for and store the overview table in that directory. Otherwise file will be stored in *tempdir*}
+if option *cache_path* is set it will look for and store the overview table in that directory.}
 }
 \value{
 A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.

@@ -16,10 +16,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-A simple example using employment data for economic regions. We can use the internal table search function. At this point the table search function scrapes the CANSIM webpage, so it takes some time the first time it runs. Make sure the set the `option(cache_path="your chache path")` option so that the information is cached across R sessions.
+A simple example using employment data for economic regions. We can use the internal table search function. At this point the table search function scrapes the CANSIM webpage, so it takes some time the first time it runs. Make sure the set the `options(cache_path="your chache path")` option so that the information is cached across R sessions.
 
-```{r message=FALSE}
+```{r}
 library(dplyr)
+library(tidyr)
 #devtools::install_github("mountainmath/cansim")
 library(cansim)
 
