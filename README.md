@@ -17,7 +17,7 @@ This package:
 ### Installation
 ```r
 # install.packages("devtools")
-devtools::install_github("mountainmath/github")
+devtools::install_github("mountainmath/cansim")
 ```
 
 ### Caching
