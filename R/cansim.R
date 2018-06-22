@@ -488,6 +488,72 @@ view_cansim_webpage <- function(cansimTableNumber,browser = getOption("browser")
   utils::browseURL(url,browser)
 }
 
+
+
+
+#' Get table metadata from API
+#'
+#' @param cansimTableNumber new or old CANSIM table number
+#'
+#' @return a tibble containing the table metadata
+#'
+#' @export
+get_cansim_cube_metadata <- function(cansimTableNumber){
+  table_id=naked_ndm_table_number(cansimTableNumber)
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
+  response <- httr::POST(url,
+                     #body=jsonlite::toJSON(list("productId"=table_id),auto_unbox =TRUE),
+                     body=paste0('[{"productId":',table_id,'}]'),
+                     encode="json",
+                     httr::add_headers("Content-Type"="application/json")
+  )
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code)
+  }
+  data <-  flatten(httr::content(response))$object
+  excluded=c("footnote", "correction","responseStatusCode")
+  fields <- setdiff(names(data),excluded)
+  l <- lapply(fields, function(field){
+    d <- data[[field]]
+    if (typeof(d)=="list") d <- d %>% flatten %>% as.character() %>% paste(collapse = ",")
+    d
+  }) %>%
+    set_names(fields) %>%
+    as.tibble
+}
+
+#' get table url from API, should be more stable than guessing the link
+get_cansim_table_url <- function(cansimTableNumber,language){
+  l <- cansim:::cleaned_ndm_language(language) %>% substr(1,2)
+  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",cansim:::naked_ndm_table_number(cansimTableNumber),"/",l)
+  response <- httr::GET(url)
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code)
+  }
+  httr::content(response)$object
+}
+
+#' get list of changed tables in date range
+#'
+#' @param cansimTableNumber cansim table number
+#' @param start_date starting date to look for changes that changed on or after that date
+#'
+#' @return a tible with cansim product ids and release times
+#'
+#' @export
+get_cansim_changed_tables <- function(cansimTableNumber,start_date){
+  end_date=NA
+  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",start_date)
+  if (!is.na(end_date)) url = paste0(url,"/",end_date)
+  response <- httr::GET(url)
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code)
+  }
+  httr::content(response)$object %>%
+    map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
+    bind_rows
+}
+
 #' @import dplyr
 #' @importFrom rvest html_node
 #' @importFrom rvest html_nodes

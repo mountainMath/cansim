@@ -20,6 +20,7 @@ In this vignette we show how to utilize the metadata information by drilling int
 
 ```{r}
 library(dplyr)
+#devtools::install_github("mountainmath/cansim")
 library(cansim)
 table_id="36-10-0402"
 
@@ -56,10 +57,10 @@ cut_data <- data %>% filter(
   !grepl("^T",`Classification Code for North American Industry Classification System (NAICS)`),
   `North American Industry Classification System (NAICS)` %in% 
     categories_for_level(.,"North American Industry Classification System (NAICS)",1))
-length(cut_data$`North American Industry Classification System (NAICS)` %>% unique)
+n<-length(cut_data$`North American Industry Classification System (NAICS)` %>% unique)
 ```
 
-There are still too many level 1 categories to sensibly visualize at the same time.
+There are still `r n` level 1 categories, too many to sensibly visualize at the same time.
 
 ```{r fig.height=3, fig.width=4.5}
 regions = "British Columbia"
