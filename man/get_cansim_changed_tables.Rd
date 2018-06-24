@@ -4,11 +4,9 @@
 \alias{get_cansim_changed_tables}
 \title{get list of changed tables in date range}
 \usage{
-get_cansim_changed_tables(cansimTableNumber, start_date)
+get_cansim_changed_tables(start_date)
 }
 \arguments{
-\item{cansimTableNumber}{cansim table number}
-
 \item{start_date}{starting date to look for changes that changed on or after that date}
 }
 \value{

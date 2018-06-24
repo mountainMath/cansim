@@ -449,7 +449,7 @@ list_cansim_tables <- function(refresh=FALSE){
   if (is.null(directory)) {
     result=cansim:::cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
-    if (age>3) {
+    if (age>30) {
       message(paste0("Your cansim table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
     }
     if (refresh==TRUE) {
@@ -465,7 +465,7 @@ list_cansim_tables <- function(refresh=FALSE){
     }
     result=readRDS(path)
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
-    if (age>3) {
+    if (age>30) {
       message(paste0("Your cansim table overview data is ",age," days old.\nConsider refreshing the table via list_cansim_tables(refresh=TRUE)"))
     }
   }
@@ -492,6 +492,10 @@ view_cansim_webpage <- function(cansimTableNumber,browser = getOption("browser")
 
 
 #' Get table metadata from API
+#' Also accepts a vector of cansim table numbers, new or old.
+#' Patience required, StatCan API is very slow. Alternatively
+#' one can also use the `list_cansim_tables()` function to retieve
+#' a (cached) list of cansim tables with (more limited) metadata
 #'
 #' @param cansimTableNumber new or old CANSIM table number
 #'
@@ -503,20 +507,23 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
   url="https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
   response <- httr::POST(url,
                      #body=jsonlite::toJSON(list("productId"=table_id),auto_unbox =TRUE),
-                     body=paste0('[{"productId":',table_id,'}]'),
+                     body=paste0("[",paste(paste0('{"productId":',table_id,'}'),collapse = ", "),"]"),
                      encode="json",
                      httr::add_headers("Content-Type"="application/json")
   )
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code)
   }
-  data <-  flatten(httr::content(response))$object
-  excluded=c("footnote", "correction","responseStatusCode")
-  fields <- setdiff(names(data),excluded)
+  data <- httr::content(response)
+  fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
+              "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
+              "surveyCode",  "dimension")
   l <- lapply(fields, function(field){
-    d <- data[[field]]
-    if (typeof(d)=="list") d <- d %>% flatten %>% as.character() %>% paste(collapse = ",")
-    d
+    map(data,function(d){
+      dd<-d$object[[field]]
+      if (typeof(dd)=="list") dd <- dd%>% flatten %>% as.character() %>% paste(collapse = ",")
+      dd
+      }) %>% as.character()
   }) %>%
     set_names(fields) %>%
     as.tibble
@@ -535,13 +542,12 @@ get_cansim_table_url <- function(cansimTableNumber,language){
 
 #' get list of changed tables in date range
 #'
-#' @param cansimTableNumber cansim table number
 #' @param start_date starting date to look for changes that changed on or after that date
 #'
 #' @return a tible with cansim product ids and release times
 #'
 #' @export
-get_cansim_changed_tables <- function(cansimTableNumber,start_date){
+get_cansim_changed_tables <- function(start_date){
   end_date=NA
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",start_date)
   if (!is.na(end_date)) url = paste0(url,"/",end_date)
