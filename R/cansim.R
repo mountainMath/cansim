@@ -74,7 +74,7 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
   uom_string=ifelse(language=="fr","UNITÉ DE MESURE","UOM")
-  percentage_string=ifelse(language=="fr","Pourcentage","Percentage")
+  percentage_string=ifelse(language=="fr","^Pourcent","^Percent")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
   data <- data %>%
     mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
@@ -84,7 +84,7 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
   if (normalize_percent) {
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
-      mutate(!!as.name(replacement_value_string):=ifelse(!!as.name(uom_string)==percentage_string,!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
+      mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
       mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
   }
   date_field=ifelse(language=="fr","PÉRIODE DE RÉFÉRENCE","REF_DATE")
@@ -515,18 +515,26 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
     stop("Problem downloading data, status code ",response$status_code)
   }
   data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    data2 %>% purrr::map(function(x){
+      message(x$object)
+    })
+  }
   fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
               "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
               "surveyCode",  "dimension")
   l <- lapply(fields, function(field){
-    map(data,function(d){
+    purrr::map(data1,function(d){
       dd<-d$object[[field]]
-      if (typeof(dd)=="list") dd <- dd%>% flatten %>% as.character() %>% paste(collapse = ",")
+      if (typeof(dd)=="list") dd <- dd %>% unlist %>% as.character() %>% paste(collapse = ",")
       dd
       }) %>% as.character()
   }) %>%
-    set_names(fields) %>%
-    as.tibble
+    purrr::set_names(fields) %>%
+    tibble::as.tibble()
 }
 
 #' get table url from API, should be more stable than guessing the link
