@@ -79,9 +79,9 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
   data <- data %>%
     mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
   if (is.na(replacement_value)) { # remove scale columns
-    data <- data %>% select(-one_of(scale_string,scale_string2))
+    data <- data %>% select(-one_of(intersect(c(scale_string,scale_string2),names(data))))
   }
-  if (normalize_percent) {
+  if (normalize_percent & uom_string %in% names(data)) {
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
@@ -99,6 +99,7 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
     # year and month
     data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
   }
+  data
 }
 
 
@@ -566,6 +567,56 @@ get_cansim_changed_tables <- function(start_date){
   httr::content(response)$object %>%
     map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
     bind_rows
+}
+
+#' get list of changed tables in date range
+#'
+#' @param vecors list of vectors to retrieve
+#' @param start_time data release data starting time
+#' @param start_time optional data release data ending time, default is current time
+#'
+#' @return a tible with data for vectors released between start and end time
+#'
+#' @export
+get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
+  time_format="%Y-%m-%dT%H:%m"
+  vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
+  vectors_string=paste0('"vectorIds":[',paste(purrr::map(vectors,function(x)paste0('"',x,'"')),collapse = ", "),"]")
+  time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
+                     '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
+  response <- httr::POST(url,
+                         #body=jsonlite::toJSON(list("vectorIds"=vectors)),
+                         body=paste0("{",vectors_string,",",time_string,"}"),
+                         encode="json",
+                         httr::add_headers("Content-Type"="application/json")
+  )
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code)
+  }
+  data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    data2 %>% purrr::map(function(x){
+      message(x$object)
+    })
+  }
+  vf=list("DECIMALS"="decimals",
+          "VALUE"="value",
+          "REF_DATE"="refPer",
+          #"SYMBOL"="symbolCode"
+          "SCALAR_ID"="scalarFactorCode")
+  result <- purrr::map(data1,function(d){
+    value_data = lapply(vf,function(f){purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]]) %>% unlist}) %>%
+      tibble::as.tibble() %>%
+      mutate(COORDINATE=d$object$coordinate,
+             VECTOR=paste0("v",d$object$vectorId))
+    value_data
+  }) %>%
+    dplyr::bind_rows()
+  result
 }
 
 #' @import dplyr
