@@ -2,14 +2,14 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_vector}
 \alias{get_cansim_vector}
-\title{get list of changed tables in date range}
+\title{get data for cansim vector released in time frame}
 \usage{
 get_cansim_vector(vectors, start_time, end_time = Sys.Date())
 }
 \arguments{
-\item{start_time}{data release data starting time}
+\item{vectors}{list of vectors to retrieve}
 
-\item{vecors}{list of vectors to retrieve}
+\item{start_time}{data release data starting time}
 
 \item{start_time}{optional data release data ending time, default is current time}
 }
@@ -17,5 +17,5 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date())
 a tible with data for vectors released between start and end time
 }
 \description{
-get list of changed tables in date range
+get data for cansim vector released in time frame
 }

@@ -513,7 +513,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
                      httr::add_headers("Content-Type"="application/json")
   )
   if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code)
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
   data <- httr::content(response)
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
@@ -544,7 +544,7 @@ get_cansim_table_url <- function(cansimTableNumber,language){
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",cansim:::naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
   if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code)
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
   httr::content(response)$object
 }
@@ -562,16 +562,16 @@ get_cansim_changed_tables <- function(start_date){
   if (!is.na(end_date)) url = paste0(url,"/",end_date)
   response <- httr::GET(url)
   if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code)
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
   httr::content(response)$object %>%
     map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
     bind_rows
 }
 
-#' get list of changed tables in date range
+#' get data for cansim vector released in time frame
 #'
-#' @param vecors list of vectors to retrieve
+#' @param vectors list of vectors to retrieve
 #' @param start_time data release data starting time
 #' @param start_time optional data release data ending time, default is current time
 #'
@@ -592,7 +592,7 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
                          httr::add_headers("Content-Type"="application/json")
   )
   if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code)
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
   data <- httr::content(response)
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
@@ -618,6 +618,101 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
     dplyr::bind_rows()
   result
 }
+
+#' get data for cansim vector(s) for last N periods
+#'
+#' @param vectors list of vectors to retrieve
+#' @param periods number of latest periods to retrieve data for
+#'
+#' @return a tible with data for vector(s) for last N periods
+#'
+#' @export
+get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
+  vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
+  vectors_string=paste0("[",paste(purrr::map(vectors,function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
+  response <- httr::POST(url,
+                         #body=jsonlite::toJSON(list("vectorIds"=vectors)),
+                         body=vectors_string,
+                         encode="json",
+                         httr::add_headers("Content-Type"="application/json")
+  )
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+  }
+  data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    data2 %>% purrr::map(function(x){
+      message(x$object)
+    })
+  }
+  vf=list("DECIMALS"="decimals",
+          "VALUE"="value",
+          "REF_DATE"="refPer",
+          #"SYMBOL"="symbolCode"
+          "SCALAR_ID"="scalarFactorCode")
+  result <- purrr::map(data1,function(d){
+    value_data = lapply(vf,function(f){purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]]) %>% unlist}) %>%
+      tibble::as.tibble() %>%
+      mutate(COORDINATE=d$object$coordinate,
+             VECTOR=paste0("v",d$object$vectorId))
+    value_data
+  }) %>%
+    dplyr::bind_rows()
+  result
+}
+
+
+#' get data for cansim table number and coordinate for latest periods
+#'
+#' @param cansimTableNumber cansim table number
+#' @param coordinate cansim coordinate
+#' @param periods number of latest periods to retrieve data for
+#'
+#' @return a tible with data
+#'
+#' @export
+get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,periods=1){
+  table=naked_ndm_table_number(cansimTableNumber)
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
+  body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
+  response <- httr::POST(url,
+                         body=body_string,
+                         encode="json",
+                         httr::add_headers("Content-Type"="application/json")
+  )
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+  }
+  data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    data2 %>% purrr::map(function(x){
+      message(x$object)
+    })
+  }
+  vf=list("DECIMALS"="decimals",
+          "VALUE"="value",
+          "REF_DATE"="refPer",
+          #"SYMBOL"="symbolCode"
+          "SCALAR_ID"="scalarFactorCode")
+  result <- purrr::map(data1,function(d){
+    value_data = lapply(vf,function(f){purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]]) %>% unlist}) %>%
+      tibble::as.tibble() %>%
+      mutate(COORDINATE=d$object$coordinate,
+             VECTOR=paste0("v",d$object$vectorId))
+    value_data
+  }) %>%
+    dplyr::bind_rows()
+  result
+}
+
+
 
 #' @import dplyr
 #' @importFrom rvest html_node
