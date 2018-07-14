@@ -1,4 +1,9 @@
 # cansim
+
+> Update 19/06/2018 
+> 
+> Please note that this package is under active development for the next little while and may have some breaking bugs, but a stable version is expected to be ready for end of June. 
+
 R package to download Statistics Canada CANSIM/NDM tables.
 
 This package:
@@ -12,7 +17,7 @@ This package:
 ### Installation
 ```r
 # install.packages("devtools")
-devtools::install_github("mountainmath/github")
+devtools::install_github("mountainmath/cansim")
 ```
 
 ### Caching
@@ -32,7 +37,7 @@ bop <- get_cansim("3768105")
 bop <- get_cansim("36-10-0042")
 ```    
 
-### Bilingual
+### Bilingual - * NOTE: French metadata currently unavailable * 
 
 The cansim package works in either English or French. There is an optional language argument to retrieve CANSIM/NDM tables in French: 
 

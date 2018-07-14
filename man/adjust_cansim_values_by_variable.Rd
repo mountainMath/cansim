@@ -3,11 +3,13 @@
 \name{adjust_cansim_values_by_variable}
 \alias{adjust_cansim_values_by_variable}
 \title{Adjust Cansim Value by scaled amount
-French part does not work, probably encoding issues}
+French part does not work, probably encoding issues
+Legacy function}
 \usage{
 adjust_cansim_values_by_variable(data, var)
 }
 \description{
 Adjust Cansim Value by scaled amount
 French part does not work, probably encoding issues
+Legacy function
 }

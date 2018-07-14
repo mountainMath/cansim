@@ -2,17 +2,18 @@
 % Please edit documentation in R/cansim.R
 \name{list_cansim_tables}
 \alias{list_cansim_tables}
-\title{Get overview list for all CANSIM tables
-Will generate the table in case it does not exist or refresh option is set}
+\title{Get overview list for all CANSIM tables}
 \usage{
 list_cansim_tables(refresh = FALSE)
 }
 \arguments{
 \item{refresh}{Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
 hundred we pages to gather the data
-if option *cache_path* is set it will look for and store the overview table in that directory. Otherwise file will be stored in *tempdir*}
+if option *cache_path* is set it will look for and store the overview table in that directory.}
+}
+\value{
+A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
 }
 \description{
-Get overview list for all CANSIM tables
 Will generate the table in case it does not exist or refresh option is set
 }
