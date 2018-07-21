@@ -438,9 +438,8 @@ generate_table_metadata <- function(){
 #'
 #' Will generate the table in case it does not exist or refresh option is set
 #'
-#' @param refresh Default is *FALSE*, will regenerate the table if set to *TRUE*. Takes some time since this is scraping through several
-#' hundred we pages to gather the data
-#' if option *cache_path* is set it will look for and store the overview table in that directory.
+#' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}. This takes some time since this is scraping through several
+#' hundred web pages to gather required metadata data. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 #'
 #' @return A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
 #'
@@ -471,6 +470,31 @@ list_cansim_tables <- function(refresh=FALSE){
     }
   }
   result
+}
+
+#' Search through CANSIM tables using a search term
+#'
+#' Will generate the table in case it does not exist or refresh option is set to TRUE.
+#'
+#' @param search_term User-supplied search term used to find CANSIM tables with matching titles. Search-terms are case insensitive, but will accept regular expressions for more advanced searching.
+#'
+#' @param search_description By default, this function will only search through table titles. Setting this parameter to \code{TRUE} will instead search through table descriptions.
+#'
+#' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}. This takes some time since this is scraping through several
+#' hundred web pages to gather required metadata data. If option \code{cache_path} is set it will look for and store the overview table in that directory.
+#'
+#' @return A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
+#'
+#' @export
+search_cansim_tables <- function(search_term, search_description = FALSE, refresh=FALSE){
+  tables <- list_cansim_tables(refresh = refresh)
+  if(!search_description) {
+    tables %>%
+      filter(grepl(search_term, title, ignore.case = TRUE))
+  } else {
+    tables %>%
+      filter(grepl(search_term, description, ignore.case = TRUE))
+  }
 }
 
 #' open cansim table information in browser
