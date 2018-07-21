@@ -2,14 +2,14 @@
 % Please edit documentation in R/cansim.R
 \name{adjust_cansim_values_by_variable}
 \alias{adjust_cansim_values_by_variable}
-\title{Adjust Cansim Value by scaled amount
+\title{Adjust CANSIM Value by scaled amount
 French part does not work, probably encoding issues
 Legacy function}
 \usage{
 adjust_cansim_values_by_variable(data, var)
 }
 \description{
-Adjust Cansim Value by scaled amount
+Adjust CANSIM Value by scaled amount
 French part does not work, probably encoding issues
 Legacy function
 }

@@ -14,7 +14,7 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date())
 \item{start_time}{optional data release data ending time, default is current time}
 }
 \value{
-a tible with data for vectors released between start and end time
+a tibble with data for vectors released between start and end time
 }
 \description{
 get data for cansim vector released in time frame

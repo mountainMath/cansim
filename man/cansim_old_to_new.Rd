@@ -7,10 +7,10 @@
 cansim_old_to_new(oldCansimTableNumber)
 }
 \arguments{
-\item{oldCansimTableNumber}{the old cansim table number. Returns the corresponding NDM number}
+\item{oldCansimTableNumber}{the old CANSIM table number. Returns the corresponding NDM number.}
 }
 \value{
-cansim ndm table number
+CANSIM NDM table number
 }
 \description{
 translate from old table number to NDM table number

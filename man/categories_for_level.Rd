@@ -2,25 +2,25 @@
 % Please edit documentation in R/cansim.R
 \name{categories_for_level}
 \alias{categories_for_level}
-\title{Use metadate to extract categories for column of specific level.}
+\title{Use metadata to extract categories for column of specific level.}
 \usage{
 categories_for_level(data, column_name, level = NA, strict = FALSE,
   remove_duplicates = TRUE)
 }
 \arguments{
-\item{data}{the cansim data as returned from *get_cansim*}
+\item{data}{the CANSIM data as returned from \code{get_cansim()}}
 
 \item{column_name}{the name of the column to extract categories from}
 
 \item{level}{the hierarchy level depth to which to extract categories, 0 is top category}
 
-\item{strict}{flag, *FALSE* by default. If true, only extract that speficit level.}
+\item{strict}{flag, \code{FALSE} by default. If true, only extract that specific level.}
 
-\item{remove_duplicates}{flag, *TRUE* by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.}
+\item{remove_duplicates}{flag, \code{TRUE} by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.}
 }
 \value{
 A vector of categories
 }
 \description{
-Use metadate to extract categories for column of specific level.
+Use metadata to extract categories for column of specific level.
 }

@@ -15,7 +15,7 @@ get_cansim_data_for_table_coord_periods(cansimTableNumber, coordinate,
 \item{periods}{number of latest periods to retrieve data for}
 }
 \value{
-a tible with data
+a tibble with data
 }
 \description{
 get data for cansim table number and coordinate for latest periods

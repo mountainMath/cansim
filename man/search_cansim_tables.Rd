@@ -16,7 +16,7 @@ search_cansim_tables(search_term, search_description = FALSE,
 hundred web pages to gather required metadata data. If option \code{cache_path} is set it will look for and store the overview table in that directory.}
 }
 \value{
-A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
+A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered.
 }
 \description{
 Will generate the table in case it does not exist or refresh option is set to TRUE.

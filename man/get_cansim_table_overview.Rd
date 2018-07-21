@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_table_overview}
 \alias{get_cansim_table_overview}
-\title{Get cansim table overview text}
+\title{Get CANSIM table overview text}
 \usage{
 get_cansim_table_overview(cansimTableNumber, column, language = "english",
   refresh = FALSE)
@@ -10,13 +10,13 @@ get_cansim_table_overview(cansimTableNumber, column, language = "english",
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{"en" or "fr" for english or french language version. Defaults to english.}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
 
-\item{refresh}{Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only}
+\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only}
 }
 \value{
 none
 }
 \description{
-Needs to load the whole cansim table in order to dusplay overview information. Prints overview as message
+Needs to load the whole CANSIM table in order to display overview information. Prints overview as message
 }

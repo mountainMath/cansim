@@ -3,10 +3,10 @@
 \name{get_cansim_cube_metadata}
 \alias{get_cansim_cube_metadata}
 \title{Get table metadata from API
-Also accepts a vector of cansim table numbers, new or old.
-Patience required, StatCan API is very slow. Alternatively
-one can also use the `list_cansim_tables()` function to retieve
-a (cached) list of cansim tables with (more limited) metadata}
+Also accepts a vector of CANSIM table numbers, new or old.
+Patience is required as Statistics Canada API is very slow. Alternatively
+one can also use the `list_cansim_tables()` function to retrieve
+a (cached) list of CANSIM tables with (more limited) metadata}
 \usage{
 get_cansim_cube_metadata(cansimTableNumber)
 }
@@ -18,8 +18,8 @@ a tibble containing the table metadata
 }
 \description{
 Get table metadata from API
-Also accepts a vector of cansim table numbers, new or old.
-Patience required, StatCan API is very slow. Alternatively
-one can also use the `list_cansim_tables()` function to retieve
-a (cached) list of cansim tables with (more limited) metadata
+Also accepts a vector of CANSIM table numbers, new or old.
+Patience is required as Statistics Canada API is very slow. Alternatively
+one can also use the `list_cansim_tables()` function to retrieve
+a (cached) list of CANSIM tables with (more limited) metadata
 }
