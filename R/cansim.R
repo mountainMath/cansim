@@ -34,8 +34,8 @@ base_path_for_table_language <- function(cansimTableNumber,language){
 #' Caches the table data for the current session
 #'
 #' @param cansimTableNumber the table number to load, accepts old or new NDM table numbers
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
 #'
 #' @return a tibble with the cansim table data
 #'
@@ -45,7 +45,7 @@ get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
 }
 
 
-#' Adjust Cansim Value by scaled amount
+#' Adjust CANSIM Value by scaled amount
 #' French part does not work, probably encoding issues
 #' Legacy function
 #' @export
@@ -55,20 +55,20 @@ adjust_cansim_values_by_variable <-function(data,var){
 
 #' normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.
 #'
-#' if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
+#' if "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the scale columns,
 #' otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
-#' It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)
+#' It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
-#' @param data A cansim table as returned from *get_cansim*.
+#' @param data A cansim table as returned from \code{get_cansim()}.
 #' @param replacement_value Optional name of the column the manipulated value should be returned in. Defaults to replacing the current value field.
-#' @param normalize_percent Optional normailze percentages by changing them to rates. *TRUE* by default.
+#' @param normalize_percent Optional normalize percentages by changing them to rates. \code{TRUE} by default.
 #' @param default_month The default month that should be used when creating Date objects for annual data.
-#' @param default_day The defauly day of the month that should be used when creating Date objects for monthly data.
+#' @param default_day The default day of the month that should be used when creating Date objects for monthly data.
 #'
 #' @return tibble with adjusted values
 #'
 #' @export
-normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=TRUE,default_month="01",default_day="01"){
+normalize_cansim_values <- function(data,replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01"){
   language <- ifelse("VALEUR" %in% names(data),"fr","en")
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
@@ -106,9 +106,9 @@ normalize_cansim_values <- function(data,replacement_value=NA,normalize_percent=
 
 #' translate from old table number to NDM table number
 #'
-#' @param oldCansimTableNumber the old cansim table number. Returns the corresponding NDM number
+#' @param oldCansimTableNumber the old CANSIM table number. Returns the corresponding NDM number.
 #'
-#' @return cansim ndm table number
+#' @return CANSIM NDM table number
 #'
 #' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
@@ -133,10 +133,10 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 }
 
 
-#' Get cansim table via NDM
+#' Get CANSIM table via NDM
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
 get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language=cleaned_ndm_language(language)
@@ -240,11 +240,11 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
   readRDS(file=data_path)
 }
 
-#' Get cansim table info
+#' Get CANSIM table info
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
-get_cansim_table_info <- function(cansimTableNumber,language="english",refresh=FALSE){
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
+get_cansim_table_info <- function(cansimTableNumber, language="english", refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda1")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
@@ -253,10 +253,10 @@ get_cansim_table_info <- function(cansimTableNumber,language="english",refresh=F
 }
 
 
-#' Get cansim table survey
+#' Get CANSIM table survey
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
 get_cansim_table_survey <- function(cansimTableNumber,language="english",refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
   if (refresh | !file.exists(data_path)){
@@ -265,10 +265,10 @@ get_cansim_table_survey <- function(cansimTableNumber,language="english",refresh
   readRDS(file=data_path)
 }
 
-#' Get cansim table subject
+#' Get CANSIM table subject
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
 get_cansim_table_subject <- function(cansimTableNumber,language="english",refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda4")
   if (refresh | !file.exists(data_path)){
@@ -277,10 +277,10 @@ get_cansim_table_subject <- function(cansimTableNumber,language="english",refres
   readRDS(file=data_path)
 }
 
-#' Get cansim table notes
+#' Get CANSIM table notes
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
 get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
   if (refresh | !file.exists(data_path)){
@@ -290,10 +290,10 @@ get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=
 }
 
 
-#' Get cansim table column list
+#' Get CANSIM table column list
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only.
 get_cansim_column_list <- function(cansimTableNumber,language="english",refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
@@ -302,10 +302,10 @@ get_cansim_column_list <- function(cansimTableNumber,language="english",refresh=
   readRDS(file=data_path)
 }
 
-#' Get cansim table column categories
+#' Get CANSIM table column categories
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only.
 get_cansim_column_categories <- function(cansimTableNumber,column,language="english",refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
@@ -318,13 +318,13 @@ get_cansim_column_categories <- function(cansimTableNumber,column,language="engl
   readRDS(file=data_path)
 }
 
-#' Get cansim table overview text
+#' Get CANSIM table overview text
 #'
-#' Needs to load the whole cansim table in order to dusplay overview information. Prints overview as message
+#' Needs to load the whole CANSIM table in order to display overview information. Prints overview as message
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language "en" or "fr" for english or french language version. Defaults to english.
-#' @param refresh Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only
 #'
 #' @return none
 #'
@@ -347,13 +347,13 @@ get_cansim_table_overview <- function(cansimTableNumber,column,language="english
 }
 
 
-#' Use metadate to extract categories for column of specific level.
+#' Use metadata to extract categories for column of specific level.
 #'
-#' @param data the cansim data as returned from *get_cansim*
+#' @param data the CANSIM data as returned from \code{get_cansim()}
 #' @param column_name the name of the column to extract categories from
 #' @param level the hierarchy level depth to which to extract categories, 0 is top category
-#' @param strict flag, *FALSE* by default. If true, only extract that speficit level.
-#' @param remove_duplicates flag, *TRUE* by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.
+#' @param strict flag, \code{FALSE} by default. If true, only extract that specific level.
+#' @param remove_duplicates flag, \code{TRUE} by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.
 #'
 #' @return A vector of categories
 #'
@@ -441,7 +441,7 @@ generate_table_metadata <- function(){
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}. This takes some time since this is scraping through several
 #' hundred web pages to gather required metadata data. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 #'
-#' @return A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
+#' @return A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered.
 #'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
@@ -450,7 +450,7 @@ list_cansim_tables <- function(refresh=FALSE){
     result=cansim:::cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
-      message(paste0("Your cansim table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
+      message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
     }
     if (refresh==TRUE) {
       message("The table won't be able to refresh if options(cache_path=\"your cache path\") is not set.")
@@ -466,7 +466,7 @@ list_cansim_tables <- function(refresh=FALSE){
     result=readRDS(path)
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
-      message(paste0("Your cansim table overview data is ",age," days old.\nConsider refreshing the table via list_cansim_tables(refresh=TRUE)"))
+      message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider refreshing the table via list_cansim_tables(refresh=TRUE)"))
     }
   }
   result
@@ -483,7 +483,7 @@ list_cansim_tables <- function(refresh=FALSE){
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}. This takes some time since this is scraping through several
 #' hundred web pages to gather required metadata data. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 #'
-#' @return A tibble with available cansim tables, listing title, cansim table number, old table number, description and geographies covered.
+#' @return A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered.
 #'
 #' @export
 search_cansim_tables <- function(search_term, search_description = FALSE, refresh=FALSE){
@@ -497,11 +497,11 @@ search_cansim_tables <- function(search_term, search_description = FALSE, refres
   }
 }
 
-#' open cansim table information in browser
+#' open CANSIM table information in browser
 #'
-#' useful for getting furthe info on cansim table and survey methods
+#' useful for getting further info on CANSIM table and survey methods
 #'
-#' @param cansimTableNumber cansim table number
+#' @param cansimTableNumber CANSIM table number
 #' @param browser optionally a browser to open the page in
 #'
 #' @return none
@@ -517,10 +517,10 @@ view_cansim_webpage <- function(cansimTableNumber,browser = getOption("browser")
 
 
 #' Get table metadata from API
-#' Also accepts a vector of cansim table numbers, new or old.
-#' Patience required, StatCan API is very slow. Alternatively
-#' one can also use the `list_cansim_tables()` function to retieve
-#' a (cached) list of cansim tables with (more limited) metadata
+#' Also accepts a vector of CANSIM table numbers, new or old.
+#' Patience is required as Statistics Canada API is very slow. Alternatively
+#' one can also use the `list_cansim_tables()` function to retrieve
+#' a (cached) list of CANSIM tables with (more limited) metadata
 #'
 #' @param cansimTableNumber new or old CANSIM table number
 #'
@@ -577,7 +577,7 @@ get_cansim_table_url <- function(cansimTableNumber,language){
 #'
 #' @param start_date starting date to look for changes that changed on or after that date
 #'
-#' @return a tible with cansim product ids and release times
+#' @return a tibble with cansim product ids and release times
 #'
 #' @export
 get_cansim_changed_tables <- function(start_date){
@@ -599,7 +599,7 @@ get_cansim_changed_tables <- function(start_date){
 #' @param start_time data release data starting time
 #' @param start_time optional data release data ending time, default is current time
 #'
-#' @return a tible with data for vectors released between start and end time
+#' @return a tibble with data for vectors released between start and end time
 #'
 #' @export
 get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
@@ -648,7 +648,7 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
 #' @param vectors list of vectors to retrieve
 #' @param periods number of latest periods to retrieve data for
 #'
-#' @return a tible with data for vector(s) for last N periods
+#' @return a tibble with data for vector(s) for last N periods
 #'
 #' @export
 get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
@@ -696,7 +696,7 @@ get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
 #' @param coordinate cansim coordinate
 #' @param periods number of latest periods to retrieve data for
 #'
-#' @return a tible with data
+#' @return a tibble with data
 #'
 #' @export
 get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,periods=1){

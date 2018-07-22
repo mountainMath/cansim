@@ -2,12 +2,12 @@
 % Please edit documentation in R/cansim.R
 \name{view_cansim_webpage}
 \alias{view_cansim_webpage}
-\title{open cansim table information in browser}
+\title{open CANSIM table information in browser}
 \usage{
 view_cansim_webpage(cansimTableNumber, browser = getOption("browser"))
 }
 \arguments{
-\item{cansimTableNumber}{cansim table number}
+\item{cansimTableNumber}{CANSIM table number}
 
 \item{browser}{optionally a browser to open the page in}
 }
@@ -15,5 +15,5 @@ view_cansim_webpage(cansimTableNumber, browser = getOption("browser"))
 none
 }
 \description{
-useful for getting furthe info on cansim table and survey methods
+useful for getting further info on CANSIM table and survey methods
 }

@@ -8,21 +8,21 @@ normalize_cansim_values(data, replacement_value = NA,
   normalize_percent = TRUE, default_month = "01", default_day = "01")
 }
 \arguments{
-\item{data}{A cansim table as returned from *get_cansim*.}
+\item{data}{A cansim table as returned from \code{get_cansim()}.}
 
 \item{replacement_value}{Optional name of the column the manipulated value should be returned in. Defaults to replacing the current value field.}
 
-\item{normalize_percent}{Optional normailze percentages by changing them to rates. *TRUE* by default.}
+\item{normalize_percent}{Optional normalize percentages by changing them to rates. \code{TRUE} by default.}
 
 \item{default_month}{The default month that should be used when creating Date objects for annual data.}
 
-\item{default_day}{The defauly day of the month that should be used when creating Date objects for monthly data.}
+\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data.}
 }
 \value{
 tibble with adjusted values
 }
 \description{
-if "replacement_value" is not set, it will replace the *VALUE* field with normailzed values and drop the scale columns,
+if "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the scale columns,
 otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
-It will attempt to parse the *REF_DATE* field and create an R date variable. (experimental)
+It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 }

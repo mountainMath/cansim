@@ -12,7 +12,7 @@ get_cansim_vector_for_latest_periods(vectors, periods = 1)
 \item{periods}{number of latest periods to retrieve data for}
 }
 \value{
-a tible with data for vector(s) for last N periods
+a tibble with data for vector(s) for last N periods
 }
 \description{
 get data for cansim vector(s) for last N periods

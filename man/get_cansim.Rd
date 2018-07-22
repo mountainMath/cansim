@@ -9,9 +9,9 @@ get_cansim(cansimTableNumber, language = "english", refresh = FALSE)
 \arguments{
 \item{cansimTableNumber}{the table number to load, accepts old or new NDM table numbers}
 
-\item{language}{"en" or "fr" for english or french language version. Defaults to english.}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
 
-\item{refresh}{Optionally force reload of cansim data, default is *FALSE*. Cansim data is cached for the duration of the R session only}
+\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only}
 }
 \value{
 a tibble with the cansim table data

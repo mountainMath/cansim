@@ -10,7 +10,7 @@ get_cansim_changed_tables(start_date)
 \item{start_date}{starting date to look for changes that changed on or after that date}
 }
 \value{
-a tible with cansim product ids and release times
+a tibble with cansim product ids and release times
 }
 \description{
 get list of changed tables in date range
