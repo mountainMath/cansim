@@ -122,8 +122,8 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
 
   new_number <- data %>%
-    filter(CANSIM_ID==as.integer(cleaned_number)) %>%
-    pull(PRODUCT_ID)
+    filter(.data$CANSIM_ID == as.integer(cleaned_number)) %>%
+    pull(.data$PRODUCT_ID)
   if (identical(new_number, integer(0))) {
     stop(paste0("Unable to match old CANSIM table number ",cleaned_number))
   }
@@ -158,7 +158,7 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
                               na=na_strings,
                               locale=readr::locale(encoding="UTF8"),
                               col_types = list(.default = "c")) %>%
-        dplyr::mutate(VALUE=as.numeric(VALUE))
+        dplyr::mutate(VALUE=as.numeric(.data$VALUE))
       message("Folding in metadata")
       meta <- suppressWarnings(readr::read_csv(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                               na=na_strings,
@@ -169,11 +169,17 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
       cut_indices <- c(cut_indices,grep("Symbol Legend",meta$`Cube Title`))
       meta1 <- meta[seq(1,cut_indices[1]-1),]
       saveRDS(meta1,file=paste0(data_path,"1"))
-      names2 <- meta[cut_indices[1],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
-      meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>% set_names(names2)
+      names2 <- meta[cut_indices[1],]  %>%
+        dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+        as.character()
+      meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
+        set_names(names2)
       saveRDS(meta2,file=paste0(data_path,"2"))
-      names3 <- meta[cut_indices[2],]  %>% dplyr::select_if(~sum(!is.na(.)) > 0) %>% as.character()
-      meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>% set_names(names3)
+      names3 <- meta[cut_indices[2],]  %>%
+        dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+        as.character()
+      meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
+        set_names(names3)
       additional_indices=c(grep("Survey Code",meta$`Cube Title`),
                            grep("Subject Code",meta$`Cube Title`),
                            grep("Note ID",meta$`Cube Title`),
@@ -187,21 +193,24 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
       add_hierarchy <- function(meta_x){
         parent_lookup <- rlang::set_names(meta_x$`Parent Member ID`,meta_x$`Member ID`)
         current_top <- function(c){
-          strsplit(c,"\\.") %>% purrr::map(dplyr::first) %>% unlist
+          strsplit(c,"\\.") %>%
+            purrr::map(dplyr::first) %>%
+            unlist
         }
         parent_for_current_top <- function(c){
           as.character(parent_lookup[current_top(c)])
         }
-        meta_x <- meta_x %>% dplyr::mutate(Hierarchy=`Member ID`)
+        meta_x <- meta_x %>%
+          dplyr::mutate(Hierarchy=.data$`Member ID`)
         added=TRUE
         max_depth=100
         count=0
         while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
           old <- meta_x$Hierarchy
           meta_x <- meta_x %>%
-            dplyr::mutate(p=parent_for_current_top(Hierarchy)) %>%
-            dplyr::mutate(Hierarchy=ifelse(is.na(p),Hierarchy,paste0(p,".",Hierarchy))) %>%
-            dplyr::select(-p)
+            dplyr::mutate(p=parent_for_current_top(.data$Hierarchy)) %>%
+            dplyr::mutate(Hierarchy=ifelse(is.na(.data$p),.data$Hierarchy,paste0(.data$p,".",.data$Hierarchy))) %>%
+            dplyr::select(-.data$p)
           added <- sum(old != meta_x$Hierarchy)>0
           count=count+1
         }
@@ -210,16 +219,20 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
       }
       for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
         column=meta2[column_index,]
-        meta_x <- meta3 %>% dplyr::filter(`Dimension ID`==column$`Dimension ID`) %>%
+        meta_x <- meta3 %>%
+          dplyr::filter(.data$`Dimension ID`==column$`Dimension ID`) %>%
           add_hierarchy
         saveRDS(meta_x,file=paste0(data_path,"_column_",column$`Dimension name`))
         classification_lookup <- set_names(meta_x$`Classification Code`,meta_x$`Member Name`)
         hierarchy_lookup <- set_names(meta_x$Hierarchy,meta_x$`Member Name`)
         if (grepl("Geography",column$`Dimension name`) &  !(column$`Dimension name` %in% names(data))) {
-          data <- data %>% dplyr::mutate(GeoUID=as.character(classification_lookup[GEO]))
+          data <- data %>%
+            dplyr::mutate(GeoUID=as.character(classification_lookup[.data$GEO]))
         } else if (column$`Dimension name` %in% names(data)){
-          classification_name <- paste0("Classification Code for ",column$`Dimension name`) %>% as.name
-          hierarchy_name <- paste0("Hierarchy for ",column$`Dimension name`) %>% as.name
+          classification_name <- paste0("Classification Code for ",column$`Dimension name`) %>%
+            as.name
+          hierarchy_name <- paste0("Hierarchy for ",column$`Dimension name`) %>%
+            as.name
           data <- data %>%
             dplyr::mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column$`Dimension name`)]),
                    !!hierarchy_name:=as.character(hierarchy_lookup[!!as.name(column$`Dimension name`)]))
@@ -232,7 +245,7 @@ get_cansim_ndm <- function(cansimTableNumber,language="english",refresh=FALSE){
                                na=na_strings,
                                locale=readr::locale(encoding="UTF8"),
                                col_types = list(.default = "c")) %>%
-        dplyr::mutate(VALEUR=as.numeric(VALEUR))
+        dplyr::mutate(VALEUR=as.numeric(.data$VALEUR))
     }
     saveRDS(data,file=data_path)
     unlink(exdir,recursive = TRUE)
@@ -367,15 +380,15 @@ categories_for_level <- function(data,column_name,level=NA,strict=FALSE,remove_d
   if (is.na(level) | level>max_level) level=max_level
   h <- h %>%
     dplyr::mutate(`Member ID`=strsplit(!!as.name(hierarchy_name),"\\.") %>% purrr::map(last) %>% as.integer) %>%
-    dplyr::filter(hierarchy_level<=level)
-  strict_hierarchy=h %>% dplyr::filter(hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
+    dplyr::filter(.data$hierarchy_level<=level)
+  strict_hierarchy=h %>% dplyr::filter(.data$hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
   if (strict) {
-    h <- h %>% dplyr::filter(hierarchy_level==level)
+    h <- h %>% dplyr::filter(.data$hierarchy_level==level)
   } else if (remove_duplicates) {
     higher_ids <- strict_hierarchy %>% strsplit("\\.") %>%
       purrr::map(function(x){utils::head(as.integer(x),-1)}) %>%
       unlist %>% unique() %>% as.integer()
-    h <- h %>% dplyr::filter(!(`Member ID` %in% higher_ids))
+    h <- h %>% dplyr::filter(!(.data$`Member ID` %in% higher_ids))
   }
   h[[column_name]]
 }
@@ -387,25 +400,25 @@ generate_table_metadata <- function(){
     product <- item %>%
       html_node(".ndm-result-productid") %>%
       html_text() %>%
-      sub("^Table: ","",.)
+      sub("^Table: ","", .data)
     if (grepl("^\\d{2}-\\d{2}-\\d{4}",product)) {
       result = tibble(
         title=item %>%
           html_node(".ndm-result-title") %>%
-          html_text() %>% sub("^(\\d|,)+\\. ","",.),
+          html_text() %>% sub("^(\\d|,)+\\. ","", .data),
         table=product,
         former = item %>%
           html_node(".ndm-result-formerid") %>%
           html_text() %>% trimws %>%
-          gsub("^\\(formerly: CANSIM |\\)$","",.),
+          gsub("^\\(formerly: CANSIM |\\)$","", .data),
         geo = item %>%
           html_node(".ndm-result-geo") %>%
           html_text() %>%
-          sub("Geography: ","",.),
+          sub("Geography: ","", .data),
         description = item %>%
           html_node(".ndm-result-description") %>%
           html_text() %>%
-          sub("Description: ","",.),
+          sub("Description: ","", .data),
         release_date = item %>%
           html_node(".ndm-result-date .ndm-result-date") %>%
           html_text() %>%
@@ -422,7 +435,7 @@ generate_table_metadata <- function(){
   max_page = (l[length(l)-1] %>%
                 html_node("a") %>%
                 html_text() %>%
-                stringr::str_extract(.,"^(\\d+)") %>%
+                stringr::str_extract(.data,"^(\\d+)") %>%
                 as.integer)-1
   pb <- utils::txtProgressBar(0,max_page)
   bind_rows(lapply(seq(0,max_page),function(page){
@@ -430,7 +443,8 @@ generate_table_metadata <- function(){
     p <- xml2::read_html(url_for_page(page))
     l <- p %>%
       html_nodes("#ndm-results #tables .ndm-item") %>%
-      purrr::map(parse_table_data) %>% bind_rows
+      purrr::map(parse_table_data) %>%
+      bind_rows
   }))
 }
 
@@ -490,10 +504,10 @@ search_cansim_tables <- function(search_term, search_description = FALSE, refres
   tables <- list_cansim_tables(refresh = refresh)
   if(!search_description) {
     tables %>%
-      filter(grepl(search_term, title, ignore.case = TRUE))
+      filter(grepl(search_term, .data$title, ignore.case = TRUE))
   } else {
     tables %>%
-      filter(grepl(search_term, description, ignore.case = TRUE))
+      filter(grepl(search_term, .data$description, ignore.case = TRUE))
   }
 }
 
@@ -745,6 +759,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
 #' @importFrom rlang set_names
+#' @importFrom rlang .data
 #' @importFrom purrr map
 #' @importFrom rlang :=
 
