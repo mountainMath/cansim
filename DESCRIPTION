@@ -1,14 +1,15 @@
 Package: cansim
 Type: Package
-Title: Convenience function to download Cansim tables
+Title: Functions and convenience tools for accessing CANSIM data
 Version: 0.1.0
 Authors@R: c(
     person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
 Maintainer: Jens von Bergmann <jens@mountainmath.ca>
-Description: Downloads Cansim data into a tidy data frame,
-    deals with encoding, allows for English or French language data,
-    has a convenience function to scale numerical values
+Description: Searches for, accesses, and retrieves new-format and old-format CANSIM data 
+    tables as tidy data frames. This package deals with encoding issues, allows for 
+    bilingual English or French language data retrieval, and bundles convenience functions 
+    to make it easier to work with CANSIM data. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -24,6 +25,7 @@ Imports: dplyr (>= 0.7),
 RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown,
+    scales, 
     tidyr,
     ggplot2
 VignetteBuilder: knitr
