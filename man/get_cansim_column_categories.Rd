@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_column_categories}
 \alias{get_cansim_column_categories}
-\title{Get CANSIM table column categories}
+\title{Retrieve CANSIM table categories for a specific column}
 \usage{
 get_cansim_column_categories(cansimTableNumber, column, language = "english",
   refresh = FALSE)
@@ -10,10 +10,12 @@ get_cansim_column_categories(cansimTableNumber, column, language = "english",
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
+\item{column}{the specified column for which to retrieve category information for}
+
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
 
 \item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only.}
 }
 \description{
-Get CANSIM table column categories
+Retrieve CANSIM table categories for a specific column
 }

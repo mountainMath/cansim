@@ -45,9 +45,12 @@ get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
 }
 
 
-#' Adjust CANSIM Value by scaled amount
-#' French part does not work, probably encoding issues
-#' Legacy function
+#' (Deprecated function) Adjust CANSIM table values by scaled amount; however
+#' French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
+#'
+#' @param data a downloaded CANSIM data table
+#' @param var deprecated input
+#'
 #' @export
 adjust_cansim_values_by_variable <-function(data,var){
   normalize_cansim_values(data)
@@ -315,11 +318,12 @@ get_cansim_column_list <- function(cansimTableNumber,language="english",refresh=
   readRDS(file=data_path)
 }
 
-#' Get CANSIM table column categories
+#' Retrieve CANSIM table categories for a specific column
 #' @param cansimTableNumber the NDM table number to load
+#' @param column the specified column for which to retrieve category information for
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only.
-get_cansim_column_categories <- function(cansimTableNumber,column,language="english",refresh=FALSE){
+get_cansim_column_categories <- function(cansimTableNumber, column, language="english", refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
@@ -342,7 +346,7 @@ get_cansim_column_categories <- function(cansimTableNumber,column,language="engl
 #' @return none
 #'
 #' @export
-get_cansim_table_overview <- function(cansimTableNumber,language="english",refresh=FALSE){
+get_cansim_table_overview <- function(cansimTableNumber, language="english", refresh=FALSE){
   info <- cansim:::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
   refresh=FALSE
   text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cansim:::cleaned_ndm_table_number(cansimTableNumber),"\n",
@@ -585,8 +589,12 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
     tibble::as.tibble()
 }
 
-#' get table url from API, should be more stable than guessing the link
-get_cansim_table_url <- function(cansimTableNumber,language){
+#' Retrieve URL of a table from the API given a table number. Offers a more stable approach than guessing the URL of the table.
+#'
+#' @param cansimTableNumber the NDM table number to load
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.
+#'
+get_cansim_table_url <- function(cansimTableNumber, language){
   l <- cansim:::cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",cansim:::naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
@@ -616,11 +624,11 @@ get_cansim_changed_tables <- function(start_date){
     bind_rows
 }
 
-#' get data for cansim vector released in time frame
+#' Retrieve data for a CANSIM vector released within a given time frame
 #'
-#' @param vectors list of vectors to retrieve
-#' @param start_time data release data starting time
-#' @param start_time optional data release data ending time, default is current time
+#' @param vectors The list of vectors to retrieve
+#' @param start_time Data release data starting time
+#' @param end_time Optional data release data ending time. Default is set to current time.
 #'
 #' @return a tibble with data for vectors released between start and end time
 #'

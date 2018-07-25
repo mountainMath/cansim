@@ -2,10 +2,15 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_table_url}
 \alias{get_cansim_table_url}
-\title{get table url from API, should be more stable than guessing the link}
+\title{Retrieve URL of a table from the API given a table number. Offers a more stable approach than guessing the URL of the table.}
 \usage{
 get_cansim_table_url(cansimTableNumber, language)
 }
+\arguments{
+\item{cansimTableNumber}{the NDM table number to load}
+
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
+}
 \description{
-get table url from API, should be more stable than guessing the link
+Retrieve URL of a table from the API given a table number. Offers a more stable approach than guessing the URL of the table.
 }
