@@ -1,8 +1,11 @@
 # cansim
 
-> Update 19/06/2018 
+> Update 24/07/2018 
 > 
-> Please note that this package is under active development for the next little while and may have some breaking bugs, but a stable version is expected to be ready for end of June. 
+> Please note that this package is still under active development for the next little while and may have some breaking bugs, while Statistics Canada continues to make changes to their updated data dissemmination services.
+>
+> The package is bundled with a full list of available CANSIM tables that is about a month old. Due to recent changes in Statistics Canada's site the ability to refresh the full list of available tables will not function until we develop a workaround or a more permanent and robust solution.
+
 
 R package to download Statistics Canada CANSIM/NDM tables.
 
@@ -22,7 +25,7 @@ devtools::install_github("mountainmath/cansim")
 
 ### Caching
 
-As many CANSIM table downloads can be quite large in size, the cansim package will temporarily cache data for the duration of the current R session. This reduces unnecessary waiting when recompiling code. 
+As many CANSIM table downloads can be quite large in size, the cansim package will temporarily cache data for the duration of the current R session. This reduces unnecessary waiting when recompiling code. You can also set up an explicit cache location that will be persistent across sessions by setting `options(cache_path="your_cache_path")` in your .Rprofile. 
 
 ### Basic Usage
 
@@ -62,15 +65,14 @@ data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replacement_valu
 
 By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set *normalize_percent=FALSE*.
 
-
 ### Contributing
 
-This package is still under development and may have some bugs. [Issues](https://github.com/mountainMath/cansim/issues) and [pull requests](https://github.com/mountainMath/cansim/pulls) are highly appreciated. 
+This package is under active development and may have some bugs. [Issues](https://github.com/mountainMath/cansim/issues) and [pull requests](https://github.com/mountainMath/cansim/pulls) are highly appreciated. 
 
 ### To-do
 
-- [ ] Clean up package and function documentation
-- [ ] Provide additional user control over cache location
+- [x] Clean up package and function documentation
+- [x] Provide additional user control over cache location
 - [ ] Test for more bugs
 - [ ] Submit to CRAN
 
