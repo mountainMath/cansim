@@ -2,17 +2,17 @@
 % Please edit documentation in R/cansim.R
 \name{adjust_cansim_values_by_variable}
 \alias{adjust_cansim_values_by_variable}
-\title{(Legacy function) Adjust CANSIM table values by scaled amount; however
-French does not work, probably due to encoding issues.}
+\title{(Deprecated function) Adjust CANSIM table values by scaled amount; however
+French does not work, probably due to encoding issues. This function is now deprecated and should not be used.}
 \usage{
 adjust_cansim_values_by_variable(data, var)
 }
 \arguments{
-\item{data}{???}
+\item{data}{a downloaded CANSIM data table}
 
-\item{var}{???}
+\item{var}{deprecated input}
 }
 \description{
-(Legacy function) Adjust CANSIM table values by scaled amount; however
-French does not work, probably due to encoding issues.
+(Deprecated function) Adjust CANSIM table values by scaled amount; however
+French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
 }

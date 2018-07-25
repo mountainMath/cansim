@@ -45,11 +45,11 @@ get_cansim <- function(cansimTableNumber,language="english",refresh=FALSE){
 }
 
 
-#' (Legacy function) Adjust CANSIM table values by scaled amount; however
-#' French does not work, probably due to encoding issues.
+#' (Deprecated function) Adjust CANSIM table values by scaled amount; however
+#' French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
 #'
-#' @param data ???
-#' @param var ???
+#' @param data a downloaded CANSIM data table
+#' @param var deprecated input
 #'
 #' @export
 adjust_cansim_values_by_variable <-function(data,var){
