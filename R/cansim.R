@@ -342,7 +342,7 @@ get_cansim_column_categories <- function(cansimTableNumber,column,language="engl
 #' @return none
 #'
 #' @export
-get_cansim_table_overview <- function(cansimTableNumber,column,language="english",refresh=FALSE){
+get_cansim_table_overview <- function(cansimTableNumber,language="english",refresh=FALSE){
   info <- cansim:::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
   refresh=FALSE
   text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cansim:::cleaned_ndm_table_number(cansimTableNumber),"\n",
@@ -472,10 +472,19 @@ list_cansim_tables <- function(refresh=FALSE){
   } else {
     path <- file.path(directory,"cansim_table_list.Rda")
     if (refresh | !file.exists(path)) {
-      message("Generating the table overview data, this may take a while. 15 minutes is not unusual.")
-      data <- cansim:::generate_table_metadata()
-      attr(data,"date") <- Sys.Date()
-      saveRDS(data,path)
+
+      # disable table download until we have cansim api to feed it
+      if (!file.exists(path)) {
+        stop("Sorry, table data refresh does not work right now, still waiting for an appropriate API")
+      } else {
+        warning("Sorry, table data refresh does not work right now, using cached table")
+      }
+      # end dusable table download. uncomment rest when api is working to restore functionality
+
+      #message("Generating the table overview data, this may take a while. 15 minutes is not unusual.")
+      #data <- cansim:::generate_table_metadata()
+      #attr(data,"date") <- Sys.Date()
+      #saveRDS(data,path)
     }
     result=readRDS(path)
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
@@ -647,7 +656,11 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
           #"SYMBOL"="symbolCode"
           "SCALAR_ID"="scalarFactorCode")
   result <- purrr::map(data1,function(d){
-    value_data = lapply(vf,function(f){purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]]) %>% unlist}) %>%
+    value_data = lapply(vf,function(f){
+      x=purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]])
+      x[sapply(x, is.null)] <- NA
+      unlist(x)
+      }) %>%
       tibble::as.tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
              VECTOR=paste0("v",d$object$vectorId))

@@ -48,6 +48,7 @@ ggplot(data,aes(x=Date,group=GEO,y=Estimate)) +
   geom_line(aes(color=GEO)) +
   theme_bw() +
   scale_y_continuous(labels=scales::percent) +
-  labs(y="Unemployment Rate",x="",fill="Economic Region",caption=paste0("CANSIM ",tables$table[2]))
+  labs(y="Unemployment Rate",x="",color="Economic Region",caption=paste0("CANSIM ",tables$table[2]))
 ```
+
 
