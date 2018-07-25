@@ -2,20 +2,20 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_vector}
 \alias{get_cansim_vector}
-\title{get data for cansim vector released in time frame}
+\title{Retrieve data for a CANSIM vector released within a given time frame}
 \usage{
 get_cansim_vector(vectors, start_time, end_time = Sys.Date())
 }
 \arguments{
-\item{vectors}{list of vectors to retrieve}
+\item{vectors}{The list of vectors to retrieve}
 
-\item{start_time}{data release data starting time}
+\item{start_time}{Data release data starting time}
 
-\item{start_time}{optional data release data ending time, default is current time}
+\item{end_time}{Optional data release data ending time. Default is set to current time.}
 }
 \value{
 a tibble with data for vectors released between start and end time
 }
 \description{
-get data for cansim vector released in time frame
+Retrieve data for a CANSIM vector released within a given time frame
 }

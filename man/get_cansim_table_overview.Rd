@@ -4,7 +4,7 @@
 \alias{get_cansim_table_overview}
 \title{Get CANSIM table overview text}
 \usage{
-get_cansim_table_overview(cansimTableNumber, column, language = "english",
+get_cansim_table_overview(cansimTableNumber, language = "english",
   refresh = FALSE)
 }
 \arguments{
