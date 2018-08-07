@@ -101,6 +101,9 @@ normalize_cansim_values <- function(data,replacement_value=NA, normalize_percent
   } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
     # year and month
     data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
+  } else if (grepl("^\\d{4}-\\d{2}-\\d{2}$",sample_date)) {
+    # year, month and day
+    data <- data %>% mutate(Date=as.Date(!!as.name(date_field)))
   }
   data
 }
