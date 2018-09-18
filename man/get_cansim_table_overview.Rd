@@ -10,13 +10,13 @@ get_cansim_table_overview(cansimTableNumber, language = "english",
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
 
-\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only}
+\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}}
 }
 \value{
 none
 }
 \description{
-Needs to load the whole CANSIM table in order to display overview information. Prints overview as message
+In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
 }

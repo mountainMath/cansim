@@ -2,18 +2,18 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_vector_for_latest_periods}
 \alias{get_cansim_vector_for_latest_periods}
-\title{get data for cansim vector(s) for last N periods}
+\title{Retrieve data for specified CANSIM vector(s) for last N periods}
 \usage{
 get_cansim_vector_for_latest_periods(vectors, periods = 1)
 }
 \arguments{
-\item{vectors}{list of vectors to retrieve}
+\item{vectors}{The list of vectors to retrieve}
 
-\item{periods}{number of latest periods to retrieve data for}
+\item{periods}{Numeric value for number of latest periods to retrieve data for}
 }
 \value{
-a tibble with data for vector(s) for last N periods
+A tibble with data for specified vector(s) for the last N periods
 }
 \description{
-get data for cansim vector(s) for last N periods
+Allows for the retrieval of data for specified vector series for the N most-recently released periods.
 }

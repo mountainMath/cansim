@@ -2,16 +2,16 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_changed_tables}
 \alias{get_cansim_changed_tables}
-\title{get list of changed tables in date range}
+\title{Retrieve a list of modified tables since a given date}
 \usage{
 get_cansim_changed_tables(start_date)
 }
 \arguments{
-\item{start_date}{starting date to look for changes that changed on or after that date}
+\item{start_date}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
 }
 \value{
-a tibble with cansim product ids and release times
+A tibble with CANSIM product ids and release times
 }
 \description{
-get list of changed tables in date range
+Retrieve a list of tables that have been modified or updated since the specified date.
 }

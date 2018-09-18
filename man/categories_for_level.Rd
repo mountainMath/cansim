@@ -2,25 +2,25 @@
 % Please edit documentation in R/cansim.R
 \name{categories_for_level}
 \alias{categories_for_level}
-\title{Use metadata to extract categories for column of specific level.}
+\title{Use metadata to extract categories for column of specific level}
 \usage{
 categories_for_level(data, column_name, level = NA, strict = FALSE,
   remove_duplicates = TRUE)
 }
 \arguments{
-\item{data}{the CANSIM data as returned from \code{get_cansim()}}
+\item{data}{retrieved CANSIM object as returned from \code{get_cansim()}}
 
-\item{column_name}{the name of the column to extract categories from}
+\item{column_name}{the quoted name of the column to extract categories from}
 
-\item{level}{the hierarchy level depth to which to extract categories, 0 is top category}
+\item{level}{the hierarchy level depth to which to extract categories, where 0 is top category}
 
-\item{strict}{flag, \code{FALSE} by default. If true, only extract that specific level.}
+\item{strict}{(default \code{FALSE}) when \code{TRUE} will only extract that specific hierarchy level}
 
-\item{remove_duplicates}{flag, \code{TRUE} by default in which case it will remove higher level grouping categories already captured by lower level hierarchy data.}
+\item{remove_duplicates}{(default \code{TRUE}) When set to \code{TRUE} higher level grouping categories already captured by lower level hierarchy data will be removed}
 }
 \value{
 A vector of categories
 }
 \description{
-Use metadata to extract categories for column of specific level.
+For tables with data with hierarchical categories, metadata containing hierarchy level descriptions is used to extract categories at a specified level of hierarchy only.
 }

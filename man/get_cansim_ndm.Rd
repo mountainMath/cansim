@@ -2,17 +2,20 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_ndm}
 \alias{get_cansim_ndm}
-\title{Get CANSIM table via NDM}
+\title{Retrieve a CANSIM table using an NDM number}
 \usage{
 get_cansim_ndm(cansimTableNumber, language = "english", refresh = FALSE)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
-\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only}
+\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}}
+}
+\value{
+a tibble with retrieved NDM table data
 }
 \description{
-Get CANSIM table via NDM
+Retrieves a CANSIM table as a tidy dataframe using an NDM number. Retrieved table data is cached for the duration of the current R session only by default.
 }

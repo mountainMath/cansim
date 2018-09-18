@@ -2,24 +2,16 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_cube_metadata}
 \alias{get_cansim_cube_metadata}
-\title{Get table metadata from API
-Also accepts a vector of CANSIM table numbers, new or old.
-Patience is required as Statistics Canada API is very slow. Alternatively
-one can also use the `list_cansim_tables()` function to retrieve
-a (cached) list of CANSIM tables with (more limited) metadata}
+\title{Retrieve table metadata from Statistics Canada API}
 \usage{
 get_cansim_cube_metadata(cansimTableNumber)
 }
 \arguments{
-\item{cansimTableNumber}{new or old CANSIM table number}
+\item{cansimTableNumber}{A new or old CANSIM/NDM table number or a vector of table numbers}
 }
 \value{
 a tibble containing the table metadata
 }
 \description{
-Get table metadata from API
-Also accepts a vector of CANSIM table numbers, new or old.
-Patience is required as Statistics Canada API is very slow. Alternatively
-one can also use the `list_cansim_tables()` function to retrieve
-a (cached) list of CANSIM tables with (more limited) metadata
+Retrieves table metadata given an input table number or vector of table numbers using either the new or old table number format. Patience is suggested as the Statistics Canada API can be very slow. The `list_cansim_tables()` function can be used as an alternative to retrieve a (cached) list of CANSIM tables with (more limited) metadata.
 }

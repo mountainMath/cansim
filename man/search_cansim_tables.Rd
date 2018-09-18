@@ -2,22 +2,21 @@
 % Please edit documentation in R/cansim.R
 \name{search_cansim_tables}
 \alias{search_cansim_tables}
-\title{Search through CANSIM tables using a search term}
+\title{Search through CANSIM tables}
 \usage{
 search_cansim_tables(search_term, search_description = FALSE,
   refresh = FALSE)
 }
 \arguments{
-\item{search_term}{User-supplied search term used to find CANSIM tables with matching titles. Search-terms are case insensitive, but will accept regular expressions for more advanced searching.}
+\item{search_term}{User-supplied search term used to find CANSIM tables with matching titles}
 
-\item{search_description}{By default, this function will only search through table titles. Setting this parameter to \code{TRUE} will instead search through table descriptions.}
+\item{search_description}{By default, this function will only search through table titles and setting this parameter to \code{TRUE} will instead search through table descriptions}
 
-\item{refresh}{Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}. This takes some time since this is scraping through several
-hundred web pages to gather required metadata data. If option \code{cache_path} is set it will look for and store the overview table in that directory.}
+\item{refresh}{Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}}
 }
 \value{
-A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered.
+A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered
 }
 \description{
-Will generate the table in case it does not exist or refresh option is set to TRUE.
+Searches through CANSIM tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not \code{search_description} is set to \code{TRUE} or not. If \code{refresh = TRUE}, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 }
