@@ -384,7 +384,9 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
 #'
 #' @export
 get_cansim_table_overview <- function(cansimTableNumber, language="english", refresh=FALSE){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   info <- cansim::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
+  refresh=FALSE
   text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cansim:::cleaned_ndm_table_number(cansimTableNumber),"\n",
                  "Start Date: ",info$`Start Reference Period`,", End Date: ",info$`End Reference Period`,", Frequency: ",info$Frequency,"\n")
   columns <- cansim::get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
