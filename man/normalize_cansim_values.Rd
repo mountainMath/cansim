@@ -2,27 +2,25 @@
 % Please edit documentation in R/cansim.R
 \name{normalize_cansim_values}
 \alias{normalize_cansim_values}
-\title{normalizes CANSIM values by setting all units to counts/dollars instead of millions, etc.}
+\title{Normalize CANSIM table values to appropriate scale}
 \usage{
 normalize_cansim_values(data, replacement_value = NA,
   normalize_percent = TRUE, default_month = "01", default_day = "01")
 }
 \arguments{
-\item{data}{A cansim table as returned from \code{get_cansim()}.}
+\item{data}{A CANSIM table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}}
 
-\item{replacement_value}{Optional name of the column the manipulated value should be returned in. Defaults to replacing the current value field.}
+\item{replacement_value}{(Optional) name of the column the manipulated value should be returned in. Defaults to replacing the current value field}
 
-\item{normalize_percent}{Optional normalize percentages by changing them to rates. \code{TRUE} by default.}
+\item{normalize_percent}{(Optional) normalize percentages by changing them to rates. \code{TRUE} by default}
 
-\item{default_month}{The default month that should be used when creating Date objects for annual data.}
+\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "01")}
 
-\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data.}
+\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 }
 \value{
-tibble with adjusted values
+Tibble with adjusted values
 }
 \description{
-if "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the scale columns,
-otherwise it keeps the scale columns and created a new column named replacement_value with the normalized value.
-It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
+Facilitates working with CANSIM values by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 }

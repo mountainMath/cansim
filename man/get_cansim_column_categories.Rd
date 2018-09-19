@@ -12,10 +12,10 @@ get_cansim_column_categories(cansimTableNumber, column, language = "english",
 
 \item{column}{the specified column for which to retrieve category information for}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
 
-\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only.}
+\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}}
 }
 \description{
-Retrieve CANSIM table categories for a specific column
+Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }

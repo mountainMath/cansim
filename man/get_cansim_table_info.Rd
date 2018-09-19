@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_table_info}
 \alias{get_cansim_table_info}
-\title{Get CANSIM table info}
+\title{Get CANSIM table information}
 \usage{
 get_cansim_table_info(cansimTableNumber, language = "english",
   refresh = FALSE)
@@ -10,10 +10,10 @@ get_cansim_table_info(cansimTableNumber, language = "english",
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions. Defaults to English.}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
 
-\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}. CANSIM data is cached for the duration of the R session only}
+\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}}
 }
 \description{
-Get CANSIM table info
+Returns table information given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }

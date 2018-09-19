@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{cansim_old_to_new}
 \alias{cansim_old_to_new}
-\title{translate from old table number to NDM table number}
+\title{Translate CANSIM table number into NDM table}
 \usage{
 cansim_old_to_new(oldCansimTableNumber)
 }
@@ -13,5 +13,5 @@ cansim_old_to_new(oldCansimTableNumber)
 CANSIM NDM table number
 }
 \description{
-translate from old table number to NDM table number
+Returns NDM table equivalent given a standard old-format CANSIM table number
 }

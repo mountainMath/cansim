@@ -9,12 +9,12 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date())
 \arguments{
 \item{vectors}{The list of vectors to retrieve}
 
-\item{start_time}{Data release data starting time}
+\item{start_time}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
 
-\item{end_time}{Optional data release data ending time. Default is set to current time.}
+\item{end_time}{Optional ending time in \code{YYYY-MM-DD} format (defaults to current system time)}
 }
 \value{
-a tibble with data for vectors released between start and end time
+A tibble with data for vectors released between start and end time
 }
 \description{
 Retrieve data for a CANSIM vector released within a given time frame

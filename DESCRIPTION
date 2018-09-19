@@ -22,6 +22,7 @@ Imports: dplyr (>= 0.7),
     rvest,
     stringr,
     purrr,
+    tibble,
     utils
 RoxygenNote: 6.0.1
 Suggests: knitr,

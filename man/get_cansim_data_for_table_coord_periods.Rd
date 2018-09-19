@@ -2,21 +2,21 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_data_for_table_coord_periods}
 \alias{get_cansim_data_for_table_coord_periods}
-\title{get data for cansim table number and coordinate for latest periods}
+\title{Retrieve data for specified CANSIM table for last N periods for specific coordinates}
 \usage{
 get_cansim_data_for_table_coord_periods(cansimTableNumber, coordinate,
   periods = 1)
 }
 \arguments{
-\item{cansimTableNumber}{cansim table number}
+\item{cansimTableNumber}{CANSIM table number}
 
-\item{coordinate}{cansim coordinate}
+\item{coordinate}{A string CANSIM coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
 
-\item{periods}{number of latest periods to retrieve data for}
+\item{periods}{Numeric value for number of latest periods to retrieve data for}
 }
 \value{
-a tibble with data
+A tibble with data matching specified coordinate and period input arguments
 }
 \description{
-get data for cansim table number and coordinate for latest periods
+Allows for the retrieval of data for a CANSIM table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 }
