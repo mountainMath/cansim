@@ -159,19 +159,3 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
   result
 }
 
-
-
-#' @import dplyr
-#' @importFrom tibble as.tibble
-#' @importFrom rvest html_node
-#' @importFrom rvest html_nodes
-#' @importFrom rvest html_text
-#' @importFrom rlang .data
-#' @importFrom stats na.omit
-#' @importFrom rlang set_names
-#' @importFrom rlang .data
-#' @importFrom purrr map
-#' @importFrom rlang :=
-
-NULL
-

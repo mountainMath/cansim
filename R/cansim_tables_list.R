@@ -144,19 +144,3 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
   }
 }
 
-
-#' @import dplyr
-#' @importFrom tibble as.tibble
-#' @importFrom rvest html_node
-#' @importFrom rvest html_nodes
-#' @importFrom rvest html_text
-#' @importFrom rlang .data
-#' @importFrom stats na.omit
-#' @importFrom rlang set_names
-#' @importFrom rlang .data
-#' @importFrom purrr map
-#' @importFrom rlang :=
-
-NULL
-
-

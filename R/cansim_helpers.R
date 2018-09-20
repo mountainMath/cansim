@@ -28,16 +28,3 @@ file_path_for_table_language <- function(cansimTableNumber, language){
 base_path_for_table_language <- function(cansimTableNumber, language){
   file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
 }
-
-
-#' @import dplyr
-#' @importFrom tibble as.tibble
-#' @importFrom rvest html_node
-#' @importFrom rvest html_nodes
-#' @importFrom rvest html_text
-#' @importFrom rlang .data
-#' @importFrom stats na.omit
-#' @importFrom rlang set_names
-#' @importFrom rlang .data
-#' @importFrom purrr map
-#' @importFrom rlang :=
