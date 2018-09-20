@@ -4,8 +4,8 @@
 \alias{get_cansim_column_categories}
 \title{Retrieve CANSIM table categories for a specific column}
 \usage{
-get_cansim_column_categories(cansimTableNumber, column, language = "english",
-  refresh = FALSE)
+get_cansim_column_categories(cansimTableNumber, column,
+  language = "english", refresh = FALSE)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}

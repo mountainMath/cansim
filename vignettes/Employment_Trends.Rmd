@@ -26,13 +26,14 @@ library(cansim)
 
 tables <- list_cansim_tables() %>% 
   filter(grepl("Labour force characteristics",title),grepl("economic region",title))
-tables$title
+tables %>% select("cansim_table_number","title")
 ```
 
-The search came up with three tables, we choose the second one.
+The search came up with two tables, we choose the first one.
 
 ```{r}
-data <-get_cansim(tables$table[2]) %>% 
+table = 14100293
+data <-get_cansim(table) %>% 
   normalize_cansim_values() %>%
   filter(grepl("Mainland|Vancouver Island|Okanagan",GEO),
          Date>=as.Date("2015-01-01"),
@@ -48,7 +49,7 @@ ggplot(data,aes(x=Date,group=GEO,y=Estimate)) +
   geom_line(aes(color=GEO)) +
   theme_bw() +
   scale_y_continuous(labels=scales::percent) +
-  labs(y="Unemployment Rate",x="",color="Economic Region",caption=paste0("CANSIM ",tables$table[2]))
+  labs(y="Unemployment Rate",x="",color="Economic Region",caption=paste0("CANSIM ",table))
 ```
 
 

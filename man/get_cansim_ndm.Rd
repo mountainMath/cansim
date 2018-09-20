@@ -4,7 +4,8 @@
 \alias{get_cansim_ndm}
 \title{Retrieve a CANSIM table using an NDM number}
 \usage{
-get_cansim_ndm(cansimTableNumber, language = "english", refresh = FALSE)
+get_cansim_ndm(cansimTableNumber, language = "english",
+  refresh = FALSE)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
