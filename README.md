@@ -1,12 +1,5 @@
 # cansim
 
-> Update 24/07/2018 
-> 
-> Please note that this package is still under active development for the next little while and may have some breaking bugs, while Statistics Canada continues to make changes to their updated data dissemmination services.
->
-> The package is bundled with a full list of available CANSIM tables that is about a month old. Due to recent changes in Statistics Canada's site the ability to refresh the full list of available tables will not function until we develop a workaround or a more permanent and robust solution.
-
-
 R package to download Statistics Canada CANSIM/NDM tables.
 
 This package:
@@ -73,7 +66,7 @@ This package is under active development and may have some bugs. [Issues](https:
 
 - [x] Clean up package and function documentation
 - [x] Provide additional user control over cache location
-- [ ] Test for more bugs
+- [x] Test for more bugs
 - [ ] Submit to CRAN
 
 ### Related packages
