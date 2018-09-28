@@ -1,0 +1,75 @@
+---
+title: "Listing CANSIM tables"
+author: ""
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse=TRUE,
+  comment = "#>"
+)
+```
+
+This vignette details how to use the internal table search functions in the `cansim` package with a simple example using employment data for economic regions in British Columbia. 
+
+### A note on caching and refreshing table lists
+
+As the table search function requires a full scrape of Statistics Canada's CANSIM webpage, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refleshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cache_path="your cache path")` option so that table information is cached across R sessions.
+
+### Listing and filtering tables
+
+Calling `list_cansim_tables` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
+```{r}
+library(cansim)
+
+names(list_cansim_tables())
+```
+The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. 
+
+```{r}
+library(dplyr)
+
+list_cansim_tables() %>% 
+  filter(grepl("Labour force characteristics",title), grepl("economic region",title)) %>% 
+  select("cansim_table_number","title")
+```
+
+The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. 
+```{r}
+library(tidyr)
+
+selected_table <- 14100293
+
+data <-get_cansim(selected_table) %>% 
+  normalize_cansim_values() %>%
+  filter(grepl("Mainland|Vancouver Island|Okanagan", GEO),
+         Date>=as.Date("2015-01-01"),
+         `Labour force characteristics`=="Unemployment rate") %>%
+  select(Date, GEO, Statistics, VALUE) %>%
+  spread(key="Statistics", value=VALUE)
+```
+
+We can visualize then results with `ggplot2`. 
+```{r}
+library(ggplot2)
+ggplot(data, aes(x=Date, group = GEO,y=Estimate)) +
+  geom_ribbon(aes(ymin=Estimate - `Standard error of estimate`,
+                  ymax=Estimate + `Standard error of estimate`),
+              fill = "grey80", alpha=0.8) +
+  geom_line(aes(color=GEO)) +
+  scale_y_continuous(labels=scales::percent) +
+  theme_bw() + 
+  labs(title = "Comparison of unemployment rate by economic region",
+       y = "Unemployment Rate", 
+       x = "", 
+       color = "",
+       caption=paste0("CANSIM ", selected_table))
+```
+
+

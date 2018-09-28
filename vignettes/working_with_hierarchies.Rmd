@@ -1,6 +1,6 @@
 ---
 title: "Working with CANSIM hierarchies"
-author: "Jens von Bergmann"
+author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -14,26 +14,30 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-In this vignette we show how to utilize the metadata information by drilling into NAICS categories and the hierarchy metadata that is downloaded with tables that have hierarchical data. 
+This vignette showcases how to utilize the metadata information by drilling into NAICS categories and the hierarchy metadata that is downloaded with tables that have hierarchical data. 
 
 ### Retrieving metadata
 
 The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
 ```{r}
-library(dplyr)
-#devtools::install_github("mountainmath/cansim")
 library(cansim)
-table_id="36-10-0402"
 
+# select a table number
+table_id = "36-10-0402"
+
+# get table overview
 get_cansim_table_overview(table_id)
 ```
 ### Accessing table data
 
 We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "Chained (2007) dollars". 
 ```{r}
-selected_value = "Chained (2007) dollars"
+library(dplyr)
 
-data <- get_cansim(table_id) %>% 
+data <- get_cansim(table_id) 
+
+selected_value = "Chained (2007) dollars"
+data <- data %>% 
   filter(Value == selected_value)
 ```
 
@@ -111,8 +115,11 @@ ggplot(plot_data %>%
   scale_y_continuous(labels = scales::percent) +
   theme_bw() +
   theme(legend.position = "bottom",legend.direction ="vertical") +
-  guides(fill=guide_legend(ncol = 2)) +
-  labs(title="Gross domestic product (GDP) at basic prices",subtitle=selected_value,x="",caption=paste0("CANSIM ", table_id))
+  guides(fill=guide_legend(ncol = 3)) +
+  labs(title="Gross domestic product (GDP) at basic prices",
+       subtitle=selected_value,
+       x="", fill = "", 
+       caption=paste0("CANSIM ", table_id))
 
 ```
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
