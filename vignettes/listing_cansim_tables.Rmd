@@ -44,7 +44,7 @@ The search came up with two tables. In this example we are interested in the une
 ```{r}
 library(tidyr)
 
-selected_table <- 14100293
+selected_table <- "14-10-0293"
 
 data <-get_cansim(selected_table) %>% 
   normalize_cansim_values() %>%
@@ -60,14 +60,15 @@ We can visualize then results with `ggplot2`.
 library(ggplot2)
 ggplot(data, aes(x=Date, group = GEO,y=Estimate)) +
   geom_ribbon(aes(ymin=Estimate - `Standard error of estimate`,
-                  ymax=Estimate + `Standard error of estimate`),
-              fill = "grey80", alpha=0.8) +
+                  ymax=Estimate + `Standard error of estimate`, fill=""),
+              alpha=0.8) +
   geom_line(aes(color=GEO)) +
   scale_y_continuous(labels=scales::percent) +
+  scale_fill_manual(name = "", values="grey80", label="Standard error") +
   theme_bw() + 
   labs(title = "Comparison of unemployment rate by economic region",
        y = "Unemployment Rate", 
-       x = "", 
+       x = "",
        color = "",
        caption=paste0("CANSIM ", selected_table))
 ```

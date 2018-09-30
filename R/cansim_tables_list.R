@@ -47,7 +47,9 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
       url_data=tibble::tibble(source="Other",url_en="",url_fr="")
     }
     table_number_from_url <- function(u){
-      gsub('^(https://.+/)(\\d+)(-eng.zip)$', '\\2', u)
+      cansim_table_number=gsub('^(https://.+/)(\\d+)(-eng.zip)$', '\\2', u)
+      if (grepl("^\\d{8}$",cansim_table_number)) cansim_table_number = cleaned_ndm_table_number(cansim_table_number)
+      cansim_table_number
     }
 
     url_data %>% dplyr::mutate(cansim_table_number=table_number_from_url(url_en))
@@ -75,7 +77,7 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
 
   rows %>%
     dplyr::filter(.data$source=="CANSIM",
-                  nchar(cansim_table_number)==8) %>%
+                  grepl("^\\d{2}-\\d{2}-\\d{4}",cansim_table_number)) %>%
     dplyr::select(-source)
 }
 
