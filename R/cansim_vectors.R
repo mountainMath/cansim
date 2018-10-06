@@ -16,12 +16,6 @@ extract_vector_data <- function(data1){
       tibble::as.tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
              VECTOR=paste0("v",d$object$vectorId))
-    if (!is.null(names(vectors))) {
-      vectors2 <- setNames(names(vectors),as.character(vectors))
-      value_data <- value_data %>%
-        mutate(label=d$object$vectorId) %>%
-        mutate(label=recode(label,!!!vectors2))
-    }
     value_data
   }) %>%
     dplyr::bind_rows()
@@ -30,6 +24,15 @@ extract_vector_data <- function(data1){
   result
 }
 
+
+rename_vectors <- function(data,vectors){
+  if (!is.null(names(vectors))) {
+    vectors2 <- setNames(names(vectors),paste0("v",as.character(vectors)))
+    data <- data %>%
+      mutate(label=recode(VECTOR,!!!vectors2))
+  }
+  data
+}
 
 #' Retrieve data for a CANSIM vector released within a given time frame
 #'
@@ -65,7 +68,8 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
     })
   }
 
-  extract_vector_data(data1)
+  extract_vector_data(data1) %>%
+    rename_vectors(vectors)
 }
 
 #' Retrieve data for specified CANSIM vector(s) for last N periods
@@ -100,7 +104,8 @@ get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
     })
   }
 
-  extract_vector_data(data1)
+  extract_vector_data(data1) %>%
+    rename_vectors(vectors)
 }
 
 
