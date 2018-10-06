@@ -1,3 +1,36 @@
+extract_vector_data <- function(data1){
+  vf=list("DECIMALS"="decimals",
+          "VALUE"="value",
+          "REF_DATE"="refPer",
+          "REF_DATE_2"="refPer2",
+          "releaseTime"="releaseTime",
+          "SYMBOL"="symbolCode",
+          "frequencyCode"="frequencyCode",
+          "SCALAR_ID"="scalarFactorCode")
+  result <- purrr::map(data1,function(d){
+    value_data = lapply(vf,function(f){
+      x=purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]])
+      x[sapply(x, is.null)] <- NA
+      unlist(x)
+    }) %>%
+      tibble::as.tibble() %>%
+      mutate(COORDINATE=d$object$coordinate,
+             VECTOR=paste0("v",d$object$vectorId))
+    if (!is.null(names(vectors))) {
+      vectors2 <- setNames(names(vectors),as.character(vectors))
+      value_data <- value_data %>%
+        mutate(label=d$object$vectorId) %>%
+        mutate(label=recode(label,!!!vectors2))
+    }
+    value_data
+  }) %>%
+    dplyr::bind_rows()
+  ref_date_2 <- unique(result$REF_DATE_2) %>% unique
+  if (length(ref_date_2)==1 && ref_date_2=="") result <- result %>% dplyr::select(-REF_DATE_2)
+  result
+}
+
+
 #' Retrieve data for a CANSIM vector released within a given time frame
 #'
 #' @param vectors The list of vectors to retrieve
@@ -31,30 +64,8 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
       message(x$object)
     })
   }
-  vf=list("DECIMALS"="decimals",
-          "VALUE"="value",
-          "REF_DATE"="refPer",
-          #"SYMBOL"="symbolCode"
-          "SCALAR_ID"="scalarFactorCode")
-  result <- purrr::map(data1,function(d){
-    value_data = lapply(vf,function(f){
-      x=purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]])
-      x[sapply(x, is.null)] <- NA
-      unlist(x)
-    }) %>%
-      tibble::as.tibble() %>%
-      mutate(COORDINATE=d$object$coordinate,
-             VECTOR=paste0("v",d$object$vectorId))
-    if (!is.null(names(vectors))) {
-      vectors2 <- setNames(names(vectors),as.character(vectors))
-      value_data <- value_data %>%
-        mutate(label=d$object$vectorId) %>%
-        mutate(label=recode(label,!!!vectors2))
-    }
-    value_data
-  }) %>%
-    dplyr::bind_rows()
-  result
+
+  extract_vector_data(data1)
 }
 
 #' Retrieve data for specified CANSIM vector(s) for last N periods
@@ -88,26 +99,8 @@ get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
       message(x$object)
     })
   }
-  vf=list("DECIMALS"="decimals",
-          "VALUE"="value",
-          "REF_DATE"="refPer",
-          #"SYMBOL"="symbolCode"
-          "SCALAR_ID"="scalarFactorCode")
-  result <- purrr::map(data1,function(d){
-    value_data = lapply(vf,function(f){purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]]) %>% unlist}) %>%
-      tibble::as.tibble() %>%
-      mutate(COORDINATE=d$object$coordinate,
-             VECTOR=paste0("v",d$object$vectorId))
-    if (!is.null(names(vectors))) {
-      vectors2 <- setNames(names(vectors),as.character(vectors))
-      value_data <- value_data %>%
-        mutate(label=d$object$vectorId) %>%
-        mutate(label=recode(label,!!!vectors2))
-    }
-    value_data
-  }) %>%
-    dplyr::bind_rows()
-  result
+
+  extract_vector_data(data1)
 }
 
 
