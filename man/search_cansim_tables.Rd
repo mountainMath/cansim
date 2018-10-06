@@ -4,7 +4,8 @@
 \alias{search_cansim_tables}
 \title{Search through CANSIM tables}
 \usage{
-search_cansim_tables(search_term, search_fields = "both", refresh = FALSE)
+search_cansim_tables(search_term, search_fields = "both",
+  refresh = FALSE)
 }
 \arguments{
 \item{search_term}{User-supplied search term used to find CANSIM tables with matching titles}
