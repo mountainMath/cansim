@@ -45,7 +45,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
-  uom_string=ifelse(language=="fr","UNITÉ DE MESURE","UOM")
+  uom_string=ifelse(language=="fr",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
   percentage_string=ifelse(language=="fr","^Pourcent","^Percent")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
   data <- data %>%
@@ -59,7 +59,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
       mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
   }
-  date_field=ifelse(language=="fr","PÉRIODE DE RÉFÉRENCE","REF_DATE")
+  date_field=ifelse(language=="fr",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
   sample_date <- data[[date_field]] %>% na.omit %>% first()
   if (grepl("^\\d{4}$",sample_date)) {
     # year
