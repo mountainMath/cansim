@@ -357,7 +357,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   info <- cansim::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
   refresh=FALSE
-  text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cansim:::cleaned_ndm_table_number(cansimTableNumber),"\n",
+  text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cleaned_ndm_table_number(cansimTableNumber),"\n",
                  "Start Date: ",info$`Start Reference Period`,", End Date: ",info$`End Reference Period`,", Frequency: ",info$Frequency,"\n")
   columns <- cansim::get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
   for (column in columns$`Dimension name`) {
@@ -533,8 +533,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
 #'
 #' @export
 get_cansim_table_url <- function(cansimTableNumber, language){
-  l <- cansim:::cleaned_ndm_language(language) %>% substr(1,2)
-  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",cansim:::naked_ndm_table_number(cansimTableNumber),"/",l)
+  l <- cleaned_ndm_language(language) %>% substr(1,2)
+  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))

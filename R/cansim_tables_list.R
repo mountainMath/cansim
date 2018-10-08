@@ -5,7 +5,7 @@ get_cansim_table_list <- function(){
   stop=FALSE
   result=tibble::tibble()
   while(!stop) {
-    new_rows <- cansim:::get_cansim_table_list_page(start,rows)
+    new_rows <- get_cansim_table_list_page(start,rows)
     if (nrow(new_rows)>0) {
       result=dplyr::bind_rows(result,new_rows)
       start = start + rows
@@ -98,7 +98,7 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
 list_cansim_tables <- function(refresh=FALSE){
   directory <- getOption("cache_path")
   if (is.null(directory)) {
-    result=cansim:::cansim_table_list
+    result=cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
       message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))

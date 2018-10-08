@@ -27,9 +27,9 @@ extract_vector_data <- function(data1){
 
 rename_vectors <- function(data,vectors){
   if (!is.null(names(vectors))) {
-    vectors2 <- setNames(names(vectors),paste0("v",as.character(vectors)))
+    vectors2 <- rlang::set_names(names(vectors),paste0("v",as.character(vectors)))
     data <- data %>%
-      mutate(label=recode(VECTOR,!!!vectors2))
+      mutate(label=recode(.data$VECTOR,!!!vectors2))
   }
   data
 }
@@ -141,19 +141,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
       message(x$object)
     })
   }
-  vf=list("DECIMALS"="decimals",
-          "VALUE"="value",
-          "REF_DATE"="refPer",
-          #"SYMBOL"="symbolCode"
-          "SCALAR_ID"="scalarFactorCode")
-  result <- purrr::map(data1,function(d){
-    value_data = lapply(vf,function(f){purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]]) %>% unlist}) %>%
-      tibble::as.tibble() %>%
-      mutate(COORDINATE=d$object$coordinate,
-             VECTOR=paste0("v",d$object$vectorId))
-    value_data
-  }) %>%
-    dplyr::bind_rows()
-  result
+
+  extract_vector_data(data1)
 }
 

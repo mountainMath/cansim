@@ -23,7 +23,8 @@ Imports: dplyr (>= 0.7),
     stringr,
     purrr,
     tibble,
-    utils
+    utils,
+    jsonlite
 RoxygenNote: 6.1.0
 Suggests: knitr,
     rmarkdown,
