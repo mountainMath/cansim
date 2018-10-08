@@ -4,7 +4,8 @@
 \alias{get_cansim_vector}
 \title{Retrieve data for a CANSIM vector released within a given time frame}
 \usage{
-get_cansim_vector(vectors, start_time, end_time = Sys.Date())
+get_cansim_vector(vectors, start_time, end_time = Sys.Date(),
+  use_ref_date = TRUE)
 }
 \arguments{
 \item{vectors}{The list of vectors to retrieve}
@@ -12,6 +13,8 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date())
 \item{start_time}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
 
 \item{end_time}{Optional ending time in \code{YYYY-MM-DD} format (defaults to current system time)}
+
+\item{use_ref_date}{Optional, TRUE by default. If TRUE, it uses \code{REF_DATE} to filter, otherwise it uses \code{releaseDate}}
 }
 \value{
 A tibble with data for vectors released between start and end time

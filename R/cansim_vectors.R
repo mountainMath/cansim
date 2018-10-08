@@ -39,37 +39,46 @@ rename_vectors <- function(data,vectors){
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date
 #' @param end_time Optional ending time in \code{YYYY-MM-DD} format (defaults to current system time)
+#' @param use_ref_date Optional, TRUE by default. If TRUE, it uses \code{REF_DATE} to filter, otherwise it uses \code{releaseDate}
 #'
 #' @return A tibble with data for vectors released between start and end time
 #'
 #' @export
-get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date()){
-  time_format="%Y-%m-%dT%H:%m"
-  vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
-  url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
-  vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
-  time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
-                     '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
-  response <- httr::POST(url,
-                         body=paste0("{",vectors_string,",",time_string,"}"),
-                         encode="json",
-                         httr::add_headers("Content-Type"="application/json")
-  )
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-  }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load metadata for ",length(data2)," tables "))
-    data2 %>% purrr::map(function(x){
-      message(x$object)
-    })
-  }
+get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date(),use_ref_date=TRUE){
+  start_time=as.Date(start_time)
+  end_time=as.Date(end_time)
+  if (!use_ref_date) {
+    time_format="%Y-%m-%dT%H:%m"
+    vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
+    url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
+    vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
+    time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
+                       '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
+    response <- httr::POST(url,
+                           body=paste0("{",vectors_string,",",time_string,"}"),
+                           encode="json",
+                           httr::add_headers("Content-Type"="application/json")
+    )
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load metadata for ",length(data2)," tables "))
+      data2 %>% purrr::map(function(x){
+        message(x$object)
+      })
+    }
 
-  extract_vector_data(data1) %>%
-    rename_vectors(vectors)
+    result <- extract_vector_data(data1) %>%
+      rename_vectors(vectors)
+  } else {
+    result <- get_cansim_vector_for_latest_periods(vectors,periods=10000) %>%
+      filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=end_time)
+  }
+  result
 }
 
 #' Retrieve data for specified CANSIM vector(s) for last N periods
