@@ -45,7 +45,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
-  uom_string=ifelse(language=="fr","UNITÉ DE MESURE","UOM")
+  uom_string=ifelse(language=="fr",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
   percentage_string=ifelse(language=="fr","^Pourcent","^Percent")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
   data <- data %>%
@@ -59,7 +59,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
       mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
   }
-  date_field=ifelse(language=="fr","PÉRIODE DE RÉFÉRENCE","REF_DATE")
+  date_field=ifelse(language=="fr",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
   sample_date <- data[[date_field]] %>% na.omit %>% first()
   if (grepl("^\\d{4}$",sample_date)) {
     # year
@@ -357,7 +357,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   info <- cansim::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
   refresh=FALSE
-  text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cansim:::cleaned_ndm_table_number(cansimTableNumber),"\n",
+  text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cleaned_ndm_table_number(cansimTableNumber),"\n",
                  "Start Date: ",info$`Start Reference Period`,", End Date: ",info$`End Reference Period`,", Frequency: ",info$Frequency,"\n")
   columns <- cansim::get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
   for (column in columns$`Dimension name`) {
@@ -533,8 +533,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
 #'
 #' @export
 get_cansim_table_url <- function(cansimTableNumber, language){
-  l <- cansim:::cleaned_ndm_language(language) %>% substr(1,2)
-  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",cansim:::naked_ndm_table_number(cansimTableNumber),"/",l)
+  l <- cleaned_ndm_language(language) %>% substr(1,2)
+  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))

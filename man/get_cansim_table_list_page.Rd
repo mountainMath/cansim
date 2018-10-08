@@ -2,10 +2,15 @@
 % Please edit documentation in R/cansim_tables_list.R
 \name{get_cansim_table_list_page}
 \alias{get_cansim_table_list_page}
-\title{get page of cansim tables}
+\title{internal method to get page of cansim tables}
 \usage{
 get_cansim_table_list_page(start = 0, rows = 1000)
 }
+\arguments{
+\item{start}{starting row}
+
+\item{rows}{number of rows, maximum is 1000}
+}
 \description{
-get page of cansim tables
+internal method to get page of cansim tables
 }

@@ -5,7 +5,7 @@ get_cansim_table_list <- function(){
   stop=FALSE
   result=tibble::tibble()
   while(!stop) {
-    new_rows <- cansim:::get_cansim_table_list_page(start,rows)
+    new_rows <- get_cansim_table_list_page(start,rows)
     if (nrow(new_rows)>0) {
       result=dplyr::bind_rows(result,new_rows)
       start = start + rows
@@ -16,7 +16,9 @@ get_cansim_table_list <- function(){
   result
 }
 
-#' get page of cansim tables
+#' internal method to get page of cansim tables
+#' @param start starting row
+#' @param rows number of rows, maximum is 1000
 get_cansim_table_list_page <- function(start=0,rows=1000){
   if (rows>1000) {
     warning("Clipping to 1000 rows")
@@ -36,8 +38,8 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
       dplyr::filter(.data$format=="CSV")
     if (nrow(dd)==2) {
       # have cansim dataset
-      url_1=filter(dd,lang=="en")
-      url_2=filter(dd,lang=="fr")
+      url_1=filter(dd,.data$lang=="en")
+      url_2=filter(dd,.data$lang=="fr")
       url_1=ifelse(nrow(url_1)==1,url_1$url,"")
       url_2=ifelse(nrow(url_2)==1,url_2$url,"")
       url_data=tibble::tibble(source="CANSIM",
@@ -48,11 +50,11 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
     }
     table_number_from_url <- function(u){
       cansim_table_number=gsub('^(https://.+/)(\\d+)(-eng.zip)$', '\\2', u)
-      if (grepl("^\\d{8}$",cansim_table_number)) cansim_table_number = cleaned_ndm_table_number(cansim_table_number)
+      if (grepl("^\\d{8}$",cansim_table_number)) cansim_table_number = cleaned_ndm_table_number(.data$cansim_table_number)
       cansim_table_number
     }
 
-    url_data %>% dplyr::mutate(cansim_table_number=table_number_from_url(url_en))
+    url_data %>% dplyr::mutate(cansim_table_number=table_number_from_url(.data$url_en))
   }))
 
   rows <- tibble::tibble(title=results$title,
@@ -96,7 +98,7 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
 list_cansim_tables <- function(refresh=FALSE){
   directory <- getOption("cache_path")
   if (is.null(directory)) {
-    result=cansim:::cansim_table_list
+    result=cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
       message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
@@ -126,7 +128,7 @@ list_cansim_tables <- function(refresh=FALSE){
 #' Searches through CANSIM tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not \code{search_description} is set to \code{TRUE} or not. If \code{refresh = TRUE}, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 #'
 #' @param search_term User-supplied search term used to find CANSIM tables with matching titles
-#' @param search_keywords By default, this function will search through table titles and keywords. Setting this parameter to "title" will only serach through the title, setting it to "keyword" will only search through keywords.
+#' @param search_fields By default, this function will search through table titles and keywords. Setting this parameter to "title" will only serach through the title, setting it to "keyword" will only search through keywords.
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}
 #'
 #' @return A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered
