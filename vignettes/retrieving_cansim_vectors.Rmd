@@ -24,12 +24,14 @@ Much of the time-series data available from Statistics Canada have individual ve
 
 ### get_cansim_vector()
 
-Running `search_cansim_tables("consumer price index")` shows `r search_cansim_tables("consumer price index") %>% pull(title) %>% length()` tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the CANSIM vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and a specified series start date.
+Running `search_cansim_tables("consumer price index")` shows `r search_cansim_tables("consumer price index") %>% pull(title) %>% length()` tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the CANSIM vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
 ```{r}
 get_cansim_vector("v41690973","2015-01-01")
 ```
 
-The call to `get_cansim_vector` takes three inputs: a string code (or codes) for `vectors`, a `start_time` in YYYY-MM-DD format, and an optional value for `end_time`, also in YYYY-MM-DD format. If `end_time` is not provided, the call will use the current date as the default series end time. Vectors can be coerced into a list object in order to retrieve multiple series at the same time. For example, provincial seasonally-unadjusted CPI values have their own vector codes. The vector code for British Columbia all-items CPI is *v41692462*.
+The call to `get_cansim_vector` takes three inputs: a string code (or codes) for `vectors`, a `start_time` in YYYY-MM-DD format, and an optional value for `end_time`, also in YYYY-MM-DD format. By default, the `start_time` and `end_time` vectors uses Statistics Canada's reference periods ("REF_DATE") for selecting the date range of the data for retrieved vectors. There are a few optional input parameters for this function. If `end_time` is not provided, the call will use the current date as the default series end time. If the optional parameter `use_ref_date` is set to `FALSE`, then vector retrieval will instead filter on the release date of the vector itself.
+
+Vectors can be coerced into a list object in order to retrieve multiple series at the same time. For example, provincial seasonally-unadjusted CPI values have their own vector codes. The vector code for British Columbia all-items CPI is *v41692462*.
 
 The below code retrieves monthly Canadian and BC CPI values for the period January 2015 to December 2017 only. Monthly data series are always dated to the first day of the month. 
 ```{r}

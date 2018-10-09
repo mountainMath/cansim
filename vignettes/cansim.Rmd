@@ -11,8 +11,62 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+	collapse = TRUE,
+	comment = "#>"
 )
+library(cansim)
+library(dplyr)
+```
+
+# About Cansim
+
+The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data). Data can be accessed by table number, vector or table number and coordinate. The package accepts both old and new (NDM) cansim table numbers.
+
+## Installing cansim
+
+The stable version of **cansim** can be easily installed from CRAN.
+```{r load_package_cran, echo=TRUE, message=FALSE, warning=FALSE, eval = FALSE}
+install.packages("cansim")
+
+library(cansim)
+```
+
+Alternatively, the latest development version can be installed from Github using `devtools`. 
+```{r load_package_git, echo=TRUE, message=FALSE, warning=FALSE, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("mountainmath/cansim")
+
+library(cansim)
+```
+
+## Usage
+
+If you know the CANSIM table number you are interested in, use `get_cansim` to download the entire table.
+
+```{r}
+data <- get_cansim("14-10-0293")
+head(data)
+```
+
+By defualt CANSIM data comes in the format provided by Statistics Canada, but often it is convenient to cast the data into an R data object and normalise values that are sent down in e.g. "millions" as unitless numbers. Piping data through the convenience function `normalize_cansim_values` takes care of that.
+```{r}
+data <- get_cansim("14-10-0293") %>% 
+  normalize_cansim_values
+head(data)
+```
+
+If you first want an overview of the data in the table you can use
+```{r}
+get_cansim_table_overview("14-10-0293")
+```
+
+If you don't know the table number you can browse the available tables or serach by survey, keyword or title.
+```{r}
+search_cansim_tables("housing price indexes")
+```
+
+Cansim data can also be accessed by vector, which is especially useful when building reports using specific indicators. For convenince one can specify named vectors, where the `label` field will be added to the returned tibble containing the specified name for each vector.
+```{r}
+get_cansim_vector(c("Meto Van Apartment Construction Price Index"="v44176267","Metro Van CPI"="v41692930"),start_time = "2015-05-01",end_time="2015-08-01")
 ```
 

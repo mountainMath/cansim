@@ -103,7 +103,7 @@ This package is under active development and may have some bugs. [Issues](https:
 
 ### Related packages
 
-* There exists a [CANSIM2R package](https://cran.r-project.org/web/packages/CANSIM2R/index.html) on CRAN. This package currently uses some functionality from that package to access legacy CANSIM data. The *CANSIM2R* package currently does not support retrieval of data from Statistics Canada's NDM tables. 
+* There exists a [CANSIM2R package](https://cran.r-project.org/web/packages/CANSIM2R/index.html) on CRAN that shares some functionality.
 
 * [CANSIM-dataviewer](https://github.com/bcgov/CANSIM-dataviewer) is another tool that depends on the existing *CANSIM2R* package with a focus on uses for the Province of British Columbia.
 
