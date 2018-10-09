@@ -23,7 +23,6 @@ r_binary_packages:
   - rlang
   - purrr
   - tibble
-  - utils
   - jsonlite
   - stringr
   - xml2
