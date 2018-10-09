@@ -10,7 +10,7 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date(),
 \arguments{
 \item{vectors}{The list of vectors to retrieve}
 
-\item{start_time}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
+\item{start_time}{Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter}
 
 \item{end_time}{Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)}
 
