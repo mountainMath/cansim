@@ -12,9 +12,9 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date(),
 
 \item{start_time}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
 
-\item{end_time}{Optional ending time in \code{YYYY-MM-DD} format (defaults to current system time)}
+\item{end_time}{Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)}
 
-\item{use_ref_date}{Optional, TRUE by default. If TRUE, it uses \code{REF_DATE} to filter, otherwise it uses \code{releaseDate}}
+\item{use_ref_date}{Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors}
 }
 \value{
 A tibble with data for vectors released between start and end time

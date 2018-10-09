@@ -38,8 +38,8 @@ rename_vectors <- function(data,vectors){
 #'
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date
-#' @param end_time Optional ending time in \code{YYYY-MM-DD} format (defaults to current system time)
-#' @param use_ref_date Optional, TRUE by default. If TRUE, it uses \code{REF_DATE} to filter, otherwise it uses \code{releaseDate}
+#' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
+#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors
 #'
 #' @return A tibble with data for vectors released between start and end time
 #'
