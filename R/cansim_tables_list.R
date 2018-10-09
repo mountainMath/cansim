@@ -17,15 +17,15 @@ get_cansim_table_list <- function(){
 }
 
 #' internal method to get page of cansim tables
-#' @param start starting row
-#' @param rows number of rows, maximum is 1000
-get_cansim_table_list_page <- function(start=0,rows=1000){
-  if (rows>1000) {
+#' @param start_offset starting row
+#' @param max_rows number of rows, maximum is 1000
+get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
+  if (max_rows>1000) {
     warning("Clipping to 1000 rows")
-    rows=1000
+    max_rows=1000
   }
   url=paste0("https://open.canada.ca/data/api/3/action/package_search?q=owner_org:A0F0FCFC-BC3B-4696-8B6D-E7E411D55BAC",
-             "&start=",start,"&rows=",rows)
+             "&start=",start_offset,"&rows=",max_rows)
   response <- jsonlite::fromJSON(url)$result
   results=response$results
   if (length(results)==0) return (tibble::tibble())
@@ -50,7 +50,7 @@ get_cansim_table_list_page <- function(start=0,rows=1000){
     }
     table_number_from_url <- function(u){
       cansim_table_number=gsub('^(https://.+/)(\\d+)(-eng.zip)$', '\\2', u)
-      if (grepl("^\\d{8}$",cansim_table_number)) cansim_table_number = cleaned_ndm_table_number(.data$cansim_table_number)
+      if (grepl("^\\d{8}$",cansim_table_number)) cansim_table_number = cleaned_ndm_table_number(cansim_table_number)
       cansim_table_number
     }
 
