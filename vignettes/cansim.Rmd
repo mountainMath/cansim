@@ -11,9 +11,10 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+	collapse = TRUE,
+	comment = "#>"
 )
+library(cansim)
 ```
 
 # About Cansim
