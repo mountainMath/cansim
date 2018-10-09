@@ -29,4 +29,7 @@ r_binary_packages:
   - rvest
   - httr
   - ggplot2
-  - sf
+
+# Development version of ggplot2
+r_github_packages:
+  - r-spatial/sf
