@@ -60,7 +60,7 @@ By default percentages will be converted to rates, so instead of being 0-100 it 
 
 ### License
 
-The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open License Agreement requires that: 
+The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that: 
 
 > Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive >licence to:
 > 
@@ -79,7 +79,7 @@ The code in this package is licensed under the MIT license. The bundled table me
 
 ### Attribution
 
-Subject to the Statistics Canada Open License Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
+Subject to the Statistics Canada Open Licence Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
 
 > Acknowledgment of Source
 > (a) You shall include and maintain the following notice on all licensed rights of the Information:
