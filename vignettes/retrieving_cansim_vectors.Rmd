@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(cansim)
+library(dplyr)
 library(ggplot2)
 ```
 
