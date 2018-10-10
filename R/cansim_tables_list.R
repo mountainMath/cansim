@@ -54,7 +54,8 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
       cansim_table_number
     }
 
-    url_data %>% dplyr::mutate(cansim_table_number=table_number_from_url(.data$url_en))
+    url_data %>%
+      dplyr::mutate(cansim_table_number=table_number_from_url(.data$url_en))
   }))
 
   rows <- tibble::tibble(title=results$title,
@@ -79,7 +80,7 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 
   rows %>%
     dplyr::filter(.data$source=="CANSIM",
-                  grepl("^\\d{2}-\\d{2}-\\d{4}",cansim_table_number)) %>%
+                  grepl("^\\d{2}-\\d{2}-\\d{4}",.data$cansim_table_number)) %>%
     dplyr::select(-source)
 }
 

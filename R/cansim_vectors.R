@@ -20,7 +20,7 @@ extract_vector_data <- function(data1){
   }) %>%
     dplyr::bind_rows()
   ref_date_2 <- unique(result$REF_DATE_2) %>% unique
-  if (length(ref_date_2)==1 && ref_date_2=="") result <- result %>% dplyr::select(-REF_DATE_2)
+  if (length(ref_date_2)==1 && ref_date_2=="") result <- result %>% dplyr::select(-.data$REF_DATE_2)
   result
 }
 
