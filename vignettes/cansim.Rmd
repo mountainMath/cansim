@@ -15,58 +15,80 @@ knitr::opts_chunk$set(
 	comment = "#>"
 )
 library(cansim)
-library(dplyr)
 ```
 
-# About Cansim
+### About
 
-The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data). Data can be accessed by table number, vector or table number and coordinate. The package accepts both old and new (NDM) cansim table numbers.
+The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and referred to in this package as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table numbers.
 
-## Installing cansim
+### Installing cansim
 
-The stable version of **cansim** can be easily installed from CRAN.
+The stable version of the `cansim` package is not yet available on CRAN but is close to an official release. In the meantime, the development version of the package can be downloaded from [Github](https://github.com/mountainMath/cansim) using the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) packages.
 ```{r load_package_cran, echo=TRUE, message=FALSE, warning=FALSE, eval = FALSE}
-install.packages("cansim")
+# install.packages("remotes")
+remotes::install_github("mountainmath/cansim")
 
 library(cansim)
 ```
 
-Alternatively, the latest development version can be installed from Github using `devtools`. 
-```{r load_package_git, echo=TRUE, message=FALSE, warning=FALSE, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("mountainmath/cansim")
-
-library(cansim)
-```
-
-## Usage
+### Usage
 
 If you know the CANSIM table number you are interested in, use `get_cansim` to download the entire table.
-
 ```{r}
 data <- get_cansim("14-10-0293")
 head(data)
 ```
-
-By defualt CANSIM data comes in the format provided by Statistics Canada, but often it is convenient to cast the data into an R data object and normalise values that are sent down in e.g. "millions" as unitless numbers. Piping data through the convenience function `normalize_cansim_values` takes care of that.
+By default, CANSIM data retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into an R data object and transform values by their appropriate scaling or unit variable. For example, data may be reported as a value in "millions" but with unitless numbers. A convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
 ```{r}
+library(dplyr)
 data <- get_cansim("14-10-0293") %>% 
   normalize_cansim_values
 head(data)
 ```
-
-If you first want an overview of the data in the table you can use
+Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the `get_cansim_table_overview(table_number)` function. 
 ```{r}
 get_cansim_table_overview("14-10-0293")
 ```
-
-If you don't know the table number you can browse the available tables or serach by survey, keyword or title.
+When a table number is unknown, you can browse the available tables or search by survey name, keyword or title.
 ```{r}
 search_cansim_tables("housing price indexes")
 ```
-
-Cansim data can also be accessed by vector, which is especially useful when building reports using specific indicators. For convenince one can specify named vectors, where the `label` field will be added to the returned tibble containing the specified name for each vector.
+CANSIM data can also be accessed for individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the `cansim` package allows users to specify named vectors, where the `label` field will be added to the returned data frame containing the specified name for each vector.
 ```{r}
-get_cansim_vector(c("Meto Van Apartment Construction Price Index"="v44176267","Metro Van CPI"="v41692930"),start_time = "2015-05-01",end_time="2015-08-01")
+get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
+                    "Metro Van CPI"="v41692930"),
+                  start_time = "2015-05-01",
+                  end_time="2015-08-01")
 ```
 
+### License
+
+The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that: 
+
+> Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive >licence to:
+> 
+> * use, reproduce, publish, freely distribute, or sell the Information;
+> * use, reproduce, publish, freely distribute, or sell Value-added Products; and,
+> * sublicence any or all such rights, under terms consistent with this agreement.
+> 
+> In doing any of the above, you shall:
+> 
+> * reproduce the Information accurately;
+> * not use the Information in a way that suggests that Statistics Canada endorses you or your use of the Information;
+> * not misrepresent the Information or its source;
+> * use the Information in a manner that does not breach or infringe any applicable laws;
+> * not merge or link the Information with any other databases for the purpose of attempting to identify an individual person, business or organization; and
+> * not present the Information in such a manner that gives the appearance that you may have received, or had access to, information held by Statistics Canada about any identifiable individual person, business or organization.
+
+### Attribution
+
+Subject to the Statistics Canada Open Licence Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
+
+> Acknowledgment of Source
+> (a) You shall include and maintain the following notice on all licensed rights of the Information:
+>
+> Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
+> 
+> (b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
+> 
+> Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
