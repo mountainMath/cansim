@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mountainMath/cansim.svg?branch=master)](https://travis-ci.org/mountainMath/cansim)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cansim)](https://cran.r-project.org/package=cansim)
 # cansim
 
 R package to download Statistics Canada CANSIM/NDM tables.
