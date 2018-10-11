@@ -159,3 +159,6 @@ ggplot(rrl_data %>% filter(GEO %in% regions),
 ```
 We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction. 
 
+```{r include=FALSE}
+Sys.sleep(120)
+```

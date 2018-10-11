@@ -75,3 +75,7 @@ ggplot(data,aes(x=Date,y=VALUE,color=label)) +
        caption=paste0("CANSIM vectors ",paste0(vectors,collapse = ", ")),x="",y="",color="")
 ```
 
+```{r include=FALSE}
+Sys.sleep(120)
+```
+
