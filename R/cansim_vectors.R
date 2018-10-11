@@ -154,3 +154,23 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
   extract_vector_data(data1)
 }
 
+
+#' Retrieve metadatadata for specified CANSIM vectors
+#'
+#' Allows for the retrieval of metadatadata for CANSIM vectors
+#'
+#' @param vectors a vector of cansim vectors
+#'
+#' @return A tibble with metadata for the cansim vectors
+#'
+#' @export
+get_cansim_vector_info <- function(vectors){
+  vectors=paste0("v",gsub("^v","",vectors))
+  url=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",paste0(vectors,collapse = "%2C+"))
+  result <- xml2::read_html(url) %>%
+    rvest::html_node("script#csvContent") %>%
+    rvest::html_text() %>%
+    readr::read_csv()
+  result
+}
+
