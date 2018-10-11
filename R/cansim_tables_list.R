@@ -97,19 +97,22 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
+  # flow: if cache_path version exists, use that, otherwise fall back on package version
+  # if refresh is TRUE, refresh cache path
+
   directory <- getOption("cache_path")
-  if (is.null(directory)) {
+  path <- file.path(directory,"cansim_table_list.Rda")
+  if (is.null(directory) || (!refresh && !exists(path))) {
     result=cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
       message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
     }
-    if (refresh==TRUE) {
+    if (is.null(directory)) {
       message("The table won't be able to refresh if options(cache_path=\"your cache path\") is not set.")
     }
   } else {
-    path <- file.path(directory,"cansim_table_list.Rda")
-    if (refresh | !file.exists(path)) {
+    if (refresh) {
       message("Generating the table overview data, this may take a minute.")
       data <- get_cansim_table_list()
       attr(data,"date") <- Sys.Date()

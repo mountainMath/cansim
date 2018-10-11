@@ -1,25 +1,5 @@
-language: R
+language: r
 cache: packages
+sudo: false
 latex: false
-sudo: required
-dist: trusty
-
-r:
-  - release
-
-# Binary versions of packages to reduce build time.
-r_binary_packages:
-  - dplyr
-  - markdown
-  - readr
-  - rmarkdown
-  - tidyr
-  - rlang
-  - purrr
-  - tibble
-  - jsonlite
-  - stringr
-  - xml2
-  - rvest
-  - httr
-  - ggplot2
+pandoc: false
