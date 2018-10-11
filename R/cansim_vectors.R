@@ -165,12 +165,40 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
 #'
 #' @export
 get_cansim_vector_info <- function(vectors){
-  vectors=paste0("v",gsub("^v","",vectors))
-  url=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",paste0(vectors,collapse = "%2C+"))
-  result <- xml2::read_html(url) %>%
-    rvest::html_node("script#csvContent") %>%
-    rvest::html_text() %>%
-    readr::read_csv()
-  result
+  vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromVector"
+  vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,'}')),collapse = ", "),"]")
+  response <- httr::POST(url,
+                         body=vectors_string,
+                         encode="json",
+                         httr::add_headers("Content-Type"="application/json")
+  )
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+  }
+  data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    data2 %>% purrr::map(function(x){
+      message(x$object)
+    })
+  }
+
+  extract_vector_metadata(data1)
 }
+
+
+# get_cansim_vector_info_webscrape <- function(vectors){
+#   vectors=paste0("v",gsub("^v","",vectors))
+#   url=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",paste0(vectors,collapse = "%2C+"))
+#   result <- xml2::read_html(url) %>%
+#     rvest::html_node("script#csvContent") %>%
+#     rvest::html_text() %>%
+#     readr::read_csv()
+#   result
+# }
+
+
 
