@@ -74,6 +74,3 @@ ggplot(data, aes(x=Date, group = GEO,y=Estimate)) +
 ```
 
 
-```{r include=FALSE}
-Sys.sleep(120)
-```

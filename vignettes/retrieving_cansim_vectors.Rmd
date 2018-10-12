@@ -75,12 +75,3 @@ ggplot(data,aes(x=Date,y=VALUE,color=label)) +
        caption=paste0("CANSIM vectors ",paste0(vectors,collapse = ", ")),x="",y="",color="")
 ```
 
-```{r include=FALSE}
-#Sys.sleep(120)
-vectors <- c("v41690973","v41692462")
-get_cansim_vector("v41690973","2015-01-01")
-get_cansim_vector(vectors, "2017-01-01")
-get_cansim_vector_for_latest_periods("v41690973", periods = 60)
-
-```
-

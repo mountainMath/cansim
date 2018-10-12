@@ -94,7 +94,3 @@ Subject to the Statistics Canada Open Licence Agreement, licensed products using
 > Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
 
 
-```{r include=FALSE}
-Sys.sleep(120)
-```
-
