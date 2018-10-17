@@ -519,7 +519,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
       }) %>% as.character()
   }) %>%
     purrr::set_names(fields) %>%
-    tibble::as.tibble()
+    tibble::as.tibble() %>%
+    dplyr::mutate(productId=cleaned_ndm_table_number(productId))
   l
 }
 
