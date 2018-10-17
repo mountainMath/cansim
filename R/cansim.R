@@ -520,6 +520,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
   }) %>%
     purrr::set_names(fields) %>%
     tibble::as.tibble()
+  l
 }
 
 #' Retrieve a CANSIM table URL given a table number
