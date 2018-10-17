@@ -92,3 +92,5 @@ Subject to the Statistics Canada Open Licence Agreement, licensed products using
 > (b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
 > 
 > Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
+
+

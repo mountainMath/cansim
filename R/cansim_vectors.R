@@ -24,6 +24,31 @@ extract_vector_data <- function(data1){
   result
 }
 
+extract_vector_metadata <- function(data1){
+  vf=list("DECIMALS"="decimals",
+          "VECTOR"="vectorId",
+          "table"="productId",
+          "COORDINATE"="coordinate",
+          "title_en"="SeriesTitleEn",
+          "title_fr"="SeriesTitleFr",
+          "UOM"="memberUomCode",
+          "frequencyCode"="frequencyCode",
+          "SCALAR_ID"="scalarFactorCode")
+  result <- purrr::map(data1,function(d){
+    value_data = lapply(vf,function(f){
+      x=d$object[[f]]
+      if (is.null(x)) x <- NA
+      x
+    }) %>%
+      tibble::as.tibble()
+    value_data
+  }) %>%
+    dplyr::bind_rows() %>%
+    dplyr::mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
+    dplyr::mutate(title=.data$title_en)
+
+  result
+}
 
 rename_vectors <- function(data,vectors){
   if (!is.null(names(vectors))) {
@@ -54,11 +79,7 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date(),use_ref_date=
     vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
     time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
                        '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
-    response <- httr::POST(url,
-                           body=paste0("{",vectors_string,",",time_string,"}"),
-                           encode="json",
-                           httr::add_headers("Content-Type"="application/json")
-    )
+    response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
     if (response$status_code!=200) {
       stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
     }
@@ -95,11 +116,7 @@ get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
-  response <- httr::POST(url,
-                         body=vectors_string,
-                         encode="json",
-                         httr::add_headers("Content-Type"="application/json")
-  )
+  response <- post_with_timeout_retry(url, body=vectors_string)
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
@@ -133,11 +150,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
   table=naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
-  response <- httr::POST(url,
-                         body=body_string,
-                         encode="json",
-                         httr::add_headers("Content-Type"="application/json")
-  )
+  response <- post_with_timeout_retry(url, body=body_string)
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
@@ -168,11 +181,7 @@ get_cansim_vector_info <- function(vectors){
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromVector"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,'}')),collapse = ", "),"]")
-  response <- httr::POST(url,
-                         body=vectors_string,
-                         encode="json",
-                         httr::add_headers("Content-Type"="application/json")
-  )
+  response <- post_with_timeout_retry(url, body=vectors_string)
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
   }
