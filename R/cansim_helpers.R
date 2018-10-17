@@ -1,12 +1,13 @@
 cleaned_ndm_table_number <- function(cansimTableNumber){
-  t<-gsub("-","",as.character(cansimTableNumber))
-  if (nchar(t)<=7) {
-    tt<-cansim_old_to_new(t)
-    message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
-    cansimTableNumber=tt
-  }
-  cansimTableNumber
-  n=as.character(gsub("-","",cansimTableNumber))
+  n<-gsub("-","",as.character(cansimTableNumber)) %>%
+    purrr::map(function(t){
+      if (nchar(t)<=7) {
+        tt<-cansim_old_to_new(t)
+        message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
+        t=gsub("-","",tt)
+      }
+      t
+    }) %>% unlist
   paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
 }
 
