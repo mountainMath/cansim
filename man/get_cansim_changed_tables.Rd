@@ -15,3 +15,7 @@ A tibble with CANSIM product ids and release times
 \description{
 Retrieve a list of tables that have been modified or updated since the specified date.
 }
+\examples{
+get_cansim_changed_tables("2018-08-01")
+
+}

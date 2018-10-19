@@ -18,5 +18,9 @@ get_cansim_table_overview(cansimTableNumber, language = "english",
 none
 }
 \description{
-In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
+Prints table overview information as console output. In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
+}
+\examples{
+get_cansim_table_overview("34-10-0013")
+
 }
