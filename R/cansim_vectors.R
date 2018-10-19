@@ -88,14 +88,17 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date(),use_ref_date=
     data1 <- Filter(function(x)x$status=="SUCCESS",data)
     data2 <- Filter(function(x)x$status!="SUCCESS",data)
     if (length(data2)>0) {
-      message(paste0("Failed to load metadata for ",length(data2)," tables "))
+      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
       data2 %>% purrr::map(function(x){
-        message(x$object)
+        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
       })
     }
 
-    result <- extract_vector_data(data1) %>%
-      rename_vectors(vectors)
+    if (length(data1)>0)
+      result <- extract_vector_data(data1) %>%
+        rename_vectors(vectors)
+    else
+      result <- tibble::tibble()
   } else {
     result <- get_cansim_vector_for_latest_periods(vectors,periods=10000) %>%
       filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=end_time)
@@ -125,14 +128,17 @@ get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
   data2 <- Filter(function(x)x$status!="SUCCESS",data)
   if (length(data2)>0) {
-    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    message(paste0("Failed to load data for ",length(data2)," vector(s)."))
     data2 %>% purrr::map(function(x){
-      message(x$object)
+      message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
     })
   }
-
-  extract_vector_data(data1) %>%
-    rename_vectors(vectors)
+  if (length(data1)>0)
+    result <- extract_vector_data(data1) %>%
+      rename_vectors(vectors)
+  else
+    result <- tibble::tibble()
+  result
 }
 
 
