@@ -29,3 +29,15 @@ file_path_for_table_language <- function(cansimTableNumber, language){
 base_path_for_table_language <- function(cansimTableNumber, language){
   file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
 }
+
+response_status_code_translation <- list(
+  "0"="Success",
+  "1"="Invalid date",
+  "2"="Invalid cube and series combination",
+  "3"="Request failed",
+  "4"="Vector is invalid",
+  "5"="Cube product id is invalid",
+  "6"="Cube is currently being published. Please try again later.",
+  "7"="Cube is currently unavailable. For more information, contact us (toll-free 1-800-263-1136; 514-283-8300; STATCAN.infostats-infostats.STATCAN@canada.ca).",
+  "8"="Invalid number of reference periods"
+)
