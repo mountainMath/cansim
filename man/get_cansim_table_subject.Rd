@@ -17,3 +17,7 @@ get_cansim_table_subject(cansimTableNumber, language = "english",
 \description{
 Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
+\examples{
+get_cansim_table_subject("34-10-0013")
+
+}

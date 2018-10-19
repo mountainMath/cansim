@@ -9,6 +9,12 @@
 #'
 #' @return a tibble with CANSIM table data
 #'
+#' @examples
+#' # Retrieve a table with an NDM code
+#' get_cansim("34-10-0013")
+#' # Retrieve a table with an old-style CANSIM code
+#' get_cansim("026-0018")
+#'
 #' @export
 get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE){
   get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber),language,refresh)
@@ -38,6 +44,10 @@ adjust_cansim_values_by_variable <-function(data,var){
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #'
 #' @return Tibble with adjusted values
+#'
+#' @examples
+#' cansim_table <- get_cansim("34-10-0013")
+#' normalize_cansim_values(cansim_table)
 #'
 #' @export
 normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01"){
@@ -85,6 +95,9 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 #'
 #' @return CANSIM NDM table number
 #'
+#' @examples
+#' cansim_old_to_new("026-0018")
+#'
 #' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
   path <- file.path(tempdir(),"cansim-correspondence.csv")
@@ -116,6 +129,9 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
 #'
 #' @return a tibble with retrieved NDM table data
+#'
+#' @examples
+#' get_cansim("34-10-0013")
 #'
 #' @export
 get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE){
@@ -242,6 +258,9 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
 #'
+#' @examples
+#' get_cansim_table_info("34-10-0013")
+#'
 #' @export
 get_cansim_table_info <- function(cansimTableNumber, language="english", refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda1")
@@ -260,6 +279,9 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
 #'
+#' @examples
+#' get_cansim_table_survey("34-10-0013")
+#'
 #' @export
 get_cansim_table_survey <- function(cansimTableNumber, language="english", refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
@@ -276,6 +298,9 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#'
+#' @examples
+#' get_cansim_table_subject("34-10-0013")
 #'
 #' @export
 get_cansim_table_subject <- function(cansimTableNumber, language="english", refresh=FALSE){
@@ -294,6 +319,9 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
 #'
+#' @examples
+#' get_cansim_table_notes("34-10-0013")
+#'
 #' @export
 get_cansim_table_notes <- function(cansimTableNumber, language="english", refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
@@ -310,6 +338,9 @@ get_cansim_table_notes <- function(cansimTableNumber, language="english", refres
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#'
+#' @examples
+#' get_cansim_column_list("34-10-0013")
 #'
 #' @export
 get_cansim_column_list <- function(cansimTableNumber, language="english", refresh=FALSE){
@@ -329,6 +360,9 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
 #'
+#' @examples
+#' get_cansim_column_categories("34-10-0013", "Geography")
+#'
 #' @export
 get_cansim_column_categories <- function(cansimTableNumber, column, language="english", refresh=FALSE){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
@@ -344,13 +378,16 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
 
 #' Get CANSIM table overview text
 #'
-#' In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
+#' Prints table overview information as console output. In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
 #'
 #' @return none
+#'
+#' @examples
+#' get_cansim_table_overview("34-10-0013")
 #'
 #' @export
 get_cansim_table_overview <- function(cansimTableNumber, language="english", refresh=FALSE){
@@ -486,6 +523,9 @@ view_cansim_webpage <- function(cansimTableNumber){
 #'
 #' @return a tibble containing the table metadata
 #'
+#' @examples
+#' get_cansim_cube_metadata("34-10-0013")
+#'
 #' @export
 get_cansim_cube_metadata <- function(cansimTableNumber){
   table_id=naked_ndm_table_number(cansimTableNumber)
@@ -533,8 +573,12 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
 #'
 #' @return String object containing URL for specified table number
 #'
+#' @examples
+#' get_cansim_table_url("34-10-0013")
+#' get_cansim_table_url("34-10-0013", language = "fr")
+#'
 #' @export
-get_cansim_table_url <- function(cansimTableNumber, language){
+get_cansim_table_url <- function(cansimTableNumber, language = "en"){
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
@@ -551,6 +595,9 @@ get_cansim_table_url <- function(cansimTableNumber, language){
 #' @param start_date Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date
 #'
 #' @return A tibble with CANSIM product ids and release times
+#'
+#' @examples
+#' get_cansim_changed_tables("2018-08-01")
 #'
 #' @export
 get_cansim_changed_tables <- function(start_date){

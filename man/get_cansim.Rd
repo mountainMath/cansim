@@ -19,3 +19,10 @@ a tibble with CANSIM table data
 \description{
 Retrieves a CANSIM table as a tidy dataframe using either a CANSIM code or an NDM table number. Retrieved table data is cached for the duration of the current R session only by default.
 }
+\examples{
+# Retrieve a table with an NDM code
+get_cansim("34-10-0013")
+# Retrieve a table with an old-style CANSIM code
+get_cansim("026-0018")
+
+}

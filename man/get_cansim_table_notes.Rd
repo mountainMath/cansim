@@ -17,3 +17,7 @@ get_cansim_table_notes(cansimTableNumber, language = "english",
 \description{
 Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
+\examples{
+get_cansim_table_notes("34-10-0013")
+
+}

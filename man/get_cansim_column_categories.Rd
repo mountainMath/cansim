@@ -19,3 +19,7 @@ get_cansim_column_categories(cansimTableNumber, column,
 \description{
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
+\examples{
+get_cansim_column_categories("34-10-0013", "Geography")
+
+}
