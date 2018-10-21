@@ -80,7 +80,7 @@
     <div class="page-header toc-ignore">
       <h1>Working with CANSIM hierarchies</h1>
             
-            <h4 class="date">2018-10-09</h4>
+            <h4 class="date">2018-10-21</h4>
       
       
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -122,21 +122,22 @@
 <a href="#accessing-table-data" class="anchor"></a>Accessing table data</h3>
 <p>We see that data set come with three different measures and 307 different NAICS values. Let’s load the data and focus on just “Chained (2007) dollars”.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/get_cansim.html">get_cansim</a></span>(table_id) </a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt; Accessing CANSIM NDM product 36-10-0402</span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14">selected_value =<span class="st"> "Chained (2007) dollars"</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(Value <span class="op">==</span><span class="st"> </span>selected_value)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.1</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/get_cansim.html">get_cansim</a></span>(table_id) </a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt; Accessing CANSIM NDM product 36-10-0402</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">selected_value =<span class="st"> "Chained (2007) dollars"</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(Value <span class="op">==</span><span class="st"> </span>selected_value)</a></code></pre></div>
 </div>
 <div id="normalizing-variables" class="section level3">
 <h3 class="hasAnchor">
@@ -213,7 +214,8 @@
 <a class="sourceLine" id="cb6-32" data-line-number="32">       <span class="dt">subtitle=</span>selected_value,</a>
 <a class="sourceLine" id="cb6-33" data-line-number="33">       <span class="dt">x=</span><span class="st">""</span>, <span class="dt">fill =</span> <span class="st">""</span>, </a>
 <a class="sourceLine" id="cb6-34" data-line-number="34">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-6-1.png" width="432"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-6-1.png" width="864"></p>
+<p>Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">real_construction &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span>)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co"># Get the NAICS hierarchy codes just for these categories</span></a>
@@ -246,7 +248,8 @@
 <a class="sourceLine" id="cb7-30" data-line-number="30">       <span class="dt">subtitle=</span><span class="kw">paste0</span>(regions,<span class="st">", "</span>, selected_value),</a>
 <a class="sourceLine" id="cb7-31" data-line-number="31">       <span class="dt">x=</span><span class="st">""</span>,</a>
 <a class="sourceLine" id="cb7-32" data-line-number="32">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="432"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"></p>
+<p>We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
 </div>
   </div>
 

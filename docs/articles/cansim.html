@@ -80,7 +80,7 @@
     <div class="page-header toc-ignore">
       <h1>Getting started with the CANSIM package</h1>
             
-            <h4 class="date">2018-10-09</h4>
+            <h4 class="date">2018-10-21</h4>
       
       
       <div class="hidden name"><code>cansim.Rmd</code></div>
@@ -129,33 +129,34 @@
 <a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt; #   Code for Statistics` &lt;chr&gt;, `Hierarchy for Statistics` &lt;chr&gt;</span></a></code></pre></div>
 <p>By default, CANSIM data retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into an R data object and transform values by their appropriate scaling or unit variable. For example, data may be reported as a value in “millions” but with unitless numbers. A convenience function, <code>normalize_cansim_values</code>, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using <code>dplyr</code>, applying normalization is as straightforward as piping data through the <code>normalize_cansim_values</code> function.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/get_cansim.html">get_cansim</a></span>(<span class="st">"14-10-0293"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="st">  </span>normalize_cansim_values</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; Accessing CANSIM NDM product 14-10-0293</span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="kw">head</span>(data)</a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; # A tibble: 6 x 20</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt;   REF_DATE GEO   DGUID `Labour force c… Statistics UOM   UOM_ID VECTOR</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; </span></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; 1 2001-03  Cana… 2016… Population       Estimate   Pers… 249    v9141…</span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; 2 2001-03  Cana… 2016… Labour force     Estimate   Pers… 249    v9141…</span></a>
-<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co">#&gt; 3 2001-03  Cana… 2016… Labour force     Standard … Pers… 249    v1018…</span></a>
-<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co">#&gt; 4 2001-03  Cana… 2016… Labour force     Standard … Pers… 249    v1018…</span></a>
-<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co">#&gt; 5 2001-03  Cana… 2016… Employment       Estimate   Pers… 249    v9141…</span></a>
-<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="co">#&gt; 6 2001-03  Cana… 2016… Employment       Standard … Pers… 249    v1018…</span></a>
-<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="co">#&gt; # ... with 12 more variables: COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb3-24" data-line-number="24"><span class="co">#&gt; #   SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="co">#&gt; #   `Classification Code for Labour force characteristics` &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co">#&gt; #   `Hierarchy for Labour force characteristics` &lt;chr&gt;, `Classification</span></a>
-<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co">#&gt; #   Code for Statistics` &lt;chr&gt;, `Hierarchy for Statistics` &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="co">#&gt; #   Date &lt;date&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.1</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/get_cansim.html">get_cansim</a></span>(<span class="st">"14-10-0293"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="st">  </span>normalize_cansim_values</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt; Accessing CANSIM NDM product 14-10-0293</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="kw">head</span>(data)</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; # A tibble: 6 x 20</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt;   REF_DATE GEO   DGUID `Labour force c… Statistics UOM   UOM_ID VECTOR</span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; </span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; 1 2001-03  Cana… 2016… Population       Estimate   Pers… 249    v9141…</span></a>
+<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co">#&gt; 2 2001-03  Cana… 2016… Labour force     Estimate   Pers… 249    v9141…</span></a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co">#&gt; 3 2001-03  Cana… 2016… Labour force     Standard … Pers… 249    v1018…</span></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co">#&gt; 4 2001-03  Cana… 2016… Labour force     Standard … Pers… 249    v1018…</span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="co">#&gt; 5 2001-03  Cana… 2016… Employment       Estimate   Pers… 249    v9141…</span></a>
+<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="co">#&gt; 6 2001-03  Cana… 2016… Employment       Standard … Pers… 249    v1018…</span></a>
+<a class="sourceLine" id="cb3-24" data-line-number="24"><span class="co">#&gt; # ... with 12 more variables: COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="co">#&gt; #   SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co">#&gt; #   `Classification Code for Labour force characteristics` &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co">#&gt; #   `Hierarchy for Labour force characteristics` &lt;chr&gt;, `Classification</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="co">#&gt; #   Code for Statistics` &lt;chr&gt;, `Hierarchy for Statistics` &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb3-29" data-line-number="29"><span class="co">#&gt; #   Date &lt;date&gt;</span></a></code></pre></div>
 <p>Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the <code><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview(table_number)</a></code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span>(<span class="st">"14-10-0293"</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Labour force characteristics by economic region, three-month moving average, unadjusted for seasonality, last 5 months</span></a>
@@ -172,22 +173,23 @@
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt; Estimate, Standard error of estimate, Standard error of year-over-year change</span></a></code></pre></div>
 <p>When a table number is unknown, you can browse the available tables or search by survey name, keyword or title.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/search_cansim_tables.html">search_cansim_tables</a></span>(<span class="st">"housing price indexes"</span>)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 8 x 21</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt;   title title_en title_fr keywords_en keywords keywords_fr notes notes_en</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   </span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; 1 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; 2 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; 3 Non-… Non-res… Indice … constructi… constru… constructi… &lt;p&gt;A… &lt;p&gt;Arch…</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; 4 Pric… Price i… Indices… constructi… constru… constructi… This… This ta…</span></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; 5 Pric… Price i… Indices… constructi… constru… constructi… &lt;p&gt;T… &lt;p&gt;This…</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 6 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 7 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 8 New … New hou… Indice … constructi… constru… constructi… Mont… Monthly…</span></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; # ... with 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;, subject &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; #   date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; #   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; #   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; #   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; The table won't be able to refresh if options(cache_path="your cache path") is not set.</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; # A tibble: 8 x 21</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;   title title_en title_fr keywords_en keywords keywords_fr notes notes_en</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   </span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; 1 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; 2 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; 3 Non-… Non-res… Indice … constructi… constru… constructi… &lt;p&gt;A… &lt;p&gt;Arch…</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; 4 Pric… Price i… Indices… constructi… constru… constructi… This… This ta…</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 5 Pric… Price i… Indices… constructi… constru… constructi… &lt;p&gt;T… &lt;p&gt;This…</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 6 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 7 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; 8 New … New hou… Indice … constructi… constru… constructi… Mont… Monthly…</span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; # ... with 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;, subject &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="co">#&gt; #   date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb5-16" data-line-number="16"><span class="co">#&gt; #   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb5-17" data-line-number="17"><span class="co">#&gt; #   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; #   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span></a></code></pre></div>
 <p>CANSIM data can also be accessed for individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the <code>cansim</code> package allows users to specify named vectors, where the <code>label</code> field will be added to the returned data frame containing the specified name for each vector.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span>(<span class="kw">c</span>(<span class="st">"Metro Van Apartment Construction Price Index"</span>=<span class="st">"v44176267"</span>,</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2">                    <span class="st">"Metro Van CPI"</span>=<span class="st">"v41692930"</span>),</a>

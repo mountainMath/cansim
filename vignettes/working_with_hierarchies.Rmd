@@ -85,7 +85,7 @@ cut_data <- data %>% filter(
 n <- length(cut_data$`North American Industry Classification System (NAICS)` %>% unique)
 ```
 There are still `r n` level 1 categories, too many to sensibly visualize at the same time. We can use `dplyr` functions to identify the top categories and group the rest so that we can have a plot that is easier to understand. 
-```{r fig.height=3, fig.width=4.5}
+```{r fig.height=6, fig.width=9}
 # Specify which regions and period we want to look at 
 regions = "British Columbia"
 period = "2017-01-01"
@@ -122,8 +122,9 @@ ggplot(plot_data %>%
        caption=paste0("CANSIM ", table_id))
 
 ```
+
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
-```{r fig.height=4, fig.width=4.5, warning=FALSE}
+```{r fig.height=7, fig.width=9, warning=FALSE}
 real_construction <- c("Construction","Real estate and rental and leasing")
 
 # Get the NAICS hierarchy codes just for these categories
@@ -157,5 +158,6 @@ ggplot(rrl_data %>% filter(GEO %in% regions),
        x="",
        caption=paste0("CANSIM ", table_id))
 ```
+
 We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction. 
 
