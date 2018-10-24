@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_vectors.R
 \name{get_cansim_vector_info}
 \alias{get_cansim_vector_info}
-\title{Retrieve metadatadata for specified CANSIM vectors}
+\title{Retrieve metadatadata for specified Statistics Canada data vectors}
 \usage{
 get_cansim_vector_info(vectors)
 }
@@ -10,8 +10,8 @@ get_cansim_vector_info(vectors)
 \item{vectors}{a vector of cansim vectors}
 }
 \value{
-A tibble with metadata for the cansim vectors
+A tibble with metadata for selected vectors
 }
 \description{
-Allows for the retrieval of metadatadata for CANSIM vectors
+Allows for the retrieval of metadatadata for Statistics Canada data vectors
 }

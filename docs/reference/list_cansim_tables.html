@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get overview list for all CANSIM tables — list_cansim_tables • cansim</title>
+<title>Get overview list for all Statistics Canada data tables — list_cansim_tables • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Get overview list for all CANSIM tables — list_cansim_tables" />
+<meta property="og:title" content="Get overview list for all Statistics Canada data tables — list_cansim_tables" />
 
-<meta property="og:description" content="Will generate the table in case it does not exist or refresh option is set" />
+<meta property="og:description" content="Generates a overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if force refresh is selected as an option. This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option cache_path is set it will look for and store the overview table in that directory." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,14 +113,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get overview list for all CANSIM tables</h1>
+    <h1>Get overview list for all Statistics Canada data tables</h1>
     
     <div class="hidden name"><code>list_cansim_tables.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Will generate the table in case it does not exist or refresh option is set</p>
+    <p>Generates a overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if force refresh is selected as an option. This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option <code>cache_path</code> is set it will look for and store the overview table in that directory.</p>
     
     </div>
 
@@ -131,14 +131,13 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>refresh</th>
-      <td><p>Default is <code>FALSE</code>, and will regenerate the table if set to <code>TRUE</code>. This takes some time since this is scraping through several
-hundred web pages to gather required metadata data. If option <code>cache_path</code> is set it will look for and store the overview table in that directory.</p></td>
+      <td><p>Default is <code>FALSE</code>, and will regenerate the table if set to <code>TRUE</code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered.</p>
+    <p>A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography</p>
     
 
   </div>

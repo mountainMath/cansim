@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get CANSIM table information — get_cansim_table_info • cansim</title>
+<title>Retrieve Statistics Canada data table information — get_cansim_table_info • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Get CANSIM table information — get_cansim_table_info" />
+<meta property="og:title" content="Retrieve Statistics Canada data table information — get_cansim_table_info" />
 
-<meta property="og:description" content="Returns table information given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only." />
+<meta property="og:description" content="Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,14 +113,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get CANSIM table information</h1>
+    <h1>Retrieve Statistics Canada data table information</h1>
     
     <div class="hidden name"><code>get_cansim_table_info.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Returns table information given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.</p>
+    <p>Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.</p>
     
     </div>
 
@@ -140,7 +140,7 @@
     </tr>
     <tr>
       <th>refresh</th>
-      <td><p>Optionally force reload of CANSIM data, default is <code>FALSE</code></p></td>
+      <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
     </tr>
     </table>
     

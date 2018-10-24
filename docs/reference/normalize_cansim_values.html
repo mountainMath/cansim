@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Normalize CANSIM table values to appropriate scale — normalize_cansim_values • cansim</title>
+<title>Normalize retrieved data table values to appropriate scales — normalize_cansim_values • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Normalize CANSIM table values to appropriate scale — normalize_cansim_values" />
+<meta property="og:title" content="Normalize retrieved data table values to appropriate scales — normalize_cansim_values" />
 
-<meta property="og:description" content="Facilitates working with CANSIM values by setting all units to counts/dollars instead of millions, etc. If &quot;replacement_value&quot; is not set, it will replace the VALUE field with normalized values and drop the scale column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the REF_DATE field and create an R date variable. This is currently experimental." />
+<meta property="og:description" content="Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If &quot;replacement_value&quot; is not set, it will replace the VALUE field with normalized values and drop the scale column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the REF_DATE field and create an R date variable. This is currently experimental." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,14 +113,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Normalize CANSIM table values to appropriate scale</h1>
+    <h1>Normalize retrieved data table values to appropriate scales</h1>
     
     <div class="hidden name"><code>normalize_cansim_values.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Facilitates working with CANSIM values by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the <code>VALUE</code> field with normalized values and drop the <code>scale</code> column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the <code>REF_DATE</code> field and create an R date variable. This is currently experimental.</p>
+    <p>Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the <code>VALUE</code> field with normalized values and drop the <code>scale</code> column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the <code>REF_DATE</code> field and create an R date variable. This is currently experimental.</p>
     
     </div>
 
@@ -132,15 +132,15 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A CANSIM table as returned from <code><a href='get_cansim.html'>get_cansim()</a></code> pr <code><a href='get_cansim_ndm.html'>get_cansim_ndm()</a></code></p></td>
+      <td><p>A retrieved data table as returned from <code><a href='get_cansim.html'>get_cansim()</a></code> pr <code><a href='get_cansim_ndm.html'>get_cansim_ndm()</a></code></p></td>
     </tr>
     <tr>
       <th>replacement_value</th>
-      <td><p>(Optional) name of the column the manipulated value should be returned in. Defaults to replacing the current value field</p></td>
+      <td><p>(Optional) the name of the column the manipulated value should be returned in. Defaults to replacing the current value field</p></td>
     </tr>
     <tr>
       <th>normalize_percent</th>
-      <td><p>(Optional) normalize percentages by changing them to rates. <code>TRUE</code> by default</p></td>
+      <td><p>(Optional) When <code>true</code> (the default) normalizes percentages by changing them to rates</p></td>
     </tr>
     <tr>
       <th>default_month</th>
@@ -154,7 +154,7 @@
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Tibble with adjusted values</p>
+    <p>Returns the input tibble with with adjusted values</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

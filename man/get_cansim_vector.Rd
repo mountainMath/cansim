@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_vectors.R
 \name{get_cansim_vector}
 \alias{get_cansim_vector}
-\title{Retrieve data for a CANSIM vector released within a given time frame}
+\title{Retrieve data for a Statistics Canada data vector released within a given time frame}
 \usage{
 get_cansim_vector(vectors, start_time, end_time = Sys.Date(),
   use_ref_date = TRUE)
@@ -20,5 +20,5 @@ get_cansim_vector(vectors, start_time, end_time = Sys.Date(),
 A tibble with data for vectors released between start and end time
 }
 \description{
-Retrieve data for a CANSIM vector released within a given time frame
+Retrieve data for a Statistics Canada data vector released within a given time frame
 }

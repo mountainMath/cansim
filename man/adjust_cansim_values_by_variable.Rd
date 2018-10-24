@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{adjust_cansim_values_by_variable}
 \alias{adjust_cansim_values_by_variable}
-\title{(Deprecated) Adjust CANSIM table values by a scaling variable}
+\title{(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable}
 \usage{
 adjust_cansim_values_by_variable(data, var)
 }
@@ -12,5 +12,5 @@ adjust_cansim_values_by_variable(data, var)
 \item{var}{A now deprecated input}
 }
 \description{
-(Deprecated) Adjust CANSIM table values by scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
+(Deprecated) Adjust retrieved data table values by a scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
 }

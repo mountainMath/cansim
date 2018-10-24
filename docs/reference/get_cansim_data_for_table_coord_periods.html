@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieve data for specified CANSIM table for last N periods for specific coordinates — get_cansim_data_for_table_coord_periods • cansim</title>
+<title>Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates — get_cansim_data_for_table_coord_periods • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Retrieve data for specified CANSIM table for last N periods for specific coordinates — get_cansim_data_for_table_coord_periods" />
+<meta property="og:title" content="Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates — get_cansim_data_for_table_coord_periods" />
 
-<meta property="og:description" content="Allows for the retrieval of data for a CANSIM table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions." />
+<meta property="og:description" content="Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -113,14 +113,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieve data for specified CANSIM table for last N periods for specific coordinates</h1>
+    <h1>Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates</h1>
     
     <div class="hidden name"><code>get_cansim_data_for_table_coord_periods.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Allows for the retrieval of data for a CANSIM table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.</p>
+    <p>Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.</p>
     
     </div>
 
@@ -132,11 +132,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>cansimTableNumber</th>
-      <td><p>CANSIM table number</p></td>
+      <td><p>Statistics Canada data table number</p></td>
     </tr>
     <tr>
       <th>coordinate</th>
-      <td><p>A string CANSIM coordinates in the form <code>"1.1.1.36.1.0.0.0.0.0"</code></p></td>
+      <td><p>A string of table coordinates in the form <code>"1.1.1.36.1.0.0.0.0.0"</code></p></td>
     </tr>
     <tr>
       <th>periods</th>

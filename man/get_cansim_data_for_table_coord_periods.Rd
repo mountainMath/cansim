@@ -2,15 +2,15 @@
 % Please edit documentation in R/cansim_vectors.R
 \name{get_cansim_data_for_table_coord_periods}
 \alias{get_cansim_data_for_table_coord_periods}
-\title{Retrieve data for specified CANSIM table for last N periods for specific coordinates}
+\title{Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates}
 \usage{
 get_cansim_data_for_table_coord_periods(cansimTableNumber, coordinate,
   periods = 1)
 }
 \arguments{
-\item{cansimTableNumber}{CANSIM table number}
+\item{cansimTableNumber}{Statistics Canada data table number}
 
-\item{coordinate}{A string CANSIM coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
+\item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
 }
@@ -18,5 +18,5 @@ get_cansim_data_for_table_coord_periods(cansimTableNumber, coordinate,
 A tibble with data matching specified coordinate and period input arguments
 }
 \description{
-Allows for the retrieval of data for a CANSIM table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
+Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 }

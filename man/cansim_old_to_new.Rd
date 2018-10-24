@@ -2,18 +2,18 @@
 % Please edit documentation in R/cansim.R
 \name{cansim_old_to_new}
 \alias{cansim_old_to_new}
-\title{Translate CANSIM table number into NDM table}
+\title{Translate deprecated CANSIM table number into new NDM-format table catalogue number}
 \usage{
 cansim_old_to_new(oldCansimTableNumber)
 }
 \arguments{
-\item{oldCansimTableNumber}{the old CANSIM table number. Returns the corresponding NDM number.}
+\item{oldCansimTableNumber}{deprecated style CANSIM table number (e.g. "427-0001")}
 }
 \value{
-CANSIM NDM table number
+new-format NDM table number
 }
 \description{
-Returns NDM table equivalent given a standard old-format CANSIM table number
+Returns NDM table catalogue equivalent given a standard old-format CANSIM table number
 }
 \examples{
 cansim_old_to_new("026-0018")

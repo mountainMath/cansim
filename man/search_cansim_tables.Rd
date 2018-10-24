@@ -2,21 +2,21 @@
 % Please edit documentation in R/cansim_tables_list.R
 \name{search_cansim_tables}
 \alias{search_cansim_tables}
-\title{Search through CANSIM tables}
+\title{Search through Statistics Canada data tables}
 \usage{
 search_cansim_tables(search_term, search_fields = "both",
   refresh = FALSE)
 }
 \arguments{
-\item{search_term}{User-supplied search term used to find CANSIM tables with matching titles}
+\item{search_term}{User-supplied search term used to find Statistics Canada data tables with matching titles}
 
-\item{search_fields}{By default, this function will search through table titles and keywords. Setting this parameter to "title" will only serach through the title, setting it to "keyword" will only search through keywords.}
+\item{search_fields}{By default, this function will search through table titles and keywords. Setting this parameter to "title" will only serach through the title, setting it to "keyword" will only search through keywords}
 
 \item{refresh}{Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}}
 }
 \value{
-A tibble with available CANSIM tables, listing title, CANSIM table number, old table number, description and geographies covered
+A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography
 }
 \description{
-Searches through CANSIM tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not \code{search_description} is set to \code{TRUE} or not. If \code{refresh = TRUE}, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
+Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to \code{TRUE}. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not \code{search_description} is set to \code{TRUE} or not. If \code{refresh = TRUE}, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 }

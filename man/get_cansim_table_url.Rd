@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_table_url}
 \alias{get_cansim_table_url}
-\title{Retrieve a CANSIM table URL given a table number}
+\title{Retrieve a Statistics Canada data table URL given a table number}
 \usage{
 get_cansim_table_url(cansimTableNumber, language = "en")
 }
