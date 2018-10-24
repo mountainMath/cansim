@@ -1,13 +1,13 @@
 
-#' Retrieve a CANSIM table using CANSIM code or NDM table number
+#' Retrieves a Statistics Canada data table using CANSIM code or NDM table number
 #'
-#' Retrieves a CANSIM table as a tidy dataframe using either a CANSIM code or an NDM table number. Retrieved table data is cached for the duration of the current R session only by default.
+#' Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.
 #'
-#' @param cansimTableNumber the table number to load, accepts old or new NDM table numbers
+#' @param cansimTableNumber the table number to load, accepts old CANSIM or new NDM table numbers
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default is set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
-#' @return a tibble with CANSIM table data
+#' @return tibble format data table output
 #'
 #' @examples
 #' # Retrieve a table with an NDM code
@@ -17,33 +17,33 @@
 #'
 #' @export
 get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE){
-  get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber),language,refresh)
+  get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber), language, refresh)
 }
 
 
-#' (Deprecated) Adjust CANSIM table values by a scaling variable
+#' (Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable
 #'
-#' (Deprecated) Adjust CANSIM table values by scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
+#' (Deprecated) Adjust retrieved data table values by a scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
 #'
 #' @param data A downloaded CANSIM data table
 #' @param var A now deprecated input
 #'
 #' @export
-adjust_cansim_values_by_variable <-function(data,var){
+adjust_cansim_values_by_variable <-function(data, var){
   normalize_cansim_values(data)
 }
 
-#' Normalize CANSIM table values to appropriate scale
+#' Normalize retrieved data table values to appropriate scales
 #'
-#' Facilitates working with CANSIM values by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
+#' Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
-#' @param data A CANSIM table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
-#' @param replacement_value (Optional) name of the column the manipulated value should be returned in. Defaults to replacing the current value field
-#' @param normalize_percent (Optional) normalize percentages by changing them to rates. \code{TRUE} by default
+#' @param data A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
+#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to replacing the current value field
+#' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #'
-#' @return Tibble with adjusted values
+#' @return Returns the input tibble with with adjusted values
 #'
 #' @examples
 #' cansim_table <- get_cansim("34-10-0013")
@@ -61,7 +61,8 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   data <- data %>%
     mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
   if (is.na(replacement_value)) { # remove scale columns
-    data <- data %>% select(-one_of(intersect(c(scale_string,scale_string2),names(data))))
+    data <- data %>%
+      select(-one_of(intersect(c(scale_string,scale_string2),names(data))))
   }
   if (normalize_percent & uom_string %in% names(data)) {
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
@@ -70,30 +71,35 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
   }
   date_field=ifelse(language=="fr",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
-  sample_date <- data[[date_field]] %>% na.omit %>% first()
+  sample_date <- data[[date_field]] %>%
+    na.omit %>%
+    first()
   if (grepl("^\\d{4}$",sample_date)) {
     # year
-    data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
+    data <- data %>%
+      mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
   } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
     # year range, use second year as anchor
-    data <- data %>% mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
+    data <- data %>%
+      mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
   } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
     # year and month
     data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
   } else if (grepl("^\\d{4}-\\d{2}-\\d{2}$",sample_date)) {
     # year, month and day
-    data <- data %>% mutate(Date=as.Date(!!as.name(date_field)))
+    data <- data %>%
+      mutate(Date=as.Date(!!as.name(date_field)))
   }
   data
 }
 
-#' Translate CANSIM table number into NDM table
+#' Translate deprecated CANSIM table number into new NDM-format table catalogue number
 #'
-#' Returns NDM table equivalent given a standard old-format CANSIM table number
+#' Returns NDM table catalogue equivalent given a standard old-format CANSIM table number
 #'
-#' @param oldCansimTableNumber the old CANSIM table number. Returns the corresponding NDM number.
+#' @param oldCansimTableNumber deprecated style CANSIM table number (e.g. "427-0001")
 #'
-#' @return CANSIM NDM table number
+#' @return new-format NDM table number
 #'
 #' @examples
 #' cansim_old_to_new("026-0018")
@@ -120,15 +126,15 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   new_table
 }
 
-#' Retrieve a CANSIM table using an NDM number
+#' Retrieve a Statistics Canada data table using NDM catalogue number
 #'
-#' Retrieves a CANSIM table as a tidy dataframe using an NDM number. Retrieved table data is cached for the duration of the current R session only by default.
+#' Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
-#' @return a tibble with retrieved NDM table data
+#' @return tibble format data table output
 #'
 #' @examples
 #' get_cansim("34-10-0013")
@@ -250,13 +256,13 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
   readRDS(file=data_path)
 }
 
-#' Get CANSIM table information
+#' Retrieve Statistics Canada data table information
 #'
-#' Returns table information given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
+#' Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @examples
 #' get_cansim_table_info("34-10-0013")
@@ -271,13 +277,13 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 }
 
 
-#' Get CANSIM table survey detail
+#' Retrieve Statistics Canada data table survey detail
 #'
 #' Returns table survey detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @examples
 #' get_cansim_table_survey("34-10-0013")
@@ -291,13 +297,13 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
   readRDS(file=data_path)
 }
 
-#' Get CANSIM table subject detail
+#' Retrieve Statistics Canada data table subject detail
 #'
 #' Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @examples
 #' get_cansim_table_subject("34-10-0013")
@@ -311,13 +317,13 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
   readRDS(file=data_path)
 }
 
-#' Get CANSIM table notes
+#' Retrieve Statistics Canada data table notes
 #'
 #' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @examples
 #' get_cansim_table_notes("34-10-0013")
@@ -331,13 +337,13 @@ get_cansim_table_notes <- function(cansimTableNumber, language="english", refres
   readRDS(file=data_path)
 }
 
-#' Get CANSIM table column list
+#' Retrieve Statistics Canada data table column list
 #'
 #' Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @examples
 #' get_cansim_column_list("34-10-0013")
@@ -351,14 +357,14 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
   readRDS(file=data_path)
 }
 
-#' Retrieve CANSIM table categories for a specific column
+#' Retrieve Statistics Canada data table categories for a specific column
 #'
 #' Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param column the specified column for which to retrieve category information for
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @examples
 #' get_cansim_column_categories("34-10-0013", "Geography")
@@ -376,13 +382,13 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
   readRDS(file=data_path)
 }
 
-#' Get CANSIM table overview text
+#' Retrieve Statistics Canada data table overview text
 #'
 #' Prints table overview information as console output. In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
-#' @param refresh Optionally force reload of CANSIM data, default is \code{FALSE}
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @return none
 #'
@@ -412,7 +418,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
 #'
 #' For tables with data with hierarchical categories, metadata containing hierarchy level descriptions is used to extract categories at a specified level of hierarchy only.
 #'
-#' @param data retrieved CANSIM object as returned from \code{get_cansim()}
+#' @param data data table object as returned from \code{get_cansim()}
 #' @param column_name the quoted name of the column to extract categories from
 #' @param level the hierarchy level depth to which to extract categories, where 0 is top category
 #' @param strict (default \code{FALSE}) when \code{TRUE} will only extract that specific hierarchy level
@@ -421,7 +427,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
 #' @return A vector of categories
 #'
 #' @export
-categories_for_level <- function(data,column_name,level=NA,strict=FALSE,remove_duplicates=TRUE){
+categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remove_duplicates=TRUE){
   hierarchy_name=paste0("Hierarchy for ",column_name)
   h <- data %>% dplyr::select(column_name,hierarchy_name) %>%
     unique %>%
@@ -564,7 +570,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
   l
 }
 
-#' Retrieve a CANSIM table URL given a table number
+#' Retrieve a Statistics Canada data table URL given a table number
 #'
 #' Retrieve URL of a table from the API given a table number. Offers a more stable approach than manually guessing the URL of the table.
 #'
@@ -594,7 +600,7 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
 #'
 #' @param start_date Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date
 #'
-#' @return A tibble with CANSIM product ids and release times
+#' @return A tibble with Statistics Canada data table product ids and their release times
 #'
 #' @examples
 #' get_cansim_changed_tables("2018-08-01")

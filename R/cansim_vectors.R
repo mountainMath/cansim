@@ -60,7 +60,7 @@ rename_vectors <- function(data,vectors){
   data
 }
 
-#' Retrieve data for a CANSIM vector released within a given time frame
+#' Retrieve data for a Statistics Canada data vector released within a given time frame
 #'
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
@@ -70,7 +70,7 @@ rename_vectors <- function(data,vectors){
 #' @return A tibble with data for vectors released between start and end time
 #'
 #' @export
-get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date(),use_ref_date=TRUE){
+get_cansim_vector<-function(vectors, start_time, end_time=Sys.Date(), use_ref_date=TRUE){
   start_time=as.Date(start_time)
   end_time=as.Date(end_time)
   if (!use_ref_date) {
@@ -106,7 +106,7 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date(),use_ref_date=
   result
 }
 
-#' Retrieve data for specified CANSIM vector(s) for last N periods
+#' Retrieve data for specified Statistics Canada data vector(s) for last N periods
 #'
 #' Allows for the retrieval of data for specified vector series for the N most-recently released periods.
 #'
@@ -116,7 +116,7 @@ get_cansim_vector<-function(vectors,start_time,end_time=Sys.Date(),use_ref_date=
 #' @return A tibble with data for specified vector(s) for the last N periods
 #'
 #' @export
-get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
+get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
@@ -142,18 +142,18 @@ get_cansim_vector_for_latest_periods<-function(vectors,periods=1){
 }
 
 
-#' Retrieve data for specified CANSIM table for last N periods for specific coordinates
+#' Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates
 #'
-#' Allows for the retrieval of data for a CANSIM table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
+#' Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 #'
-#' @param cansimTableNumber CANSIM table number
-#' @param coordinate A string CANSIM coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}
+#' @param cansimTableNumber Statistics Canada data table number
+#' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}
 #' @param periods Numeric value for number of latest periods to retrieve data for
 #'
 #' @return A tibble with data matching specified coordinate and period input arguments
 #'
 #' @export
-get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,periods=1){
+get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1){
   table=naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
@@ -175,13 +175,13 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber,coordinate,p
 }
 
 
-#' Retrieve metadatadata for specified CANSIM vectors
+#' Retrieve metadatadata for specified Statistics Canada data vectors
 #'
-#' Allows for the retrieval of metadatadata for CANSIM vectors
+#' Allows for the retrieval of metadatadata for Statistics Canada data vectors
 #'
 #' @param vectors a vector of cansim vectors
 #'
-#' @return A tibble with metadata for the cansim vectors
+#' @return A tibble with metadata for selected vectors
 #'
 #' @export
 get_cansim_vector_info <- function(vectors){
@@ -204,17 +204,5 @@ get_cansim_vector_info <- function(vectors){
 
   extract_vector_metadata(data1)
 }
-
-
-# get_cansim_vector_info_webscrape <- function(vectors){
-#   vectors=paste0("v",gsub("^v","",vectors))
-#   url=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",paste0(vectors,collapse = "%2C+"))
-#   result <- xml2::read_html(url) %>%
-#     rvest::html_node("script#csvContent") %>%
-#     rvest::html_text() %>%
-#     readr::read_csv()
-#   result
-# }
-
 
 
