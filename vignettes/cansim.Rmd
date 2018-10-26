@@ -1,5 +1,5 @@
 ---
-title: "Getting started with the CANSIM package"
+title: "Getting started with the cansim package"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -19,7 +19,7 @@ library(cansim)
 
 ### About
 
-The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and referred to in this package as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table numbers.
+The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and frequently referred to in this package, and elsewhere, as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table catalogue numbers. 
 
 ### Installing cansim
 
@@ -33,12 +33,12 @@ library(cansim)
 
 ### Usage
 
-If you know the CANSIM table number you are interested in, use `get_cansim` to download the entire table.
+If you know the data table catalogue number you are interested in, use `get_cansim` to download the entire table.
 ```{r}
 data <- get_cansim("14-10-0293")
 head(data)
 ```
-By default, CANSIM data retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into an R data object and transform values by their appropriate scaling or unit variable. For example, data may be reported as a value in "millions" but with unitless numbers. A convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
+By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into a clearner data object and to use the included data to transform values by their appropriate scaling or unit variable. This makes it easier to work on the data directly and minimize unnecessary data manipulation. For example, data may be reported as a value in "millions" but with unitless numbers. A built-in convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
 ```{r}
 library(dplyr)
 data <- get_cansim("14-10-0293") %>% 
@@ -53,7 +53,7 @@ When a table number is unknown, you can browse the available tables or search by
 ```{r}
 search_cansim_tables("housing price indexes")
 ```
-CANSIM data can also be accessed for individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the `cansim` package allows users to specify named vectors, where the `label` field will be added to the returned data frame containing the specified name for each vector.
+Individual series in Statistics Canada data tables can also be accessed by using individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the `cansim` package allows users to specify named vectors, where the `label` field will be added to the returned data frame containing the specified name for each vector.
 ```{r}
 get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
                     "Metro Van CPI"="v41692930"),

@@ -1,15 +1,15 @@
 Package: cansim
 Type: Package
-Title: Functions and convenience tools for accessing CANSIM data
-Version: 0.1.0
+Title: Functions and convenience tools for accessing Statistics Canada data tables
+Version: 0.2.0
 Authors@R: c(
     person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
 Maintainer: Jens von Bergmann <jens@mountainmath.ca>
-Description: Searches for, accesses, and retrieves new-format and old-format CANSIM data 
+Description: Searches for, accesses, and retrieves new-format and old-format Statistics Canada data 
     tables as tidy data frames. This package deals with encoding issues, allows for 
     bilingual English or French language data retrieval, and bundles convenience functions 
-    to make it easier to work with CANSIM data. 
+    to make it easier to work with retrieved table data. Optional caching features are provided.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

@@ -1,5 +1,5 @@
 ---
-title: "Retrieving individual CANSIM vectors"
+title: "Retrieving individual Statistics Canada vectors"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -21,11 +21,11 @@ library(ggplot2)
 
 ### Retrieving individual vectors
 
-Much of the time-series data available from Statistics Canada have individual vector codes. These vector codes follow a naming format of a lower-case "v" and an identifying numbers. Time-series tables will often bundle many series together, resulting in large and sometimes unwieldy files. Many users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. For this reason, the `cansim` package also provides two functions to make it easier to retrieve individual vectors: `get_cansim_vector()` and `get_cansim_vector_for_latest_periods()`. 
+Many of the time-series data available from Statistics Canada have individual vector codes. These vector codes follow a naming format of a lower-case "v" and an identifying numbers. Time-series tables will often bundle many series together, resulting in large and sometimes unwieldy files. Many users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. For this reason, the `cansim` package also provides two functions to make it easier to retrieve individual vectors: `get_cansim_vector()` and `get_cansim_vector_for_latest_periods()`. 
 
 ### get_cansim_vector()
 
-Running `search_cansim_tables("consumer price index")` shows `r search_cansim_tables("consumer price index") %>% pull(title) %>% length()` tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the CANSIM vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+Running `search_cansim_tables("consumer price index")` shows `r search_cansim_tables("consumer price index") %>% pull(title) %>% length()` tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
 ```{r}
 get_cansim_vector("v41690973","2015-01-01")
 ```
@@ -43,7 +43,7 @@ get_cansim_vector(vectors, "2017-01-01")
 
 ### get_cansim_vectors_for_latest_periods()
 
-Some CANSIM vectors extend backwards for a significant number of periods that may not be of interest. `get_cansim_vectors_for_lates_periods()` is a wrapper around `get_cansim_vectors` that takes a `periods` input instead of arguments for `start_time` and `end_time`, and provides data for the selected vector(s) for the last `n` periods for which data is available, irrespective of dates. 
+Some vectors extend backwards for a significant number of periods that may not be of interest. `get_cansim_vectors_for_lates_periods()` is a wrapper around `get_cansim_vectors` that takes a `periods` input instead of arguments for `start_time` and `end_time`, and provides data for the selected vector(s) for the last `n` periods for which data is available, irrespective of dates. 
 
 ```{r}
 get_cansim_vector_for_latest_periods("v41690973", periods = 60)
@@ -59,15 +59,16 @@ The convenience function `normalize_cansim_values()` works for data retrieved by
 
 ### Putting it all together
 
+This quick example uses a list with two named vectors and a starting date as an input value, converts values ("normalizes") on the fly, and prepares a simple `ggplot2` graphic.
+
 ```{r}
-library(ggplot2)
 
 vectors <- c("Canadian CPI"="v41690973",
              "BC CPI"="v41692462")
 
-data <-   normalize_cansim_values(get_cansim_vector(vectors, "2010-01-01"))
+data <- normalize_cansim_values(get_cansim_vector(vectors, "2010-01-01"))
 
-
+library(ggplot2)
 ggplot(data,aes(x=Date,y=VALUE,color=label)) +
   geom_line() +
   labs(title="Consumer Price Index, January 2010 to September 2018",

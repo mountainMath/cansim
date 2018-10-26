@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Working with CANSIM hierarchies • cansim</title>
+<title>Working with Statistics Canada data table object hierarchies • cansim</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Working with CANSIM hierarchies">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Working with Statistics Canada data table object hierarchies">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
@@ -29,7 +29,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
       </span>
     </div>
 
@@ -55,13 +55,13 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/listing_cansim_tables.html">Listing CANSIM tables</a>
+      <a href="../articles/listing_cansim_tables.html">Listing Statistics Canada data tables</a>
     </li>
     <li>
-      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual CANSIM vectors</a>
+      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
     <li>
-      <a href="../articles/working_with_hierarchies.html">Working with CANSIM hierarchies</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
     </li>
   </ul>
 </li>
@@ -78,9 +78,9 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Working with CANSIM hierarchies</h1>
+      <h1>Working with Statistics Canada data table object hierarchies</h1>
             
-            <h4 class="date">2018-10-23</h4>
+            <h4 class="date">2018-10-26</h4>
       
       
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -89,7 +89,7 @@
 
     
     
-<p>This vignette showcases how to utilize the metadata information by drilling into NAICS categories and the hierarchy metadata that is downloaded with tables that have hierarchical data.</p>
+<p>This vignette showcases how to utilize the metadata information by drilling into North American Industry Classification System (NAICS) categories and the hierarchy metadata that is downloaded with tables that have hierarchical data.</p>
 <div id="retrieving-metadata" class="section level3">
 <h3 class="hasAnchor">
 <a href="#retrieving-metadata" class="anchor"></a>Retrieving metadata</h3>
@@ -141,7 +141,7 @@
 <div id="normalizing-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#normalizing-variables" class="anchor"></a>Normalizing variables</h3>
-<p>There are several annoying characteristics to the raw data downloaded from CANSIM which we address with a convenience function called <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code>. By default, downloaded CANSIM data contains a <code>VALUE</code> and a <code>SCALAR_FACTOR</code> field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will apply the appropriate conversion based on the scale variable so that the <code>VALUE</code> value is more straight-forward to work with. The default data also includes a character string <code>REF_DATE</code> field, which the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will attempt to convert into a standard date-class variable.</p>
+<p>There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code>. By default, downloaded CANSIM data contains a <code>VALUE</code> and a <code>SCALAR_FACTOR</code> field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will apply the appropriate conversion based on the scale variable so that the <code>VALUE</code> value is more straight-forward to work with. The default data also includes a character string <code>REF_DATE</code> field, which the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will attempt to convert into a standard date-class variable.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span>()</a></code></pre></div>
 </div>
@@ -149,7 +149,7 @@
 <h3 class="hasAnchor">
 <a href="#taking-advantage-of-metadata" class="anchor"></a>Taking advantage of metadata</h3>
 <p>This table includes all the different levels of NAICS categories in one dimension. This makes working with the data at that level rather cumbersome when we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let’s first get an overview of the data. We can also use this to easily compute shares instead of totals.</p>
-<p>We can extract the hierarchy using the built-in convenience function <code>categories_for_level</code> which takes in a CANSIM table with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract.</p>
+<p>We can extract the hierarchy using the built-in convenience function <code>categories_for_level</code> which takes in a <code>cansim</code>-package retrieved data table object with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># Extract top-level hierarchy to calculate total</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2">top_level &lt;-<span class="st"> </span><span class="kw"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(data, <span class="st">"North American Industry Classification System (NAICS)"</span>,<span class="dv">0</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"></a>
@@ -196,59 +196,56 @@
 <a class="sourceLine" id="cb6-15" data-line-number="15"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(Date, GEO, NAICS) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb6-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="dt">VALUE =</span> <span class="kw">sum</span>(VALUE, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>),</a>
 <a class="sourceLine" id="cb6-17" data-line-number="17">            <span class="dt">Share =</span> <span class="kw">sum</span>(Share, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()</a>
-<a class="sourceLine" id="cb6-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co"># Visualize with ggplot2</span></a>
-<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb6-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(plot_data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="st">         </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions), </a>
-<a class="sourceLine" id="cb6-25" data-line-number="25">       <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-26" data-line-number="26"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_area</a></span>(<span class="dt">position=</span><span class="st">"stack"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-27" data-line-number="27"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-28" data-line-number="28"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-29" data-line-number="29"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-30" data-line-number="30"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guides">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guide_legend">guide_legend</a></span>(<span class="dt">ncol =</span> <span class="dv">3</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb6-31" data-line-number="31"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
-<a class="sourceLine" id="cb6-32" data-line-number="32">       <span class="dt">subtitle=</span>selected_value,</a>
-<a class="sourceLine" id="cb6-33" data-line-number="33">       <span class="dt">x=</span><span class="st">""</span>, <span class="dt">fill =</span> <span class="st">""</span>, </a>
-<a class="sourceLine" id="cb6-34" data-line-number="34">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-6-1.png" width="864"></p>
-<p>Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">real_construction &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span>)</a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()</a></code></pre></div>
+<p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co"># Get the NAICS hierarchy codes just for these categories</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4">rrl_hierarchy &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span>real_construction) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(<span class="st">"Hierarchy for North American Industry Classification System (NAICS)"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span>unique</a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co"># Filter out all sub-categories for Real Estate. </span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co"># The paste with | trick ensures that we grepl for all matches. </span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11">rrl_data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw">grepl</span>(<span class="kw">paste</span>(rrl_hierarchy,<span class="dt">collapse=</span><span class="st">"|"</span>),<span class="st">`</span><span class="dt">Hierarchy for North American Industry Classification System (NAICS)</span><span class="st">`</span>))</a>
-<a class="sourceLine" id="cb7-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co"># Ensure we only retain the NAICS leaves and none of the aggregate subcategories</span></a>
-<a class="sourceLine" id="cb7-15" data-line-number="15">rrl_data &lt;-<span class="st"> </span>rrl_data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(</a>
-<a class="sourceLine" id="cb7-17" data-line-number="17">  <span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="st">    </span><span class="kw"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(.,<span class="st">"North American Industry Classification System (NAICS)"</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb7-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="dt">NAICS=</span><span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span>)</a>
-<a class="sourceLine" id="cb7-20" data-line-number="20"></a>
-<a class="sourceLine" id="cb7-21" data-line-number="21"><span class="co"># Plot with labels from our original selections</span></a>
-<a class="sourceLine" id="cb7-22" data-line-number="22"><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(rrl_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions),</a>
-<a class="sourceLine" id="cb7-23" data-line-number="23">       <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-24" data-line-number="24"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_area</a></span>(<span class="dt">position =</span> <span class="st">"stack"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-26" data-line-number="26"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-27" data-line-number="27"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-28" data-line-number="28"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guides">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guide_legend">guide_legend</a></span>(<span class="dt">ncol=</span><span class="dv">2</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-29" data-line-number="29"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
-<a class="sourceLine" id="cb7-30" data-line-number="30">       <span class="dt">subtitle=</span><span class="kw">paste0</span>(regions,<span class="st">", "</span>, selected_value),</a>
-<a class="sourceLine" id="cb7-31" data-line-number="31">       <span class="dt">x=</span><span class="st">""</span>,</a>
-<a class="sourceLine" id="cb7-32" data-line-number="32">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"></p>
-<p>We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(plot_data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">         </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions), </a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">       <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_area</a></span>(<span class="dt">position=</span><span class="st">"stack"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guides">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guide_legend">guide_legend</a></span>(<span class="dt">ncol =</span> <span class="dv">3</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
+<a class="sourceLine" id="cb7-12" data-line-number="12">       <span class="dt">subtitle=</span>selected_value,</a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">       <span class="dt">x=</span><span class="st">""</span>, <span class="dt">fill =</span> <span class="st">""</span>, </a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">real_construction &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span>)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co"># Get the NAICS hierarchy codes just for these categories</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">rrl_hierarchy &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span>real_construction) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(<span class="st">"Hierarchy for North American Industry Classification System (NAICS)"</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="st">  </span>unique</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co"># Filter out all sub-categories for Real Estate. </span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co"># The paste with | trick ensures that we grepl for all matches. </span></a>
+<a class="sourceLine" id="cb8-11" data-line-number="11">rrl_data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw">grepl</span>(<span class="kw">paste</span>(rrl_hierarchy,<span class="dt">collapse=</span><span class="st">"|"</span>),<span class="st">`</span><span class="dt">Hierarchy for North American Industry Classification System (NAICS)</span><span class="st">`</span>))</a>
+<a class="sourceLine" id="cb8-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb8-14" data-line-number="14"><span class="co"># Ensure we only retain the NAICS leaves and none of the aggregate subcategories</span></a>
+<a class="sourceLine" id="cb8-15" data-line-number="15">rrl_data &lt;-<span class="st"> </span>rrl_data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(</a>
+<a class="sourceLine" id="cb8-17" data-line-number="17">  <span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span> <span class="op">%in%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-18" data-line-number="18"><span class="st">    </span><span class="kw"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(.,<span class="st">"North American Industry Classification System (NAICS)"</span>)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="dt">NAICS=</span><span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span>)</a>
+<a class="sourceLine" id="cb8-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb8-21" data-line-number="21"><span class="co"># Plot with labels from our original selections</span></a>
+<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggplot">ggplot</a></span>(rrl_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions),</a>
+<a class="sourceLine" id="cb8-23" data-line-number="23">       <span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/aes">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-24" data-line-number="24"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/geom_ribbon">geom_area</a></span>(<span class="dt">position =</span> <span class="st">"stack"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/scale_continuous">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-26" data-line-number="26"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/ggtheme">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-27" data-line-number="27"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/theme">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-28" data-line-number="28"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guides">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/guide_legend">guide_legend</a></span>(<span class="dt">ncol=</span><span class="dv">2</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-29" data-line-number="29"><span class="st">  </span><span class="kw"><a href="http://www.rdocumentation.org/packages/ggplot2/topics/labs">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
+<a class="sourceLine" id="cb8-30" data-line-number="30">       <span class="dt">subtitle=</span><span class="kw">paste0</span>(regions,<span class="st">", "</span>, selected_value),</a>
+<a class="sourceLine" id="cb8-31" data-line-number="31">       <span class="dt">x=</span><span class="st">""</span>,</a>
+<a class="sourceLine" id="cb8-32" data-line-number="32">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-8-1.png" width="864"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
 </div>
   </div>
 

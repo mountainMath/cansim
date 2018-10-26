@@ -2,29 +2,33 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cansim)](https://cran.r-project.org/package=cansim)
 # cansim
 
-R package to download Statistics Canada CANSIM/NDM tables.
+An R package to retrieve and work with public Statistics Canada data tables.
 
 This package:
 
-* Downloads CANSIM/NDM tables as analysis-ready tidy data frames
-* Works with new NDM tables and legacy CANSIM table catalogue numbers
-* Bilingual
-* Caches downloaded data for faster loading and less waiting
-* Convenience functions for relabelling and rescaling when appropriate
+* Searches for and retrieves data tables and series from Statistics Canada's socioeconomic data repository (previously known as CANSIM) 
+* Prepares retrieved data tables as analysis-ready tidy data frames
+* Accepts legacy CANSIM table catalogue numbers
+* Allows for bilingual data retrieval
+* Offers caching of downloaded data for faster loading and less waiting
+* Includes convenience functions for relabelling and rescaling as well as tools for working with data hierarchies in downloaded table objects
 
 ### Installation
+
+The latest development version can be downloaded from Github using either the `remotes` or `devtools` packages. 
 ```r
-# install.packages("devtools")
-devtools::install_github("mountainmath/cansim")
+# install.packages("remotes")
+remotes::install_github("mountainmath/cansim")
 ```
+A stable version is in submission to CRAN. 
 
 ### Caching
 
-As many CANSIM table downloads can be quite large in size, the cansim package will temporarily cache data for the duration of the current R session. This reduces unnecessary waiting when recompiling code. You can also set up an explicit cache location that will be persistent across sessions by setting `options(cache_path="your_cache_path")` in your .Rprofile. 
+Many of the data tables available in Statistics Canada's data repository are quite large in size. After downloading tables, the `cansim` package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. Users can set up a persistent cache location that will exist across sessions by defining an explicit cache path. This is as simple as adding `options(cache_path="your_cache_path")` to your .Rprofile file. 
 
 ### Basic Usage
 
-Use old or new table number to download entire CANSIM or NDM tables into a tidy dataframe. The cansim package retains the ability to work with legacy CANSIM table numbers or their new NDM equivalent. Calling either the legacy CANSIM table number or the new NDM number will load the same data. 
+The package acccepts use of both old-format ("051-0013") or new-format ("17-10-0016-01") table catalogue numbers to download entire data tables as tidy data frames. Calling either the legacy CANSIM table number or the new NDM number will load the same data. Since the transition to the new data repository, existing tables will have retained their old-format numbers, but any newly created tables will have only new-format names. 
 ```r
 # Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)
 births <- get_cansim("051-0013")
@@ -33,32 +37,62 @@ births <- get_cansim("17-10-0016-01")
 # Retrieve data for balance of payment table 36-10-0042-01 (formerly CANSIM  376-8105)
 bop <- get_cansim("3768105")
 bop <- get_cansim("36-10-0042")
-```    
+```
+See more example usage and worfklow in the _Getting started with the cansim package_ vignette. 
 
-### Bilingual - * NOTE: French metadata currently unavailable * 
+### Bilingual
 
-The cansim package works in either English or French. There is an optional language argument to retrieve CANSIM/NDM tables in French: 
+Statistics Canada data tables are provided in either English or French formats, including labels and formats. The `cansim` package allows for download of tables in either English or French. There is an optional language argument to retrieve tables in French: 
 
-Le paquet cansim fonctionne en anglais ou en français. Il existe un argument de langue optionnel pour récupérer les tables CANSIM / NMD en français:
+Le paquet `cansim` fonctionne en anglais ou en français. Il existe un argument de langue optionnel pour récupérer les tables en français:
 ```r
 naissances <- get_cansim("051-0013",language="fr")
 ```    
 
 ### Normalizing values
 
-The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. CANSIM data values may be scaled by powers of 10. 
+The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Retrieved data table values may be scaled by powers of 10.
 
-For example, values in the VALUE field may be reported in "millions", so a VALUE of 10 means 10,000,000. The `normalize_cansim_values` function automatically scales the VALUE field to be a number, so the VALUE will be converted from 10 to 10000000 in the example given.
+For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. The `normalize_cansim_values` function automatically scales the `VALUE` field to be a number, so the `VALUE` will be converted from 10 to 10000000 in the example given.
 ```r
 data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values
 ``` 
-
-To retain the original VALUE field pass the *replacement_value = <your field name>* option to create a field to contain the normailzed value.
+To retain the original `VALUE` field pass the *replacement_value = <your field name>* option to create a field to contain the normailzed value.
 ```r
 data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replacement_value="normalized value")
 ```
-
 By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set *normalize_percent=FALSE*.
+
+### Vectors
+
+Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+```{r}
+get_cansim_vector("v41690973","2015-01-01")
+```
+More detailed usage examples are available in the _Retrieving individual Statistics Canada vectors_ vignette. 
+
+### Table overview metadata
+
+The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
+```{r}
+get_cansim_table_overview(36-10-040)
+```
+
+### Listing available tables
+
+Calling `list_cansim_tables` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
+```{r}
+list_cansim_tables()
+```
+The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard `dplyr` verbs.  
+```{r}
+list_cansim_tables() %>% 
+  filter(grepl("Labour force characteristics",title), grepl("economic region",title)) %>% 
+  select("cansim_table_number","title")
+```
+As table search functions require a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refleshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cache_path="your cache path")` option so that table information is cached across R sessions.
+
+The _Listing Statistics Canada data tables_ vignette has additional detail and examples. 
 
 ### License
 
@@ -92,16 +126,15 @@ Subject to the Statistics Canada Open Licence Agreement, licensed products using
 > 
 > Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
 
+### Why cansim?
+
+CANSIM was the name of Statistics Canada's legacy socio-economic data repository that was widely used by practitioners, academics, and students, with many still calling the new repository by that name. Statistics Canada refers to the current repository simply as "Statistics Canada data" or "StatCan data". We use the CANSIM name for this package as a nostalgic reference.  
+
 ### Contributing
 
-This package is under active development and may have some bugs. [Issues](https://github.com/mountainMath/cansim/issues) and [pull requests](https://github.com/mountainMath/cansim/pulls) are highly appreciated. 
+[Issues](https://github.com/mountainMath/cansim/issues) and [pull requests](https://github.com/mountainMath/cansim/pulls) are highly appreciated. 
 
-### To-do
-
-- [x] Clean up package and function documentation
-- [x] Provide additional user control over cache location
-- [x] Test for more bugs
-- [ ] Submit to CRAN
+If you want to get in touch, we are pretty good at responding via email or via twitter at [@dshkol](https://twitter.com/dshkol) or [@vb_jens](https://twitter.com/vb_jens). 
 
 ### Related packages
 
@@ -111,4 +144,20 @@ This package is under active development and may have some bugs. [Issues](https:
 
 * [cancensus](https://github.com/mountainMath/cancensus) is a package designed to access, retrieve, and work with Canadian Census data and geography. A stable version is available on CRAN and a development version is on Github. 
 
+### Cite cansim
+
+If you wish to cite the `cansim` package in your work:
+
+  von Bergmann, J., Dmitry Shkolnik (2018). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.2.0.
+
+A BibTeX entry for LaTeX users is
+```
+  @Manual{,
+    author = {Jens {von Bergmann} and Dmitry Shkolnik},
+    title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
+    year = {2018},
+    note = {R package version 0.2.0},
+    url = {https://mountainmath.github.io/cansim/},
+  }
+```
 
