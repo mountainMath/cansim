@@ -30,6 +30,8 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 <meta property="og:title" content="Get overview list for all Statistics Canada data tables — list_cansim_tables" />
 
 <meta property="og:description" content="Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to FALSE by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option cache_path is set it will look for and store the overview table in that directory." />
@@ -45,6 +47,16 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107390160-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107390160-2');
+</script>
 
   </head>
 
@@ -100,7 +112,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mountainMath/cansim">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -114,7 +131,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get overview list for all Statistics Canada data tables</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
     <div class="hidden name"><code>list_cansim_tables.Rd</code></div>
     </div>
 
@@ -154,7 +171,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jens von Bergmann, Dmitry Shkolnik.</p>
+  <p>Developed by <a href='https://mountainmath.ca'>Jens von Bergmann</a>, <a href='https://dshkol.com'>Dmitry Shkolnik</a>.</p>
 </div>
 
 <div class="pkgdown">

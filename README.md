@@ -98,33 +98,38 @@ The _Listing Statistics Canada data tables_ vignette has additional detail and e
 
 The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that: 
 
-> Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive >licence to:
-> 
-> * use, reproduce, publish, freely distribute, or sell the Information;
-> * use, reproduce, publish, freely distribute, or sell Value-added Products; and,
-> * sublicence any or all such rights, under terms consistent with this agreement.
-> 
-> In doing any of the above, you shall:
-> 
-> * reproduce the Information accurately;
-> * not use the Information in a way that suggests that Statistics Canada endorses you or your use of the Information;
-> * not misrepresent the Information or its source;
-> * use the Information in a manner that does not breach or infringe any applicable laws;
-> * not merge or link the Information with any other databases for the purpose of attempting to identify an individual person, business or organization; and
-> * not present the Information in such a manner that gives the appearance that you may have received, or had access to, information held by Statistics Canada about any identifiable individual person, business or organization.
+```
+Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive licence to:
+ 
+  - use, reproduce, publish, freely distribute, or sell the Information;
+  - use, reproduce, publish, freely distribute, or sell Value-added Products; and,
+  - sublicence any or all such rights, under terms consistent with this agreement.
+
+In doing any of the above, you shall:
+ 
+  - reproduce the Information accurately;
+  - not use the Information in a way that suggests that Statistics Canada endorses you or your use of the Information;
+  - not misrepresent the Information or its source;
+  - use the Information in a manner that does not breach or infringe any applicable laws;
+  - not merge or link the Information with any other databases for the purpose of attempting to identify an individual person, business or organization; and
+  - not present the Information in such a manner that gives the appearance that you may have received, or had access to, information held by Statistics Canada about any identifiable individual person, business or organization.
+```
 
 ### Attribution
 
 Subject to the Statistics Canada Open Licence Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
 
-> Acknowledgment of Source
-> (a) You shall include and maintain the following notice on all licensed rights of the Information:
->
-> Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
-> 
-> (b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
-> 
-> Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
+```
+Acknowledgment of Source
+
+(a) You shall include and maintain the following notice on all licensed rights of the Information:
+
+  - Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
+ 
+(b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
+
+  - Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
+```
 
 ### Why cansim?
 
