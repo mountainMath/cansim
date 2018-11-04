@@ -2,10 +2,10 @@
 % Please edit documentation in R/cansim_tables_list.R
 \name{get_cansim_table_list}
 \alias{get_cansim_table_list}
-\title{get all cansim tables}
+\title{Retrieve list of all Statistics Canada data tables}
 \usage{
 get_cansim_table_list()
 }
 \description{
-get all cansim tables
+Internal function to collect an up-to-date and complete list of Statistics Canada data tables
 }

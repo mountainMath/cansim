@@ -1,5 +1,5 @@
 ---
-title: "Working with CANSIM hierarchies"
+title: "Working with Statistics Canada data table object hierarchies"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-This vignette showcases how to utilize the metadata information by drilling into NAICS categories and the hierarchy metadata that is downloaded with tables that have hierarchical data. 
+This vignette showcases how to utilize the metadata information by drilling into North American Industry Classification System (NAICS) categories and the hierarchy metadata that is downloaded with tables that have hierarchical data. 
 
 ### Retrieving metadata
 
@@ -28,6 +28,7 @@ table_id = "36-10-0402"
 # get table overview
 get_cansim_table_overview(table_id)
 ```
+
 ### Accessing table data
 
 We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "Chained (2007) dollars". 
@@ -43,7 +44,7 @@ data <- data %>%
 
 ### Normalizing variables
 
-There are several annoying characteristics to the raw data downloaded from CANSIM which we address with a convenience function called `normalize_cansim_values()`. By default, downloaded CANSIM data contains a `VALUE` and a `SCALAR_FACTOR` field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the `normalize_cansim_values()` function will apply the appropriate conversion based on the scale variable so that the `VALUE` value is more straight-forward to work with. The default data also includes a character string `REF_DATE` field, which the `normalize_cansim_values()` function will attempt to convert into a standard date-class variable.
+There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called `normalize_cansim_values()`. By default, downloaded CANSIM data contains a `VALUE` and a `SCALAR_FACTOR` field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the `normalize_cansim_values()` function will apply the appropriate conversion based on the scale variable so that the `VALUE` value is more straight-forward to work with. The default data also includes a character string `REF_DATE` field, which the `normalize_cansim_values()` function will attempt to convert into a standard date-class variable.
 ```{r}
 data <- data %>% 
   normalize_cansim_values()
@@ -53,7 +54,7 @@ data <- data %>%
 
 This table includes all the different levels of NAICS categories in one dimension. This makes working with the data at that level rather cumbersome when we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let's first get an overview of the data. We can also use this to easily compute shares instead of totals.
 
-We can extract the hierarchy using the built-in convenience function `categories_for_level` which takes in a CANSIM table with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract. 
+We can extract the hierarchy using the built-in convenience function `categories_for_level` which takes in a `cansim`-package retrieved data table object with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract. 
 ```{r}
 # Extract top-level hierarchy to calculate total
 top_level <- categories_for_level(data, "North American Industry Classification System (NAICS)",0)
@@ -104,8 +105,9 @@ plot_data <- cut_data %>%
   summarise(VALUE = sum(VALUE, na.rm = TRUE),
             Share = sum(Share, na.rm = TRUE)) %>% 
   ungroup()
-
-# Visualize with ggplot2
+```
+With the data prepared, the last step is putting it all together into a visualization using `ggplot2`. We can then see if any further adjustments are required. 
+```{r fig.height=6, fig.width=9}
 library(ggplot2)
 
 ggplot(plot_data %>% 
@@ -122,7 +124,6 @@ ggplot(plot_data %>%
        caption=paste0("CANSIM ", table_id))
 
 ```
-
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
 ```{r fig.height=7, fig.width=9, warning=FALSE}
 real_construction <- c("Construction","Real estate and rental and leasing")
@@ -158,6 +159,5 @@ ggplot(rrl_data %>% filter(GEO %in% regions),
        x="",
        caption=paste0("CANSIM ", table_id))
 ```
-
 We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction. 
 

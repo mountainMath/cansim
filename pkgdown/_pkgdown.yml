@@ -1,0 +1,16 @@
+pandoc: 2.2.1
+pkgdown: 1.1.0
+pkgdown_sha: ~
+articles:
+  cansim: cansim.html
+  listing_cansim_tables: listing_cansim_tables.html
+  retrieving_cansim_vectors: retrieving_cansim_vectors.html
+  working_with_hierarchies: working_with_hierarchies.html
+authors:
+  Jens von Bergmann:
+    href: https://mountainmath.ca
+  Dmitry Shkolnik:
+    href: https://dshkol.com
+template:
+  params:
+    ganalytics: UA-107390160-2

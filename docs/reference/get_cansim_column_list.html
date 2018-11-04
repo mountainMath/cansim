@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get CANSIM table column list — get_cansim_column_list • cansim</title>
+<title>Retrieve Statistics Canada data table column list — get_cansim_column_list • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,7 +30,9 @@
 
 
 
-<meta property="og:title" content="Get CANSIM table column list — get_cansim_column_list" />
+  <link href="../extra.css" rel="stylesheet">
+  
+<meta property="og:title" content="Retrieve Statistics Canada data table column list — get_cansim_column_list" />
 
 <meta property="og:description" content="Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only." />
 <meta name="twitter:card" content="summary" />
@@ -45,6 +47,16 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107390160-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107390160-2');
+</script>
 
   </head>
 
@@ -61,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
       </span>
     </div>
 
@@ -87,20 +99,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/listing_cansim_tables.html">Listing CANSIM tables</a>
+      <a href="../articles/listing_cansim_tables.html">Listing Statistics Canada data tables</a>
     </li>
     <li>
-      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual CANSIM vectors</a>
+      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
     <li>
-      <a href="../articles/working_with_hierarchies.html">Working with CANSIM hierarchies</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
     </li>
   </ul>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mountainMath/cansim">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -113,8 +130,8 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get CANSIM table column list</h1>
-    
+    <h1>Retrieve Statistics Canada data table column list</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
     <div class="hidden name"><code>get_cansim_column_list.Rd</code></div>
     </div>
 
@@ -140,7 +157,7 @@
     </tr>
     <tr>
       <th>refresh</th>
-      <td><p>Optionally force reload of CANSIM data, default is <code>FALSE</code></p></td>
+      <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
     </tr>
     </table>
     
@@ -166,7 +183,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jens von Bergmann, Dmitry Shkolnik.</p>
+  <p>Developed by <a href='https://mountainmath.ca'>Jens von Bergmann</a>, <a href='https://dshkol.com'>Dmitry Shkolnik</a>.</p>
 </div>
 
 <div class="pkgdown">

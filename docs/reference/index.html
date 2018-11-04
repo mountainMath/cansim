@@ -30,6 +30,8 @@
 
 
 
+  <link href="../extra.css" rel="stylesheet">
+  
 <meta property="og:title" content="Function reference" />
 
 
@@ -42,6 +44,16 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107390160-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107390160-2');
+</script>
 
   </head>
 
@@ -58,7 +70,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
       </span>
     </div>
 
@@ -84,20 +96,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/listing_cansim_tables.html">Listing CANSIM tables</a>
+      <a href="../articles/listing_cansim_tables.html">Listing Statistics Canada data tables</a>
     </li>
     <li>
-      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual CANSIM vectors</a>
+      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
     <li>
-      <a href="../articles/working_with_hierarchies.html">Working with CANSIM hierarchies</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
     </li>
   </ul>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mountainMath/cansim">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -133,13 +150,13 @@
         <td>
           <p><code><a href="adjust_cansim_values_by_variable.html">adjust_cansim_values_by_variable()</a></code> </p>
         </td>
-        <td><p>(Deprecated) Adjust CANSIM table values by a scaling variable</p></td>
+        <td><p>(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="cansim_old_to_new.html">cansim_old_to_new()</a></code> </p>
         </td>
-        <td><p>Translate CANSIM table number into NDM table</p></td>
+        <td><p>Translate deprecated CANSIM table number into new NDM-format table catalogue number</p></td>
       </tr><tr>
         
         <td>
@@ -151,7 +168,7 @@
         <td>
           <p><code><a href="get_cansim.html">get_cansim()</a></code> </p>
         </td>
-        <td><p>Retrieve a CANSIM table using CANSIM code or NDM table number</p></td>
+        <td><p>Retrieves a Statistics Canada data table using CANSIM code or NDM table number</p></td>
       </tr><tr>
         
         <td>
@@ -163,13 +180,13 @@
         <td>
           <p><code><a href="get_cansim_column_categories.html">get_cansim_column_categories()</a></code> </p>
         </td>
-        <td><p>Retrieve CANSIM table categories for a specific column</p></td>
+        <td><p>Retrieve Statistics Canada data table categories for a specific column</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_column_list.html">get_cansim_column_list()</a></code> </p>
         </td>
-        <td><p>Get CANSIM table column list</p></td>
+        <td><p>Retrieve Statistics Canada data table column list</p></td>
       </tr><tr>
         
         <td>
@@ -181,97 +198,97 @@
         <td>
           <p><code><a href="get_cansim_data_for_table_coord_periods.html">get_cansim_data_for_table_coord_periods()</a></code> </p>
         </td>
-        <td><p>Retrieve data for specified CANSIM table for last N periods for specific coordinates</p></td>
+        <td><p>Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_ndm.html">get_cansim_ndm()</a></code> </p>
         </td>
-        <td><p>Retrieve a CANSIM table using an NDM number</p></td>
+        <td><p>Retrieve a Statistics Canada data table using NDM catalogue number</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_info.html">get_cansim_table_info()</a></code> </p>
         </td>
-        <td><p>Get CANSIM table information</p></td>
+        <td><p>Retrieve Statistics Canada data table information</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_list.html">get_cansim_table_list()</a></code> </p>
         </td>
-        <td><p>get all cansim tables</p></td>
+        <td><p>Retrieve list of all Statistics Canada data tables</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_list_page.html">get_cansim_table_list_page()</a></code> </p>
         </td>
-        <td><p>internal method to get page of cansim tables</p></td>
+        <td><p>An internal method to get page of Statistics Canada data tables</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_notes.html">get_cansim_table_notes()</a></code> </p>
         </td>
-        <td><p>Get CANSIM table notes</p></td>
+        <td><p>Retrieve Statistics Canada data table notes</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_overview.html">get_cansim_table_overview()</a></code> </p>
         </td>
-        <td><p>Get CANSIM table overview text</p></td>
+        <td><p>Retrieve Statistics Canada data table overview text</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_subject.html">get_cansim_table_subject()</a></code> </p>
         </td>
-        <td><p>Get CANSIM table subject detail</p></td>
+        <td><p>Retrieve Statistics Canada data table subject detail</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_survey.html">get_cansim_table_survey()</a></code> </p>
         </td>
-        <td><p>Get CANSIM table survey detail</p></td>
+        <td><p>Retrieve Statistics Canada data table survey detail</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_table_url.html">get_cansim_table_url()</a></code> </p>
         </td>
-        <td><p>Retrieve a CANSIM table URL given a table number</p></td>
+        <td><p>Retrieve a Statistics Canada data table URL given a table number</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_vector.html">get_cansim_vector()</a></code> </p>
         </td>
-        <td><p>Retrieve data for a CANSIM vector released within a given time frame</p></td>
+        <td><p>Retrieve data for a Statistics Canada data vector released within a given time frame</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods()</a></code> </p>
         </td>
-        <td><p>Retrieve data for specified CANSIM vector(s) for last N periods</p></td>
+        <td><p>Retrieve data for specified Statistics Canada data vector(s) for last N periods</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="get_cansim_vector_info.html">get_cansim_vector_info()</a></code> </p>
         </td>
-        <td><p>Retrieve metadatadata for specified CANSIM vectors</p></td>
+        <td><p>Retrieve metadatadata for specified Statistics Canada data vectors</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="list_cansim_tables.html">list_cansim_tables()</a></code> </p>
         </td>
-        <td><p>Get overview list for all CANSIM tables</p></td>
+        <td><p>Get overview list for all Statistics Canada data tables</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="normalize_cansim_values.html">normalize_cansim_values()</a></code> </p>
         </td>
-        <td><p>Normalize CANSIM table values to appropriate scale</p></td>
+        <td><p>Normalize retrieved data table values to appropriate scales</p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="search_cansim_tables.html">search_cansim_tables()</a></code> </p>
         </td>
-        <td><p>Search through CANSIM tables</p></td>
+        <td><p>Search through Statistics Canada data tables</p></td>
       </tr><tr>
         
         <td>
@@ -293,7 +310,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jens von Bergmann, Dmitry Shkolnik.</p>
+  <p>Developed by <a href='https://mountainmath.ca'>Jens von Bergmann</a>, <a href='https://dshkol.com'>Dmitry Shkolnik</a>.</p>
 </div>
 
 <div class="pkgdown">

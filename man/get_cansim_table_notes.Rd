@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_table_notes}
 \alias{get_cansim_table_notes}
-\title{Get CANSIM table notes}
+\title{Retrieve Statistics Canada data table notes}
 \usage{
 get_cansim_table_notes(cansimTableNumber, language = "english",
   refresh = FALSE)
@@ -12,7 +12,7 @@ get_cansim_table_notes(cansimTableNumber, language = "english",
 
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
 
-\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}}
+\item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 }
 \description{
 Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.

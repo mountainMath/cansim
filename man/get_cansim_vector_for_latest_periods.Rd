@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_vectors.R
 \name{get_cansim_vector_for_latest_periods}
 \alias{get_cansim_vector_for_latest_periods}
-\title{Retrieve data for specified CANSIM vector(s) for last N periods}
+\title{Retrieve data for specified Statistics Canada data vector(s) for last N periods}
 \usage{
 get_cansim_vector_for_latest_periods(vectors, periods = 1)
 }

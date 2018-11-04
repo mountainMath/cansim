@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_ndm}
 \alias{get_cansim_ndm}
-\title{Retrieve a CANSIM table using an NDM number}
+\title{Retrieve a Statistics Canada data table using NDM catalogue number}
 \usage{
 get_cansim_ndm(cansimTableNumber, language = "english",
   refresh = FALSE)
@@ -12,13 +12,13 @@ get_cansim_ndm(cansimTableNumber, language = "english",
 
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
-\item{refresh}{Optionally force reload of CANSIM data, default is \code{FALSE}}
+\item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 }
 \value{
-a tibble with retrieved NDM table data
+tibble format data table output
 }
 \description{
-Retrieves a CANSIM table as a tidy dataframe using an NDM number. Retrieved table data is cached for the duration of the current R session only by default.
+Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 }
 \examples{
 get_cansim("34-10-0013")

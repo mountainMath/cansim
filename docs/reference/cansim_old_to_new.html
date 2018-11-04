@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Translate CANSIM table number into NDM table — cansim_old_to_new • cansim</title>
+<title>Translate deprecated CANSIM table number into new NDM-format table catalogue number — cansim_old_to_new • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,11 @@
 
 
 
-<meta property="og:title" content="Translate CANSIM table number into NDM table — cansim_old_to_new" />
+  <link href="../extra.css" rel="stylesheet">
+  
+<meta property="og:title" content="Translate deprecated CANSIM table number into new NDM-format table catalogue number — cansim_old_to_new" />
 
-<meta property="og:description" content="Returns NDM table equivalent given a standard old-format CANSIM table number" />
+<meta property="og:description" content="Returns NDM table catalogue equivalent given a standard old-format CANSIM table number" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -45,6 +47,16 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107390160-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107390160-2');
+</script>
 
   </head>
 
@@ -61,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
       </span>
     </div>
 
@@ -87,20 +99,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/listing_cansim_tables.html">Listing CANSIM tables</a>
+      <a href="../articles/listing_cansim_tables.html">Listing Statistics Canada data tables</a>
     </li>
     <li>
-      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual CANSIM vectors</a>
+      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
     <li>
-      <a href="../articles/working_with_hierarchies.html">Working with CANSIM hierarchies</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
     </li>
   </ul>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mountainMath/cansim">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -113,14 +130,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Translate CANSIM table number into NDM table</h1>
-    
+    <h1>Translate deprecated CANSIM table number into new NDM-format table catalogue number</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
     <div class="hidden name"><code>cansim_old_to_new.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Returns NDM table equivalent given a standard old-format CANSIM table number</p>
+    <p>Returns NDM table catalogue equivalent given a standard old-format CANSIM table number</p>
     
     </div>
 
@@ -131,17 +148,21 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>oldCansimTableNumber</th>
-      <td><p>the old CANSIM table number. Returns the corresponding NDM number.</p></td>
+      <td><p>deprecated style CANSIM table number (e.g. "427-0001")</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>CANSIM NDM table number</p>
+    <p>new-format NDM table number</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>cansim_old_to_new</span>(<span class='st'>"026-0018"</span>)</div><div class='output co'>#&gt; [1] "34-10-0013"</div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'>cansim_old_to_new</span>(<span class='st'>"026-0018"</span>)</div><div class='output co'>#&gt; <span class='message'>Parsed with column specification:</span>
+#&gt; <span class='message'>cols(</span>
+#&gt; <span class='message'>  CANSIM_ID = col_integer(),</span>
+#&gt; <span class='message'>  PRODUCT_ID = col_integer()</span>
+#&gt; <span class='message'>)</span></div><div class='output co'>#&gt; [1] "34-10-0013"</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -159,7 +180,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jens von Bergmann, Dmitry Shkolnik.</p>
+  <p>Developed by <a href='https://mountainmath.ca'>Jens von Bergmann</a>, <a href='https://dshkol.com'>Dmitry Shkolnik</a>.</p>
 </div>
 
 <div class="pkgdown">

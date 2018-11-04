@@ -8,7 +8,7 @@ categories_for_level(data, column_name, level = NA, strict = FALSE,
   remove_duplicates = TRUE)
 }
 \arguments{
-\item{data}{retrieved CANSIM object as returned from \code{get_cansim()}}
+\item{data}{data table object as returned from \code{get_cansim()}}
 
 \item{column_name}{the quoted name of the column to extract categories from}
 

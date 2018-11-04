@@ -2,4 +2,6 @@
 ^doc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^docs
+^pkgdown
 .travis.yml

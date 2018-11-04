@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Normalize CANSIM table values to appropriate scale — normalize_cansim_values • cansim</title>
+<title>Normalize retrieved data table values to appropriate scales — normalize_cansim_values • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,11 @@
 
 
 
-<meta property="og:title" content="Normalize CANSIM table values to appropriate scale — normalize_cansim_values" />
+  <link href="../extra.css" rel="stylesheet">
+  
+<meta property="og:title" content="Normalize retrieved data table values to appropriate scales — normalize_cansim_values" />
 
-<meta property="og:description" content="Facilitates working with CANSIM values by setting all units to counts/dollars instead of millions, etc. If &quot;replacement_value&quot; is not set, it will replace the VALUE field with normalized values and drop the scale column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the REF_DATE field and create an R date variable. This is currently experimental." />
+<meta property="og:description" content="Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If &quot;replacement_value&quot; is not set, it will replace the VALUE field with normalized values and drop the scale column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the REF_DATE field and create an R date variable. This is currently experimental." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -45,6 +47,16 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-107390160-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-107390160-2');
+</script>
 
   </head>
 
@@ -61,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
       </span>
     </div>
 
@@ -87,20 +99,25 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/listing_cansim_tables.html">Listing CANSIM tables</a>
+      <a href="../articles/listing_cansim_tables.html">Listing Statistics Canada data tables</a>
     </li>
     <li>
-      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual CANSIM vectors</a>
+      <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
     <li>
-      <a href="../articles/working_with_hierarchies.html">Working with CANSIM hierarchies</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
     </li>
   </ul>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/mountainMath/cansim">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -113,14 +130,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Normalize CANSIM table values to appropriate scale</h1>
-    
+    <h1>Normalize retrieved data table values to appropriate scales</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
     <div class="hidden name"><code>normalize_cansim_values.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Facilitates working with CANSIM values by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the <code>VALUE</code> field with normalized values and drop the <code>scale</code> column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the <code>REF_DATE</code> field and create an R date variable. This is currently experimental.</p>
+    <p>Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the <code>VALUE</code> field with normalized values and drop the <code>scale</code> column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the <code>REF_DATE</code> field and create an R date variable. This is currently experimental.</p>
     
     </div>
 
@@ -132,15 +149,15 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A CANSIM table as returned from <code><a href='get_cansim.html'>get_cansim()</a></code> pr <code><a href='get_cansim_ndm.html'>get_cansim_ndm()</a></code></p></td>
+      <td><p>A retrieved data table as returned from <code><a href='get_cansim.html'>get_cansim()</a></code> pr <code><a href='get_cansim_ndm.html'>get_cansim_ndm()</a></code></p></td>
     </tr>
     <tr>
       <th>replacement_value</th>
-      <td><p>(Optional) name of the column the manipulated value should be returned in. Defaults to replacing the current value field</p></td>
+      <td><p>(Optional) the name of the column the manipulated value should be returned in. Defaults to replacing the current value field</p></td>
     </tr>
     <tr>
       <th>normalize_percent</th>
-      <td><p>(Optional) normalize percentages by changing them to rates. <code>TRUE</code> by default</p></td>
+      <td><p>(Optional) When <code>true</code> (the default) normalizes percentages by changing them to rates</p></td>
     </tr>
     <tr>
       <th>default_month</th>
@@ -154,7 +171,7 @@
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Tibble with adjusted values</p>
+    <p>Returns the input tibble with with adjusted values</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -192,7 +209,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jens von Bergmann, Dmitry Shkolnik.</p>
+  <p>Developed by <a href='https://mountainmath.ca'>Jens von Bergmann</a>, <a href='https://dshkol.com'>Dmitry Shkolnik</a>.</p>
 </div>
 
 <div class="pkgdown">

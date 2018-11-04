@@ -10,7 +10,7 @@ get_cansim_changed_tables(start_date)
 \item{start_date}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
 }
 \value{
-A tibble with CANSIM product ids and release times
+A tibble with Statistics Canada data table product ids and their release times
 }
 \description{
 Retrieve a list of tables that have been modified or updated since the specified date.
