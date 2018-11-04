@@ -137,11 +137,11 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE){
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language=cleaned_ndm_language(language)
-  message(paste0("Accessing CANSIM NDM product ",cleaned_number))
   base_table=naked_ndm_table_number(cansimTableNumber)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
   if (refresh | !file.exists(data_path)){
+    message(paste0("Accessing CANSIM NDM product ",cleaned_number, " from Statistics Canada"))
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
     httr::GET(url,httr::write_disk(path, overwrite = TRUE))
     data <- NA
@@ -246,6 +246,8 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
     }
     saveRDS(data,file=data_path)
     unlink(exdir,recursive = TRUE)
+  } else {
+    message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
   }
   readRDS(file=data_path)
 }

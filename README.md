@@ -12,6 +12,9 @@ This package:
 * Caches downloaded data for faster loading and less waiting
 * Convenience functions for relabelling and rescaling when appropriate
 
+### Documentation
+[Cansim R package home page and reference guide](https://mountainmath.github.io/cansim/index.html)
+
 ### Installation
 ```r
 # install.packages("devtools")
@@ -20,11 +23,11 @@ devtools::install_github("mountainmath/cansim")
 
 ### Caching
 
-As many CANSIM table downloads can be quite large in size, the cansim package will temporarily cache data for the duration of the current R session. This reduces unnecessary waiting when recompiling code. You can also set up an explicit cache location that will be persistent across sessions by setting `options(cache_path="your_cache_path")` in your .Rprofile. 
+As many Statistics Canada table (formerly CANSIM) downloads can be quite large in size, the cansim package will temporarily cache data for the duration of the current R session. This reduces unnecessary waiting when recompiling code. You can also set up an explicit cache location that will be persistent across sessions by setting `options(cache_path="your_cache_path")` in your .Rprofile. 
 
 ### Basic Usage
 
-Use old or new table number to download entire CANSIM or NDM tables into a tidy dataframe. The cansim package retains the ability to work with legacy CANSIM table numbers or their new NDM equivalent. Calling either the legacy CANSIM table number or the new NDM number will load the same data. 
+Use old CANSIM or new table number to download entire Statistics Canada tables into a tidy dataframe. The cansim R package retains the ability to work with legacy CANSIM table numbers or their new NDM equivalent. Calling either the legacy CANSIM table number or the new NDM number will load the same data. 
 ```r
 # Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)
 births <- get_cansim("051-0013")
@@ -46,7 +49,7 @@ naissances <- get_cansim("051-0013",language="fr")
 
 ### Normalizing values
 
-The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. CANSIM data values may be scaled by powers of 10. 
+The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Sttistics Canada data table values may be scaled by powers of 10. 
 
 For example, values in the VALUE field may be reported in "millions", so a VALUE of 10 means 10,000,000. The `normalize_cansim_values` function automatically scales the VALUE field to be a number, so the VALUE will be converted from 10 to 10000000 in the example given.
 ```r
@@ -59,6 +62,35 @@ data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replacement_valu
 ```
 
 By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set *normalize_percent=FALSE*.
+
+
+### Accessing data by Statistics Canada vector
+
+Data can also be accessed by Statistics Canada vector. If named vectors are supplied, a new `Label` field will contain the corresponding names as labels in the resulting data frame. For example, to access and graph the average income per adjusted family income deciles for British Columbia we can call.
+```r
+vectors <-c("Lowest decile"="96439626",
+            "Second decile"="96439627", 
+            "Third decile"="v96439628", 
+            "Fourth decile"="v96439629",
+            "Fifth decile"="v96439630",
+            "Sixth decile"="v96439631",
+            "Seventh decile"="v96439632",
+            "Eighth decile"="v96439633",
+            "Ninth decile"="v96439634",
+            "Highest decile"="v96439635")
+
+data <- get_cansim_vector(vectors, start_time = "2001-01-01") %>%
+  normalize_cansim_values
+
+ggplot(data,aes(x=Date,y=VALUE,color=label)) +
+  geom_line()
+```
+
+To access metadata for the vectors, use
+```{r}
+get_cansim_vector_info(vectors)
+```
+
 
 ### License
 

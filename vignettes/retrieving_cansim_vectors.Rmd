@@ -75,3 +75,7 @@ ggplot(data,aes(x=Date,y=VALUE,color=label)) +
        caption=paste0("CANSIM vectors ",paste0(vectors,collapse = ", ")),x="",y="",color="")
 ```
 
+To access metadata for vectors we can use the `get_cansim_vector_info` call
+```{r}
+get_cansim_vector_info(vectors)
+```
