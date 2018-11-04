@@ -27,12 +27,6 @@ A stable version is in submission to CRAN.
 
 ### Basic Usage
 
-Use old CANSIM or new table number to download entire Statistics Canada tables into a tidy dataframe. The cansim R package retains the ability to work with legacy CANSIM table numbers or their new NDM equivalent. Calling either the legacy CANSIM table number or the new NDM number will load the same data. 
-
-Many of the data tables available in Statistics Canada's data repository are quite large in size. After downloading tables, the `cansim` package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. Users can set up a persistent cache location that will exist across sessions by defining an explicit cache path. This is as simple as adding `options(cache_path="your_cache_path")` to your .Rprofile file. 
-
-### Basic Usage
-
 The package acccepts use of both old-format ("051-0013") or new-format ("17-10-0016-01") table catalogue numbers to download entire data tables as tidy data frames. Calling either the legacy CANSIM table number or the new NDM number will load the same data. Since the transition to the new data repository, existing tables will have retained their old-format numbers, but any newly created tables will have only new-format names. 
 
 ```r
@@ -45,6 +39,10 @@ bop <- get_cansim("3768105")
 bop <- get_cansim("36-10-0042")
 ```
 See more example usage and worfklow in the _Getting started with the cansim package_ vignette. 
+
+### Caching
+
+Many of the data tables available in Statistics Canada's data repository are quite large in size. After downloading tables, the `cansim` package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. Users can set up a persistent cache location that will exist across sessions by defining an explicit cache path. This is as simple as adding `options(cache_path="your_cache_path")` to your .Rprofile file. To force a refresh of the data, pass the `refresh=TRUE` option in the function call. 
 
 ### Bilingual
 
