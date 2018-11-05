@@ -621,49 +621,6 @@ get_cansim_changed_tables <- function(start_date){
     bind_rows
 }
 
-get_with_timeout_retry <- function(url,timeout=200,retry=3){
-  response <- purrr::safely(httr::GET)(url,timeout=timeout)
-  if (!is.null(response$error)){
-    if (retry>0) {
-      message("Got timeout from StatCan, trying again")
-      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1)
-    } else {
-      message("Got timeout from StatCan, giving up")
-      response=response$result
-    }
-  } else {
-    response=response$result
-  }
-
-  if (is.null(response)) {
-    stop("Problem downloading data")
-  }
-  response
-}
-
-post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
-  response <- purrr::safely(httr::POST)(url,
-                         body=body,
-                         encode="json",
-                         httr::add_headers("Content-Type"="application/json"),
-                         httr::timeout(timeout))
-    if (!is.null(response$error)){
-      if (retry>0) {
-        message("Got timeout from StatCan, trying again")
-        response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1)
-      } else {
-        message("Got timeout from StatCan, giving up")
-        response=response$result
-      }
-    } else {
-      response=response$result
-    }
-
-  if (is.null(response)) {
-    stop("Problem downloading data")
-  }
-  response
-}
 
 
 #' @import dplyr

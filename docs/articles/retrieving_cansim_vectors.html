@@ -94,12 +94,7 @@
     <div class="page-header toc-ignore">
       <h1>Retrieving individual Statistics Canada vectors</h1>
             
-<<<<<<< HEAD
             <h4 class="date">2018-11-04</h4>
-      
-=======
-            <h4 class="date">2018-11-03</h4>
->>>>>>> 151b1864401cd301bf2883cdb42044dd6422545f
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/retrieving_cansim_vectors.Rmd"><code>vignettes/retrieving_cansim_vectors.Rmd</code></a></small>
       <div class="hidden name"><code>retrieving_cansim_vectors.Rmd</code></div>
@@ -195,18 +190,13 @@
 <a class="sourceLine" id="cb4-3" data-line-number="3">             <span class="st">"BC CPI"</span>=<span class="st">"v41692462"</span>)</a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span>(<span class="kw"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span>(vectors, <span class="st">"2010-01-01"</span>))</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; Got timeout from StatCan, trying again</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"></a>
-<<<<<<< HEAD
-<a class="sourceLine" id="cb4-8" data-line-number="8"></a>
-=======
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="kw">library</span>(ggplot2)</a>
->>>>>>> 151b1864401cd301bf2883cdb42044dd6422545f
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="kw"><a href="ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(data,<span class="kw"><a href="ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>Date,<span class="dt">y=</span>VALUE,<span class="dt">color=</span>label)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Consumer Price Index, January 2010 to September 2018"</span>,</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">       <span class="dt">subtitle =</span> <span class="st">"Seasonally-unadjusted, all-items (2002 = 100)"</span>,</a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM vectors "</span>,<span class="kw">paste0</span>(vectors,<span class="dt">collapse =</span> <span class="st">", "</span>)),<span class="dt">x=</span><span class="st">""</span>,<span class="dt">y=</span><span class="st">""</span>,<span class="dt">color=</span><span class="st">""</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb4-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="kw"><a href="ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(data,<span class="kw"><a href="ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>Date,<span class="dt">y=</span>VALUE,<span class="dt">color=</span>label)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Consumer Price Index, January 2010 to September 2018"</span>,</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11">       <span class="dt">subtitle =</span> <span class="st">"Seasonally-unadjusted, all-items (2002 = 100)"</span>,</a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM vectors "</span>,<span class="kw">paste0</span>(vectors,<span class="dt">collapse =</span> <span class="st">", "</span>)),<span class="dt">x=</span><span class="st">""</span>,<span class="dt">y=</span><span class="st">""</span>,<span class="dt">color=</span><span class="st">""</span>)</a></code></pre></div>
 <p><img src="retrieving_cansim_vectors_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <p>To access metadata for vectors we can use the <code>get_cansim_vector_info</code> call</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span>(vectors)</a>

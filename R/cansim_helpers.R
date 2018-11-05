@@ -41,3 +41,53 @@ response_status_code_translation <- list(
   "7"="Cube is currently unavailable. For more information, contact us (toll-free 1-800-263-1136; 514-283-8300; STATCAN.infostats-infostats.STATCAN@canada.ca).",
   "8"="Invalid number of reference periods"
 )
+
+get_with_timeout_retry <- function(url,timeout=200,retry=3){
+  response <- purrr::safely(httr::GET)(url,httr::timeout(timeout))
+  if (!is.null(response$error)){
+    if (retry>0) {
+      message("Got timeout from StatCan, trying again")
+      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1)
+    } else {
+      message("Got timeout from StatCan, giving up")
+      response=response$result
+    }
+  } else {
+    response=response$result
+  }
+
+  if (is.null(response)) {
+    stop("Problem downloading data")
+  }
+  response
+}
+
+post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
+  response <- purrr::safely(httr::POST)(url,
+                                        body=body,
+                                        encode="json",
+                                        httr::add_headers("Content-Type"="application/json"),
+                                        httr::timeout(timeout))
+  if (!is.null(response$error)){
+    if (retry>0) {
+      message("Got timeout from StatCan, trying again")
+      response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1)
+    } else {
+      message("Got timeout from StatCan, giving up")
+      response=response$result
+    }
+  } else {
+    response=response$result
+  }
+
+  if (is.null(response)) {
+    stop("Problem downloading data")
+  }
+  response
+}
+
+
+# refresh_cansim_table_list <- function(){
+#   cansim_table_list <- list_cansim_tables(refresh = TRUE)
+#   usethis::use_data(cansim_table_list, internal = TRUE, overwrite = TRUE)
+# }

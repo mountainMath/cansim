@@ -28,7 +28,8 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
   }
   url=paste0("https://open.canada.ca/data/api/3/action/package_search?q=owner_org:A0F0FCFC-BC3B-4696-8B6D-E7E411D55BAC",
              "&start=",start_offset,"&rows=",max_rows)
-  response <- jsonlite::fromJSON(url)$result
+  raw_response <- get_with_timeout_retry(url)
+  response <- jsonlite::fromJSON(httr::content(raw_response,type="text",encoding = "UTF-8"))$result
   results=response$results
   if (length(results)==0) return (tibble::tibble())
   string_list <- function(d){
@@ -107,10 +108,13 @@ list_cansim_tables <- function(refresh=FALSE){
     result=cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
+      message_text <- paste0("Your CANSIM table overview data is ",age," days old.\n")
+      if (is.null(directory)) message_text <- paste0(message_text,"Consider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
+      else message_text <- paste0(message_text,"Consider refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
       message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
-    }
-    if (is.null(directory)) {
-      message("The table won't be able to refresh if options(cache_path=\"your cache path\") is not set.")
+      if (is.null(directory)) {
+        message("The table won't be able to be refreshed if options(cache_path=\"your cache path\") is not set.")
+      }
     }
   } else {
     if (refresh) {
