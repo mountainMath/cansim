@@ -19,7 +19,7 @@ This vignette details how to use the internal table search functions in the `can
 
 ### A note on caching and refreshing table lists
 
-As the table search function requires a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refleshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cache_path="your cache path")` option so that table information is cached across R sessions.
+As the table search function requires a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cache_path="your cache path")` option so that table information is cached across R sessions.
 
 ### Listing and filtering tables
 

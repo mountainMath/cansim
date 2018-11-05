@@ -137,7 +137,7 @@ list_cansim_tables <- function(refresh=FALSE){
 #' Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to \code{TRUE}. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not \code{search_description} is set to \code{TRUE} or not. If \code{refresh = TRUE}, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 #'
 #' @param search_term User-supplied search term used to find Statistics Canada data tables with matching titles
-#' @param search_fields By default, this function will search through table titles and keywords. Setting this parameter to "title" will only serach through the title, setting it to "keyword" will only search through keywords
+#' @param search_fields By default, this function will search through table titles and keywords. Setting this parameter to "title" will only search through the title, setting it to "keyword" will only search through keywords
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}
 #'
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography

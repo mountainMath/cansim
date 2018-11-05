@@ -34,3 +34,5 @@ Suggests: knitr,
 URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/
 BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr
+Language: en-CA
+

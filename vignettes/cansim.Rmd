@@ -38,7 +38,7 @@ If you know the data table catalogue number you are interested in, use `get_cans
 data <- get_cansim("14-10-0293")
 head(data)
 ```
-By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into a clearner data object and to use the included data to transform values by their appropriate scaling or unit variable. This makes it easier to work on the data directly and minimize unnecessary data manipulation. For example, data may be reported as a value in "millions" but with unitless numbers. A built-in convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
+By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into a cleaner data object and to use the included data to transform values by their appropriate scaling or unit variable. This makes it easier to work on the data directly and minimize unnecessary data manipulation. For example, data may be reported as a value in "millions" but with unitless numbers. A built-in convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
 ```{r}
 library(dplyr)
 data <- get_cansim("14-10-0293") %>% 

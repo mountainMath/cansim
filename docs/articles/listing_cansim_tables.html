@@ -107,7 +107,7 @@
 <div id="a-note-on-caching-and-refreshing-table-lists" class="section level3">
 <h3 class="hasAnchor">
 <a href="#a-note-on-caching-and-refreshing-table-lists" class="anchor"></a>A note on caching and refreshing table lists</h3>
-<p>As the table search function requires a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refleshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
+<p>As the table search function requires a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
 </div>
 <div id="listing-and-filtering-tables" class="section level3">
 <h3 class="hasAnchor">
@@ -116,21 +116,17 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(cansim)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">names</span>(<span class="kw"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>())</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; Your CANSIM table overview data is 35 days old.</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; Consider setting options(cache_path="your cache path")</span></a>
-<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span></a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; The table won't be able to refresh if options(cache_path="your cache path") is not set.</span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt;  [1] "title"                      "title_en"                  </span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt;  [3] "title_fr"                   "keywords_en"               </span></a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt;  [5] "keywords"                   "keywords_fr"               </span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt;  [7] "notes"                      "notes_en"                  </span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt;  [9] "notes_fr"                   "state"                     </span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; [11] "subject"                    "date_published"            </span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; [13] "frequency"                  "revision_id"               </span></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; [15] "time_period_coverage_start" "time_period_coverage_end"  </span></a>
-<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; [17] "metadata_created"           "metadata_modified"         </span></a>
-<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="co">#&gt; [19] "url_en"                     "url_fr"                    </span></a>
-<a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co">#&gt; [21] "cansim_table_number"</span></a></code></pre></div>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt;  [1] "title"                      "title_en"                  </span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt;  [3] "title_fr"                   "keywords_en"               </span></a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt;  [5] "keywords"                   "keywords_fr"               </span></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt;  [7] "notes"                      "notes_en"                  </span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt;  [9] "notes_fr"                   "state"                     </span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; [11] "subject"                    "date_published"            </span></a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; [13] "frequency"                  "revision_id"               </span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt; [15] "time_period_coverage_start" "time_period_coverage_end"  </span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; [17] "metadata_created"           "metadata_modified"         </span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; [19] "url_en"                     "url_fr"                    </span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; [21] "cansim_table_number"</span></a></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; </span></a>
@@ -145,15 +141,11 @@
 <a class="sourceLine" id="cb2-11" data-line-number="11"><span class="kw"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw">grepl</span>(<span class="st">"Labour force characteristics"</span>,title), <span class="kw">grepl</span>(<span class="st">"economic region"</span>,title)) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"cansim_table_number"</span>,<span class="st">"title"</span>)</a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; Your CANSIM table overview data is 35 days old.</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; Consider setting options(cache_path="your cache path")</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span></a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; The table won't be able to refresh if options(cache_path="your cache path") is not set.</span></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt;   cansim_table_number title                                               </span></a>
-<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;                                               </span></a>
-<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt; 1 14-10-0293          Labour force characteristics by economic region, th…</span></a>
-<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; 2 14-10-0090          Labour force characteristics by province, territory…</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt;   cansim_table_number title                                               </span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;                                               </span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; 1 14-10-0293          Labour force characteristics by economic region, th…</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; 2 14-10-0090          Labour force characteristics by province, territory…</span></a></code></pre></div>
 <p>The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the <code>tidyr</code> package here to reshape data from a long format to a wider format.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(tidyr)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"></a>

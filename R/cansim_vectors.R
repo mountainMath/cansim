@@ -175,7 +175,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
 }
 
 
-#' Retrieve metadatadata for specified Statistics Canada data vectors
+#' Retrieve metadata for specified Statistics Canada data vectors
 #'
 #' Allows for the retrieval of metadatadata for Statistics Canada data vectors
 #'
