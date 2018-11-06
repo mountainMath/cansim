@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieve a Statistics Canada data table using NDM catalogue number — get_cansim_ndm • cansim</title>
+<title>Changelog • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -32,10 +32,7 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="Retrieve a Statistics Canada data table using NDM catalogue number — get_cansim_ndm" />
-
-<meta property="og:description" content="Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Changelog" />
 
 
 
@@ -61,7 +58,7 @@
   </head>
 
   <body>
-    <div class="container template-reference-topic">
+    <div class="container template-news">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -133,73 +130,20 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieve a Statistics Canada data table using NDM catalogue number</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
-    <div class="hidden name"><code>get_cansim_ndm.Rd</code></div>
+      <h1>Changelog <small></small></h1>
+      <small>Source: <a href='https://github.com/mountainMath/cansim/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div class="ref-description">
-    
-    <p>Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.</p>
-    
-    </div>
-
-    <pre class="usage"><span class='fu'>get_cansim_ndm</span>(<span class='no'>cansimTableNumber</span>, <span class='kw'>language</span> <span class='kw'>=</span> <span class='st'>"english"</span>,
-  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>cansimTableNumber</th>
-      <td><p>the NDM table number to load</p></td>
-    </tr>
-    <tr>
-      <th>language</th>
-      <td><p><code>"en"</code> or <code>"english"</code> for English and <code>"fr"</code> or <code>"french"</code> for French language versions (defaults to English)</p></td>
-    </tr>
-    <tr>
-      <th>refresh</th>
-      <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>tibble format data table output</p>
-    
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='get_cansim.html'>get_cansim</a></span>(<span class='st'>"34-10-0013"</span>)</div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='output co'>#&gt; # A tibble: 550 x 18
-#&gt;    REF_DATE GEO   DGUID `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
-#&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;    
-#&gt;  1 2005     Cana… 2016… Residential      Doll… 81     millions      6        
-#&gt;  2 2005     Newf… 2016… Residential      Doll… 81     millions      6        
-#&gt;  3 2005     Prin… 2016… Residential      Doll… 81     millions      6        
-#&gt;  4 2005     Nova… 2016… Residential      Doll… 81     millions      6        
-#&gt;  5 2005     New … 2016… Residential      Doll… 81     millions      6        
-#&gt;  6 2005     Queb… 2016… Residential      Doll… 81     millions      6        
-#&gt;  7 2005     Onta… 2016… Residential      Doll… 81     millions      6        
-#&gt;  8 2005     Mani… 2016… Residential      Doll… 81     millions      6        
-#&gt;  9 2005     Sask… 2016… Residential      Doll… 81     millions      6        
-#&gt; 10 2005     Albe… 2016… Residential      Doll… 81     millions      6        
-#&gt; # ... with 540 more rows, and 10 more variables: VECTOR &lt;chr&gt;,
-#&gt; #   COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,
-#&gt; #   TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;, `Classification Code for
-#&gt; #   Type of property` &lt;chr&gt;, `Hierarchy for Type of property` &lt;chr&gt;</div><div class='input'>
-</div></pre>
   </div>
+
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+    <div id="tocnav">
+      <h2>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+      </ul>
+    </div>
   </div>
+
 </div>
 
       <footer>

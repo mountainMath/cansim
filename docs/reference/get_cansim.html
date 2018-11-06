@@ -109,6 +109,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -167,7 +170,7 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># Retrieve a table with an NDM code</span>
-<span class='fu'>get_cansim</span>(<span class='st'>"34-10-0013"</span>)</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 34-10-0013</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='output co'>#&gt; <span class='message'>Folding in metadata</span></div><div class='output co'>#&gt; # A tibble: 550 x 18
+<span class='fu'>get_cansim</span>(<span class='st'>"34-10-0013"</span>)</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 34-10-0013 from Statistics Canada</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='output co'>#&gt; <span class='message'>Folding in metadata</span></div><div class='output co'>#&gt; # A tibble: 550 x 18
 #&gt;    REF_DATE GEO   DGUID `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
 #&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;    
 #&gt;  1 2005     Cana… 2016… Residential      Doll… 81     millions      6        
@@ -184,7 +187,7 @@
 #&gt; #   COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,
 #&gt; #   TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;, `Classification Code for
 #&gt; #   Type of property` &lt;chr&gt;, `Hierarchy for Type of property` &lt;chr&gt;</div><div class='input'><span class='co'># Retrieve a table with an old-style CANSIM code</span>
-<span class='fu'>get_cansim</span>(<span class='st'>"026-0018"</span>)</div><div class='output co'>#&gt; <span class='message'>Legacy table number 026-0018, converting to NDM 34-10-0013</span></div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 34-10-0013</span></div><div class='output co'>#&gt; # A tibble: 550 x 18
+<span class='fu'>get_cansim</span>(<span class='st'>"026-0018"</span>)</div><div class='output co'>#&gt; <span class='message'>Legacy table number 026-0018, converting to NDM 34-10-0013</span></div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='output co'>#&gt; # A tibble: 550 x 18
 #&gt;    REF_DATE GEO   DGUID `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
 #&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;    
 #&gt;  1 2005     Cana… 2016… Residential      Doll… 81     millions      6        

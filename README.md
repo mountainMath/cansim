@@ -55,17 +55,17 @@ naissances <- get_cansim("051-0013",language="fr")
 
 ### Normalizing values
 
-The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Sttistics Canada data table values may be scaled by powers of 10. 
+The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Statistics Canada data table values may be scaled by powers of 10. 
 
-For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. The `normalize_cansim_values` function automatically scales the `VALUE` field to be a number, so the `VALUE` will be converted from 10 to 10000000 in the example given.
+For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. The `normalize_cansim_values` function automatically scales the `VALUE` field to be a number, so the `VALUE` will be converted from 10 to 10,000,000 in the example given.
 ```r
 data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values
 ``` 
-To retain the original `VALUE` field pass the *replacement_value = <your field name>* option to create a field to contain the normailzed value.
+To retain the original `VALUE` field pass the `replacement_value = <your field name>` option to create a field to contain the normalized values.
 ```r
 data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replacement_value="normalized value")
 ```
-By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set *normalize_percent=FALSE*.
+By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set `normalize_percent=FALSE`.
 
 
 ### Vectors

@@ -10,7 +10,7 @@ search_cansim_tables(search_term, search_fields = "both",
 \arguments{
 \item{search_term}{User-supplied search term used to find Statistics Canada data tables with matching titles}
 
-\item{search_fields}{By default, this function will search through table titles and keywords. Setting this parameter to "title" will only serach through the title, setting it to "keyword" will only search through keywords}
+\item{search_fields}{By default, this function will search through table titles and keywords. Setting this parameter to "title" will only search through the title, setting it to "keyword" will only search through keywords}
 
 \item{refresh}{Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}}
 }

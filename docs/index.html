@@ -75,6 +75,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -109,6 +112,11 @@
 <li>Offers caching of downloaded data for faster loading and less waiting</li>
 <li>Includes convenience functions for relabelling and rescaling as well as tools for working with data hierarchies in downloaded table objects</li>
 </ul>
+<div id="documentation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#documentation" class="anchor"></a>Documentation</h3>
+<p><a href="https://mountainmath.github.io/cansim/index.html">Cansim R package home page and reference guide</a></p>
+</div>
 <div id="installation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h3>
@@ -116,11 +124,6 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># install.packages("remotes")</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"mountainmath/cansim"</span>)</a></code></pre></div>
 <p>A stable version is in submission to CRAN.</p>
-</div>
-<div id="caching" class="section level3">
-<h3 class="hasAnchor">
-<a href="#caching" class="anchor"></a>Caching</h3>
-<p>Many of the data tables available in Statistics Canada’s data repository are quite large in size. After downloading tables, the <code>cansim</code> package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. Users can set up a persistent cache location that will exist across sessions by defining an explicit cache path. This is as simple as adding <code>options(cache_path="your_cache_path")</code> to your .Rprofile file.</p>
 </div>
 <div id="basic-usage" class="section level3">
 <h3 class="hasAnchor">
@@ -135,6 +138,11 @@
 <a class="sourceLine" id="cb2-7" data-line-number="7">bop &lt;-<span class="st"> </span><span class="kw"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"36-10-0042"</span>)</a></code></pre></div>
 <p>See more example usage and worfklow in the <em>Getting started with the cansim package</em> vignette.</p>
 </div>
+<div id="caching" class="section level3">
+<h3 class="hasAnchor">
+<a href="#caching" class="anchor"></a>Caching</h3>
+<p>Many of the data tables available in Statistics Canada’s data repository are quite large in size. After downloading tables, the <code>cansim</code> package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. Users can set up a persistent cache location that will exist across sessions by defining an explicit cache path. This is as simple as adding <code>options(cache_path="your_cache_path")</code> to your .Rprofile file. To force a refresh of the data, pass the <code>refresh=TRUE</code> option in the function call.</p>
+</div>
 <div id="bilingual" class="section level3">
 <h3 class="hasAnchor">
 <a href="#bilingual" class="anchor"></a>Bilingual</h3>
@@ -145,18 +153,20 @@
 <div id="normalizing-values" class="section level3">
 <h3 class="hasAnchor">
 <a href="#normalizing-values" class="anchor"></a>Normalizing values</h3>
-<p>The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Retrieved data table values may be scaled by powers of 10.</p>
-<p>For example, values in the <code>VALUE</code> field may be reported in “millions”, so a <code>VALUE</code> of 10 means 10,000,000. The <code>normalize_cansim_values</code> function automatically scales the <code>VALUE</code> field to be a number, so the <code>VALUE</code> will be converted from 10 to 10000000 in the example given.</p>
+<p>The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Statistics Canada data table values may be scaled by powers of 10.</p>
+<p>For example, values in the <code>VALUE</code> field may be reported in “millions”, so a <code>VALUE</code> of 10 means 10,000,000. The <code>normalize_cansim_values</code> function automatically scales the <code>VALUE</code> field to be a number, so the <code>VALUE</code> will be converted from 10 to 10,000,000 in the example given.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">data &lt;-<span class="st"> </span><span class="kw"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"17-10-0079-01"</span>) <span class="op">%&gt;%</span><span class="st"> </span>normalize_cansim_values</a></code></pre></div>
-<p>To retain the original <code>VALUE</code> field pass the <em>replacement_value = <your field name></your></em> option to create a field to contain the normailzed value.</p>
+<p>To retain the original <code>VALUE</code> field pass the <code>replacement_value = &lt;your field name&gt;</code> option to create a field to contain the normalized values.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">data &lt;-<span class="st"> </span><span class="kw"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"17-10-0079-01"</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="reference/normalize_cansim_values.html">normalize_cansim_values</a></span>(<span class="dt">replacement_value=</span><span class="st">"normalized value"</span>)</a></code></pre></div>
-<p>By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set <em>normalize_percent=FALSE</em>.</p>
+<p>By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set <code>normalize_percent=FALSE</code>.</p>
 </div>
 <div id="vectors" class="section level3">
 <h3 class="hasAnchor">
 <a href="#vectors" class="anchor"></a>Vectors</h3>
 <p>Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: <em>v41690973</em>. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the <code><a href="reference/get_cansim_vector.html">get_cansim_vector()</a></code> function with the vector code and the date onwards from which we want to get vector results for.</p>
 <pre class="{r}"><code><a href="reference/get_cansim_vector.html">get_cansim_vector("v41690973","2015-01-01")</a></code></pre>
+<p>To access metadata for the vectors, use</p>
+<pre class="{r}"><code><a href="reference/get_cansim_vector_info.html">get_cansim_vector_info("v41690973")</a></code></pre>
 <p>More detailed usage examples are available in the <em>Retrieving individual Statistics Canada vectors</em> vignette.</p>
 </div>
 <div id="table-overview-metadata" class="section level3">
