@@ -37,7 +37,7 @@ library(dplyr)
 
 data <- get_cansim(table_id) 
 
-selected_value = "Chained (2007) dollars"
+selected_value = data$Value[grepl("Chained",data$Value)] %>% unique()
 data <- data %>% 
   filter(Value == selected_value)
 ```
