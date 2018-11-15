@@ -146,6 +146,13 @@ Acknowledgment of Source
 
 CANSIM was the name of Statistics Canada's legacy socio-economic data repository that was widely used by practitioners, academics, and students, with many still calling the new repository by that name. Statistics Canada refers to the current repository simply as "Statistics Canada data" or "StatCan data". We use the CANSIM name for this package as a nostalgic reference.  
 
+### Proxy issues
+
+Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the `httr` package. 
+```r
+httr::set_config(use_proxy(url=http_proxy, port=selected_port, username=your_username,password=your_pass))
+```
+
 ### Contributing
 
 [Issues](https://github.com/mountainMath/cansim/issues) and [pull requests](https://github.com/mountainMath/cansim/pulls) are highly appreciated. 
