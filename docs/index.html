@@ -225,6 +225,12 @@ In doing any of the above, you shall:
 <a href="#why-cansim" class="anchor"></a>Why cansim?</h3>
 <p>CANSIM was the name of Statistics Canada’s legacy socio-economic data repository that was widely used by practitioners, academics, and students, with many still calling the new repository by that name. Statistics Canada refers to the current repository simply as “Statistics Canada data” or “StatCan data”. We use the CANSIM name for this package as a nostalgic reference.</p>
 </div>
+<div id="proxy-issues" class="section level3">
+<h3 class="hasAnchor">
+<a href="#proxy-issues" class="anchor"></a>Proxy issues</h3>
+<p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the <code>httr</code> package.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">httr<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/httr/topics/set_config">set_config</a></span>(<span class="kw">use_proxy</span>(<span class="dt">url=</span>http_proxy, <span class="dt">port=</span>selected_port, <span class="dt">username=</span>your_username,<span class="dt">password=</span>your_pass))</a></code></pre></div>
+</div>
 <div id="contributing" class="section level3">
 <h3 class="hasAnchor">
 <a href="#contributing" class="anchor"></a>Contributing</h3>
@@ -271,9 +277,8 @@ In doing any of the above, you shall:
 <div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
-<li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
-</li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
 <div class="developers">
