@@ -106,16 +106,18 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 #'
 #' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
-  path <- file.path(tempdir(),"cansim-correspondence.csv")
-  if (!file.exists(path)){
-    url="https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv"
-    data <- readr::read_csv(url)
-    saveRDS(data,file=path)
-  }
-  data <-readRDS(path)
+  # cache the file as data, old table numbers should not change
+  #
+  # path <- file.path(tempdir(),"cansim-correspondence.csv")
+  # if (!file.exists(path)){
+  #   url="https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv"
+  #   data <- readr::read_csv(url)
+  #   saveRDS(data,file=path)
+  # }
+  # data <-readRDS(path)
   cleaned_number=sprintf("%07d", as.numeric(sub("-","",as.character(oldCansimTableNumber))))
 
-  new_number <- data %>%
+  new_number <- cansim::correspondence %>%
     filter(.data$CANSIM_ID == as.integer(cleaned_number)) %>%
     pull(.data$PRODUCT_ID)
   if (identical(new_number, integer(0))) {
@@ -125,6 +127,16 @@ cansim_old_to_new <- function(oldCansimTableNumber){
   new_table <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
   new_table
 }
+
+
+#' The correspondence file for old to new StatCan table numbers is included in the package
+#'
+#' @name correspondence
+#' @docType data
+#' @author Statistics Canada
+#' @references \url{https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv}
+#' @keywords data
+NULL
 
 #' Retrieve a Statistics Canada data table using NDM catalogue number
 #'
