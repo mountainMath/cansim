@@ -19,3 +19,4 @@ data table including the metadata information
 \description{
 Parse metadata and fold into data table
 }
+\keyword{internal}

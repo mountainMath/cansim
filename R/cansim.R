@@ -143,6 +143,7 @@ NULL
 #' @param meta the raw metadata table
 #' @param data_path base path to save parsed metadata
 #' @return data table including the metadata information
+#' @keywords internal
 parse_and_fold_in_metadata <- function(data,meta,data_path){
   cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
   if (cleaned_language=="eng") {

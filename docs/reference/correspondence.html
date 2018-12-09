@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Search through Statistics Canada data tables — search_cansim_tables • cansim</title>
+<title>The correspondence file for old to new StatCan table numbers is included in the package — correspondence • cansim</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -32,9 +32,9 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="Search through Statistics Canada data tables — search_cansim_tables" />
+<meta property="og:title" content="The correspondence file for old to new StatCan table numbers is included in the package — correspondence" />
 
-<meta property="og:description" content="Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not search_description is set to TRUE or not. If refresh = TRUE, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option cache_path is set it will look for and store the overview table in that directory." />
+<meta property="og:description" content="The correspondence file for old to new StatCan table numbers is included in the package" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -135,51 +135,33 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Search through Statistics Canada data tables</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
-    <div class="hidden name"><code>search_cansim_tables.Rd</code></div>
+    <h1>The correspondence file for old to new StatCan table numbers is included in the package</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
+    <div class="hidden name"><code>correspondence.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to <code>TRUE</code>. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not <code>search_description</code> is set to <code>TRUE</code> or not. If <code>refresh = TRUE</code>, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option <code>cache_path</code> is set it will look for and store the overview table in that directory.</p>
+    <p>The correspondence file for old to new StatCan table numbers is included in the package</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>search_cansim_tables</span>(<span class='no'>search_term</span>, <span class='kw'>search_fields</span> <span class='kw'>=</span> <span class='st'>"both"</span>,
-  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>search_term</th>
-      <td><p>User-supplied search term used to find Statistics Canada data tables with matching titles</p></td>
-    </tr>
-    <tr>
-      <th>search_fields</th>
-      <td><p>By default, this function will search through table titles and keywords. Setting this parameter to "title" will only search through the title, setting it to "keyword" will only search through keywords</p></td>
-    </tr>
-    <tr>
-      <th>refresh</th>
-      <td><p>Default is <code>FALSE</code>, and will regenerate the table if set to <code>TRUE</code></p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+        
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography</p>
+    <p><a href='https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv'>https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv</a></p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
+      <li><a href="#references">References</a></li>
           </ul>
 
+    <h2>Author</h2>
+    <p>Statistics Canada</p>
   </div>
 </div>
 
