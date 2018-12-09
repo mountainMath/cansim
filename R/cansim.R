@@ -138,6 +138,120 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 #' @keywords data
 NULL
 
+#' Parse metadata and fold into data table
+#' @param data the data table
+#' @param meta the raw metadata table
+#' @param data_path base path to save parsed metadata
+#' @return data table including the metadata information
+parse_and_fold_in_metadata <- function(data,meta,data_path){
+  cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
+  if (cleaned_language=="eng") {
+    message("Folding in metadata")
+  } else {
+    message(paste0("Plier dans les m",intToUtf8(0x00E9),"tadonn",intToUtf8(0x00E9),"es"))
+  }
+  cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
+  dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
+  dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
+  classification_code_column <- ifelse(cleaned_language=="eng","Classification Code","Code sur la classification")
+  member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
+  geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+  data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  symbol_legend_grepl_field <- ifelse(cleaned_language=="eng","Symbol Legend",paste0("L",intToUtf8(0x00E9),"gende Symbole"))
+  survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
+  subject_code_grepl_field <- ifelse(cleaned_language=="eng","Subject Code","Code du sujet")
+  note_id_grepl_field <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
+  correction_id_grepl_field <- ifelse(cleaned_language=="eng","Correction ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la correction"))
+  member_id_column <- ifelse(cleaned_language=="eng","Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre"))
+  parent_member_id_column <- ifelse(cleaned_language=="eng","Parent Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre parent"))
+  hierarchy_column <- ifelse(cleaned_language=="eng","Hierarchy",paste0("Hi",intToUtf8(0x00E9),"rarchie"))
+  exceeded_hierarchy_warning_message <- ifelse(cleaned_language=="eng","Exceeded max depth for hierarchy, hierarchy information may be faulty.",
+                                               paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
+  classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
+  hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
+
+  cut_indices <- grep(dimension_id_column,meta[[cube_title_column]])
+  cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]]))
+  meta1 <- meta[seq(1,cut_indices[1]-1),]
+  saveRDS(meta1,file=paste0(data_path,"1"))
+  names2 <- meta[cut_indices[1],]  %>%
+    dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+    as.character()
+  meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
+    set_names(names2)
+  saveRDS(meta2,file=paste0(data_path,"2"))
+  names3 <- meta[cut_indices[2],]  %>%
+    dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+    as.character()
+  meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
+    set_names(names3)
+  additional_indices=c(grep(survey_code_grepl_field,meta[[cube_title_column]]),
+                       grep(subject_code_grepl_field,meta[[cube_title_column]]),
+                       grep(note_id_grepl_field,meta[[cube_title_column]]),
+                       grep(correction_id_grepl_field,meta[[cube_title_column]]))
+  saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
+            set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
+  saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
+            set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
+  saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
+            set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
+  add_hierarchy <- function(meta_x){
+    parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
+    current_top <- function(c){
+      strsplit(c,"\\.") %>%
+        purrr::map(dplyr::first) %>%
+        unlist
+    }
+    parent_for_current_top <- function(c){
+      as.character(parent_lookup[current_top(c)])
+    }
+    meta_x <- meta_x %>%
+      dplyr::mutate(!!as.name(hierarchy_column):=.data[[member_id_column]])
+    added=TRUE
+    max_depth=100
+    count=0
+    while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
+      old <- meta_x[[hierarchy_column]]
+      meta_x <- meta_x %>%
+        dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
+        dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
+        dplyr::select(-.data$p)
+      added <- sum(old != meta_x[[hierarchy_column]])>0
+      count=count+1
+    }
+    if (added) warning(exceeded_hierarchy_warning_message)
+    meta_x
+  }
+  for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
+    column=meta2[column_index,]
+    meta_x <- meta3 %>%
+      dplyr::filter(.data[[dimension_id_column]]==column[[dimension_id_column]]) %>%
+      add_hierarchy
+    saveRDS(meta_x,file=paste0(data_path,"_column_",column[[dimension_name_column]]))
+    classification_lookup <- set_names(meta_x[[classification_code_column]],meta_x[[member_name_column]])
+    hierarchy_lookup <- set_names(meta_x[[hierarchy_column]],meta_x[[member_name_column]])
+    if (grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))) {
+      data <- data %>%
+        dplyr::mutate(GeoUID=as.character(classification_lookup[.data[[data_geography_column]]]))
+    } else if (column[[dimension_name_column]] %in% names(data)){
+      classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]]) %>%
+        as.name
+      hierarchy_name <- paste0(hierarchy_prefix," ",column[[dimension_name_column]]) %>%
+        as.name
+      data <- data %>%
+        dplyr::mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column[[dimension_name_column]])]),
+                      !!hierarchy_name:=as.character(hierarchy_lookup[!!as.name(column[[dimension_name_column]])]))
+    } else {
+      if (cleaned_language=="eng")
+        warning(paste0("Don't know how to add metadata for ",column[[dimension_name_column]],"! Ignoring this dimension."))
+      else
+        warning(paste0("Je ne sais pas comment ajouter des m",intToUtf8(0x00E9),"tadonn",intToUtf8(0x00E9),"es pour ",column[[dimension_name_column]],"! Ignorer cette dimension."))
+    }
+  }
+  data
+}
+
+
 #' Retrieve a Statistics Canada data table using NDM catalogue number
 #'
 #' Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
@@ -159,7 +273,10 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
   if (refresh | !file.exists(data_path)){
-    message(paste0("Accessing CANSIM NDM product ",cleaned_number, " from Statistics Canada"))
+    if (cleaned_language=="eng")
+      message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
+    else
+      message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
     httr::GET(url,httr::write_disk(path, overwrite = TRUE))
     data <- NA
@@ -169,103 +286,34 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
     unlink(path)
     if(cleaned_language=="eng") {
       message("Parsing data")
-      data <- readr::read_csv(file.path(exdir, paste0(base_table, ".csv")),
-                              na=na_strings,
-                              locale=readr::locale(encoding="UTF8"),
-                              col_types = list(.default = "c")) %>%
-        dplyr::mutate(VALUE=as.numeric(.data$VALUE))
-      message("Folding in metadata")
-      meta <- suppressWarnings(readr::read_csv(file.path(exdir, paste0(base_table, "_MetaData.csv")),
-                              na=na_strings,
-                              #col_names=FALSE,
-                              locale=readr::locale(encoding="UTF8"),
-                              col_types = list(.default = "c")))
-      cut_indices <- grep("Dimension ID",meta$`Cube Title`)
-      cut_indices <- c(cut_indices,grep("Symbol Legend",meta$`Cube Title`))
-      meta1 <- meta[seq(1,cut_indices[1]-1),]
-      saveRDS(meta1,file=paste0(data_path,"1"))
-      names2 <- meta[cut_indices[1],]  %>%
-        dplyr::select_if(~sum(!is.na(.)) > 0) %>%
-        as.character()
-      meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
-        set_names(names2)
-      saveRDS(meta2,file=paste0(data_path,"2"))
-      names3 <- meta[cut_indices[2],]  %>%
-        dplyr::select_if(~sum(!is.na(.)) > 0) %>%
-        as.character()
-      meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
-        set_names(names3)
-      additional_indices=c(grep("Survey Code",meta$`Cube Title`),
-                           grep("Subject Code",meta$`Cube Title`),
-                           grep("Note ID",meta$`Cube Title`),
-                           grep("Correction ID",meta$`Cube Title`))
-      saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
-                set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
-      saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
-                set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
-      saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
-                set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
-      add_hierarchy <- function(meta_x){
-        parent_lookup <- rlang::set_names(meta_x$`Parent Member ID`,meta_x$`Member ID`)
-        current_top <- function(c){
-          strsplit(c,"\\.") %>%
-            purrr::map(dplyr::first) %>%
-            unlist
-        }
-        parent_for_current_top <- function(c){
-          as.character(parent_lookup[current_top(c)])
-        }
-        meta_x <- meta_x %>%
-          dplyr::mutate(Hierarchy=.data$`Member ID`)
-        added=TRUE
-        max_depth=100
-        count=0
-        while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
-          old <- meta_x$Hierarchy
-          meta_x <- meta_x %>%
-            dplyr::mutate(p=parent_for_current_top(.data$Hierarchy)) %>%
-            dplyr::mutate(Hierarchy=ifelse(is.na(.data$p),.data$Hierarchy,paste0(.data$p,".",.data$Hierarchy))) %>%
-            dplyr::select(-.data$p)
-          added <- sum(old != meta_x$Hierarchy)>0
-          count=count+1
-        }
-        if (added) warning("Exceeded max depth for hierarchy, hierarchy information may be faulty.")
-        meta_x
-      }
-      for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
-        column=meta2[column_index,]
-        meta_x <- meta3 %>%
-          dplyr::filter(.data$`Dimension ID`==column$`Dimension ID`) %>%
-          add_hierarchy
-        saveRDS(meta_x,file=paste0(data_path,"_column_",column$`Dimension name`))
-        classification_lookup <- set_names(meta_x$`Classification Code`,meta_x$`Member Name`)
-        hierarchy_lookup <- set_names(meta_x$Hierarchy,meta_x$`Member Name`)
-        if (grepl("Geography",column$`Dimension name`) &  !(column$`Dimension name` %in% names(data))) {
-          data <- data %>%
-            dplyr::mutate(GeoUID=as.character(classification_lookup[.data$GEO]))
-        } else if (column$`Dimension name` %in% names(data)){
-          classification_name <- paste0("Classification Code for ",column$`Dimension name`) %>%
-            as.name
-          hierarchy_name <- paste0("Hierarchy for ",column$`Dimension name`) %>%
-            as.name
-          data <- data %>%
-            dplyr::mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column$`Dimension name`)]),
-                   !!hierarchy_name:=as.character(hierarchy_lookup[!!as.name(column$`Dimension name`)]))
-        } else {
-          warning(paste0("Don't know how to add metadata for ",column$`Dimension name`,"! Ignoring this dimension."))
-        }
-      }
+      csv_reader <- readr::read_csv
+      value_column="VALUE"
     } else {
-      data <- readr::read_csv2(file.path(exdir, paste0(base_table, ".csv")),
-                               na=na_strings,
-                               locale=readr::locale(encoding="UTF8"),
-                               col_types = list(.default = "c")) %>%
-        dplyr::mutate(VALEUR=as.numeric(.data$VALEUR))
+      message(paste0("Analyser les donn",intToUtf8(0x00E9),"es"))
+      csv_reader <- readr::read_csv2
+      value_column="VALEUR"
     }
+
+    data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
+                            na=na_strings,
+                            locale=readr::locale(encoding="UTF8"),
+                            col_types = list(.default = "c")) %>%
+      dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+    meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
+                                             na=na_strings,
+                                             #col_names=FALSE,
+                                             locale=readr::locale(encoding="UTF8"),
+                                             col_types = list(.default = "c")))
+
+    data <- parse_and_fold_in_metadata(data,meta,data_path)
+
     saveRDS(data,file=data_path)
     unlink(exdir,recursive = TRUE)
   } else {
-    message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
+    if (cleaned_language=="eng")
+      message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
+    else
+      message(paste0("Lecture du produit ",cleaned_number)," de CANSIM NDM ",intToUtf8(0x00E0)," partir du cache.")
   }
   readRDS(file=data_path)
 }
@@ -414,14 +462,24 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   info <- cansim::get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
   refresh=FALSE
-  text <- paste0(info$`Cube Title`,"\n","CANSIM Table ",cleaned_ndm_table_number(cansimTableNumber),"\n",
-                 "Start Date: ",info$`Start Reference Period`,", End Date: ",info$`End Reference Period`,", Frequency: ",info$Frequency,"\n")
+  cleaned_language <- cleaned_ndm_language(language)
+  cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
+  start_period_column <- ifelse(cleaned_language=="eng","Start Reference Period",paste0("D",intToUtf8(0x00E9),"but de la p",intToUtf8(0x00E9),"riode de r",intToUtf8(0x00E9),"f",intToUtf8(0x00E9),"rence"))
+  end_period_column <- ifelse(cleaned_language=="eng","End Reference Period",paste0("Fin de la p",intToUtf8(0x00E9),"riode de r",intToUtf8(0x00E9),"f",intToUtf8(0x00E9),"rence"))
+  frequency_column <- ifelse(cleaned_language=="eng","Frequency",paste0("Fr",intToUtf8(0x00E9),"quence"))
+  dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
+  member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
+
+  text <- paste0(info[[cube_title_column]],"\n","CANSIM Table ",cleaned_ndm_table_number(cansimTableNumber),"\n",
+                 start_period_column,": ",info[[start_period_column]],", ",
+                 end_period_column,": ",info[[end_period_column]],", ",
+                 frequency_column,": ",info[[frequency_column]],"\n")
   columns <- cansim::get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
-  for (column in columns$`Dimension name`) {
+  for (column in columns[[dimension_name_column]]) {
     text <- paste0(text,"\n","Column ",column)
     categories <- cansim::get_cansim_column_categories(cansimTableNumber,column,language=language,refresh=refresh)
     text <- paste0(text, " (",nrow(categories),")","\n")
-    text <- paste0(text, paste(utils::head(categories$`Member Name`,10),collapse=", "))
+    text <- paste0(text, paste(utils::head(categories[[member_name_column]],10),collapse=", "))
     if (nrow(categories)>10) text <- paste0(text, ", ...")
     text <- paste0(text,"\n")
   }
