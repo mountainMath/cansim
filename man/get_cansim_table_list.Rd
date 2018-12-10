@@ -6,6 +6,10 @@
 \usage{
 get_cansim_table_list()
 }
+\value{
+cansim table list
+}
 \description{
 Internal function to collect an up-to-date and complete list of Statistics Canada data tables
 }
+\keyword{internal}

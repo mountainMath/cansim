@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable — adjust_cansim_values_by_variable • cansim</title>
+<title>Parse metadata and fold into data table — parse_and_fold_in_metadata • cansim</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -32,9 +32,9 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable — adjust_cansim_values_by_variable" />
+<meta property="og:title" content="Parse metadata and fold into data table — parse_and_fold_in_metadata" />
 
-<meta property="og:description" content="(Deprecated) Adjust retrieved data table values by a scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used." />
+<meta property="og:description" content="Parse metadata and fold into data table" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -133,31 +133,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable</h1>
+    <h1>Parse metadata and fold into data table</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
-    <div class="hidden name"><code>adjust_cansim_values_by_variable.Rd</code></div>
+    <div class="hidden name"><code>parse_and_fold_in_metadata.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>(Deprecated) Adjust retrieved data table values by a scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used.</p>
+    <p>Parse metadata and fold into data table</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>adjust_cansim_values_by_variable</span>(<span class='no'>data</span>, <span class='no'>var</span>)</pre>
+    <pre class="usage"><span class='fu'>parse_and_fold_in_metadata</span>(<span class='no'>data</span>, <span class='no'>meta</span>, <span class='no'>data_path</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>A downloaded CANSIM data table</p></td>
+      <td><p>the data table</p></td>
     </tr>
     <tr>
-      <th>var</th>
-      <td><p>A now deprecated input</p></td>
+      <th>meta</th>
+      <td><p>the raw metadata table</p></td>
+    </tr>
+    <tr>
+      <th>data_path</th>
+      <td><p>base path to save parsed metadata</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>data table including the metadata information</p>
     
 
   </div>
@@ -165,7 +173,9 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-                </ul>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>

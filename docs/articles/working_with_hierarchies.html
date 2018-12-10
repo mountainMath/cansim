@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.2</span>
       </span>
     </div>
 
@@ -97,7 +97,7 @@
     <div class="page-header toc-ignore">
       <h1>Working with Statistics Canada data table object hierarchies</h1>
             
-            <h4 class="date">2018-11-17</h4>
+            <h4 class="date">2018-12-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -123,7 +123,7 @@
 <a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; Folding in metadata</span></a>
 <a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt; Gross domestic product (GDP) at basic prices, by industry, provinces and territories</span></a>
 <a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt; CANSIM Table 36-10-0402</span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; Start Date: 1997-01-01, End Date: 2017-01-01, Frequency: Annual</span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; Start Reference Period: 1997-01-01, End Reference Period: 2017-01-01, Frequency: Annual</span></a>
 <a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; Column Geography (13)</span></a>
 <a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...</span></a>
@@ -217,15 +217,15 @@
 <p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(plot_data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(plot_data <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">         </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions), </a>
-<a class="sourceLine" id="cb7-5" data-line-number="5">       <span class="kw"><a href="ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="dt">position=</span><span class="st">"stack"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="dt">ncol =</span> <span class="dv">3</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">       <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="dt">position=</span><span class="st">"stack"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="dt">ncol =</span> <span class="dv">3</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
 <a class="sourceLine" id="cb7-12" data-line-number="12">       <span class="dt">subtitle=</span>selected_value,</a>
 <a class="sourceLine" id="cb7-13" data-line-number="13">       <span class="dt">x=</span><span class="st">""</span>, <span class="dt">fill =</span> <span class="st">""</span>, </a>
 <a class="sourceLine" id="cb7-14" data-line-number="14">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
@@ -251,14 +251,14 @@
 <a class="sourceLine" id="cb8-19" data-line-number="19"><span class="st">  </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="dt">NAICS=</span><span class="st">`</span><span class="dt">North American Industry Classification System (NAICS)</span><span class="st">`</span>)</a>
 <a class="sourceLine" id="cb8-20" data-line-number="20"></a>
 <a class="sourceLine" id="cb8-21" data-line-number="21"><span class="co"># Plot with labels from our original selections</span></a>
-<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="kw"><a href="ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(rrl_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions),</a>
-<a class="sourceLine" id="cb8-23" data-line-number="23">       <span class="kw"><a href="ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-24" data-line-number="24"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="dt">position =</span> <span class="st">"stack"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-26" data-line-number="26"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-27" data-line-number="27"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-28" data-line-number="28"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="dt">ncol=</span><span class="dv">2</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb8-29" data-line-number="29"><span class="st">  </span><span class="kw"><a href="ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
+<a class="sourceLine" id="cb8-22" data-line-number="22"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(rrl_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="http://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions),</a>
+<a class="sourceLine" id="cb8-23" data-line-number="23">       <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-24" data-line-number="24"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="dt">position =</span> <span class="st">"stack"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-25" data-line-number="25"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-26" data-line-number="26"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-27" data-line-number="27"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-28" data-line-number="28"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="dt">ncol=</span><span class="dv">2</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb8-29" data-line-number="29"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
 <a class="sourceLine" id="cb8-30" data-line-number="30">       <span class="dt">subtitle=</span><span class="kw">paste0</span>(regions,<span class="st">", "</span>, selected_value),</a>
 <a class="sourceLine" id="cb8-31" data-line-number="31">       <span class="dt">x=</span><span class="st">""</span>,</a>
 <a class="sourceLine" id="cb8-32" data-line-number="32">       <span class="dt">caption=</span><span class="kw">paste0</span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>

@@ -2,10 +2,12 @@ pandoc: 2.2.1
 pkgdown: 1.1.0
 pkgdown_sha: ~
 articles:
-  cansim: cansim.html
-  listing_cansim_tables: listing_cansim_tables.html
-  retrieving_cansim_vectors: retrieving_cansim_vectors.html
-  working_with_hierarchies: working_with_hierarchies.html
+  - title: "Listing and searching through available tables"
+    contents: listing_cansim_tables
+  - title: "Retrieving individual vector series"
+    contents: retrieving_cansim_vectors
+  - title: "Working with table hierarchies"
+    contents: working_with_hierarchies
 authors:
   Jens von Bergmann:
     href: https://mountainmath.ca

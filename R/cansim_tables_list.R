@@ -1,6 +1,8 @@
 #' Retrieve list of all Statistics Canada data tables
 #'
 #' Internal function to collect an up-to-date and complete list of Statistics Canada data tables
+#' @return cansim table list
+#' @keywords internal
 get_cansim_table_list <- function(){
   start=0
   rows=1000
@@ -21,6 +23,8 @@ get_cansim_table_list <- function(){
 #' An internal method to get page of Statistics Canada data tables
 #' @param start_offset starting row
 #' @param max_rows number of rows, maximum is 1000
+#' @return cansim table list
+#' @keywords internal
 get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
   if (max_rows>1000) {
     warning("Clipping to 1000 rows")
