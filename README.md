@@ -18,12 +18,15 @@ This package:
 
 ### Installation
 
-The latest development version can be downloaded from Github using either the `remotes` or `devtools` packages. 
+The cansim package is available on CRAN and can be installed directly.
+```r
+install.packages("cansim")
+```
+Alternatively, the latest development version can be downloaded from Github using either the `remotes` or `devtools` packages. 
 ```r
 # install.packages("remotes")
 remotes::install_github("mountainmath/cansim")
 ```
-A stable version is in submission to CRAN. 
 
 ### Basic Usage
 

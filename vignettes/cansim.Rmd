@@ -23,7 +23,11 @@ The `cansim` package provides R bindings to [Statistics Canada’s main socioeco
 
 ### Installing cansim
 
-The stable version of the `cansim` package is not yet available on CRAN but is close to an official release. In the meantime, the development version of the package can be downloaded from [Github](https://github.com/mountainMath/cansim) using the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) packages.
+The `cansim` package is available on CRAN and can be installed directly using the default package installation process:
+```{r, eval = FALSE}
+install.packages("cansim")
+```
+Alternatively, the latest development version of the package can be downloaded from [Github](https://github.com/mountainMath/cansim) using the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) packages.
 ```{r load_package_cran, echo=TRUE, message=FALSE, warning=FALSE, eval = FALSE}
 # install.packages("remotes")
 remotes::install_github("mountainmath/cansim")
