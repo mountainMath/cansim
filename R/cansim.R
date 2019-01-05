@@ -297,13 +297,13 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
 
     data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
                             na=na_strings,
-                            locale=readr::locale(encoding="UTF8"),
+                            locale=readr::locale(encoding="UTF-8"),
                             col_types = list(.default = "c")) %>%
       dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
     meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                              na=na_strings,
                                              #col_names=FALSE,
-                                             locale=readr::locale(encoding="UTF8"),
+                                             locale=readr::locale(encoding="UTF-8"),
                                              col_types = list(.default = "c")))
 
     data <- parse_and_fold_in_metadata(data,meta,data_path)

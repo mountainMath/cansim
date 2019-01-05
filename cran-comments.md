@@ -5,8 +5,12 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs or NOTEs. 
 
-## Changes from previous submissions
+## Changes from version 0.2.1
 
 * Redundancies removed from package title
 * Implement timeout and retry for API requests to remote servers
 * Reduced number of vignettes to be generated during package build--putting them online on an accompanying package website instead.  
+
+## Changes from version 0.2.2
+
+* Correct problem with incorrect encoding
