@@ -13,6 +13,8 @@ This package:
 * Offers caching of downloaded data for faster loading and less waiting
 * Includes convenience functions for relabelling and rescaling as well as tools for working with data hierarchies in downloaded table objects
 
+[![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
+
 ### Documentation
 [Cansim R package home page and reference guide](https://mountainmath.github.io/cansim/index.html)
 
