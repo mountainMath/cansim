@@ -42,12 +42,16 @@ response_status_code_translation <- list(
   "8"="Invalid number of reference periods"
 )
 
-get_with_timeout_retry <- function(url,timeout=200,retry=3){
-  response <- purrr::safely(httr::GET)(url,httr::timeout(timeout))
+get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
+  if (!is.na(path)) {
+    response <- purrr::safely(httr::GET)(url,httr::timeout(timeout),httr::write_disk(path,overwrite = TRUE))
+  } else {
+    response <- purrr::safely(httr::GET)(url,httr::timeout(timeout))
+  }
   if (!is.null(response$error)){
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
-      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1)
+      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path)
     } else {
       message("Got timeout from StatCan, giving up")
       response=response$result
@@ -56,8 +60,8 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3){
     response=response$result
   }
 
-  if (is.null(response)) {
-    stop("Problem downloading data")
+  if (is.null(response) && retry == 0) {
+    stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
   }
   response
 }
@@ -80,8 +84,8 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
     response=response$result
   }
 
-  if (is.null(response)) {
-    stop("Problem downloading data")
+  if (is.null(response) && retry == 0) {
+    stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
   }
   response
 }

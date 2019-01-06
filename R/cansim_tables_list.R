@@ -95,7 +95,7 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 
 #' Get overview list for all Statistics Canada data tables
 #'
-#' Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to \code{FALSE} by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
+#' Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to \code{FALSE} by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option \code{cansim.cache_path} is set it will look for and store the overview table in that directory.
 #'
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}
 #'
@@ -103,21 +103,22 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
-  # flow: if cache_path version exists, use that, otherwise fall back on package version
+  # flow: if cansim.cache_path version exists, use that, otherwise fall back on package version
   # if refresh is TRUE, refresh cache path
 
-  directory <- getOption("cache_path")
+  directory <- getOption("cansim.cache_path")
+  #if (is.null(directory)) directory <- getOption("cache_path") # legacy
   path <- file.path(directory,"cansim_table_list.Rda")
   if (is.null(directory) || (!refresh && !exists(path))) {
     result=cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
       message_text <- paste0("Your CANSIM table overview data is ",age," days old.\n")
-      if (is.null(directory)) message_text <- paste0(message_text,"Consider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
+      if (is.null(directory)) message_text <- paste0(message_text,"Consider setting options(cansim.cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
       else message_text <- paste0(message_text,"Consider refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
-      message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
+      message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cansim.cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
       if (is.null(directory)) {
-        message("The table won't be able to be refreshed if options(cache_path=\"your cache path\") is not set.")
+        message("The table won't be able to be refreshed if options(cansim.cache_path=\"your cache path\") is not set.")
       }
     }
   } else {

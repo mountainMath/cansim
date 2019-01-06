@@ -47,7 +47,7 @@ See more example usage and worfklow in the _Getting started with the cansim pack
 
 ### Caching
 
-Many of the data tables available in Statistics Canada's data repository are quite large in size. After downloading tables, the `cansim` package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. Users can set up a persistent cache location that will exist across sessions by defining an explicit cache path. This is as simple as adding `options(cache_path="your_cache_path")` to your .Rprofile file. To force a refresh of the data, pass the `refresh=TRUE` option in the function call. 
+Many of the data tables available in Statistics Canada's data repository are quite large in size. After downloading tables, the `cansim` package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. To force a refresh of the data, pass the `refresh=TRUE` option in the function call. 
 
 ### Bilingual
 
@@ -106,7 +106,7 @@ list_cansim_tables() %>%
   filter(grepl("Labour force characteristics",title), grepl("economic region",title)) %>% 
   select("cansim_table_number","title")
 ```
-As table search functions require a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refleshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cache_path="your cache path")` option so that table information is cached across R sessions.
+As table search functions require a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cansim.cache_path="your cache path")` option so that table information is cached across R sessions.
 
 The _Listing Statistics Canada data tables_ vignette has additional detail and examples. 
 

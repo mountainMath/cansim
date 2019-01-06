@@ -1,3 +1,9 @@
+## cansim 0.2.3
+
+### Minor changes
+- More robust cansim table download
+- Cleanup documentation
+
 ## cansim 0.2.2
 
 ### Major changes

@@ -279,7 +279,8 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
     else
       message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
-    httr::GET(url,httr::write_disk(path, overwrite = TRUE))
+    response <- get_with_timeout_retry(url,path=path)
+    if (is.null(response)) return(response)
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))

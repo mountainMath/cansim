@@ -17,3 +17,7 @@ A tibble with data for specified vector(s) for the last N periods
 \description{
 Allows for the retrieval of data for specified vector series for the N most-recently released periods.
 }
+\examples{
+get_cansim_vector_for_latest_periods("v41690973",10)
+
+}
