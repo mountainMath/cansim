@@ -26,8 +26,7 @@ get_cansim_table_overview(table_id)
 ```
 
 ### Accessing table data
-
-We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "Chained (2007) dollars". 
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Value))$Value)`". 
 ```{r}
 library(dplyr)
 
@@ -74,7 +73,7 @@ data <- data %>%
 There are hundreds of NAICS codes here which is too many to make sense of at the same time. We can use `categories_for_level` again to reduce our NAICS codes just to the first sub-level which represents the industry groups. We can call this subset `cut_data`. (Note that the NAICS data also includes composite groups of industries, something like a level 0.5 hierarchy, which are prefixed with a "T" and which we want to remove as well.)
 ```{r}
 cut_data <- data %>% filter(
-  !grepl("^T",`Classification Code for North American Industry Classification System (NAICS)`),
+  !grepl("T\\d+",`Classification Code for North American Industry Classification System (NAICS)`),
   `North American Industry Classification System (NAICS)` %in% 
     categories_for_level(.,"North American Industry Classification System (NAICS)",1))
 
@@ -121,7 +120,7 @@ ggplot(plot_data %>%
 
 ```
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
-```{r fig.height=7, fig.width=9, warning=FALSE}
+```{r fig.height=10, fig.width=9, warning=FALSE}
 real_construction <- c("Construction","Real estate and rental and leasing")
 
 # Get the NAICS hierarchy codes just for these categories
@@ -149,7 +148,7 @@ ggplot(rrl_data %>% filter(GEO %in% regions),
   scale_y_continuous(labels = scales::percent) +
   theme_bw() +
   theme(legend.position = "bottom",legend.direction ="vertical") +
-  guides(fill=guide_legend(ncol=2)) +
+  guides(fill=guide_legend(ncol=1)) +
   labs(title="Gross domestic product (GDP) at basic prices",
        subtitle=paste0(regions,", ", selected_value),
        x="",
