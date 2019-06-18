@@ -44,6 +44,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
+#' @param factors (Options) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})
 #'
 #' @return Returns the input tibble with with adjusted values
 #'
@@ -52,7 +53,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' normalize_cansim_values(cansim_table)
 #'
 #' @export
-normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01"){
+normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01",factors=FALSE){
   language <- ifelse("VALEUR" %in% names(data),"fr","en")
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
@@ -91,6 +92,11 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     # year, month and day
     data <- data %>%
       mutate(Date=as.Date(!!as.name(date_field)))
+  }
+
+  if (factors){
+    fields= gsub("^Classification Code for ","",names(data)[grepl("^Classification Code for ",names(data))])
+    data <- data %>% mutate_at(fields,function(d)factor(d,levels=unique(d)))
   }
   data
 }
