@@ -5,7 +5,7 @@
 \title{Retrieve Statistics Canada data table categories for a specific column}
 \usage{
 get_cansim_column_categories(cansimTableNumber, column,
-  language = "english", refresh = FALSE)
+  language = "english", refresh = FALSE, timeout = 200)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
@@ -15,6 +15,8 @@ get_cansim_column_categories(cansimTableNumber, column,
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
+
+\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
 \description{
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.

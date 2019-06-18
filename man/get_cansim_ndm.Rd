@@ -5,7 +5,7 @@
 \title{Retrieve a Statistics Canada data table using NDM catalogue number}
 \usage{
 get_cansim_ndm(cansimTableNumber, language = "english",
-  refresh = FALSE)
+  refresh = FALSE, timeout = 200)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
@@ -13,6 +13,8 @@ get_cansim_ndm(cansimTableNumber, language = "english",
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
+
+\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
 \value{
 tibble format data table output

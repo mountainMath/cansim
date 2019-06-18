@@ -5,7 +5,7 @@
 \title{Retrieve Statistics Canada data table subject detail}
 \usage{
 get_cansim_table_subject(cansimTableNumber, language = "english",
-  refresh = FALSE)
+  refresh = FALSE, timeout = 200)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
@@ -13,6 +13,8 @@ get_cansim_table_subject(cansimTableNumber, language = "english",
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
+
+\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
 \description{
 Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.

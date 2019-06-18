@@ -6,6 +6,8 @@
 #' @param cansimTableNumber the table number to load, accepts old CANSIM or new NDM table numbers
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default is set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @return tibble format data table output
 #'
@@ -16,8 +18,8 @@
 #' get_cansim("026-0018")
 #'
 #' @export
-get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE){
-  get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber), language, refresh)
+get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
+  get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber), language, refresh, timeout = timeout)
 }
 
 
@@ -260,6 +262,8 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @return tibble format data table output
 #'
@@ -267,7 +271,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' get_cansim("34-10-0013")
 #'
 #' @export
-get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE){
+get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,timeout=200){
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language=cleaned_ndm_language(language)
   base_table=naked_ndm_table_number(cansimTableNumber)
@@ -279,7 +283,7 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
     else
       message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
     url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
-    response <- get_with_timeout_retry(url,path=path)
+    response <- get_with_timeout_retry(url,path=path,timeout=timeout)
     if (is.null(response)) return(response)
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
@@ -327,15 +331,17 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE)
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @examples
 #' get_cansim_table_info("34-10-0013")
 #'
 #' @export
-get_cansim_table_info <- function(cansimTableNumber, language="english", refresh=FALSE){
+get_cansim_table_info <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda1")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh,timeout=timeout)
   }
   readRDS(file=data_path)
 }
@@ -348,15 +354,17 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @examples
 #' get_cansim_table_survey("34-10-0013")
 #'
 #' @export
-get_cansim_table_survey <- function(cansimTableNumber, language="english", refresh=FALSE){
+get_cansim_table_survey <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -368,15 +376,17 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @examples
 #' get_cansim_table_subject("34-10-0013")
 #'
 #' @export
-get_cansim_table_subject <- function(cansimTableNumber, language="english", refresh=FALSE){
+get_cansim_table_subject <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda4")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -388,15 +398,17 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @examples
 #' get_cansim_table_notes("34-10-0013")
 #'
 #' @export
-get_cansim_table_notes <- function(cansimTableNumber, language="english", refresh=FALSE){
+get_cansim_table_notes <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -408,15 +420,17 @@ get_cansim_table_notes <- function(cansimTableNumber, language="english", refres
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @examples
 #' get_cansim_column_list("34-10-0013")
 #'
 #' @export
-get_cansim_column_list <- function(cansimTableNumber, language="english", refresh=FALSE){
+get_cansim_column_list <- function(cansimTableNumber, language="english", refresh=FALSE, timeout= 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -429,15 +443,17 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #' @param column the specified column for which to retrieve category information for
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (default is \code{200})
 #'
 #' @examples
 #' get_cansim_column_categories("34-10-0013", "Geography")
 #'
 #' @export
-get_cansim_column_categories <- function(cansimTableNumber, column, language="english", refresh=FALSE){
+get_cansim_column_categories <- function(cansimTableNumber, column, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh)
+    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = 200)
   }
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda_column_",column)
   if (!file.exists(data_path)){
