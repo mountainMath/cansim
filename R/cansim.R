@@ -44,7 +44,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#' @param factors (Options) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})
 #'
 #' @return Returns the input tibble with with adjusted values
 #'
@@ -96,8 +96,21 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 
   if (factors){
     fields= gsub("^Classification Code for ","",names(data)[grepl("^Classification Code for ",names(data))])
-    data <- data %>% mutate_at(fields,function(d)factor(d,levels=unique(d)))
+    levels_for_field <- function(field){
+      data %>%
+        select(field,paste0("Hierarchy for ",field)) %>%
+        unique %>%
+        mutate(id=as.integer(strsplit(!!as.name(paste0("Hierarchy for ",field)),"\\.") %>% purrr::map(last) %>% unlist)) %>%
+        arrange(id) %>%
+        pull(field)
+    }
+    for (field in fields) {
+      data <- data %>%
+        mutate(!!field:=factor(!!as.name(field),levels=levels_for_field(field)))
+        #mutate_at(fields,function(d)factor(d,levels=levels_for_field(d)))
+    }
   }
+
   data
 }
 
@@ -235,13 +248,14 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
     column=meta2[column_index,]
     meta_x <- meta3 %>%
       dplyr::filter(.data[[dimension_id_column]]==column[[dimension_id_column]]) %>%
-      add_hierarchy
+      add_hierarchy %>%
+      mutate(name=ifelse(is.na(!!as.name(classification_code_column)),!!as.name(member_name_column),paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
     saveRDS(meta_x,file=paste0(data_path,"_column_",column[[dimension_name_column]]))
-    classification_lookup <- set_names(meta_x[[classification_code_column]],meta_x[[member_name_column]])
-    hierarchy_lookup <- set_names(meta_x[[hierarchy_column]],meta_x[[member_name_column]])
+    classification_lookup <- set_names(meta_x[[classification_code_column]],meta_x$name)
+    hierarchy_lookup <- set_names(meta_x[[hierarchy_column]],meta_x$name)
     if (grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))) {
       data <- data %>%
-        dplyr::mutate(GeoUID=as.character(classification_lookup[.data[[data_geography_column]]]))
+        dplyr::mutate(GeoUID=as.character(classification_lookup[.data[[data_geography_column]]]) %>% gsub("\\[|\\]","",.))
     } else if (column[[dimension_name_column]] %in% names(data)){
       classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]]) %>%
         as.name

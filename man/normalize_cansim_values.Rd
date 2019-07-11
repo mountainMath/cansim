@@ -19,7 +19,7 @@ normalize_cansim_values(data, replacement_value = NA,
 
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 
-\item{factors}{(Options) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})}
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})}
 }
 \value{
 Returns the input tibble with with adjusted values

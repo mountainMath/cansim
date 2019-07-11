@@ -147,7 +147,7 @@
     </div>
 
     <pre class="usage"><span class='fu'>get_cansim_ndm</span>(<span class='no'>cansimTableNumber</span>, <span class='kw'>language</span> <span class='kw'>=</span> <span class='st'>"english"</span>,
-  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>200</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -163,6 +163,10 @@
     <tr>
       <th>refresh</th>
       <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>timeout</th>
+      <td><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></td>
     </tr>
     </table>
     
