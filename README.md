@@ -112,7 +112,7 @@ The _Listing Statistics Canada data tables_ vignette has additional detail and e
 
 ### License
 
-The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that: 
+The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the `inst` folder. The Statistics Canada Open Licence Agreement requires that: 
 
 ```
 Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive licence to:

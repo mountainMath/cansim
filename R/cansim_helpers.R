@@ -91,6 +91,60 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
 }
 
 
+short_prov.en <- c(
+  "British Columbia"="BC",
+  "Alberta"="AB",
+  "Saskatchewan"="SK",
+  "Manitoba"="MB",
+  "Ontario"="ON",
+  "Quebec"="QC",
+  "New Brunswick"="NB",
+  "Prince Edward Island"="PE",
+  "Nova Scotia"="NS",
+  "Newfoundland and Labrador"="NL",
+  "Yukon"="YT",
+  "Northwest Territories"="NT",
+  "Nunavut"="NU",
+  "Northwest Territories including Nunavut"="NTNU",
+  "Canada"="CAN"
+)
+
+short_prov.fr <- c(
+  "Colombie-Britannique"="BC",
+  "Alberta"="AB",
+  "Saskatchewan"="SK",
+  "Manitoba"="MB",
+  "Ontario"="ON",
+  "Qu\u00E9bec"="QC",
+  "Nouveau-Brunswick"="NB",
+  "\u00CEle-du-Prince-\u00C9douard"="PE",
+  "Nouvelle-\u00C9cosse"="NS",
+  "Terre-Neuve-et-Labrador"="NL",
+  "Yukon"="YT",
+  "Territoires du Nord-Ouest"="NT",
+  "Nunavut"="NU",
+  "Territoires du Nord-Ouest incluant Nunavut"="NTNU",
+  "Canada"="CAN"
+)
+
+
+#' add provincial appreviation as factor
+#' @export
+#' @param data cansim data frame with provincial level data
+#' @return a cansim data frame with additional factor GEO.abb that contains language-specific provincial appreviations
+add_provincial_appreviations <- function(data){
+  cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
+  if (cleaned_language=="eng") {
+    data_geography_column <- "GEO"
+    short_prov <- short_prov.en
+  } else {
+    data_geography_column <- paste0("G\u00C9O")
+    short_prov <- short_prov.fr
+  }
+  data <- data %>%
+    mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]), levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+}
+
 # refresh_cansim_table_list <- function(){
 #   cansim_table_list <- list_cansim_tables(refresh = TRUE)
 #   usethis::use_data(cansim_table_list, internal = TRUE, overwrite = TRUE)
