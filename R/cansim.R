@@ -45,7 +45,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})
-#' @param factors (strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})
+#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})
 #'
 #' @return Returns the input tibble with with adjusted values
 #'
@@ -210,13 +210,13 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
   meta1 <- meta[seq(1,cut_indices[1]-1),]
   saveRDS(meta1,file=paste0(data_path,"1"))
   names2 <- meta[cut_indices[1],]  %>%
-    dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
     as.character()
   meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
     set_names(names2)
   saveRDS(meta2,file=paste0(data_path,"2"))
   names3 <- meta[cut_indices[2],]  %>%
-    dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
     as.character()
   meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
     set_names(names3)
@@ -268,7 +268,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
     hierarchy_lookup <- set_names(meta_x[[hierarchy_column]],meta_x$name)
     if (grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))) {
       data <- data %>%
-        dplyr::mutate(GeoUID=as.character(classification_lookup[.data[[data_geography_column]]]) %>% gsub("\\[|\\]","",.))
+        dplyr::mutate(GeoUID=gsub("\\[|\\]","",as.character(classification_lookup[.data[[data_geography_column]]])))
     } else if (column[[dimension_name_column]] %in% names(data)){
       classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]]) %>%
         as.name

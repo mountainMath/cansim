@@ -21,7 +21,7 @@ normalize_cansim_values(data, replacement_value = NA,
 
 \item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})}
 
-\item{factors}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})}
+\item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})}
 }
 \value{
 Returns the input tibble with with adjusted values
