@@ -98,7 +98,7 @@
     <div class="page-header toc-ignore">
       <h1>Working with Statistics Canada data table object hierarchies</h1>
             
-            <h4 class="date">2019-07-11</h4>
+            <h4 class="date">2019-07-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -161,7 +161,7 @@
 <a href="#normalizing-variables" class="anchor"></a>Normalizing variables</h3>
 <p>There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code>. By default, downloaded CANSIM data contains a <code>VALUE</code> and a <code>SCALAR_FACTOR</code> field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will apply the appropriate conversion based on the scale variable so that the <code>VALUE</code> value is more straight-forward to work with. The default data also includes a character string <code>REF_DATE</code> field, which the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will attempt to convert into a standard date-class variable.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span>()</a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span>(<span class="dt">strip_classification_code =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 <div id="taking-advantage-of-metadata" class="section level3">
 <h3 class="hasAnchor">

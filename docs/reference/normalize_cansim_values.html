@@ -148,7 +148,7 @@
 
     <pre class="usage"><span class='fu'>normalize_cansim_values</span>(<span class='no'>data</span>, <span class='kw'>replacement_value</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
   <span class='kw'>normalize_percent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>default_month</span> <span class='kw'>=</span> <span class='st'>"01"</span>, <span class='kw'>default_day</span> <span class='kw'>=</span> <span class='st'>"01"</span>,
-  <span class='kw'>factors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>factors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>strip_classification_code</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -176,6 +176,10 @@
     <tr>
       <th>factors</th>
       <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (default set to <code>false</code>)</p></td>
+    </tr>
+    <tr>
+      <th>factors</th>
+      <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to <code>false</code>)</p></td>
     </tr>
     </table>
     

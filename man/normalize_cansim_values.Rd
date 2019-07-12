@@ -6,7 +6,7 @@
 \usage{
 normalize_cansim_values(data, replacement_value = NA,
   normalize_percent = TRUE, default_month = "01", default_day = "01",
-  factors = FALSE)
+  factors = FALSE, strip_classification_code = FALSE)
 }
 \arguments{
 \item{data}{A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}}
@@ -20,6 +20,8 @@ normalize_cansim_values(data, replacement_value = NA,
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 
 \item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})}
+
+\item{factors}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})}
 }
 \value{
 Returns the input tibble with with adjusted values

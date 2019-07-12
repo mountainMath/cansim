@@ -45,6 +45,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})
+#' @param factors (strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})
 #'
 #' @return Returns the input tibble with with adjusted values
 #'
@@ -53,13 +54,15 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' normalize_cansim_values(cansim_table)
 #'
 #' @export
-normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01",factors=FALSE){
+normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01",factors=FALSE,strip_classification_code=FALSE){
   language <- ifelse("VALEUR" %in% names(data),"fr","en")
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
   uom_string=ifelse(language=="fr",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
   percentage_string=ifelse(language=="fr","^Pourcent","^Percent")
+  classification_prefix <- ifelse(language=="fr","Code de classification pour ","Classification Code for ")
+  hierarchy_prefix <- ifelse(language=="fr",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
   data <- data %>%
     mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
@@ -94,13 +97,23 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(Date=as.Date(!!as.name(date_field)))
   }
 
+  fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
+
+  if (strip_classification_code){
+    for (field in fields) {
+      if (sum(!is.na(data[[paste0(classification_prefix,field)]]))>0) {
+        data <- data %>%
+          mutate(!!field:=gsub(" \\[.+\\]$","",!!as.name(field)))
+      }
+    }
+  }
+
   if (factors){
-    fields= gsub("^Classification Code for ","",names(data)[grepl("^Classification Code for ",names(data))])
     levels_for_field <- function(field){
       data %>%
-        select(field,paste0("Hierarchy for ",field)) %>%
+        select(field,paste0(hierarchy_prefix,field)) %>%
         unique %>%
-        mutate(id=as.integer(strsplit(!!as.name(paste0("Hierarchy for ",field)),"\\.") %>% purrr::map(last) %>% unlist)) %>%
+        mutate(id=as.integer(strsplit(!!as.name(paste0(hierarchy_prefix,field)),"\\.") %>% purrr::map(last) %>% unlist)) %>%
         arrange(id) %>%
         pull(field)
     }
