@@ -8,6 +8,13 @@
 
 <title>Normalize retrieved data table values to appropriate scales — normalize_cansim_values • cansim</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
@@ -35,6 +42,8 @@
 <meta property="og:title" content="Normalize retrieved data table values to appropriate scales — normalize_cansim_values" />
 
 <meta property="og:description" content="Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If &quot;replacement_value&quot; is not set, it will replace the VALUE field with normalized values and drop the scale column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the REF_DATE field and create an R date variable. This is currently experimental." />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -175,11 +184,11 @@
     </tr>
     <tr>
       <th>factors</th>
-      <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (default set to <code>false</code>)</p></td>
+      <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>false</code>).</p></td>
     </tr>
     <tr>
       <th>strip_classification_code</th>
-      <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to <code>false</code>)</p></td>
+      <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to <code>false</code>).</p></td>
     </tr>
     </table>
     

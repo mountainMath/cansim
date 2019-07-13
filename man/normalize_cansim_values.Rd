@@ -19,9 +19,9 @@ normalize_cansim_values(data, replacement_value = NA,
 
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 
-\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})}
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).}
 
-\item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})}
+\item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
 }
 \value{
 Returns the input tibble with with adjusted values
