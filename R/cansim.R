@@ -258,15 +258,16 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
     meta_x
   }
   for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
-    column=meta2[column_index,]
+    column <- meta2[column_index,]
+    is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x <- meta3 %>%
       dplyr::filter(.data[[dimension_id_column]]==column[[dimension_id_column]]) %>%
       add_hierarchy %>%
-      mutate(name=ifelse(is.na(!!as.name(classification_code_column)),!!as.name(member_name_column),paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
+      mutate(name=ifelse(is.na(!!as.name(classification_code_column)) | is_geo_column,!!as.name(member_name_column),paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
     saveRDS(meta_x,file=paste0(data_path,"_column_",column[[dimension_name_column]]))
     classification_lookup <- set_names(meta_x[[classification_code_column]],meta_x$name)
     hierarchy_lookup <- set_names(meta_x[[hierarchy_column]],meta_x$name)
-    if (grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))) {
+    if (is_geo_column) {
       data <- data %>%
         dplyr::mutate(GeoUID=gsub("\\[|\\]","",as.character(classification_lookup[.data[[data_geography_column]]])))
     } else if (column[[dimension_name_column]] %in% names(data)){
