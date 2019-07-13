@@ -1,6 +1,9 @@
+# cansim
+
 [![Build Status](https://travis-ci.org/mountainMath/cansim.svg?branch=master)](https://travis-ci.org/mountainMath/cansim)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cansim)](https://cran.r-project.org/package=cansim)
-# cansim
+
+<a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
 
 An R package to retrieve and work with public Statistics Canada data tables.
 
@@ -176,7 +179,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2018). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.2.0.
+  von Bergmann, J., Dmitry Shkolnik (2018). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.0.
 
 A BibTeX entry for LaTeX users is
 ```
@@ -184,7 +187,7 @@ A BibTeX entry for LaTeX users is
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2018},
-    note = {R package version 0.2.0},
+    note = {R package version 0.3.0},
     url = {https://mountainmath.github.io/cansim/},
   }
 ```

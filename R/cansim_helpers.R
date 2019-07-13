@@ -128,11 +128,11 @@ short_prov.fr <- c(
 )
 
 
-#' add provincial appreviation as factor
+#' Add provincial abbreviations as factor
 #' @export
-#' @param data cansim data frame with provincial level data
-#' @return a cansim data frame with additional factor GEO.abb that contains language-specific provincial appreviations
-add_provincial_appreviations <- function(data){
+#' @param data code{cansim} package data frame with provincial level data
+#' @return a code{cansim} package data frame with additional factor GEO.abb that contains language-specific provincial abbreviations
+add_provincial_abbreviations <- function(data){
   cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
   if (cleaned_language=="eng") {
     data_geography_column <- "GEO"
@@ -144,8 +144,3 @@ add_provincial_appreviations <- function(data){
   data <- data %>%
     mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]), levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
 }
-
-# refresh_cansim_table_list <- function(){
-#   cansim_table_list <- list_cansim_tables(refresh = TRUE)
-#   usethis::use_data(cansim_table_list, internal = TRUE, overwrite = TRUE)
-# }

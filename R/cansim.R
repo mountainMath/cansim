@@ -7,7 +7,7 @@
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default is set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return tibble format data table output
 #'
@@ -44,8 +44,8 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (default set to \code{false})
-#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (default set to \code{false})
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).
+#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
 #'
 #' @return Returns the input tibble with with adjusted values
 #'
@@ -297,7 +297,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return tibble format data table output
 #'
@@ -366,7 +366,7 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
 #' get_cansim_table_info("34-10-0013")
@@ -389,7 +389,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
 #' get_cansim_table_survey("34-10-0013")
@@ -411,7 +411,7 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
 #' get_cansim_table_subject("34-10-0013")
@@ -433,7 +433,7 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
 #' get_cansim_table_notes("34-10-0013")
@@ -455,7 +455,7 @@ get_cansim_table_notes <- function(cansimTableNumber, language="english", refres
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
 #' get_cansim_column_list("34-10-0013")
@@ -478,7 +478,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
-#  Set to higher values for large tables and slow network connection. (default is \code{200})
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
 #' get_cansim_column_categories("34-10-0013", "Geography")
