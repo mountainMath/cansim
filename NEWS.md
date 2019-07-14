@@ -1,3 +1,14 @@
+## cansim 0.3
+
+### Major changes
+- Fixes issues arising from StatCan changing their API
+- Member Names come concatenated with Classification Code by default, this could break existing code. 
+
+### Minor changes
+- Adds option to change fields to factors
+- Adds option to strip Classification Codes from fields
+- Exposes timeout limit to deal with slow connections and large tables
+
 ## cansim 0.2.3
 
 ### Minor changes
