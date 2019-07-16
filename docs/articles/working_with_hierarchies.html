@@ -105,7 +105,7 @@
     <div class="page-header toc-ignore">
       <h1>Working with Statistics Canada data table object hierarchies</h1>
             
-            <h4 class="date">2019-07-14</h4>
+            <h4 class="date">2019-07-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -147,22 +147,21 @@
 <a href="#accessing-table-data" class="anchor"></a>Accessing table data</h3>
 <p>We see that data set come with three different measures and 307 different NAICS values. Let’s load the data and focus on just “Chained (2012) dollars”.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.2</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/get_cansim.html">get_cansim</a></span>(table_id) </a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#&gt; Reading CANSIM NDM product 36-10-0402 from cache.</span></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15">selected_value =<span class="st"> </span>data<span class="op">$</span>Value[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"Chained"</span>,data<span class="op">$</span>Value)] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>()</a>
-<a class="sourceLine" id="cb2-16" data-line-number="16">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(Value <span class="op">==</span><span class="st"> </span>selected_value)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">data &lt;-<span class="st"> </span><span class="kw"><a href="../reference/get_cansim.html">get_cansim</a></span>(table_id) </a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#&gt; Reading CANSIM NDM product 36-10-0402 from cache.</span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">selected_value =<span class="st"> </span>data<span class="op">$</span>Value[<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"Chained"</span>,data<span class="op">$</span>Value)] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique</a></span>()</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(Value <span class="op">==</span><span class="st"> </span>selected_value)</a></code></pre></div>
 </div>
 <div id="normalizing-variables" class="section level3">
 <h3 class="hasAnchor">
@@ -225,20 +224,19 @@
 <a class="sourceLine" id="cb6-18" data-line-number="18"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()</a></code></pre></div>
 <p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 3.5.2</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(plot_data <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="st">         </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions), </a>
-<a class="sourceLine" id="cb7-6" data-line-number="6">       <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="dt">position=</span><span class="st">"stack"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="dt">ncol =</span> <span class="dv">3</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
-<a class="sourceLine" id="cb7-13" data-line-number="13">       <span class="dt">subtitle=</span>selected_value,</a>
-<a class="sourceLine" id="cb7-14" data-line-number="14">       <span class="dt">x=</span><span class="st">""</span>, <span class="dt">fill =</span> <span class="st">""</span>, </a>
-<a class="sourceLine" id="cb7-15" data-line-number="15">       <span class="dt">caption=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(plot_data <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">         </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(GEO <span class="op">%in%</span><span class="st"> </span>regions), </a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">       <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> Date, <span class="dt">y =</span> Share, <span class="dt">fill =</span> NAICS)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="dt">position=</span><span class="st">"stack"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>,<span class="dt">legend.direction =</span><span class="st">"vertical"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="dt">fill=</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="dt">ncol =</span> <span class="dv">3</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</a>
+<a class="sourceLine" id="cb7-12" data-line-number="12">       <span class="dt">subtitle=</span>selected_value,</a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">       <span class="dt">x=</span><span class="st">""</span>, <span class="dt">fill =</span> <span class="st">""</span>, </a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">       <span class="dt">caption=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"CANSIM "</span>, table_id))</a></code></pre></div>
 <p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">real_construction &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span>)</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"></a>

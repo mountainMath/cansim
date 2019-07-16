@@ -105,7 +105,7 @@
     <div class="page-header toc-ignore">
       <h1>Listing Statistics Canada data tables</h1>
             
-            <h4 class="date">2019-07-14</h4>
+            <h4 class="date">2019-07-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/listing_cansim_tables.Rmd"><code>vignettes/listing_cansim_tables.Rmd</code></a></small>
       <div class="hidden name"><code>listing_cansim_tables.Rmd</code></div>
@@ -127,7 +127,7 @@
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(cansim)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/names">names</a></span>(<span class="kw"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>())</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; Your CANSIM table overview data is 190 days old.</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; Your CANSIM table overview data is 191 days old.</span></a>
 <a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span></a>
 <a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span></a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span></a>
@@ -144,28 +144,27 @@
 <a class="sourceLine" id="cb1-18" data-line-number="18"><span class="co">#&gt; [21] "cansim_table_number"</span></a></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.5.2</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt;     filter, lag</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="kw"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"Labour force characteristics"</span>,title), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"economic region"</span>,title)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"cansim_table_number"</span>,<span class="st">"title"</span>)</a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; Your CANSIM table overview data is 190 days old.</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span></a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
-<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt;   cansim_table_number title                                                </span></a>
-<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;                                                </span></a>
-<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; 1 14-10-0090          Labour force characteristics by province, territory …</span></a>
-<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="co">#&gt; 2 14-10-0293          Labour force characteristics by economic region, thr…</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; Attaching package: 'dplyr'</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; The following objects are masked from 'package:stats':</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt;     filter, lag</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; The following objects are masked from 'package:base':</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#&gt;     intersect, setdiff, setequal, union</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="kw"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>() <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"Labour force characteristics"</span>,title), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">grepl</a></span>(<span class="st">"economic region"</span>,title)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"cansim_table_number"</span>,<span class="st">"title"</span>)</a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#&gt; Your CANSIM table overview data is 191 days old.</span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt; # A tibble: 2 x 2</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt;   cansim_table_number title                                                </span></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;                                                </span></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co">#&gt; 1 14-10-0090          Labour force characteristics by province, territory …</span></a>
+<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co">#&gt; 2 14-10-0293          Labour force characteristics by economic region, thr…</span></a></code></pre></div>
 <p>The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the <code>tidyr</code> package here to reshape data from a long format to a wider format.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidyr)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"></a>
@@ -183,20 +182,19 @@
 <a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; Folding in metadata</span></a></code></pre></div>
 <p>We can visualize then results with <code>ggplot2</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 3.5.2</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(data, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>Date, <span class="dt">group =</span> GEO,<span class="dt">y=</span>Estimate)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">ymin=</span>Estimate <span class="op">-</span><span class="st"> `</span><span class="dt">Standard error of estimate</span><span class="st">`</span>,</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">                  <span class="dt">ymax=</span>Estimate <span class="op">+</span><span class="st"> `</span><span class="dt">Standard error of estimate</span><span class="st">`</span>, <span class="dt">fill=</span><span class="st">""</span>),</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6">              <span class="dt">alpha=</span><span class="fl">0.8</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color=</span>GEO)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels=</span>scales<span class="op">::</span>percent) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="dt">name =</span> <span class="st">""</span>, <span class="dt">values=</span><span class="st">"grey80"</span>, <span class="dt">label=</span><span class="st">"Standard error"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-11" data-line-number="11"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"Comparison of unemployment rate by economic region"</span>,</a>
-<a class="sourceLine" id="cb4-12" data-line-number="12">       <span class="dt">y =</span> <span class="st">"Unemployment Rate"</span>, </a>
-<a class="sourceLine" id="cb4-13" data-line-number="13">       <span class="dt">x =</span> <span class="st">""</span>,</a>
-<a class="sourceLine" id="cb4-14" data-line-number="14">       <span class="dt">color =</span> <span class="st">""</span>,</a>
-<a class="sourceLine" id="cb4-15" data-line-number="15">       <span class="dt">caption=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"CANSIM "</span>, selected_table))</a></code></pre></div>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(data, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>Date, <span class="dt">group =</span> GEO,<span class="dt">y=</span>Estimate)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_ribbon</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">ymin=</span>Estimate <span class="op">-</span><span class="st"> `</span><span class="dt">Standard error of estimate</span><span class="st">`</span>,</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">                  <span class="dt">ymax=</span>Estimate <span class="op">+</span><span class="st"> `</span><span class="dt">Standard error of estimate</span><span class="st">`</span>, <span class="dt">fill=</span><span class="st">""</span>),</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">              <span class="dt">alpha=</span><span class="fl">0.8</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color=</span>GEO)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="dt">labels=</span>scales<span class="op">::</span>percent) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="dt">name =</span> <span class="st">""</span>, <span class="dt">values=</span><span class="st">"grey80"</span>, <span class="dt">label=</span><span class="st">"Standard error"</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10"><span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"Comparison of unemployment rate by economic region"</span>,</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11">       <span class="dt">y =</span> <span class="st">"Unemployment Rate"</span>, </a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">       <span class="dt">x =</span> <span class="st">""</span>,</a>
+<a class="sourceLine" id="cb4-13" data-line-number="13">       <span class="dt">color =</span> <span class="st">""</span>,</a>
+<a class="sourceLine" id="cb4-14" data-line-number="14">       <span class="dt">caption=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"CANSIM "</span>, selected_table))</a></code></pre></div>
 <p><img src="listing_cansim_tables_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
   </div>

@@ -12,3 +12,5 @@ vignettes/listing_cansim_tables.Rmd
 vignettes/working_with_hierarchies.Rmd
 vignettes/retrieving_cansim_vectors.Rmd
 R/hex_sticker.R
+images
+images/*

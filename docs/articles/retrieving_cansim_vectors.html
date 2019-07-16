@@ -105,7 +105,7 @@
     <div class="page-header toc-ignore">
       <h1>Retrieving individual Statistics Canada vectors</h1>
             
-            <h4 class="date">2019-07-14</h4>
+            <h4 class="date">2019-07-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/retrieving_cansim_vectors.Rmd"><code>vignettes/retrieving_cansim_vectors.Rmd</code></a></small>
       <div class="hidden name"><code>retrieving_cansim_vectors.Rmd</code></div>
@@ -166,21 +166,22 @@
 <a href="#get_cansim_vectors_for_latest_periods" class="anchor"></a>get_cansim_vectors_for_latest_periods()</h3>
 <p>Some vectors extend backwards for a significant number of periods that may not be of interest. <code>get_cansim_vectors_for_lates_periods()</code> is a wrapper around <code>get_cansim_vectors</code> that takes a <code>periods</code> input instead of arguments for <code>start_time</code> and <code>end_time</code>, and provides data for the selected vector(s) for the last <code>n</code> periods for which data is available, irrespective of dates.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="../reference/get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods</a></span>(<span class="st">"v41690973"</span>, <span class="dt">periods =</span> <span class="dv">60</span>)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; # A tibble: 60 x 9</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;       &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;  1        1  126. 2014-06… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;  2        1  126. 2014-07… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;  3        1  126. 2014-08… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt;  4        1  126. 2014-09… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt;  5        1  126. 2014-10… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt;  6        1  125. 2014-11… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt;  7        1  124. 2014-12… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt;  8        1  124. 2015-01… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt;  9        1  125. 2015-02… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; 10        1  126. 2015-03… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; # … with 50 more rows, and 2 more variables: COORDINATE &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; #   VECTOR &lt;chr&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; Got timeout from StatCan, trying again</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt; # A tibble: 60 x 9</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;       &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;  1        1  126. 2014-06… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;  2        1  126. 2014-07… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt;  3        1  126. 2014-08… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt;  4        1  126. 2014-09… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt;  5        1  126. 2014-10… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt;  6        1  125. 2014-11… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt;  7        1  124. 2014-12… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt;  8        1  124. 2015-01… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt;  9        1  125. 2015-02… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; 10        1  126. 2015-03… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; # … with 50 more rows, and 2 more variables: COORDINATE &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; #   VECTOR &lt;chr&gt;</span></a></code></pre></div>
 </div>
 <div id="naming-vector-series" class="section level3">
 <h3 class="hasAnchor">
