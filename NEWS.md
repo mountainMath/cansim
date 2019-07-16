@@ -1,4 +1,4 @@
-## cansim 0.3
+## cansim 0.3.0
 
 ### Major changes
 - Fixes issues arising from StatCan changing their API
