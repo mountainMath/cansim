@@ -8,6 +8,13 @@
 
 <title>Retrieve data for a Statistics Canada data vector released within a given time frame — get_cansim_vector • cansim</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
@@ -35,6 +42,8 @@
 <meta property="og:title" content="Retrieve data for a Statistics Canada data vector released within a given time frame — get_cansim_vector" />
 
 <meta property="og:description" content="Retrieve data for a Statistics Canada data vector released within a given time frame" />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -75,7 +84,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -176,7 +185,7 @@
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>get_cansim_vector</span>(<span class='st'>"v41690973"</span>,<span class='st'>"2015-01-01"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 48 x 9</span><span>
+    <pre class="examples"><div class='input'><span class='fu'>get_cansim_vector</span>(<span class='st'>"v41690973"</span>,<span class='st'>"2015-01-01"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 53 x 9</span><span>
 #&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE
 #&gt;       </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     
 #&gt; </span><span style='color: #555555;'> 1</span><span>        1  124. 2015-01… 2018-06-12…      0             6         0 2.2.0.0.0…
@@ -189,7 +198,7 @@
 #&gt; </span><span style='color: #555555;'> 8</span><span>        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…
 #&gt; </span><span style='color: #555555;'> 9</span><span>        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…
 #&gt; </span><span style='color: #555555;'>10</span><span>        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'># … with 38 more rows, and 1 more variable: VECTOR </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'># … with 43 more rows, and 1 more variable: VECTOR </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

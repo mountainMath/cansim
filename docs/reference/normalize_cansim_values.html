@@ -8,6 +8,13 @@
 
 <title>Normalize retrieved data table values to appropriate scales — normalize_cansim_values • cansim</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
@@ -35,6 +42,8 @@
 <meta property="og:title" content="Normalize retrieved data table values to appropriate scales — normalize_cansim_values" />
 
 <meta property="og:description" content="Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If &quot;replacement_value&quot; is not set, it will replace the VALUE field with normalized values and drop the scale column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the REF_DATE field and create an R date variable. This is currently experimental." />
+
+<meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -75,7 +84,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -147,7 +156,8 @@
     </div>
 
     <pre class="usage"><span class='fu'>normalize_cansim_values</span>(<span class='no'>data</span>, <span class='kw'>replacement_value</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>normalize_percent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>default_month</span> <span class='kw'>=</span> <span class='st'>"01"</span>, <span class='kw'>default_day</span> <span class='kw'>=</span> <span class='st'>"01"</span>)</pre>
+  <span class='kw'>normalize_percent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>default_month</span> <span class='kw'>=</span> <span class='st'>"01"</span>, <span class='kw'>default_day</span> <span class='kw'>=</span> <span class='st'>"01"</span>,
+  <span class='kw'>factors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>strip_classification_code</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,6 +181,14 @@
     <tr>
       <th>default_day</th>
       <td><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")</p></td>
+    </tr>
+    <tr>
+      <th>factors</th>
+      <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>false</code>).</p></td>
+    </tr>
+    <tr>
+      <th>strip_classification_code</th>
+      <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to <code>false</code>).</p></td>
     </tr>
     </table>
     

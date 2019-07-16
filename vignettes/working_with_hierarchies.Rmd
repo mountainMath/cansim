@@ -42,7 +42,7 @@ data <- data %>%
 There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called `normalize_cansim_values()`. By default, downloaded CANSIM data contains a `VALUE` and a `SCALAR_FACTOR` field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the `normalize_cansim_values()` function will apply the appropriate conversion based on the scale variable so that the `VALUE` value is more straight-forward to work with. The default data also includes a character string `REF_DATE` field, which the `normalize_cansim_values()` function will attempt to convert into a standard date-class variable.
 ```{r}
 data <- data %>% 
-  normalize_cansim_values()
+  normalize_cansim_values(strip_classification_code = TRUE)
 ```
 
 ### Taking advantage of metadata
