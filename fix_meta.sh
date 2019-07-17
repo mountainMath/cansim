@@ -1,5 +1,5 @@
 og_img1='<meta property="og:image" content="/logo.png"'
-og_img2='<meta property="og:image" content="logo.png"'
+og_img2='<meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png"'
 
 replace_meta () {
   file=$(find . -name '*.html')
