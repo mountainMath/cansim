@@ -109,7 +109,7 @@ list_cansim_tables <- function(refresh=FALSE){
   directory <- getOption("cansim.cache_path")
   #if (is.null(directory)) directory <- getOption("cache_path") # legacy
   path <- file.path(directory,"cansim_table_list.Rda")
-  if (is.null(directory) || (!refresh && !exists(path))) {
+  if (is.null(directory) || (!refresh && !file.exists(path))) {
     result=cansim_table_list
     age=(Sys.Date()-attr(result,"date")) %>% as.integer
     if (age>30) {
