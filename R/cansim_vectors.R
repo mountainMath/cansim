@@ -1,3 +1,5 @@
+MAX_PERIODS = 6000
+
 extract_vector_data <- function(data1){
   vf=list("DECIMALS"="decimals",
           "VALUE"="value",
@@ -104,7 +106,7 @@ get_cansim_vector<-function(vectors, start_time, end_time=Sys.Date(), use_ref_da
     else
       result <- tibble::tibble()
   } else {
-    result <- get_cansim_vector_for_latest_periods(vectors,periods=10000) %>%
+    result <- get_cansim_vector_for_latest_periods(vectors,periods=MAX_PERIODS) %>%
       filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=end_time)
   }
   result
@@ -124,6 +126,10 @@ get_cansim_vector<-function(vectors, start_time, end_time=Sys.Date(), use_ref_da
 #'
 #' @export
 get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
+  if (periods*length(vectors)>MAX_PERIODS) {
+    periods=pmin(periods,floor(as.numeric(MAX_PERIODS)/length(vectors)))
+    warning(paste0("Can access at most ",MAX_PERIODS," data points, capping value to ",periods," periods per vector."))
+  }
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
