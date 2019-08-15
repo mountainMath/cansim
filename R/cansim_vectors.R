@@ -10,8 +10,10 @@ extract_vector_data <- function(data1){
           "frequencyCode"="frequencyCode",
           "SCALAR_ID"="scalarFactorCode")
   result <- purrr::map(data1,function(d){
+    vdp <- d$object$vectorDataPoint
+    if (length(vdp)==0) {return(NULL)}
     value_data = lapply(vf,function(f){
-      x=purrr::map(d$object$vectorDataPoint,function(cc)cc[[f]])
+      x=purrr::map(vdp,function(cc)cc[[f]])
       x[sapply(x, is.null)] <- NA
       unlist(x)
     }) %>%
@@ -77,37 +79,36 @@ rename_vectors <- function(data,vectors){
 #' @export
 get_cansim_vector<-function(vectors, start_time, end_time=Sys.Date(), use_ref_date=TRUE){
   start_time=as.Date(start_time)
-  end_time=as.Date(end_time)
-  if (!use_ref_date) {
-    time_format="%Y-%m-%dT%H:%m"
-    vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
-    url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
-    vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
-    time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
-                       '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
-    response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
-    if (is.null(response)) return(response)
-    if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-    }
-    data <- httr::content(response)
-    data1 <- Filter(function(x)x$status=="SUCCESS",data)
-    data2 <- Filter(function(x)x$status!="SUCCESS",data)
-    if (length(data2)>0) {
-      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-      data2 %>% purrr::map(function(x){
-        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-      })
-    }
+  original_end_time=as.Date(end_time)
+  if (use_ref_date) end_time=Sys.Date() else end_time=original_end_time
+  time_format="%Y-%m-%dT%H:%m"
+  vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
+  vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
+  time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
+                     '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
+  response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
+  if (is.null(response)) return(response)
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+  }
+  data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+    data2 %>% purrr::map(function(x){
+      message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+    })
+  }
 
-    if (length(data1)>0)
-      result <- extract_vector_data(data1) %>%
-        rename_vectors(vectors)
-    else
-      result <- tibble::tibble()
-  } else {
-    result <- get_cansim_vector_for_latest_periods(vectors,periods=MAX_PERIODS) %>%
-      filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=end_time)
+  if (length(data1)>0)
+    result <- extract_vector_data(data1) %>% rename_vectors(vectors)
+  else
+    result <- tibble::tibble()
+  if (use_ref_date) {
+    result <- result %>%
+      filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
   }
   result
 }

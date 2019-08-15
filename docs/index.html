@@ -21,7 +21,7 @@
     tables, as well as individual vectors, as tidy data frames. This package deals with encoding issues, allows for 
     bilingual English or French language data retrieval, and bundles convenience functions 
     to make it easier to work with retrieved table data. Optional caching features are provided.">
-<meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png">
+<meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -47,7 +47,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
       </span>
     </div>
 
@@ -239,7 +239,7 @@ In doing any of the above, you shall:
 <h3 class="hasAnchor">
 <a href="#proxy-issues" class="anchor"></a>Proxy issues</h3>
 <p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the <code>httr</code> package.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">httr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/httr/topics/set_config">set_config</a></span>(<span class="kw">use_proxy</span>(<span class="dt">url=</span>http_proxy, <span class="dt">port=</span>selected_port, <span class="dt">username=</span>your_username,<span class="dt">password=</span>your_pass))</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">httr<span class="op">::</span><span class="kw"><a href="https://httr.r-lib.org/reference/set_config.html">set_config</a></span>(<span class="kw">use_proxy</span>(<span class="dt">url=</span>http_proxy, <span class="dt">port=</span>selected_port, <span class="dt">username=</span>your_username,<span class="dt">password=</span>your_pass))</a></code></pre></div>
 </div>
 <div id="contributing" class="section level3">
 <h3 class="hasAnchor">
