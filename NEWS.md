@@ -1,3 +1,11 @@
+## cansim 0.3.1
+
+### Major changes
+- Fixes issues arising from StatCan changing their API row limit
+
+### Minor changes
+- Optimize vector retrieval by REF_DATE
+
 ## cansim 0.3.0
 
 ### Major changes

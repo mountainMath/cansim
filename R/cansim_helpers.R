@@ -42,6 +42,10 @@ response_status_code_translation <- list(
   "8"="Invalid number of reference periods"
 )
 
+response_error_translation <- list(
+  "503"="StatCan website is currently unavailable"
+)
+
 get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
   if (!is.na(path)) {
     response <- purrr::safely(httr::GET)(url,httr::timeout(timeout),httr::write_disk(path,overwrite = TRUE))
@@ -56,6 +60,10 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
       message("Got timeout from StatCan, giving up")
       response=response$result
     }
+  } else if (response$result$status_code %in% names(response_error_translation)){
+    stop(sprintf("%s\nReturned status code %s",response_error_translation[[as.character(response$result$status_code)]], response$result$status_code),call.=FALSE)
+  } else if (response$result$status_code != 200){
+    stop(sprintf("Problem downloading data, returned status code %s.",response$result$status_code),call.=FALSE)
   } else {
     response=response$result
   }
