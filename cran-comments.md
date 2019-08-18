@@ -20,3 +20,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Fixes issues arising from StatCan changing their API
 * Adds some post-processing options in normalize_cansim_values
 
+## Changes from version 0.3.0
+
+* Fixes issues arising from StatCan changing their API row limit
+* Optimize vector retrieval by REF_DATE
