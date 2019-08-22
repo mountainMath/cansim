@@ -205,7 +205,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
   classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
   hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
 
-  cut_indices <- grep(dimension_id_column,meta[[cube_title_column]])
+  cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
   cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]]))
   meta1 <- meta[seq(1,cut_indices[1]-1),]
   saveRDS(meta1,file=paste0(data_path,"1"))
@@ -220,10 +220,12 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
     as.character()
   meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
     set_names(names3)
+  correction_index <- grep(correction_id_grepl_field,meta[[cube_title_column]])
+  if (length(correction_index)==0) correction_index=nrow(meta)
   additional_indices=c(grep(survey_code_grepl_field,meta[[cube_title_column]]),
                        grep(subject_code_grepl_field,meta[[cube_title_column]]),
                        grep(note_id_grepl_field,meta[[cube_title_column]]),
-                       grep(correction_id_grepl_field,meta[[cube_title_column]]))
+                       correction_index)
   saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
             set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
   saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
