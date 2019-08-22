@@ -345,7 +345,11 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,
                                              locale=readr::locale(encoding="UTF-8"),
                                              col_types = list(.default = "c")))
 
-    data <- parse_and_fold_in_metadata(data,meta,data_path)
+    tryCatch({
+      data <- parse_and_fold_in_metadata(data,meta,data_path)
+    }, error = function(e) {
+      warning("Could not fold in metadata")
+    })
 
     saveRDS(data,file=data_path)
     unlink(exdir,recursive = TRUE)
