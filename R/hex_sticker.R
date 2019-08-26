@@ -47,4 +47,11 @@ generate_cansim_hex_sticker <- function (){
 
 }
 
+#' Internal function to update table list
+#' @keywords internal
+update_internal_data <- function(){
+  cansim_table_list <- list_cansim_tables(refresh=TRUE)
+  usethis::use_data(cansim_table_list, internal = TRUE,overwrite = TRUE)
+}
+
 #' @importFrom dplyr %>%

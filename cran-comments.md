@@ -24,3 +24,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 
 * Fixes issues arising from StatCan changing their API row limit
 * Optimize vector retrieval by REF_DATE
+
+## Changes from version 0.3.1
+
+* Adjust package for changes in StatCan API with different metadata format
+

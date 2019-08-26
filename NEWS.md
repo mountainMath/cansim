@@ -1,3 +1,8 @@
+## cansim 0.3.2
+
+### Minor changes
+- Adjust package for changes in StatCan API with different metadata format
+
 ## cansim 0.3.1
 
 ### Major changes

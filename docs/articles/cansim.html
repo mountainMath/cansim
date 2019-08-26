@@ -44,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.2</span>
       </span>
     </div>
 
@@ -105,7 +105,7 @@
     <div class="page-header toc-ignore">
       <h1>Getting started with the cansim package</h1>
             
-            <h4 class="date">2019-08-18</h4>
+            <h4 class="date">2019-08-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/cansim.Rmd"><code>vignettes/cansim.Rmd</code></a></small>
       <div class="hidden name"><code>cansim.Rmd</code></div>
@@ -199,28 +199,24 @@
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; Estimate, Standard error of estimate, Standard error of year-over-year change</span></a></code></pre></div>
 <p>When a table number is unknown, you can browse the available tables or search by survey name, keyword or title.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/search_cansim_tables.html">search_cansim_tables</a></span>(<span class="st">"housing price indexes"</span>)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; Your CANSIM table overview data is 32 days old.</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; # A tibble: 10 x 21</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt;    title title_en title_fr keywords_en keywords keywords_fr notes notes_en</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   </span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt;  1 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
-<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt;  2 Buil… Buildin… Indices… constructi… constru… constructi… &lt;p&gt;B… &lt;p&gt;Buil…</span></a>
-<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt;  3 Expe… Experim… Indice … constructi… constru… constructi… &lt;p&gt;E… &lt;p&gt;Expe…</span></a>
-<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt;  4 Pric… Price i… Indices… constructi… constru… constructi… &lt;p&gt;T… &lt;p&gt;This…</span></a>
-<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt;  5 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
-<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt;  6 Pric… Price i… Indices… constructi… constru… constructi… This… This ta…</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt;  7 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
-<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt;  8 Non-… Non-res… Indice … constructi… constru… constructi… &lt;p&gt;A… &lt;p&gt;Arch…</span></a>
-<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt;  9 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; 10 New … New hou… Indice … constructi… constru… constructi… Mont… Monthly…</span></a>
-<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; # … with 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;, subject &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; #   date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; #   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; #   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt; #   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; # A tibble: 10 x 21</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;    title title_en title_fr keywords_en keywords keywords_fr notes notes_en</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;    &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   </span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;  1 Buil… Buildin… Indices… constructi… constru… constructi… &lt;p&gt;B… &lt;p&gt;Buil…</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt;  2 Expe… Experim… Indice … constructi… constru… constructi… &lt;p&gt;E… &lt;p&gt;Expe…</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt;  3 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt;  4 Pric… Price i… Indices… constructi… constru… constructi… &lt;p&gt;T… &lt;p&gt;This…</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt;  5 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt;  6 Pric… Price i… Indices… constructi… constru… constructi… This… This ta…</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="co">#&gt;  7 New … New hou… Indice … constructi… constru… constructi… &lt;p&gt;N… &lt;p&gt;New …</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt;  8 Non-… Non-res… Indice … constructi… constru… constructi… &lt;p&gt;A… &lt;p&gt;Arch…</span></a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt;  9 New … New hou… Indices… constructi… constru… constructi… This… This ta…</span></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; 10 New … New hou… Indice … constructi… constru… constructi… Mont… Monthly…</span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt; # … with 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;, subject &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt; #   date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; #   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; #   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; #   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span></a></code></pre></div>
 <p>Individual series in Statistics Canada data tables can also be accessed by using individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the <code>cansim</code> package allows users to specify named vectors, where the <code>label</code> field will be added to the returned data frame containing the specified name for each vector.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"Metro Van Apartment Construction Price Index"</span>=<span class="st">"v44176267"</span>,</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2">                    <span class="st">"Metro Van CPI"</span>=<span class="st">"v41692930"</span>),</a>
@@ -229,11 +225,11 @@
 <a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; # A tibble: 5 x 10</span></a>
 <a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt;   DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID</span></a>
 <a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt;      &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 1        1  153  2015-07… 2015-11-10…      0             9         0</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; 2        1  122. 2015-05… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; 3        1  122. 2015-06… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; 4        1  122. 2015-07… 2018-06-12…      0             6         0</span></a>
-<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; 5        1  123. 2015-08… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 1        1  122. 2015-05… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; 2        1  122. 2015-06… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; 3        1  122. 2015-07… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">#&gt; 4        1  123. 2015-08… 2018-06-12…      0             6         0</span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">#&gt; 5        1  153  2015-07… 2015-11-10…      0             9         0</span></a>
 <a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">#&gt; # … with 3 more variables: COORDINATE &lt;chr&gt;, VECTOR &lt;chr&gt;, label &lt;chr&gt;</span></a></code></pre></div>
 </div>
 <div id="license" class="section level3">
