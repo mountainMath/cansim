@@ -1,3 +1,8 @@
+## cansim 0.3.3
+
+### Minor changes
+- Fix time zone problem when parsing and formatting times for the StatCan API
+
 ## cansim 0.3.2
 
 ### Minor changes

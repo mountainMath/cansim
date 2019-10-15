@@ -29,3 +29,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 
 * Adjust package for changes in StatCan API with different metadata format
 
+## Changes from version 0.3.2
+
+* Fix time zone problem when parsing and formatting times for the StatCan API
+

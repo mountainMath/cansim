@@ -1,4 +1,7 @@
 MAX_PERIODS = 6000
+STATCAN_TIMEZONE = "America/Toronto"
+STATCAN_TIME_FORMAT="%Y-%m-%dT%H:%M"
+
 
 extract_vector_data <- function(data1){
   vf=list("DECIMALS"="decimals",
@@ -77,16 +80,15 @@ rename_vectors <- function(data,vectors){
 #' get_cansim_vector("v41690973","2015-01-01")
 #'
 #' @export
-get_cansim_vector<-function(vectors, start_time, end_time=Sys.Date(), use_ref_date=TRUE){
+get_cansim_vector<-function(vectors, start_time, end_time=Sys.time(), use_ref_date=TRUE){
   start_time=as.Date(start_time)
   original_end_time=as.Date(end_time)
-  if (use_ref_date) end_time=Sys.Date() else end_time=original_end_time
-  time_format="%Y-%m-%dT%H:%m"
+  if (use_ref_date) end_time=pmax(Sys.time(),end_time) else end_time=original_end_time
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
   vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
-  time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,time_format),
-                     '","endDataPointReleaseDate": "',strftime(end_time,time_format),'"')
+  time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
+                     '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
   response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
   if (is.null(response)) return(response)
   if (response$status_code!=200) {
