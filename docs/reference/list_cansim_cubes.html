@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieve data for a Statistics Canada data vector released within a given time frame — get_cansim_vector • cansim</title>
+<title>Get overview list for all Statistics Canada data cubes — list_cansim_cubes • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -41,9 +41,9 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="Retrieve data for a Statistics Canada data vector released within a given time frame — get_cansim_vector" />
+<meta property="og:title" content="Get overview list for all Statistics Canada data cubes — list_cansim_cubes" />
 
-<meta property="og:description" content="Retrieve data for a Statistics Canada data vector released within a given time frame" />
+<meta property="og:description" content="Generates an overview table containing metadata of available Statistics Canada data cubes." />
 
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -148,65 +148,56 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieve data for a Statistics Canada data vector released within a given time frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_vectors.R'><code>R/cansim_vectors.R</code></a></small>
-    <div class="hidden name"><code>get_cansim_vector.Rd</code></div>
+    <h1>Get overview list for all Statistics Canada data cubes</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
+    <div class="hidden name"><code>list_cansim_cubes.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Retrieve data for a Statistics Canada data vector released within a given time frame</p>
+    <p>Generates an overview table containing metadata of available Statistics Canada data cubes.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_vector</span>(
-  <span class='no'>vectors</span>,
-  <span class='no'>start_time</span>,
-  <span class='kw'>end_time</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span>(),
-  <span class='kw'>use_ref_date</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>list_cansim_cubes</span>(<span class='kw'>lite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>vectors</th>
-      <td><p>The list of vectors to retrieve</p></td>
+      <th>lite</th>
+      <td><p>Get the version without cube dimensions and comments for faster retrieval, default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
-      <th>start_time</th>
-      <td><p>Starting date in <code>YYYY-MM-DD</code> format, applies to <code>REF_DATE</code> or <code>releaseTime</code>, depending on <code>use_ref_date</code> parameter</p></td>
-    </tr>
-    <tr>
-      <th>end_time</th>
-      <td><p>Set an optional end time filter in <code>YYYY-MM-DD</code> format (defaults to current system time)</p></td>
-    </tr>
-    <tr>
-      <th>use_ref_date</th>
-      <td><p>Optional, <code>TRUE</code> by default. When set to <code>TRUE</code>, uses <code>REF_DATE</code> of vector data to filter, otherwise it uses Statistics Canada's <code>releaseDate</code> value for filtering the specified vectors</p></td>
+      <th>refresh</th>
+      <td><p>Default is <code>FALSE</code>, repeated calls during the same session will hit the cached data.
+To refresh the code list during a running R session set to <code>TRUE</code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble with data for vectors released between start and end time</p>
+    <p>A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
+start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>get_cansim_vector</span>(<span class='st'>"v41690973"</span>,<span class='st'>"2015-01-01"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 61 x 9</span><span>
-#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE
-#&gt;       </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     
-#&gt; </span><span style='color: #555555;'> 1</span><span>        1  124. 2015-01… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 2</span><span>        1  125. 2015-02… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 3</span><span>        1  126. 2015-03… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 4</span><span>        1  126. 2015-04… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 5</span><span>        1  127. 2015-05… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 6</span><span>        1  127. 2015-06… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 7</span><span>        1  127. 2015-07… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 8</span><span>        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 9</span><span>        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'>10</span><span>        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'># … with 51 more rows, and 1 more variable: VECTOR </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'>list_cansim_cubes</span>()</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5,389 x 13</span><span>
+#&gt;    cansim_table_nu… cubeTitleEn cubeTitleFr productId cansimId cubeStartDate
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span>       
+#&gt; </span><span style='color: #555555;'> 1</span><span> 10-10-0001       Federal pu… Emploi du … 10100001  183-0021 1999-01-01   
+#&gt; </span><span style='color: #555555;'> 2</span><span> 10-10-0002       Central go… Dette du g… 10100002  191-0002 2009-04-01   
+#&gt; </span><span style='color: #555555;'> 3</span><span> 10-10-0003       Capital ma… Activités … 10100003  176-0079 1975-01-01   
+#&gt; </span><span style='color: #555555;'> 4</span><span> 10-10-0004       Chartered … Banques à … 10100004  176-0013 1978-04-01   
+#&gt; </span><span style='color: #555555;'> 5</span><span> 10-10-0005       Canadian C… Classifica… 10100005  385-0041 2008-01-01   
+#&gt; </span><span style='color: #555555;'> 6</span><span> 10-10-0006       Funds adva… Avances de… 10100006  176-0091 2013-01-01   
+#&gt; </span><span style='color: #555555;'> 7</span><span> 10-10-0007       Net new is… Émissions … 10100007  176-0082 1975-03-01   
+#&gt; </span><span style='color: #555555;'> 8</span><span> 10-10-0008       Foreign ex… Taux de ch… 10100008  176-0067 1950-10-02   
+#&gt; </span><span style='color: #555555;'> 9</span><span> 10-10-0009       Foreign ex… Taux de ch… 10100009  176-0064 1950-10-01   
+#&gt; </span><span style='color: #555555;'>10</span><span> 10-10-0010       Sales of a… Ventes de … 10100010  183-0023 2004-01-01   
+#&gt; </span><span style='color: #555555;'># … with 5,379 more rows, and 7 more variables: cubeEndDate </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span style='color: #555555;'>,
+#&gt; #   archived </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span style='color: #555555;'>, subjectCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, frequencyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,
+#&gt; #   corrections </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, dimensions </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

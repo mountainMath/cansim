@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieve data for a Statistics Canada data vector released within a given time frame — get_cansim_vector • cansim</title>
+<title>Retrieve Statistics Canada data table short notes — get_cansim_table_short_notes • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -41,9 +41,9 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="Retrieve data for a Statistics Canada data vector released within a given time frame — get_cansim_vector" />
+<meta property="og:title" content="Retrieve Statistics Canada data table short notes — get_cansim_table_short_notes" />
 
-<meta property="og:description" content="Retrieve data for a Statistics Canada data vector released within a given time frame" />
+<meta property="og:description" content="Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only." />
 
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -148,74 +148,60 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieve data for a Statistics Canada data vector released within a given time frame</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_vectors.R'><code>R/cansim_vectors.R</code></a></small>
-    <div class="hidden name"><code>get_cansim_vector.Rd</code></div>
+    <h1>Retrieve Statistics Canada data table short notes</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
+    <div class="hidden name"><code>get_cansim_table_short_notes.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Retrieve data for a Statistics Canada data vector released within a given time frame</p>
+    <p>Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_vector</span>(
-  <span class='no'>vectors</span>,
-  <span class='no'>start_time</span>,
-  <span class='kw'>end_time</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span>(),
-  <span class='kw'>use_ref_date</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+    <pre class="usage"><span class='fu'>get_cansim_table_short_notes</span>(
+  <span class='no'>cansimTableNumber</span>,
+  <span class='kw'>language</span> <span class='kw'>=</span> <span class='st'>"english"</span>,
+  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>200</span>
 )</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>vectors</th>
-      <td><p>The list of vectors to retrieve</p></td>
+      <th>cansimTableNumber</th>
+      <td><p>the NDM table number to load</p></td>
     </tr>
     <tr>
-      <th>start_time</th>
-      <td><p>Starting date in <code>YYYY-MM-DD</code> format, applies to <code>REF_DATE</code> or <code>releaseTime</code>, depending on <code>use_ref_date</code> parameter</p></td>
+      <th>language</th>
+      <td><p><code>"en"</code> or <code>"english"</code> for English and <code>"fr"</code> or <code>"french"</code> for French language versions (default set to English)</p></td>
     </tr>
     <tr>
-      <th>end_time</th>
-      <td><p>Set an optional end time filter in <code>YYYY-MM-DD</code> format (defaults to current system time)</p></td>
+      <th>refresh</th>
+      <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
     </tr>
     <tr>
-      <th>use_ref_date</th>
-      <td><p>Optional, <code>TRUE</code> by default. When set to <code>TRUE</code>, uses <code>REF_DATE</code> of vector data to filter, otherwise it uses Statistics Canada's <code>releaseDate</code> value for filtering the specified vectors</p></td>
+      <th>timeout</th>
+      <td><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A tibble with data for vectors released between start and end time</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>get_cansim_vector</span>(<span class='st'>"v41690973"</span>,<span class='st'>"2015-01-01"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 61 x 9</span><span>
-#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE
-#&gt;       </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     
-#&gt; </span><span style='color: #555555;'> 1</span><span>        1  124. 2015-01… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 2</span><span>        1  125. 2015-02… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 3</span><span>        1  126. 2015-03… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 4</span><span>        1  126. 2015-04… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 5</span><span>        1  127. 2015-05… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 6</span><span>        1  127. 2015-06… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 7</span><span>        1  127. 2015-07… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 8</span><span>        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'> 9</span><span>        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'>10</span><span>        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #555555;'># … with 51 more rows, and 1 more variable: VECTOR </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='fu'>get_cansim_table_short_notes</span>(<span class='st'>"34-10-0013"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 3 x 2</span><span>
+#&gt;   `Note ID` Note                                                                
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                                                               
+#&gt; </span><span style='color: #555555;'>1</span><span> 1         </span><span style='color: #555555;'>"</span><span>The methodology used in the current release differs from that used…
+#&gt; </span><span style='color: #555555;'>2</span><span> 2         </span><span style='color: #555555;'>"</span><span>Changes occurred in census metropolitan area geographical boundari…
+#&gt; </span><span style='color: #555555;'>3</span><span> 3         </span><span style='color: #555555;'>"</span><span>Changes occurred in census metropolitan area geographical boundari…</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
-      <li><a href="#value">Value</a></li>
-      
+            
       <li><a href="#examples">Examples</a></li>
     </ul>
 

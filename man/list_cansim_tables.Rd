@@ -15,3 +15,7 @@ A tibble with available Statistics Canada data tables, listing title, Statistics
 \description{
 Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to \code{FALSE} by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option \code{cansim.cache_path} is set it will look for and store the overview table in that directory.
 }
+\examples{
+list_cansim_tables()
+
+}

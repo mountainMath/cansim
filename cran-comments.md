@@ -1,6 +1,6 @@
 ## Test environments
-* local OS X install, R 3.6.0
-* ubuntu 14.04.5 LTS (on travis-ci), R 3.6.0
+* local OS X install, R 3.6.2
+* ubuntu 14.04.5 LTS (on travis-ci), R 3.6.2
 
 ## R CMD check results
 There were no ERRORs or WARNINGs or NOTEs. 
@@ -32,4 +32,9 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Changes from version 0.3.2
 
 * Fix time zone problem when parsing and formatting times for the StatCan API
+
+## Changes from version 0.3.3
+
+* Expand get_cansim_table_notes functionality
+* Add functionality to access the new cube list API
 

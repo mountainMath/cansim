@@ -431,7 +431,7 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
   readRDS(file=data_path)
 }
 
-#' Retrieve Statistics Canada data table notes
+#' Retrieve Statistics Canada data table short notes
 #'
 #' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
@@ -442,10 +442,10 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' get_cansim_table_notes("34-10-0013")
+#' get_cansim_table_short_notes("34-10-0013")
 #'
 #' @export
-get_cansim_table_notes <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
+get_cansim_table_short_notes <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
   if (refresh | !file.exists(data_path)){
     get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
@@ -567,16 +567,18 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
   h <- h %>%
     dplyr::mutate(`Member ID`=strsplit(!!as.name(hierarchy_name),"\\.") %>% purrr::map(last) %>% as.integer) %>%
     dplyr::filter(.data$hierarchy_level<=level)
-  strict_hierarchy=h %>% dplyr::filter(.data$hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
+  #strict_hierarchy=h %>% dplyr::filter(.data$hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
   if (strict) {
     h <- h %>% dplyr::filter(.data$hierarchy_level==level)
   } else if (remove_duplicates) {
-    higher_ids <- strict_hierarchy %>% strsplit("\\.") %>%
+    higher_ids <- h %>% pull(hierarchy_name) %>% #strict_hierarchy %>%
+      as.character() %>%
+      strsplit("\\.") %>%
       purrr::map(function(x){utils::head(as.integer(x),-1)}) %>%
       unlist %>% unique() %>% as.integer()
     h <- h %>% dplyr::filter(!(.data$`Member ID` %in% higher_ids))
   }
-  h[[column_name]]
+  h[[column_name]] %>% as.character()
 }
 
 
@@ -750,6 +752,45 @@ get_cansim_changed_tables <- function(start_date){
 }
 
 
+#' Retrieve Statistics Canada data table notes and column categories
+#'
+#' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
+#'
+#' @param cansimTableNumber the NDM table number to load
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
+#'
+#' @examples
+#' get_cansim_table_notes("34-10-0013")
+#'
+#' @export
+get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE, timeout = 200) {
+  cleaned_language <- cleaned_ndm_language(language)
+  dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
+  dimenion_note_column <- ifelse(cleaned_language=="eng","Dimension Notes","Notes sur la dimension")
+  member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
+  member_note_column <- ifelse(cleaned_language=="eng","Member Notes","Notes sur le membre")
+  note_id_column <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
+  notes <- get_cansim_table_short_notes(cansimTableNumber,language=language,refresh=refresh,timeout=timeout)
+  columns <- get_cansim_column_list(cansimTableNumber,language=language)
+  full_notes <- columns %>%
+    select(!!as.name(dimension_name_column),!!note_id_column:=!!as.name(dimenion_note_column)) %>%
+    bind_rows(
+      pull(.,dimension_name_column) %>% lapply(function(c) {
+        cansim::get_cansim_column_categories(cansimTableNumber,column=c,language = language) %>%
+          mutate(!!dimension_name_column:=c) %>%
+          select(!!as.name(dimension_name_column),!!as.name(member_name_column),
+                 !!note_id_column:=!!as.name(member_note_column))
+      }) %>%
+        bind_rows) %>%
+    filter(!is.na(!!as.name(note_id_column))) %>%
+    full_join(notes,by=note_id_column) %>%
+    arrange(!!as.name(note_id_column))
+  full_notes
+}
+
 
 #' @import dplyr
 #' @importFrom tibble as.tibble
@@ -759,10 +800,13 @@ get_cansim_changed_tables <- function(start_date){
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
 #' @importFrom rlang set_names
-#' @importFrom rlang .data
 #' @importFrom purrr map
 #' @importFrom rlang :=
 
 NULL
+
+## quiets concerns of R CMD check re: the .'s that appear in pipelines
+if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
+
 
 

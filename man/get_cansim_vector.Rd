@@ -4,8 +4,12 @@
 \alias{get_cansim_vector}
 \title{Retrieve data for a Statistics Canada data vector released within a given time frame}
 \usage{
-get_cansim_vector(vectors, start_time, end_time = Sys.time(),
-  use_ref_date = TRUE)
+get_cansim_vector(
+  vectors,
+  start_time,
+  end_time = Sys.time(),
+  use_ref_date = TRUE
+)
 }
 \arguments{
 \item{vectors}{The list of vectors to retrieve}

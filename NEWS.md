@@ -1,3 +1,9 @@
+## cansim 0.3.4
+
+### Minor changes
+- Expand get_cansim_table_notes functionality
+- Add functionality to access the new cube list API
+
 ## cansim 0.3.3
 
 ### Minor changes
@@ -36,7 +42,7 @@
 ## cansim 0.2.2
 
 ### Major changes
-- French metadata for retrived tables now implemented
+- French metadata for retrieved tables now implemented
 - Reference article vignettes now built for site only
 
 ## cansim 0.2.1

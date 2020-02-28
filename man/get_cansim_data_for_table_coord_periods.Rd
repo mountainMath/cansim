@@ -4,8 +4,11 @@
 \alias{get_cansim_data_for_table_coord_periods}
 \title{Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates}
 \usage{
-get_cansim_data_for_table_coord_periods(cansimTableNumber, coordinate,
-  periods = 1)
+get_cansim_data_for_table_coord_periods(
+  cansimTableNumber,
+  coordinate,
+  periods = 1
+)
 }
 \arguments{
 \item{cansimTableNumber}{Statistics Canada data table number}

@@ -4,8 +4,12 @@
 \alias{get_cansim_table_subject}
 \title{Retrieve Statistics Canada data table subject detail}
 \usage{
-get_cansim_table_subject(cansimTableNumber, language = "english",
-  refresh = FALSE, timeout = 200)
+get_cansim_table_subject(
+  cansimTableNumber,
+  language = "english",
+  refresh = FALSE,
+  timeout = 200
+)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}

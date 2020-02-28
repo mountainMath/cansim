@@ -101,6 +101,9 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #'
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography
 #'
+#' @examples
+#' list_cansim_tables()
+#'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
   # flow: if cansim.cache_path version exists, use that, otherwise fall back on package version
@@ -145,7 +148,10 @@ list_cansim_tables <- function(refresh=FALSE){
 #' @param search_fields By default, this function will search through table titles and keywords. Setting this parameter to "title" will only search through the title, setting it to "keyword" will only search through keywords
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}
 #'
-#' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography
+#' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.
+#'
+#' @examples
+#' search_cansim_tables("Labour force")
 #'
 #' @export
 search_cansim_tables <- function(search_term, search_fields = "both", refresh=FALSE){
@@ -161,4 +167,122 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
       filter(grepl(search_term, .data$subject, ignore.case = TRUE) | grepl(search_term, .data$keywords, ignore.case = TRUE) | grepl(search_term, .data$title, ignore.case = TRUE))
   }
 }
+
+
+#' Get overview list for all Statistics Canada data cubes
+#'
+#' Generates an overview table containing metadata of available Statistics Canada data cubes.
+#'
+#' @param lite Get the version without cube dimensions and comments for faster retrieval, default is \code{FALSE}.
+#' @param refresh Default is \code{FALSE}, repeated calls during the same session will hit the cached data.
+#' To refresh the code list during a running R session set to \code{TRUE}
+#'
+#' @return A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
+#' start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.
+#'
+#' @examples
+#' list_cansim_cubes()
+#'
+#' @export
+list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
+  directory <- tempdir() #getOption("cansim.cache_path")
+  path <- file.path(directory,"cansim_cube_list.Rda")
+  if (refresh | !file.exists(path)) {
+    url=ifelse(lite,"https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite","https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesList")
+    r<-get_with_timeout_retry(url)
+    if (r$status_code==200) {
+      content <- httr::content(r)
+
+      header <- content[[1]] %>%
+        tibble::enframe() %>%
+        t() %>%
+        as_tibble() %>%
+        slice(1) %>%
+        unlist() %>%
+        as.character()
+
+      if ("dimesions" %in% header)
+        header <- c(setdiff(header,"dimensions"),"dimensionNameEn","dimensionNameFr")
+
+
+      if (lite) {
+        dd<-content %>% purrr::map(function(l) {
+          tibble::enframe(l) %>%
+            mutate(value=purrr::map(.data$value,function(v)
+              paste0(unlist(v),collapse = ", ")) %>%
+                unlist)
+        })
+      } else {
+        dd <- content %>% purrr::map(function(l) {
+          df <- tibble::enframe(l)
+          dimensions <- filter(df,.data$name=="dimensions")$value
+          c(df %>%
+              filter(.data$name!=dimensions) %>%
+              mutate(value=purrr::map(.data$value,function(v)
+                paste0(unlist(v),collapse = ", ")) %>%
+                  unlist),
+            purrr::map(dimensions[[1]],function(a)a$dimensionNameEn) %>% paste0(collapse=", "),
+            purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", "))
+        })
+      }
+      data <- lapply(dd,function(d)d$value) %>%
+        do.call(rbind,.) %>%
+        as_tibble() %>%
+        set_names(header) %>%
+        mutate_at(vars(ends_with("Date")),as.Date) %>%
+        mutate(archived=.data$archived==1) %>%
+        mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
+        select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
+               setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr")))
+      # data <- content %>% purrr::map_df(function(l){
+      #   tibble::enframe(l) %>%
+      #     t() %>%
+      #     as_tibble() %>%
+      #     setNames(unlist((.)[1,])) %>%
+      #     slice(-1)
+      #   if ("dimensions" %in% names(data)) {
+      #     data <- data %>%
+      #       mutate(dimensionsEn=purrr::map(dimensions[[1]],function(a)a$dimensionNameEn) %>% paste0(collapse=", ")) %>%
+      #       mutate(dimensionsFR=purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", ")) %>%
+      #       select(-dimensions)
+      #   }
+      #   data <- data %>%
+      #     mutate_if(is.list,function(d)unlist(d) %>% paste0(collapse=", "))
+      # }) %>%
+      #   mutate_at(vars(ends_with("Date")),as.Date) %>%
+      #   mutate(archived=archived==1) %>%
+      #   mutate(cansim_table_number=cleaned_ndm_table_number(productId)) %>%
+      #   select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
+      #          setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr")))
+      saveRDS(data,path)
+    }
+  } else {
+    data <- readRDS(path)
+  }
+  data
+}
+
+
+#' Search through Statistics Canada data cubes
+#'
+#' Searches through Statistics Canada data cubes using a search term.
+#'
+#' @param search_term User-supplied search term used to find Statistics Canada data cubes with matching titles, table numbers, subject and survey codes.
+#' @param refresh Default is \code{FALSE}. The underlying cube list is cached for the duration of the R sessions and will regenerate the cube list if set to \code{TRUE}
+#'
+#' @return A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, description and geography that match the search term.
+#'
+#' @examples
+#' search_cansim_cubes("Labour force")
+#'
+#' @export
+search_cansim_cubes <- function(search_term, refresh=FALSE){
+  list_cansim_cubes(refresh = refresh) %>%
+    filter(grepl(search_term,.data$cubeTitleEn,ignore.case = TRUE) |
+             grepl(search_term,.data$cubeTitleFr,ignore.case = TRUE) |
+             grepl(search_term,.data$cansim_table_number,ignore.case = TRUE) |
+             grepl(search_term,.data$productId,ignore.case = TRUE))
+}
+
+
 

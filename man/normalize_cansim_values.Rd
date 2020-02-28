@@ -4,9 +4,15 @@
 \alias{normalize_cansim_values}
 \title{Normalize retrieved data table values to appropriate scales}
 \usage{
-normalize_cansim_values(data, replacement_value = NA,
-  normalize_percent = TRUE, default_month = "01", default_day = "01",
-  factors = FALSE, strip_classification_code = FALSE)
+normalize_cansim_values(
+  data,
+  replacement_value = NA,
+  normalize_percent = TRUE,
+  default_month = "01",
+  default_day = "01",
+  factors = FALSE,
+  strip_classification_code = FALSE
+)
 }
 \arguments{
 \item{data}{A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}}

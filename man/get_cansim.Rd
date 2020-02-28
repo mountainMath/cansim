@@ -4,8 +4,12 @@
 \alias{get_cansim}
 \title{Retrieves a Statistics Canada data table using CANSIM code or NDM table number}
 \usage{
-get_cansim(cansimTableNumber, language = "english", refresh = FALSE,
-  timeout = 200)
+get_cansim(
+  cansimTableNumber,
+  language = "english",
+  refresh = FALSE,
+  timeout = 200
+)
 }
 \arguments{
 \item{cansimTableNumber}{the table number to load, accepts old CANSIM or new NDM table numbers}

@@ -4,8 +4,13 @@
 \alias{categories_for_level}
 \title{Use metadata to extract categories for column of specific level}
 \usage{
-categories_for_level(data, column_name, level = NA, strict = FALSE,
-  remove_duplicates = TRUE)
+categories_for_level(
+  data,
+  column_name,
+  level = NA,
+  strict = FALSE,
+  remove_duplicates = TRUE
+)
 }
 \arguments{
 \item{data}{data table object as returned from \code{get_cansim()}}

@@ -4,8 +4,13 @@
 \alias{get_cansim_column_categories}
 \title{Retrieve Statistics Canada data table categories for a specific column}
 \usage{
-get_cansim_column_categories(cansimTableNumber, column,
-  language = "english", refresh = FALSE, timeout = 200)
+get_cansim_column_categories(
+  cansimTableNumber,
+  column,
+  language = "english",
+  refresh = FALSE,
+  timeout = 200
+)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}

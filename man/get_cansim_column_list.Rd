@@ -4,8 +4,12 @@
 \alias{get_cansim_column_list}
 \title{Retrieve Statistics Canada data table column list}
 \usage{
-get_cansim_column_list(cansimTableNumber, language = "english",
-  refresh = FALSE, timeout = 200)
+get_cansim_column_list(
+  cansimTableNumber,
+  language = "english",
+  refresh = FALSE,
+  timeout = 200
+)
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
