@@ -175,6 +175,11 @@ short_prov.fr <- purrr::set_names(c(
 #' @export
 #' @param data code{cansim} package data frame with provincial level data
 #' @return a code{cansim} package data frame with additional factor GEO.abb that contains language-specific provincial abbreviations
+#'
+#' @examples
+#' df <- get_cansim("17-10-0005")
+#' df <- add_provincial_abbreviations(df)
+#'
 add_provincial_abbreviations <- function(data){
   cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
   if (cleaned_language=="eng") {
@@ -186,4 +191,43 @@ add_provincial_abbreviations <- function(data){
   }
   data <- data %>%
     mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]), levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+}
+
+
+#' Get NDM code sets
+#'
+#' Useful to get a list of surveys  or subjects and used internally
+#' @export
+#' @param code_set the code set to retrieve.
+#' @param refresh Default is \code{FALSE}, repeated calls during the same session will hit the cached data.
+#' To refresh the code list during a running R session set to \code{TRUE}
+#' @return a tibble with english and french labels for the given code set
+#'
+#' @examples
+#' get_cansim_code_set("survey")
+#'
+get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "status", "uom", "survey",  "subject", "wdsResponseStatus"),
+                                refresh=FALSE){
+  code_sets <- c("scalar", "frequency", "symbol", "status", "uom", "survey",  "subject", "wdsResponseStatus")
+  if (length(code_set)!=1 | !(code_set %in% code_sets)) {
+    stop(paste0("Invalid code set, code_set must be one of ",paste0(code_sets,collapse=", ")))
+  }
+  path=file.path(tempdir(),"cansim_code_sets.Rmd")
+  if (refresh | !file.exists(path)) {
+    url='https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
+    r<-get_with_timeout_retry(url)
+    if (r$status_code==200) {
+      content <- httr::content(r)
+      saveRDS(content,path)
+    } else {
+      warning("Problem downloading code sets.")
+      stop(httr::content(r))
+    }
+  } else {
+    content <- readRDS(path)
+  }
+  m<-do.call(rbind, content$object[[code_set]])
+  m[m=="NULL"] <- NA
+  as_tibble(m) %>%
+    mutate_all(unlist)
 }

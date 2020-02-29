@@ -225,6 +225,8 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
             purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", "))
         })
       }
+      surveys <- get_cansim_code_set("survey")
+      subjects <- get_cansim_code_set("subject")
       data <- lapply(dd,function(d)d$value) %>%
         do.call(rbind,.) %>%
         as_tibble() %>%
@@ -233,27 +235,10 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
         mutate(archived=.data$archived==1) %>%
         mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
         select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
-               setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr")))
-      # data <- content %>% purrr::map_df(function(l){
-      #   tibble::enframe(l) %>%
-      #     t() %>%
-      #     as_tibble() %>%
-      #     setNames(unlist((.)[1,])) %>%
-      #     slice(-1)
-      #   if ("dimensions" %in% names(data)) {
-      #     data <- data %>%
-      #       mutate(dimensionsEn=purrr::map(dimensions[[1]],function(a)a$dimensionNameEn) %>% paste0(collapse=", ")) %>%
-      #       mutate(dimensionsFR=purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", ")) %>%
-      #       select(-dimensions)
-      #   }
-      #   data <- data %>%
-      #     mutate_if(is.list,function(d)unlist(d) %>% paste0(collapse=", "))
-      # }) %>%
-      #   mutate_at(vars(ends_with("Date")),as.Date) %>%
-      #   mutate(archived=archived==1) %>%
-      #   mutate(cansim_table_number=cleaned_ndm_table_number(productId)) %>%
-      #   select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
-      #          setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr")))
+               setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
+        left_join(surveys,by="surveyCode") %>%
+        left_join(subjects,by="subjectCode")
+
       saveRDS(data,path)
     }
   } else {
@@ -270,7 +255,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
 #' @param search_term User-supplied search term used to find Statistics Canada data cubes with matching titles, table numbers, subject and survey codes.
 #' @param refresh Default is \code{FALSE}. The underlying cube list is cached for the duration of the R sessions and will regenerate the cube list if set to \code{TRUE}
 #'
-#' @return A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, description and geography that match the search term.
+#' @return A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.
 #'
 #' @examples
 #' search_cansim_cubes("Labour force")
@@ -280,6 +265,12 @@ search_cansim_cubes <- function(search_term, refresh=FALSE){
   list_cansim_cubes(refresh = refresh) %>%
     filter(grepl(search_term,.data$cubeTitleEn,ignore.case = TRUE) |
              grepl(search_term,.data$cubeTitleFr,ignore.case = TRUE) |
+             grepl(search_term,.data$surveyEn,ignore.case = TRUE) |
+             grepl(search_term,.data$surveyFr,ignore.case = TRUE) |
+             grepl(search_term,.data$subjectEn,ignore.case = TRUE) |
+             grepl(search_term,.data$subjectFr,ignore.case = TRUE) |
+             grepl(search_term,.data$subjectCode,ignore.case = TRUE) |
+             grepl(search_term,.data$surveyCode,ignore.case = TRUE) |
              grepl(search_term,.data$cansim_table_number,ignore.case = TRUE) |
              grepl(search_term,.data$productId,ignore.case = TRUE))
 }

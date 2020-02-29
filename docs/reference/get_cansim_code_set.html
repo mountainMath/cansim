@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Add provincial abbreviations as factor — add_provincial_abbreviations • cansim</title>
+<title>Get NDM code sets — get_cansim_code_set • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -41,9 +41,9 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="Add provincial abbreviations as factor — add_provincial_abbreviations" />
+<meta property="og:title" content="Get NDM code sets — get_cansim_code_set" />
 
-<meta property="og:description" content="Add provincial abbreviations as factor" />
+<meta property="og:description" content="Useful to get a list of surveys  or subjects and used internally" />
 
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -148,35 +148,58 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Add provincial abbreviations as factor</h1>
+    <h1>Get NDM code sets</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_helpers.R'><code>R/cansim_helpers.R</code></a></small>
-    <div class="hidden name"><code>add_provincial_abbreviations.Rd</code></div>
+    <div class="hidden name"><code>get_cansim_code_set.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Add provincial abbreviations as factor</p>
+    <p>Useful to get a list of surveys  or subjects and used internally</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>add_provincial_abbreviations</span>(<span class='no'>data</span>)</pre>
+    <pre class="usage"><span class='fu'>get_cansim_code_set</span>(
+  <span class='kw'>code_set</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"scalar"</span>, <span class='st'>"frequency"</span>, <span class='st'>"symbol"</span>, <span class='st'>"status"</span>, <span class='st'>"uom"</span>, <span class='st'>"survey"</span>, <span class='st'>"subject"</span>,
+    <span class='st'>"wdsResponseStatus"</span>),
+  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>codecansim package data frame with provincial level data</p></td>
+      <th>code_set</th>
+      <td><p>the code set to retrieve.</p></td>
+    </tr>
+    <tr>
+      <th>refresh</th>
+      <td><p>Default is <code>FALSE</code>, repeated calls during the same session will hit the cached data.
+To refresh the code list during a running R session set to <code>TRUE</code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a codecansim package data frame with additional factor GEO.abb that contains language-specific provincial abbreviations</p>
+    <p>a tibble with english and french labels for the given code set</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_cansim.html'>get_cansim</a></span>(<span class='st'>"17-10-0005"</span>)</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 17-10-0005 from Statistics Canada</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='output co'>#&gt; <span class='message'>Folding in metadata</span></div><div class='input'><span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>add_provincial_abbreviations</span>(<span class='no'>df</span>)</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'>get_cansim_code_set</span>(<span class='st'>"survey"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 793 x 3</span><span>
+#&gt;    surveyCode surveyEn                          surveyFr                        
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                             </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                           
+#&gt; </span><span style='color: #555555;'> 1</span><span> 1105       Business Register                 Registre des entreprises        
+#&gt; </span><span style='color: #555555;'> 2</span><span> 1141       Average Fair Market Value/Purcha… Juste valeur marchande/prix d'a…
+#&gt; </span><span style='color: #555555;'> 3</span><span> 1209       Survey of Environmental Goods an… Enquête sur les biens et servic…
+#&gt; </span><span style='color: #555555;'> 4</span><span> 1301       Gross Domestic Product by Indust… Produit intérieur brut par indu…
+#&gt; </span><span style='color: #555555;'> 5</span><span> 1302       Gross Domestic Product by Indust… Produit intérieur brut par indu…
+#&gt; </span><span style='color: #555555;'> 6</span><span> 1303       Gross Domestic Product by Indust… Produit intérieur brut par indu…
+#&gt; </span><span style='color: #555555;'> 7</span><span> 1401       Supply, Use and Input-Output Tab… Tableaux des ressources, des em…
+#&gt; </span><span style='color: #555555;'> 8</span><span> 1402       Productivity Measures and Relate… Mesures de la productivité et d…
+#&gt; </span><span style='color: #555555;'> 9</span><span> 1529       Capital Invested Abroad by Canad… Capitaux investis à l'étranger …
+#&gt; </span><span style='color: #555555;'>10</span><span> 1530       Capital Invested in secondary fo… Capitaux investis dans les soci…
+#&gt; </span><span style='color: #555555;'># … with 783 more rows</span><span></div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

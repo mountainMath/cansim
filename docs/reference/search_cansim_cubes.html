@@ -176,11 +176,11 @@
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, description and geography that match the search term.</p>
+    <p>A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>search_cansim_cubes</span>(<span class='st'>"Labour force"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 109 x 13</span><span>
+    <pre class="examples"><div class='input'><span class='fu'>search_cansim_cubes</span>(<span class='st'>"Labour force"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 244 x 17</span><span>
 #&gt;    cansim_table_nu… cubeTitleEn cubeTitleFr productId cansimId cubeStartDate
 #&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span>       
 #&gt; </span><span style='color: #555555;'> 1</span><span> 13-10-0347       Labour for… Situation … 13100347  </span><span style='color: #555555;'>"</span><span>115-00… 2012-01-01   
@@ -191,11 +191,12 @@
 #&gt; </span><span style='color: #555555;'> 6</span><span> 14-10-0017       Labour for… Caractéris… 14100017  </span><span style='color: #555555;'>"</span><span>282-00… 1976-01-01   
 #&gt; </span><span style='color: #555555;'> 7</span><span> 14-10-0018       Labour for… Caractéris… 14100018  </span><span style='color: #555555;'>"</span><span>282-00… 1976-01-01   
 #&gt; </span><span style='color: #555555;'> 8</span><span> 14-10-0019       Labour for… Caractéris… 14100019  </span><span style='color: #555555;'>"</span><span>282-00… 1990-01-01   
-#&gt; </span><span style='color: #555555;'> 9</span><span> 14-10-0022       Labour for… Caractéris… 14100022  </span><span style='color: #555555;'>"</span><span>282-00… 1976-01-01   
-#&gt; </span><span style='color: #555555;'>10</span><span> 14-10-0023       Labour for… Caractéris… 14100023  </span><span style='color: #555555;'>"</span><span>282-00… 1976-01-01   
-#&gt; </span><span style='color: #555555;'># … with 99 more rows, and 7 more variables: cubeEndDate </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span style='color: #555555;'>,
+#&gt; </span><span style='color: #555555;'> 9</span><span> 14-10-0020       Unemployme… Taux de ch… 14100020  </span><span style='color: #555555;'>"</span><span>282-00… 1990-01-01   
+#&gt; </span><span style='color: #555555;'>10</span><span> 14-10-0021       Unemployme… Taux de ch… 14100021  </span><span style='color: #555555;'>"</span><span>282-00… 1976-01-01   
+#&gt; </span><span style='color: #555555;'># … with 234 more rows, and 11 more variables: cubeEndDate </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span style='color: #555555;'>,
 #&gt; #   archived </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span style='color: #555555;'>, subjectCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, frequencyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,
-#&gt; #   corrections </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, dimensions </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+#&gt; #   corrections </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, dimensions </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyEn </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyFr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,
+#&gt; #   subjectEn </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, subjectFr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

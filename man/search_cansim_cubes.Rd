@@ -12,7 +12,7 @@ search_cansim_cubes(search_term, refresh = FALSE)
 \item{refresh}{Default is \code{FALSE}. The underlying cube list is cached for the duration of the R sessions and will regenerate the cube list if set to \code{TRUE}}
 }
 \value{
-A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, description and geography that match the search term.
+A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.
 }
 \description{
 Searches through Statistics Canada data cubes using a search term.
