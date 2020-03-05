@@ -181,7 +181,9 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
 #' start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.
 #'
 #' @examples
+#' \dontrun{
 #' list_cansim_cubes()
+#' }
 #'
 #' @export
 list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
@@ -258,7 +260,9 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
 #' @return A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.
 #'
 #' @examples
+#' \dontrun{
 #' search_cansim_cubes("Labour force")
+#' }
 #'
 #' @export
 search_cansim_cubes <- function(search_term, refresh=FALSE){

@@ -16,7 +16,9 @@ a code{cansim} package data frame with additional factor GEO.abb that contains l
 Add provincial abbreviations as factor
 }
 \examples{
+\dontrun{
 df <- get_cansim("17-10-0005")
 df <- add_provincial_abbreviations(df)
+}
 
 }

@@ -177,8 +177,10 @@ short_prov.fr <- purrr::set_names(c(
 #' @return a code{cansim} package data frame with additional factor GEO.abb that contains language-specific provincial abbreviations
 #'
 #' @examples
+#' \dontrun{
 #' df <- get_cansim("17-10-0005")
 #' df <- add_provincial_abbreviations(df)
+#' }
 #'
 add_provincial_abbreviations <- function(data){
   cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")

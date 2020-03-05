@@ -18,6 +18,8 @@ A tibble with available Statistics Canada data cubes, listing title, Statistics 
 Searches through Statistics Canada data cubes using a search term.
 }
 \examples{
+\dontrun{
 search_cansim_cubes("Labour force")
+}
 
 }
