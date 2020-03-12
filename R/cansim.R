@@ -403,8 +403,9 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
+#' \dontrun{
 #' get_cansim_table_survey("34-10-0013")
-#'
+#' }
 #' @export
 get_cansim_table_survey <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
