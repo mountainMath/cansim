@@ -23,3 +23,8 @@ A tibble with data matching specified coordinate and period input arguments
 \description{
 Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 }
+\examples{
+\dontrun{
+get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12.0.0.0.0.0.0.0.0",periods=3)
+}
+}

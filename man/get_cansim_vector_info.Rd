@@ -15,3 +15,8 @@ A tibble with metadata for selected vectors
 \description{
 Allows for the retrieval of metadatadata for Statistics Canada data vectors
 }
+\examples{
+\dontrun{
+get_cansim_vector_info("v41690973")
+}
+}

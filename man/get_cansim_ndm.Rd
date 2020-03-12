@@ -27,6 +27,7 @@ tibble format data table output
 Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 }
 \examples{
+\dontrun{
 get_cansim("34-10-0013")
-
+}
 }

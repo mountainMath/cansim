@@ -102,8 +102,9 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography
 #'
 #' @examples
+#' \dontrun{
 #' list_cansim_tables()
-#'
+#' }
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
   # flow: if cansim.cache_path version exists, use that, otherwise fall back on package version
@@ -151,8 +152,9 @@ list_cansim_tables <- function(refresh=FALSE){
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.
 #'
 #' @examples
+#' \dontrun{
 #' search_cansim_tables("Labour force")
-#'
+#' }
 #' @export
 search_cansim_tables <- function(search_term, search_fields = "both", refresh=FALSE){
   tables <- list_cansim_tables(refresh = refresh)

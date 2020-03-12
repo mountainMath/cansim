@@ -27,9 +27,10 @@ tibble format data table output
 Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.
 }
 \examples{
+\dontrun{
 # Retrieve a table with an NDM code
 get_cansim("34-10-0013")
 # Retrieve a table with an old-style CANSIM code
 get_cansim("026-0018")
-
+}
 }
