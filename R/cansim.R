@@ -12,7 +12,7 @@
 #' @return tibble format data table output
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Retrieve a table with an NDM code
 #' get_cansim("34-10-0013")
 #' # Retrieve a table with an old-style CANSIM code
@@ -51,7 +51,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @return Returns the input tibble with with adjusted values
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' cansim_table <- get_cansim("34-10-0013")
 #' normalize_cansim_values(cansim_table)
 #' }
@@ -138,7 +138,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 #' @return new-format NDM table number
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' cansim_old_to_new("026-0018")
 #' }
 #' @export
@@ -307,7 +307,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @return tibble format data table output
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim("34-10-0013")
 #' }
 #' @export
@@ -379,7 +379,7 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_info("34-10-0013")
 #' }
 #' @export
@@ -403,7 +403,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_survey("34-10-0013")
 #' }
 #' @export
@@ -426,7 +426,7 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_subject("34-10-0013")
 #' }
 #' @export
@@ -449,7 +449,7 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_short_notes("34-10-0013")
 #' }
 #' @export
@@ -472,7 +472,7 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_column_list("34-10-0013")
 #' }
 #' @export
@@ -496,7 +496,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_column_categories("34-10-0013", "Geography")
 #' }
 #' @export
@@ -523,7 +523,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
 #' @return none
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_overview("34-10-0013")
 #' }
 #' @export
@@ -568,7 +568,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
 #' @return A vector of categories
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data <- get_cansim("16-10-0117")
 #' categories_for_level(data,"North American Industry Classification System (NAICS)",level=2)
 #' }
@@ -662,7 +662,7 @@ generate_table_metadata <- function(){
 #' @return none
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' view_cansim_webpage("34-10-0013")
 #' }
 #' @export
@@ -682,7 +682,7 @@ view_cansim_webpage <- function(cansimTableNumber){
 #' @return a tibble containing the table metadata
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_cube_metadata("34-10-0013")
 #' }
 #' @export
@@ -733,7 +733,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
 #' @return String object containing URL for specified table number
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_url("34-10-0013")
 #' get_cansim_table_url("34-10-0013", language = "fr")
 #' }
@@ -757,7 +757,7 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
 #' @return A tibble with Statistics Canada data table product ids and their release times
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_changed_tables("2018-08-01")
 #' }
 #' @export
@@ -786,7 +786,7 @@ get_cansim_changed_tables <- function(start_date){
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_notes("34-10-0013")
 #' }
 #' @export

@@ -77,7 +77,7 @@ rename_vectors <- function(data,vectors){
 #' @return A tibble with data for vectors released between start and end time
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_vector("v41690973","2015-01-01")
 #' }
 #' @export
@@ -126,7 +126,7 @@ get_cansim_vector<-function(vectors, start_time, end_time=Sys.time(), use_ref_da
 #' @return A tibble with data for specified vector(s) for the last N periods
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_vector_for_latest_periods("v41690973",10)
 #' }
 #' @export
@@ -172,7 +172,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
 #' @return A tibble with data matching specified coordinate and period input arguments
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12.0.0.0.0.0.0.0.0",periods=3)
 #' }
 #' @export
@@ -207,7 +207,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
 #' @return A tibble with metadata for selected vectors
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_vector_info("v41690973")
 #' }
 #' @export

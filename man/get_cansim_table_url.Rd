@@ -18,7 +18,7 @@ String object containing URL for specified table number
 Retrieve URL of a table from the API given a table number. Offers a more stable approach than manually guessing the URL of the table.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_url("34-10-0013")
 get_cansim_table_url("34-10-0013", language = "fr")
 }
