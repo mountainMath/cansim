@@ -1,3 +1,8 @@
+## cansim 0.3.5
+### Minor changes
+- Exclude all vignettes and example code from compilation as this may cause CRAN check errors when StatCan servers are down or otherwise temporarily unavailable
+
+
 ## cansim 0.3.4
 
 ### Minor changes

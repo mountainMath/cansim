@@ -8,7 +8,8 @@ output: rmarkdown::html_vignette
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   collapse=TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 ```
 This vignette details how to use the internal table search functions in the `cansim` package with a simple example using employment data for economic regions in British Columbia. 

@@ -38,3 +38,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Expand get_cansim_table_notes functionality
 * Add functionality to access the new cube list API
 
+## Changes from version 0.3.4
+
+* Exclude all vignettes and example code from compilation as this may cause CRAN check errors when StatCan servers are down or otherwise temporarily unavailable
+
+

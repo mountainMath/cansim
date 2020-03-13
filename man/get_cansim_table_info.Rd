@@ -24,6 +24,7 @@ get_cansim_table_info(
 Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
+\donttest{
 get_cansim_table_info("34-10-0013")
-
+}
 }

@@ -7,7 +7,8 @@ output: rmarkdown::html_vignette
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 ```
 This vignette showcases how to utilize the metadata information by drilling into North American Industry Classification System (NAICS) categories and the hierarchy metadata that is downloaded with tables that have hierarchical data. 

@@ -87,7 +87,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
       </span>
     </div>
 
@@ -182,9 +182,26 @@ start and end dates, achieve status, subject and survey codes, frequency codes a
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'>list_cansim_cubes</span>()
-}</div></pre>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'>list_cansim_cubes</span>()</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5,393 x 17</span><span>
+#&gt;    cansim_table_nu… cubeTitleEn cubeTitleFr productId cansimId cubeStartDate
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span>       
+#&gt; </span><span style='color: #555555;'> 1</span><span> 10-10-0001       Federal pu… Emploi du … 10100001  183-0021 1999-01-01   
+#&gt; </span><span style='color: #555555;'> 2</span><span> 10-10-0002       Central go… Dette du g… 10100002  191-0002 2009-04-01   
+#&gt; </span><span style='color: #555555;'> 3</span><span> 10-10-0003       Capital ma… Activités … 10100003  176-0079 1975-01-01   
+#&gt; </span><span style='color: #555555;'> 4</span><span> 10-10-0004       Chartered … Banques à … 10100004  176-0013 1978-04-01   
+#&gt; </span><span style='color: #555555;'> 5</span><span> 10-10-0005       Canadian C… Classifica… 10100005  385-0041 2008-01-01   
+#&gt; </span><span style='color: #555555;'> 6</span><span> 10-10-0006       Funds adva… Avances de… 10100006  176-0091 2013-01-01   
+#&gt; </span><span style='color: #555555;'> 7</span><span> 10-10-0007       Net new is… Émissions … 10100007  176-0082 1975-03-01   
+#&gt; </span><span style='color: #555555;'> 8</span><span> 10-10-0008       Foreign ex… Taux de ch… 10100008  176-0067 1950-10-02   
+#&gt; </span><span style='color: #555555;'> 9</span><span> 10-10-0009       Foreign ex… Taux de ch… 10100009  176-0064 1950-10-01   
+#&gt; </span><span style='color: #555555;'>10</span><span> 10-10-0010       Sales of a… Ventes de … 10100010  183-0023 2004-01-01   
+#&gt; </span><span style='color: #555555;'># … with 5,383 more rows, and 11 more variables: cubeEndDate </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span style='color: #555555;'>,
+#&gt; #   archived </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span style='color: #555555;'>, subjectCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, frequencyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,
+#&gt; #   corrections </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, dimensions </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyEn </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyFr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,
+#&gt; #   subjectEn </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, subjectFr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'># }
+
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

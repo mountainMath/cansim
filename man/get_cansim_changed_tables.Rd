@@ -16,6 +16,7 @@ A tibble with Statistics Canada data table product ids and their release times
 Retrieve a list of tables that have been modified or updated since the specified date.
 }
 \examples{
+\donttest{
 get_cansim_changed_tables("2018-08-01")
-
+}
 }

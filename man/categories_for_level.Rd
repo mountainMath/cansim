@@ -29,3 +29,9 @@ A vector of categories
 \description{
 For tables with data with hierarchical categories, metadata containing hierarchy level descriptions is used to extract categories at a specified level of hierarchy only.
 }
+\examples{
+\donttest{
+data <- get_cansim("16-10-0117")
+categories_for_level(data,"North American Industry Classification System (NAICS)",level=2)
+}
+}
