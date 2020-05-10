@@ -15,23 +15,29 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -41,10 +47,10 @@
 
   <link href="../extra.css" rel="stylesheet">
   
-<meta property="og:title" content="Function reference" />
 
-<meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Function reference" />
+<meta property="og:image" content="https://mountainmath.github.io/cansim/index.html/logo.png" />
+
 
 
 
@@ -71,7 +77,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-index">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -116,19 +122,36 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
+    <li class="divider"></li>
     <li>
-      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+      <a href="../articles/index.html">More...</a>
     </li>
   </ul>
 </li>
-<li>
-  <a href="../news/index.html">Changelog</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    News
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-2-2">Version 0.2</a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <a href="../news/index.html">Changelog</a>
+    </li>
+  </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/mountainMath/cansim">
+  <a href="https://github.com/mountainMath/cansim/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -160,41 +183,16 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-retrieving-data" class="hasAnchor"><a href="#section-retrieving-data" class="anchor"></a>Retrieving data</h2>
+          <p class="section-desc"><p>Retrieve data cubes, tables, and vectors from Statistics Canada</p></p>
         </th>
       </tr>
+      
+      
+    </tbody><tbody>
+      
+      
       <tr>
-        
-        <td>
-          <p><code><a href="add_provincial_abbreviations.html">add_provincial_abbreviations()</a></code> </p>
-        </td>
-        <td><p>Add provincial abbreviations as factor</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="adjust_cansim_values_by_variable.html">adjust_cansim_values_by_variable()</a></code> </p>
-        </td>
-        <td><p>(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="cansim_old_to_new.html">cansim_old_to_new()</a></code> </p>
-        </td>
-        <td><p>Translate deprecated CANSIM table number into new NDM-format table catalogue number</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="categories_for_level.html">categories_for_level()</a></code> </p>
-        </td>
-        <td><p>Use metadata to extract categories for column of specific level</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="correspondence.html">correspondence</a></code> </p>
-        </td>
-        <td><p>The correspondence file for old to new StatCan table numbers is included in the package</p></td>
-      </tr><tr>
         
         <td>
           <p><code><a href="get_cansim.html">get_cansim()</a></code> </p>
@@ -203,33 +201,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="get_cansim_changed_tables.html">get_cansim_changed_tables()</a></code> </p>
+          <p><code><a href="get_cansim_ndm.html">get_cansim_ndm()</a></code> </p>
         </td>
-        <td><p>Retrieve a list of modified tables since a given date</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cansim_code_set.html">get_cansim_code_set()</a></code> </p>
-        </td>
-        <td><p>Get NDM code sets</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cansim_column_categories.html">get_cansim_column_categories()</a></code> </p>
-        </td>
-        <td><p>Retrieve Statistics Canada data table categories for a specific column</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cansim_column_list.html">get_cansim_column_list()</a></code> </p>
-        </td>
-        <td><p>Retrieve Statistics Canada data table column list</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cansim_cube_metadata.html">get_cansim_cube_metadata()</a></code> </p>
-        </td>
-        <td><p>Retrieve table metadata from Statistics Canada API</p></td>
+        <td><p>Retrieve a Statistics Canada data table using NDM catalogue number</p></td>
       </tr><tr>
         
         <td>
@@ -239,9 +213,77 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="get_cansim_ndm.html">get_cansim_ndm()</a></code> </p>
+          <p><code><a href="get_cansim_vector.html">get_cansim_vector()</a></code> </p>
         </td>
-        <td><p>Retrieve a Statistics Canada data table using NDM catalogue number</p></td>
+        <td><p>Retrieve data for a Statistics Canada data vector released within a given time frame</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods()</a></code> </p>
+        </td>
+        <td><p>Retrieve data for specified Statistics Canada data vector(s) for last N periods</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-locating-data" class="hasAnchor"><a href="#section-locating-data" class="anchor"></a>Locating data</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="list_cansim_cubes.html">list_cansim_cubes()</a></code> </p>
+        </td>
+        <td><p>Get overview list for all Statistics Canada data cubes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="list_cansim_tables.html">list_cansim_tables()</a></code> </p>
+        </td>
+        <td><p>Get overview list for all Statistics Canada data tables</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="search_cansim_cubes.html">search_cansim_cubes()</a></code> </p>
+        </td>
+        <td><p>Search through Statistics Canada data cubes</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="search_cansim_tables.html">search_cansim_tables()</a></code> </p>
+        </td>
+        <td><p>Search through Statistics Canada data tables</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_cansim_changed_tables.html">get_cansim_changed_tables()</a></code> </p>
+        </td>
+        <td><p>Retrieve a list of modified tables since a given date</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-metadata-and-information" class="hasAnchor"><a href="#section-metadata-and-information" class="anchor"></a>Metadata and information</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="get_cansim_cube_metadata.html">get_cansim_cube_metadata()</a></code> </p>
+        </td>
+        <td><p>Retrieve table metadata from Statistics Canada API</p></td>
       </tr><tr>
         
         <td>
@@ -287,34 +329,47 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="get_cansim_vector.html">get_cansim_vector()</a></code> </p>
-        </td>
-        <td><p>Retrieve data for a Statistics Canada data vector released within a given time frame</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods()</a></code> </p>
-        </td>
-        <td><p>Retrieve data for specified Statistics Canada data vector(s) for last N periods</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="get_cansim_vector_info.html">get_cansim_vector_info()</a></code> </p>
         </td>
         <td><p>Retrieve metadata for specified Statistics Canada data vectors</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="list_cansim_cubes.html">list_cansim_cubes()</a></code> </p>
+          <p><code><a href="get_cansim_column_categories.html">get_cansim_column_categories()</a></code> </p>
         </td>
-        <td><p>Get overview list for all Statistics Canada data cubes</p></td>
+        <td><p>Retrieve Statistics Canada data table categories for a specific column</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="list_cansim_tables.html">list_cansim_tables()</a></code> </p>
+          <p><code><a href="get_cansim_column_list.html">get_cansim_column_list()</a></code> </p>
         </td>
-        <td><p>Get overview list for all Statistics Canada data tables</p></td>
+        <td><p>Retrieve Statistics Canada data table column list</p></td>
       </tr><tr>
+        
+        <td>
+          <p><code><a href="view_cansim_webpage.html">view_cansim_webpage()</a></code> </p>
+        </td>
+        <td><p>View CANSIM table information in browser</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="categories_for_level.html">categories_for_level()</a></code> </p>
+        </td>
+        <td><p>Use metadata to extract categories for column of specific level</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-data-transformation" class="hasAnchor"><a href="#section-data-transformation" class="anchor"></a>Data transformation</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
         
         <td>
           <p><code><a href="normalize_cansim_values.html">normalize_cansim_values()</a></code> </p>
@@ -323,31 +378,49 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="search_cansim_cubes.html">search_cansim_cubes()</a></code> </p>
+          <p><code><a href="adjust_cansim_values_by_variable.html">adjust_cansim_values_by_variable()</a></code> </p>
         </td>
-        <td><p>Search through Statistics Canada data cubes</p></td>
+        <td><p>(Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-miscellaneous" class="hasAnchor"><a href="#section-miscellaneous" class="anchor"></a>Miscellaneous</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="add_provincial_abbreviations.html">add_provincial_abbreviations()</a></code> </p>
+        </td>
+        <td><p>Add provincial abbreviations as factor</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="search_cansim_tables.html">search_cansim_tables()</a></code> </p>
+          <p><code><a href="cansim_old_to_new.html">cansim_old_to_new()</a></code> </p>
         </td>
-        <td><p>Search through Statistics Canada data tables</p></td>
+        <td><p>Translate deprecated CANSIM table number into new NDM-format table catalogue number</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="view_cansim_webpage.html">view_cansim_webpage()</a></code> </p>
+          <p><code><a href="get_cansim_code_set.html">get_cansim_code_set()</a></code> </p>
         </td>
-        <td><p>View CANSIM table information in browser</p></td>
+        <td><p>Get NDM code sets</p></td>
       </tr>
     </tbody>
     </table>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
-    </ul>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -358,7 +431,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
