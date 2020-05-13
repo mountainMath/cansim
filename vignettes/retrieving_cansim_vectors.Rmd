@@ -1,5 +1,7 @@
 ---
 title: "Retrieving individual Statistics Canada vectors"
+description: >
+  A worked example showing how to retrieve individual data vectors instead of entire tables. 
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -41,7 +43,6 @@ get_cansim_vector(vectors, "2017-01-01")
 ### get_cansim_vectors_for_latest_periods()
 
 Some vectors extend backwards for a significant number of periods that may not be of interest. `get_cansim_vectors_for_lates_periods()` is a wrapper around `get_cansim_vectors` that takes a `periods` input instead of arguments for `start_time` and `end_time`, and provides data for the selected vector(s) for the last `n` periods for which data is available, irrespective of dates. 
-
 ```{r}
 get_cansim_vector_for_latest_periods("v41690973", periods = 60)
 ```
@@ -57,7 +58,6 @@ The convenience function `normalize_cansim_values()` works for data retrieved by
 ### Putting it all together
 
 This quick example uses a list with two named vectors and a starting date as an input value, converts values ("normalizes") on the fly, and prepares a simple `ggplot2` graphic.
-
 ```{r}
 
 vectors <- c("Canadian CPI"="v41690973",
@@ -72,7 +72,6 @@ ggplot(data,aes(x=Date,y=VALUE,color=label)) +
        subtitle = "Seasonally-unadjusted, all-items (2002 = 100)",
        caption=paste0("CANSIM vectors ",paste0(vectors,collapse = ", ")),x="",y="",color="")
 ```
-
 To access metadata for vectors we can use the `get_cansim_vector_info` call
 ```{r}
 get_cansim_vector_info(vectors)
