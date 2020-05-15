@@ -1,15 +1,61 @@
-pandoc: 2.2.1
-pkgdown: 1.3.0
+pandoc: 2.3.1
 pkgdown_sha: ~
+
+url: https://mountainmath.github.io/cansim/index.html
+
+home:
+  title: Retrieve and work with public Statistics Canada data tables in R
+
+reference:
+  - title: Retrieving data
+    desc: Retrieve data cubes, tables, and vectors from Statistics Canada
+  - contents:
+    - get_cansim
+    - get_cansim_ndm
+    - get_cansim_data_for_table_coord_periods
+    - get_cansim_vector
+    - get_cansim_vector_for_latest_periods
+  - title: Locating data
+  - contents:
+    - list_cansim_cubes
+    - list_cansim_tables
+    - search_cansim_cubes
+    - search_cansim_tables
+    - get_cansim_changed_tables
+  - title: Metadata and information
+  - contents:
+    - get_cansim_cube_metadata
+    - starts_with("get_cansim_table_")
+    - get_cansim_vector_info
+    - get_cansim_column_categories
+    - get_cansim_column_list
+    - view_cansim_webpage
+    - categories_for_level
+  - title: Data transformation
+  - contents:
+    - normalize_cansim_values
+    - adjust_cansim_values_by_variable
+  - title: Miscellaneous
+  - contents:
+    - add_provincial_abbreviations
+    - cansim_old_to_new
+    - get_cansim_code_set
 articles:
-  - title: "Getting started with the cansim package"
-    contents: cansim
-  - title: "Listing and searching through available tables"
-    contents: listing_cansim_tables
-  - title: "Retrieving individual vector series"
-    contents: retrieving_cansim_vectors
-  - title: "Working with table hierarchies"
+  - title: "Finding and retrieving data"
+    navbar: ~
+    contents:
+      - listing_cansim_tables
+      - retrieving_cansim_vectors
+  - title: "Working with data"
     contents: working_with_hierarchies
+
+news:
+  releases:
+  - text: "Version 0.3"
+    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0
+  - text: "Version 0.2"
+    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-2-2
+
 authors:
   Jens von Bergmann:
     href: https://mountainmath.ca
