@@ -3,17 +3,22 @@ title: "Working with Statistics Canada data table object hierarchies"
 description: >
   Data retrieved from Statistics Canada frequently has complicated hierarchical structures. The cansim provides convenience tools to make it easier to work with these structures. 
 author: ""
-date: "2020-05-14"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 ---
-
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = nzchar(Sys.getenv("COMPILE_VIG"))
+)
+```
 This vignette showcases how to utilize the metadata information by drilling into North American Industry Classification System (NAICS) categories and the hierarchy metadata that is downloaded with tables that have hierarchical data. 
 
 ### Retrieving metadata
 
 The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
-
-```r
+```{r}
 library(cansim)
 
 # select a table number
@@ -21,28 +26,14 @@ table_id = "36-10-0402"
 
 # get table overview
 get_cansim_table_overview(table_id)
-#> Gross domestic product (GDP) at basic prices, by industry, provinces and territories
-#> CANSIM Table 36-10-0402
-#> Start Reference Period: 1997-01-01, End Reference Period: 2018-01-01, Frequency: Annual
-#> 
-#> Column Geography (13)
-#> Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...
-#> 
-#> Column Value (3)
-#> Current dollars, Chained (2012) dollars, Contributions to percent change
-#> 
-#> Column North American Industry Classification System (NAICS) (337)
-#> All industries, Goods-producing industries, Service-producing industries, Industrial production, Non-durable manufacturing industries, Durable manufacturing industries, Information and communication technology sector, Information and communication technology, manufacturing, Information and communication technology, services, Energy sector, ...
 ```
 
 ### Accessing table data
-We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "Chained (2012) dollars". 
-
-```r
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Value))$Value)`". 
+```{r}
 library(dplyr)
 
 data <- get_cansim(table_id) 
-#> Reading CANSIM NDM product 36-10-0402 from cache.
 
 selected_value = data$Value[grepl("Chained",data$Value)] %>% unique()
 data <- data %>% 
@@ -52,8 +43,7 @@ data <- data %>%
 ### Normalizing variables
 
 There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called `normalize_cansim_values()`. By default, downloaded CANSIM data contains a `VALUE` and a `SCALAR_FACTOR` field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the `normalize_cansim_values()` function will apply the appropriate conversion based on the scale variable so that the `VALUE` value is more straight-forward to work with. The default data also includes a character string `REF_DATE` field, which the `normalize_cansim_values()` function will attempt to convert into a standard date-class variable.
-
-```r
+```{r}
 data <- data %>% 
   normalize_cansim_values(strip_classification_code = TRUE)
 ```
@@ -63,8 +53,7 @@ data <- data %>%
 This table includes all the different levels of NAICS categories in one dimension. This makes working with the data at that level rather cumbersome when we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let's first get an overview of the data. We can also use this to easily compute shares instead of totals.
 
 We can extract the hierarchy using the built-in convenience function `categories_for_level` which takes in a `cansim`-package retrieved data table object with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract. 
-
-```r
+```{r}
 # Extract top-level hierarchy to calculate total
 top_level <- categories_for_level(data, "North American Industry Classification System (NAICS)",0)
 
@@ -80,14 +69,12 @@ total_data <- data %>%
 data <- data %>% 
   left_join(total_data) %>% 
   mutate(Share = VALUE/Total)
-#> Joining, by = c("GEO", "Date")
 ```
 
 ### Hierarchies in more detail 
 
 There are hundreds of NAICS codes here which is too many to make sense of at the same time. We can use `categories_for_level` again to reduce our NAICS codes just to the first sub-level which represents the industry groups. We can call this subset `cut_data`. (Note that the NAICS data also includes composite groups of industries, something like a level 0.5 hierarchy, which are prefixed with a "T" and which we want to remove as well.)
-
-```r
+```{r}
 cut_data <- data %>% filter(
   !grepl("T\\d+",`Classification Code for North American Industry Classification System (NAICS)`),
   `North American Industry Classification System (NAICS)` %in% 
@@ -96,9 +83,8 @@ cut_data <- data %>% filter(
 # How many are NAICS categories left? 
 n <- length(cut_data$`North American Industry Classification System (NAICS)` %>% unique)
 ```
-There are still 22 level 1 categories, too many to sensibly visualize at the same time. We can use `dplyr` functions to identify the top categories and group the rest so that we can have a plot that is easier to understand. 
-
-```r
+There are still `r n` level 1 categories, too many to sensibly visualize at the same time. We can use `dplyr` functions to identify the top categories and group the rest so that we can have a plot that is easier to understand. 
+```{r fig.height=6, fig.width=9}
 # Specify which regions and period we want to look at 
 regions = "British Columbia"
 period = "2017-01-01"
@@ -119,8 +105,7 @@ plot_data <- cut_data %>%
   ungroup()
 ```
 With the data prepared, the last step is putting it all together into a visualization using `ggplot2`. We can then see if any further adjustments are required. 
-
-```r
+```{r fig.height=6, fig.width=9}
 library(ggplot2)
 
 ggplot(plot_data %>% 
@@ -135,12 +120,10 @@ ggplot(plot_data %>%
        subtitle=selected_value,
        x="", fill = "", 
        caption=paste0("CANSIM ", table_id))
+
 ```
-
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
-
-```r
+```{r fig.height=10, fig.width=9, warning=FALSE}
 real_construction <- c("Construction","Real estate and rental and leasing")
 
 # Get the NAICS hierarchy codes just for these categories
@@ -174,7 +157,5 @@ ggplot(rrl_data %>% filter(GEO %in% regions),
        x="",
        caption=paste0("CANSIM ", table_id))
 ```
-
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction. 
 

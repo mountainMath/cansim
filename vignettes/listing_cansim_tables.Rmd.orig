@@ -3,11 +3,17 @@ title: "Listing Statistics Canada data tables"
 description: >
   An example of how to identify and search for available datasets using the cansim package.
 author: ""
-date: "2020-05-14"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 ---
 
-
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse=TRUE,
+  comment = "#>",
+  eval = nzchar(Sys.getenv("COMPILE_VIG"))
+)
+```
 This vignette details how to use the internal table search functions in the `cansim` package with a simple example using employment data for economic regions in British Columbia. 
 
 ### A note on caching and refreshing table lists
@@ -17,40 +23,21 @@ As the table search function requires a full scrape of Statistics Canada's data 
 ### Listing and filtering tables
 
 Calling `list_cansim_tables` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
-
-```r
+```{r}
 library(cansim)
 
 names(list_cansim_tables())
-#> Your CANSIM table overview data is 63 days old.
-#> Consider refreshing the table via list_cansim_tables(refresh=TRUE)
-#>  [1] "title"                      "title_en"                   "title_fr"                  
-#>  [4] "keywords_en"                "keywords"                   "keywords_fr"               
-#>  [7] "notes"                      "notes_en"                   "notes_fr"                  
-#> [10] "state"                      "subject"                    "date_published"            
-#> [13] "frequency"                  "revision_id"                "time_period_coverage_start"
-#> [16] "time_period_coverage_end"   "metadata_created"           "metadata_modified"         
-#> [19] "url_en"                     "url_fr"                     "cansim_table_number"
 ```
 The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. 
-
-```r
+```{r}
 library(dplyr)
 
 list_cansim_tables() %>% 
   filter(grepl("Labour force characteristics",title), grepl("economic region",title)) %>% 
   select("cansim_table_number","title")
-#> Your CANSIM table overview data is 63 days old.
-#> Consider refreshing the table via list_cansim_tables(refresh=TRUE)
-#> # A tibble: 2 x 2
-#>   cansim_table_number title                                                                                     
-#>   <chr>               <chr>                                                                                     
-#> 1 14-10-0293          Labour force characteristics by economic region, three-month moving average, unadjusted f…
-#> 2 14-10-0090          Labour force characteristics by province, territory and economic region, annual
 ```
 The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the `tidyr` package here to reshape data from a long format to a wider format. 
-
-```r
+```{r}
 library(tidyr)
 
 selected_table <- "14-10-0293"
@@ -62,11 +49,9 @@ data <-get_cansim(selected_table) %>%
          `Labour force characteristics`=="Unemployment rate") %>%
   select(Date, GEO, Statistics, VALUE) %>%
   spread(key="Statistics", value=VALUE)
-#> Reading CANSIM NDM product 14-10-0293 from cache.
 ```
 We can visualize then results with `ggplot2`. 
-
-```r
+```{r}
 library(ggplot2)
 ggplot(data, aes(x=Date, group = GEO,y=Estimate)) +
   geom_ribbon(aes(ymin=Estimate - `Standard error of estimate`,
@@ -82,7 +67,5 @@ ggplot(data, aes(x=Date, group = GEO,y=Estimate)) +
        color = "",
        caption=paste0("CANSIM ", selected_table))
 ```
-
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
 
 
