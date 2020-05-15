@@ -1,7 +1,7 @@
 ---
 title: "Getting started with the cansim package"
 author: ""
-date: "`r Sys.Date()`"
+date: "2020-03-18"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{"Getting started with the cansim package"}
@@ -9,27 +9,22 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-	collapse = TRUE,
-	comment = "#>",
-	eval = nzchar(Sys.getenv("COMPILE_VIG"))
-)
-library(cansim)
-```
+
 
 ### About
 
-The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and frequently referred to in this package, and elsewhere, as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table catalogue numbers. 
+The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and frequently referred to in this package, and elsewhere, as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table catalogue numbers.
 
 ### Installing cansim
 
 The `cansim` package is available on CRAN and can be installed directly using the default package installation process:
-```{r, eval = FALSE}
+
+```r
 install.packages("cansim")
 ```
 Alternatively, the latest development version of the package can be downloaded from [Github](https://github.com/mountainMath/cansim) using the [devtools](https://cran.r-project.org/package=devtools) or [remotes](https://cran.r-project.org/package=remotes) packages.
-```{r load_package_cran, echo=TRUE, message=FALSE, warning=FALSE, eval = FALSE}
+
+```r
 # install.packages("remotes")
 remotes::install_github("mountainmath/cansim")
 
@@ -39,45 +34,119 @@ library(cansim)
 ### Usage
 
 If you know the data table catalogue number you are interested in, use `get_cansim` to download the entire table.
-```{r}
+
+```r
 data <- get_cansim("14-10-0293")
+#> Accessing CANSIM NDM product 14-10-0293 from Statistics Canada
+#> Parsing data
+#> Folding in metadata
 head(data)
+#> # A tibble: 6 x 21
+#>   REF_DATE GEO   DGUID `Labour force c~ Statistics UOM   UOM_ID SCALAR_FACTOR SCALAR_ID VECTOR COORDINATE   VALUE STATUS SYMBOL TERMINATED DECIMALS GeoUID
+#>   <chr>    <chr> <chr> <chr>            <chr>      <chr> <chr>  <chr>         <chr>     <chr>  <chr>        <dbl> <chr>  <chr>  <chr>      <chr>    <chr> 
+#> 1 2001-03  Cana~ 2016~ Population       Estimate   Pers~ 249    thousands     3         v9141~ 1.1.1      24281.  <NA>   <NA>   <NA>       1        11124 
+#> 2 2001-03  Cana~ 2016~ Labour force     Estimate   Pers~ 249    thousands     3         v9141~ 1.2.1      15758.  <NA>   <NA>   <NA>       1        11124 
+#> 3 2001-03  Cana~ 2016~ Labour force     Standard ~ Pers~ 249    thousands     3         v1018~ 1.2.2         33   <NA>   <NA>   <NA>       1        11124 
+#> 4 2001-03  Cana~ 2016~ Labour force     Standard ~ Pers~ 249    thousands     3         v1018~ 1.2.3         NA   ..     <NA>   <NA>       1        11124 
+#> 5 2001-03  Cana~ 2016~ Employment       Estimate   Pers~ 249    thousands     3         v9141~ 1.3.1      14572.  <NA>   <NA>   <NA>       1        11124 
+#> 6 2001-03  Cana~ 2016~ Employment       Standard ~ Pers~ 249    thousands     3         v1018~ 1.3.2         36.3 <NA>   <NA>   <NA>       1        11124 
+#> # ... with 4 more variables: `Classification Code for Labour force characteristics` <chr>, `Hierarchy for Labour force characteristics` <chr>, `Classification Code
+#> #   for Statistics` <chr>, `Hierarchy for Statistics` <chr>
 ```
 By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into a cleaner data object and to use the included data to transform values by their appropriate scaling or unit variable. This makes it easier to work on the data directly and minimize unnecessary data manipulation. For example, data may be reported as a value in "millions" but with unitless numbers. A built-in convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
-```{r}
+
+```r
 library(dplyr)
-data <- get_cansim("14-10-0293") %>% 
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
+data <- get_cansim("14-10-0293") %>%
   normalize_cansim_values
+#> Reading CANSIM NDM product 14-10-0293 from cache.
 head(data)
+#> # A tibble: 6 x 20
+#>   REF_DATE GEO   DGUID `Labour force c~ Statistics UOM   UOM_ID VECTOR COORDINATE   VALUE STATUS SYMBOL TERMINATED DECIMALS GeoUID `Classification~ `Hierarchy for ~
+#>   <chr>    <chr> <chr> <chr>            <chr>      <chr> <chr>  <chr>  <chr>        <dbl> <chr>  <chr>  <chr>      <chr>    <chr>  <chr>            <chr>           
+#> 1 2001-03  Cana~ 2016~ Population       Estimate   Pers~ 249    v9141~ 1.1.1       2.43e7 <NA>   <NA>   <NA>       1        11124  <NA>             1               
+#> 2 2001-03  Cana~ 2016~ Labour force     Estimate   Pers~ 249    v9141~ 1.2.1       1.58e7 <NA>   <NA>   <NA>       1        11124  <NA>             1.2             
+#> 3 2001-03  Cana~ 2016~ Labour force     Standard ~ Pers~ 249    v1018~ 1.2.2       3.30e4 <NA>   <NA>   <NA>       1        11124  <NA>             1.2             
+#> 4 2001-03  Cana~ 2016~ Labour force     Standard ~ Pers~ 249    v1018~ 1.2.3      NA      ..     <NA>   <NA>       1        11124  <NA>             1.2             
+#> 5 2001-03  Cana~ 2016~ Employment       Estimate   Pers~ 249    v9141~ 1.3.1       1.46e7 <NA>   <NA>   <NA>       1        11124  <NA>             1.2.3           
+#> 6 2001-03  Cana~ 2016~ Employment       Standard ~ Pers~ 249    v1018~ 1.3.2       3.63e4 <NA>   <NA>   <NA>       1        11124  <NA>             1.2.3           
+#> # ... with 3 more variables: `Classification Code for Statistics` <chr>, `Hierarchy for Statistics` <chr>, Date <date>
 ```
-Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the `get_cansim_table_overview(table_number)` function. 
-```{r}
+Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the `get_cansim_table_overview(table_number)` function.
+
+```r
 get_cansim_table_overview("14-10-0293")
+#> Labour force characteristics by economic region, three-month moving average, unadjusted for seasonality, last 5 months
+#> CANSIM Table 14-10-0293
+#> Start Reference Period: 2001-03-01, End Reference Period: 2020-02-01, Frequency: Monthly
+#> 
+#> Column Geography (76)
+#> Canada, Newfoundland and Labrador, Avalon Peninsula, Newfoundland and Labrador, South Coast-Burin Peninsula and Notre Dame-Central Bonavista Bay, Newfoundland and Labrador, West Coast-Northern Peninsula-Labrador, Newfoundland and Labrador, Prince Edward Island, Nova Scotia, Cape Breton, Nova Scotia, North Shore, Nova Scotia, Annapolis Valley, Nova Scotia, ...
+#> 
+#> Column Labour force characteristics (10)
+#> Population, Labour force, Employment, Full-time employment, Part-time employment, Unemployment, Not in labour force, Unemployment rate, Participation rate, Employment rate
+#> 
+#> Column Statistics (3)
+#> Estimate, Standard error of estimate, Standard error of year-over-year change
 ```
 When a table number is unknown, you can browse the available tables or search by survey name, keyword or title.
-```{r}
+
+```r
 search_cansim_tables("housing price indexes")
+#> # A tibble: 11 x 21
+#>    title title_en title_fr keywords_en keywords keywords_fr notes notes_en notes_fr state subject date_published frequency revision_id time_period_cov~
+#>    <chr> <chr>    <chr>    <chr>       <chr>    <chr>       <chr> <chr>    <chr>    <chr> <chr>   <chr>          <chr>     <chr>       <chr>           
+#>  1 Resi~ Residen~ Indice ~ housing, h~ housing~ housing, h~ <p>R~ <p>Resi~ <p>Indi~ acti~ econom~ 2020-01-29 08~ P3M       1afb8a35-7~ 2017-01-01 00:0~
+#>  2 New ~ New hou~ Indice ~ constructi~ constru~ constructi~ <p>N~ <p>New ~ <p>Indi~ acti~ econom~ 2020-02-20 08~ P1Y       bcf699b7-4~ 2017-01-01 00:0~
+#>  3 Buil~ Buildin~ Indices~ housing, h~ housing~ housing, h~ <p>B~ <p>Buil~ <p>Indi~ acti~ econom~ 2020-02-06 08~ P3M       f309593c-0~ 1981-01-01 00:0~
+#>  4 New ~ New hou~ Indice ~ constructi~ constru~ constructi~ <p>N~ <p>New ~ <p>Indi~ acti~ econom~ 2020-02-20 08~ P1M       ee45fd0b-0~ 1981-01-01 00:0~
+#>  5 Resi~ Residen~ Indice ~ housing, h~ housing~ housing, h~ <p>R~ <p>Resi~ <p>Les ~ acti~ econom~ 2019-11-14 08~ P1Y       d6a7c8d3-5~ 2017-01-01 00:0~
+#>  6 Pric~ Price i~ Indices~ housing, h~ housing~ housing, h~ <p>T~ <p>This~ Ce tabl~ acti~ econom~ 2017-02-27 08~ P3M       b8454b05-c~ 1986-01-01 00:0~
+#>  7 New ~ New hou~ Indices~ constructi~ constru~ constructi~ This~ This ta~ Ce tabl~ acti~ econom~ 2017-02-27 08~ P1M       6c21294a-9~ 1981-01-01 00:0~
+#>  8 New ~ New hou~ Indices~ constructi~ constru~ constructi~ This~ This ta~ Ce tabl~ acti~ econom~ 2017-02-27 08~ P1M       35fc176d-3~ 1981-01-01 00:0~
+#>  9 Pric~ Price i~ Indices~ housing, h~ housing~ housing, h~ This~ This ta~ Ce tabl~ acti~ econom~ 2017-02-27 08~ P3M       f7abbbfd-0~ 1981-01-01 00:0~
+#> 10 Non-~ Non-res~ Indice ~ constructi~ constru~ constructi~ <p>A~ <p>Arch~ <p>Arch~ acti~ econom~ 2018-05-23 08~ P3M       592129f5-2~ 1981-01-01 00:0~
+#> 11 New ~ New hou~ Indice ~ constructi~ constru~ constructi~ Mont~ Monthly~ Indice ~ acti~ econom~ 2017-03-09 08~ P1Y       38bfc609-7~ 2007-01-01 00:0~
+#> # ... with 6 more variables: time_period_coverage_end <chr>, metadata_created <chr>, metadata_modified <chr>, url_en <chr>, url_fr <chr>, cansim_table_number <chr>
 ```
 Individual series in Statistics Canada data tables can also be accessed by using individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the `cansim` package allows users to specify named vectors, where the `label` field will be added to the returned data frame containing the specified name for each vector.
-```{r}
+
+```r
 get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
                     "Metro Van CPI"="v41692930"),
                   start_time = "2015-05-01",
                   end_time="2015-08-01")
+#> # A tibble: 5 x 10
+#>   DECIMALS VALUE REF_DATE   releaseTime      SYMBOL frequencyCode SCALAR_ID COORDINATE           VECTOR    label                                       
+#>      <int> <dbl> <chr>      <chr>             <int>         <int>     <int> <chr>                <chr>     <chr>                                       
+#> 1        1  122. 2015-05-01 2018-06-12T08:30      0             6         0 27.2.0.0.0.0.0.0.0.0 v41692930 Metro Van CPI                               
+#> 2        1  122. 2015-06-01 2018-06-12T08:30      0             6         0 27.2.0.0.0.0.0.0.0.0 v41692930 Metro Van CPI                               
+#> 3        1  122. 2015-07-01 2018-06-12T08:30      0             6         0 27.2.0.0.0.0.0.0.0.0 v41692930 Metro Van CPI                               
+#> 4        1  123. 2015-08-01 2018-06-12T08:30      0             6         0 27.2.0.0.0.0.0.0.0.0 v41692930 Metro Van CPI                               
+#> 5        1  153  2015-07-01 2015-11-10T08:30      0             9         0 8.7.1.0.0.0.0.0.0.0  v44176267 Metro Van Apartment Construction Price Index
 ```
 
 ### License
 
+
 The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that: 
 ```
 Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive licence to:
- 
+
   - use, reproduce, publish, freely distribute, or sell the Information;
   - use, reproduce, publish, freely distribute, or sell Value-added Products; and,
   - sublicence any or all such rights, under terms consistent with this agreement.
 
 In doing any of the above, you shall:
- 
+
   - reproduce the Information accurately;
   - not use the Information in a way that suggests that Statistics Canada endorses you or your use of the Information;
   - not misrepresent the Information or its source;
@@ -95,7 +164,7 @@ Acknowledgment of Source
 (a) You shall include and maintain the following notice on all licensed rights of the Information:
 
   - Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
- 
+
 (b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
 
   - Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.
