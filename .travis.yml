@@ -1,5 +1,14 @@
-language: r
-cache: packages
+language: R
+cache:
+  - packages
+  - ccache
 sudo: false
 latex: false
 pandoc: false
+os: linux
+dist:
+  - xenial
+  - bionic
+
+r:
+  - release
