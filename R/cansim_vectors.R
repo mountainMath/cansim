@@ -20,7 +20,7 @@ extract_vector_data <- function(data1){
       x[sapply(x, is.null)] <- NA
       unlist(x)
     }) %>%
-      tibble::as.tibble() %>%
+      tibble::as_tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
              VECTOR=paste0("v",d$object$vectorId))
     value_data
@@ -47,7 +47,7 @@ extract_vector_metadata <- function(data1){
       if (is.null(x)) x <- NA
       x
     }) %>%
-      tibble::as.tibble()
+      tibble::as_tibble()
     value_data
   }) %>%
     dplyr::bind_rows() %>%
