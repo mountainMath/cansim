@@ -6,9 +6,7 @@ sudo: false
 latex: false
 pandoc: false
 os: linux
-dist:
-  - xenial
-  - bionic
+dist: bionic
 
 r:
   - release
