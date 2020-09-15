@@ -179,7 +179,7 @@
     <p>Retrieve a list of tables that have been modified or updated since the specified date.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_changed_tables</span>(<span class='no'>start_date</span>)</pre>
+    <pre class="usage"><span class='fu'>get_cansim_changed_tables</span>(<span class='no'>start_date</span>, <span class='kw'>end_date</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,6 +187,11 @@
     <tr>
       <th>start_date</th>
       <td><p>Starting date in <code>YYYY-MM-DD</code> format to look for changes that changed on or after that date</p></td>
+    </tr>
+    <tr>
+      <th>end_date</th>
+      <td><p>Optional end date in <code>YYYY-MM-DD</code> format to look for changes that changed on or before that date,
+default is same as start date</p></td>
     </tr>
     </table>
 

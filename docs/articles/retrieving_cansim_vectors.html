@@ -121,12 +121,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="retrieving_cansim_vectors_files/header-attrs-2.3/header-attrs.js"></script><script src="retrieving_cansim_vectors_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Retrieving individual Statistics Canada vectors</h1>
+                        <h4 class="author"></h4>
             
-            <h4 class="date">2020-05-10</h4>
+            <h4 class="date">2020-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/retrieving_cansim_vectors.Rmd"><code>vignettes/retrieving_cansim_vectors.Rmd</code></a></small>
       <div class="hidden name"><code>retrieving_cansim_vectors.Rmd</code></div>
@@ -150,7 +151,7 @@
 <span class="co">#&gt; The signature and semantics have changed, see `?as_tibble`.</span>
 <span class="co">#&gt; This warning is displayed once every 8 hours.</span>
 <span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span>
-<span class="co">#&gt; # A tibble: 63 x 9</span>
+<span class="co">#&gt; # A tibble: 67 x 9</span>
 <span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
 <span class="co">#&gt;       &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt; &lt;chr&gt;     </span>
 <span class="co">#&gt;  1        1  124. 2015-01… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
@@ -163,14 +164,14 @@
 <span class="co">#&gt;  8        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
 <span class="co">#&gt;  9        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
 <span class="co">#&gt; 10        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; # … with 53 more rows, and 1 more variable: VECTOR &lt;chr&gt;</span></pre></body></html></div>
+<span class="co">#&gt; # … with 57 more rows, and 1 more variable: VECTOR &lt;chr&gt;</span></pre></body></html></div>
 <p>The call to <code>get_cansim_vector</code> takes three inputs: a string code (or codes) for <code>vectors</code>, a <code>start_time</code> in YYYY-MM-DD format, and an optional value for <code>end_time</code>, also in YYYY-MM-DD format. By default, the <code>start_time</code> and <code>end_time</code> vectors uses Statistics Canada’s reference periods (“REF_DATE”) for selecting the date range of the data for retrieved vectors. There are a few optional input parameters for this function. If <code>end_time</code> is not provided, the call will use the current date as the default series end time. If the optional parameter <code>use_ref_date</code> is set to <code>FALSE</code>, then vector retrieval will instead filter on the release date of the vector itself.</p>
 <p>Vectors can be coerced into a list object in order to retrieve multiple series at the same time. For example, provincial seasonally-unadjusted CPI values have their own vector codes. The vector code for British Columbia all-items CPI is <em>v41692462</em>.</p>
 <p>The below code retrieves monthly Canadian and BC CPI values for the period January 2015 to December 2017 only. Monthly data series are always dated to the first day of the month.</p>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">vectors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"v41690973"</span>,<span class="st">"v41692462"</span>)
 
 <span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span>(<span class="no">vectors</span>, <span class="st">"2017-01-01"</span>)
-<span class="co">#&gt; # A tibble: 78 x 9</span>
+<span class="co">#&gt; # A tibble: 86 x 9</span>
 <span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
 <span class="co">#&gt;       &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt; &lt;chr&gt;     </span>
 <span class="co">#&gt;  1        1  130. 2017-01… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
@@ -183,7 +184,7 @@
 <span class="co">#&gt;  8        1  130. 2017-08… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
 <span class="co">#&gt;  9        1  131. 2017-09… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
 <span class="co">#&gt; 10        1  131. 2017-10… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; # … with 68 more rows, and 1 more variable: VECTOR &lt;chr&gt;</span></pre></body></html></div>
+<span class="co">#&gt; # … with 76 more rows, and 1 more variable: VECTOR &lt;chr&gt;</span></pre></body></html></div>
 </div>
 <div id="get_cansim_vectors_for_latest_periods" class="section level3">
 <h3 class="hasAnchor">
@@ -193,16 +194,16 @@
 <span class="co">#&gt; # A tibble: 60 x 9</span>
 <span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
 <span class="co">#&gt;       &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt; &lt;chr&gt;     </span>
-<span class="co">#&gt;  1        1  126. 2015-04… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  2        1  127. 2015-05… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  3        1  127. 2015-06… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  4        1  127. 2015-07… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  5        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  6        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  7        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  8        1  127. 2015-11… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt;  9        1  126. 2015-12… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; 10        1  127. 2016-01… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  1        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  2        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  3        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  4        1  127. 2015-11… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  5        1  126. 2015-12… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  6        1  127. 2016-01… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  7        1  127. 2016-02… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  8        1  128. 2016-03… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt;  9        1  128. 2016-04… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
+<span class="co">#&gt; 10        1  129. 2016-05… 2018-06-12…      0             6         0 2.2.0.0.0…</span>
 <span class="co">#&gt; # … with 50 more rows, and 1 more variable: VECTOR &lt;chr&gt;</span></pre></body></html></div>
 </div>
 <div id="naming-vector-series" class="section level3">

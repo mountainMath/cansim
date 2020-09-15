@@ -121,12 +121,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="listing_cansim_tables_files/header-attrs-2.3/header-attrs.js"></script><script src="listing_cansim_tables_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Listing Statistics Canada data tables</h1>
+                        <h4 class="author"></h4>
             
-            <h4 class="date">2020-05-10</h4>
+            <h4 class="date">2020-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/listing_cansim_tables.Rmd"><code>vignettes/listing_cansim_tables.Rmd</code></a></small>
       <div class="hidden name"><code>listing_cansim_tables.Rmd</code></div>
@@ -148,7 +149,7 @@
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">cansim</span>)
 
 <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="fu"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>())
-<span class="co">#&gt; Your CANSIM table overview data is 73 days old.</span>
+<span class="co">#&gt; Your CANSIM table overview data is 200 days old.</span>
 <span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span>
 <span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span>
 <span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span>
@@ -177,7 +178,7 @@
 <span class="fu"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span>() <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"Labour force characteristics"</span>,<span class="no">title</span>), <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"economic region"</span>,<span class="no">title</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="st">"cansim_table_number"</span>,<span class="st">"title"</span>)
-<span class="co">#&gt; Your CANSIM table overview data is 73 days old.</span>
+<span class="co">#&gt; Your CANSIM table overview data is 200 days old.</span>
 <span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span>
 <span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span>
 <span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span>
