@@ -776,6 +776,15 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
     message(paste0("Capping end date to last available date ",last_available_date,"."))
     end_date=last_available_date
   }
+  if (start_date>end_date) {
+    message("End date is earlier than start date, switching the order.")
+    d <-start_date
+    start_date <- end_date
+    end_date <-d
+  }
+  if (difftime(end_date,start_date,"days")>31) {
+    message("Querying for long time intervals may be slow.")
+  }
   seq(as.Date(start_date),as.Date(end_date),"days") %>%
     lapply(function(date){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
