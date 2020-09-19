@@ -753,6 +753,8 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
 #' Retrieve a list of tables that have been modified or updated since the specified date.
 #'
 #' @param start_date Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date
+#' @param end_date Optional end date in \code{YYYY-MM-DD} format to look for changes that changed on or before that date,
+#' default is same as start date
 #'
 #' @return A tibble with Statistics Canada data table product ids and their release times
 #'
@@ -761,16 +763,39 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
 #' get_cansim_changed_tables("2018-08-01")
 #' }
 #' @export
-get_cansim_changed_tables <- function(start_date){
-  end_date=NA
-  url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",start_date)
-  if (!is.na(end_date)) url = paste0(url,"/",end_date)
-  response <- httr::GET(url)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+get_cansim_changed_tables <- function(start_date,end_date=NULL){
+  last_available_date <- Sys.Date()
+  if (Sys.time()<as.POSIXct(paste0(Sys.Date()," 09:00:00"),tz="America/Toronto")) {
+    last_available_date = last_available_date  -1
   }
-  httr::content(response)$object %>%
-    map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
+  if (start_date>last_available_date) {
+    stop(paste0("Last available date is ",last_available_date,", please try with a start date on or before that date."))
+  }
+  if (is.null(end_date)) end_date=start_date
+  if (as.Date(end_date) > last_available_date) {
+    message(paste0("Capping end date to last available date ",last_available_date,"."))
+    end_date=last_available_date
+  }
+  if (start_date>end_date) {
+    message("End date is earlier than start date, switching the order.")
+    d <-start_date
+    start_date <- end_date
+    end_date <-d
+  }
+  if (difftime(end_date,start_date,"days")>31) {
+    message("Querying for long time intervals may be slow.")
+  }
+  seq(as.Date(start_date),as.Date(end_date),"days") %>%
+    lapply(function(date){
+      url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
+      response <- httr::GET(url)
+      if (response$status_code!=200) {
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+      }
+      httr::content(response)$object %>%
+        map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
+        bind_rows
+    }) %>%
     bind_rows
 }
 

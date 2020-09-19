@@ -1,4 +1,4 @@
-pandoc: 2.3.1
+pandoc: 2.9.2.1
 pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
@@ -6,7 +6,7 @@ articles:
   listing_cansim_tables: listing_cansim_tables.html
   retrieving_cansim_vectors: retrieving_cansim_vectors.html
   working_with_hierarchies: working_with_hierarchies.html
-last_built: 2020-05-10T15:31Z
+last_built: 2020-09-15T05:04Z
 urls:
   reference: https://mountainmath.github.io/cansim/index.html/reference
   article: https://mountainmath.github.io/cansim/index.html/articles

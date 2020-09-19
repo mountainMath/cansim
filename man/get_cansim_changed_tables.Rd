@@ -4,10 +4,13 @@
 \alias{get_cansim_changed_tables}
 \title{Retrieve a list of modified tables since a given date}
 \usage{
-get_cansim_changed_tables(start_date)
+get_cansim_changed_tables(start_date, end_date = NULL)
 }
 \arguments{
 \item{start_date}{Starting date in \code{YYYY-MM-DD} format to look for changes that changed on or after that date}
+
+\item{end_date}{Optional end date in \code{YYYY-MM-DD} format to look for changes that changed on or before that date,
+default is same as start date}
 }
 \value{
 A tibble with Statistics Canada data table product ids and their release times

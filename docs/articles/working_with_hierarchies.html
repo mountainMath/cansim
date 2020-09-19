@@ -121,12 +121,13 @@
 
       
 
-      </header><div class="row">
+      </header><script src="working_with_hierarchies_files/header-attrs-2.3/header-attrs.js"></script><script src="working_with_hierarchies_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with Statistics Canada data table object hierarchies</h1>
+                        <h4 class="author"></h4>
             
-            <h4 class="date">2020-05-10</h4>
+            <h4 class="date">2020-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -152,7 +153,7 @@
 <span class="co">#&gt; Folding in metadata</span>
 <span class="co">#&gt; Gross domestic product (GDP) at basic prices, by industry, provinces and territories</span>
 <span class="co">#&gt; CANSIM Table 36-10-0402</span>
-<span class="co">#&gt; Start Reference Period: 1997-01-01, End Reference Period: 2018-01-01, Frequency: Annual</span>
+<span class="co">#&gt; Start Reference Period: 1997-01-01, End Reference Period: 2019-01-01, Frequency: Annual</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Column Geography (13)</span>
 <span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...</span>
@@ -204,12 +205,12 @@
 <span class="co"># but we wanted to demonstrate how to use specific hierarchy levels. </span>
 <span class="no">total_data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span> <span class="no">top_level</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="kw">Total</span> <span class="kw">=</span> <span class="no">VALUE</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">Total</span> <span class="kw">=</span> <span class="no">VALUE</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">Date</span>, <span class="no">GEO</span>, <span class="no">Total</span>)
 
 <span class="co"># Merge total back in and calculate share for every NAICS code</span>
 <span class="no">data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join.html">left_join</a></span>(<span class="no">total_data</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span>(<span class="no">total_data</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">Share</span> <span class="kw">=</span> <span class="no">VALUE</span>/<span class="no">Total</span>)
 <span class="co">#&gt; Joining, by = c("GEO", "Date")</span></pre></body></html></div>
 </div>
@@ -242,7 +243,8 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">Date</span>, <span class="no">GEO</span>, <span class="no">NAICS</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="kw">VALUE</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">VALUE</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
             <span class="kw">Share</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">Share</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()</pre></body></html></div>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()
+<span class="co">#&gt; `summarise()` regrouping output by 'Date', 'GEO' (override with `.groups` argument)</span></pre></body></html></div>
 <p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
 
@@ -277,7 +279,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(
   <span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span>
     <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(<span class="no">.</span>,<span class="st">"North American Industry Classification System (NAICS)"</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="kw">NAICS</span><span class="kw">=</span><span class="no">`North American Industry Classification System (NAICS)`</span>)
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">NAICS</span><span class="kw">=</span><span class="no">`North American Industry Classification System (NAICS)`</span>)
 
 <span class="co"># Plot with labels from our original selections</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">rrl_data</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">GEO</span> <span class="kw">%in%</span> <span class="no">regions</span>),
