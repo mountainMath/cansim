@@ -84,31 +84,39 @@ rename_vectors <- function(data,vectors){
 get_cansim_vector<-function(vectors, start_time, end_time=Sys.time(), use_ref_date=TRUE){
   start_time=as.Date(start_time)
   original_end_time=as.Date(end_time)
-  if (use_ref_date) end_time=pmax(Sys.time(),end_time) else end_time=original_end_time
+  if (use_ref_date) end_time=as.Date(pmax(Sys.time(),end_time))+1 else end_time=original_end_time
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
   vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
   time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
                      '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
-  response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
-  if (is.null(response)) return(response)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-  }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-    data2 %>% purrr::map(function(x){
-      message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-    })
-  }
+  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(list(vectors_string,time_string), algo = "md5"), ".rda"))
+  if (!file.exists(cache_path)) {
+    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+    response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
+    if (is.null(response)) return(response)
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+      data2 %>% purrr::map(function(x){
+        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+      })
+    }
 
-  if (length(data1)>0)
-    result <- extract_vector_data(data1) %>% rename_vectors(vectors)
-  else
-    result <- tibble::tibble()
+    if (length(data1)>0)
+      result <- extract_vector_data(data1) %>% rename_vectors(vectors)
+    else
+      result <- tibble::tibble()
+    saveRDS(result,cache_path)
+  } else {
+    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
+    result <- readRDS(cache_path)
+  }
   if (use_ref_date) {
     result <- result %>%
       filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
@@ -138,25 +146,33 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
-  response <- post_with_timeout_retry(url, body=vectors_string)
-  if (is.null(response)) return(response)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-  }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-    data2 %>% purrr::map(function(x){
-      message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-    })
-  }
-  if (length(data1)>0)
-    result <- extract_vector_data(data1) %>%
+  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(vectors_string, algo = "md5"), ".rda"))
+  if (!file.exists(cache_path)) {
+    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+    response <- post_with_timeout_retry(url, body=vectors_string)
+    if (is.null(response)) return(response)
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+      data2 %>% purrr::map(function(x){
+        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+      })
+    }
+    if (length(data1)>0)
+      result <- extract_vector_data(data1) %>%
       rename_vectors(vectors)
-  else
-    result <- tibble::tibble()
+    else
+      result <- tibble::tibble()
+    saveRDS(result,cache_path)
+  } else {
+    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
+    result <- readRDS(cache_path)
+  }
   result
 }
 
@@ -180,18 +196,26 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
   table=naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
-  response <- post_with_timeout_retry(url, body=body_string)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-  }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load metadata for ",length(data2)," tables "))
-    data2 %>% purrr::map(function(x){
-      message(x$object)
-    })
+  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))
+  if (!file.exists(cache_path)) {
+    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+    response <- post_with_timeout_retry(url, body=body_string)
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load metadata for ",length(data2)," tables "))
+      data2 %>% purrr::map(function(x){
+        message(x$object)
+      })
+    }
+    saveRDS(data1,cache_path)
+  } else {
+    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
+    data1 <- readRDS(cache_path)
   }
 
   extract_vector_data(data1)

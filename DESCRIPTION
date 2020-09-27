@@ -24,7 +24,8 @@ Imports: dplyr (>= 0.7),
     purrr,
     tibble,
     utils,
-    jsonlite
+    jsonlite,
+    digest
 RoxygenNote: 7.1.0.9000
 Suggests: knitr,
     rmarkdown,
