@@ -54,7 +54,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -107,7 +107,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -121,13 +121,13 @@
 
       
 
-      </header><script src="working_with_hierarchies_files/header-attrs-2.3/header-attrs.js"></script><script src="working_with_hierarchies_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="working_with_hierarchies_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with Statistics Canada data table object hierarchies</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2020-09-14</h4>
+            <h4 class="date">2021-04-22</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -141,13 +141,14 @@
 <h3 class="hasAnchor">
 <a href="#retrieving-metadata" class="anchor"></a>Retrieving metadata</h3>
 <p>The <code>get_cansim_table_overview</code> function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let’s take a look what’s in the table we are interested in.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">cansim</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mountainMath/cansim">cansim</a></span><span class="op">)</span>
 
 <span class="co"># select a table number</span>
-<span class="no">table_id</span> <span class="kw">=</span> <span class="st">"36-10-0402"</span>
+<span class="va">table_id</span> <span class="op">=</span> <span class="st">"36-10-0402"</span>
 
 <span class="co"># get table overview</span>
-<span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span>(<span class="no">table_id</span>)
+<span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="va">table_id</span><span class="op">)</span>
 <span class="co">#&gt; Accessing CANSIM NDM product 36-10-0402 from Statistics Canada</span>
 <span class="co">#&gt; Parsing data</span>
 <span class="co">#&gt; Folding in metadata</span>
@@ -162,138 +163,137 @@
 <span class="co">#&gt; Current dollars, Chained (2012) dollars, Contributions to percent change</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Column North American Industry Classification System (NAICS) (337)</span>
-<span class="co">#&gt; All industries, Goods-producing industries, Service-producing industries, Industrial production, Non-durable manufacturing industries, Durable manufacturing industries, Information and communication technology sector, Information and communication technology, manufacturing, Information and communication technology, services, Energy sector, ...</span></pre></body></html></div>
+<span class="co">#&gt; All industries, Goods-producing industries, Service-producing industries, Industrial production, Non-durable manufacturing industries, Durable manufacturing industries, Information and communication technology sector, Information and communication technology, manufacturing, Information and communication technology, services, Energy sector, ...</span></code></pre></div>
 </div>
 <div id="accessing-table-data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#accessing-table-data" class="anchor"></a>Accessing table data</h3>
 <p>We see that data set come with three different measures and 307 different NAICS values. Let’s load the data and focus on just “Chained (2012) dollars”.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Attaching package: 'dplyr'</span>
-<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     filter, lag</span>
-<span class="co">#&gt; The following objects are masked from 'package:base':</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
-<span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/get_cansim.html">get_cansim</a></span>(<span class="no">table_id</span>)
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="va">table_id</span><span class="op">)</span> 
 <span class="co">#&gt; Reading CANSIM NDM product 36-10-0402 from cache.</span>
 
-<span class="no">selected_value</span> <span class="kw">=</span> <span class="no">data</span>$<span class="no">Value</span>[<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"Chained"</span>,<span class="no">data</span>$<span class="no">Value</span>)] <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>()
-<span class="no">data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">Value</span> <span class="kw">==</span> <span class="no">selected_value</span>)</pre></body></html></div>
+<span class="va">selected_value</span> <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">Value</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Chained"</span>,<span class="va">data</span><span class="op">$</span><span class="va">Value</span><span class="op">)</span><span class="op">]</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Value</span> <span class="op">==</span> <span class="va">selected_value</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="normalizing-variables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#normalizing-variables" class="anchor"></a>Normalizing variables</h3>
 <p>There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code>. By default, downloaded CANSIM data contains a <code>VALUE</code> and a <code>SCALAR_FACTOR</code> field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will apply the appropriate conversion based on the scale variable so that the <code>VALUE</code> value is more straight-forward to work with. The default data also includes a character string <code>REF_DATE</code> field, which the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will attempt to convert into a standard date-class variable.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span>(<span class="kw">strip_classification_code</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span><span class="op">(</span>strip_classification_code <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="taking-advantage-of-metadata" class="section level3">
 <h3 class="hasAnchor">
 <a href="#taking-advantage-of-metadata" class="anchor"></a>Taking advantage of metadata</h3>
 <p>This table includes all the different levels of NAICS categories in one dimension. This makes working with the data at that level rather cumbersome when we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let’s first get an overview of the data. We can also use this to easily compute shares instead of totals.</p>
 <p>We can extract the hierarchy using the built-in convenience function <code>categories_for_level</code> which takes in a <code>cansim</code>-package retrieved data table object with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># Extract top-level hierarchy to calculate total</span>
-<span class="no">top_level</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(<span class="no">data</span>, <span class="st">"North American Industry Classification System (NAICS)"</span>,<span class="fl">0</span>)
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Extract top-level hierarchy to calculate total</span>
+<span class="va">top_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"North American Industry Classification System (NAICS)"</span>,<span class="fl">0</span><span class="op">)</span>
 
 <span class="co"># Extract total using hierarchy and calculate share by NAICS. </span>
 <span class="co"># This could also be done using grouping functions from dplyr, </span>
 <span class="co"># but we wanted to demonstrate how to use specific hierarchy levels. </span>
-<span class="no">total_data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span> <span class="no">top_level</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">Total</span> <span class="kw">=</span> <span class="no">VALUE</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">Date</span>, <span class="no">GEO</span>, <span class="no">Total</span>)
+<span class="va">total_data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> <span class="va">top_level</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>Total <span class="op">=</span> <span class="va">VALUE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">Total</span><span class="op">)</span>
 
 <span class="co"># Merge total back in and calculate share for every NAICS code</span>
-<span class="no">data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span>(<span class="no">total_data</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">Share</span> <span class="kw">=</span> <span class="no">VALUE</span>/<span class="no">Total</span>)
-<span class="co">#&gt; Joining, by = c("GEO", "Date")</span></pre></body></html></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">total_data</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Share <span class="op">=</span> <span class="va">VALUE</span><span class="op">/</span><span class="va">Total</span><span class="op">)</span>
+<span class="co">#&gt; Joining, by = c("GEO", "Date")</span></code></pre></div>
 </div>
 <div id="hierarchies-in-more-detail" class="section level3">
 <h3 class="hasAnchor">
 <a href="#hierarchies-in-more-detail" class="anchor"></a>Hierarchies in more detail</h3>
 <p>There are hundreds of NAICS codes here which is too many to make sense of at the same time. We can use <code>categories_for_level</code> again to reduce our NAICS codes just to the first sub-level which represents the industry groups. We can call this subset <code>cut_data</code>. (Note that the NAICS data also includes composite groups of industries, something like a level 0.5 hierarchy, which are prefixed with a “T” and which we want to remove as well.)</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">cut_data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(
-  !<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="st">"T\\d+"</span>,<span class="no">`Classification Code for North American Industry Classification System (NAICS)`</span>),
-  <span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span>
-    <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(<span class="no">.</span>,<span class="st">"North American Industry Classification System (NAICS)"</span>,<span class="fl">1</span>))
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">cut_data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span>
+  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"T\\d+"</span>,<span class="va">`Classification Code for North American Industry Classification System (NAICS)`</span><span class="op">)</span>,
+  <span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> 
+    <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span><span class="op">(</span><span class="va">.</span>,<span class="st">"North American Industry Classification System (NAICS)"</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># How many are NAICS categories left? </span>
-<span class="no">n</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cut_data</span>$<span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%&gt;%</span> <span class="no">unique</span>)</pre></body></html></div>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut_data</span><span class="op">$</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%&gt;%</span> <span class="va">unique</span><span class="op">)</span></code></pre></div>
 <p>There are still 22 level 1 categories, too many to sensibly visualize at the same time. We can use <code>dplyr</code> functions to identify the top categories and group the rest so that we can have a plot that is easier to understand.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># Specify which regions and period we want to look at </span>
-<span class="no">regions</span> <span class="kw">=</span> <span class="st">"British Columbia"</span>
-<span class="no">period</span> <span class="kw">=</span> <span class="st">"2017-01-01"</span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Specify which regions and period we want to look at </span>
+<span class="va">regions</span> <span class="op">=</span> <span class="st">"British Columbia"</span>
+<span class="va">period</span> <span class="op">=</span> <span class="st">"2017-01-01"</span>
 
 <span class="co"># Select the top-8 categories for our reference region and period</span>
-<span class="no">top_categories</span> <span class="kw">&lt;-</span> <span class="no">cut_data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">GEO</span> <span class="kw">%in%</span> <span class="no">regions</span>, <span class="no">Date</span> <span class="kw">==</span> <span class="no">period</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/top_n.html">top_n</a></span>(<span class="fl">8</span>,<span class="no">Share</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(<span class="st">"North American Industry Classification System (NAICS)"</span>)
+<span class="va">top_categories</span> <span class="op">&lt;-</span> <span class="va">cut_data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">%in%</span> <span class="va">regions</span>, <span class="va">Date</span> <span class="op">==</span> <span class="va">period</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/top_n.html">top_n</a></span><span class="op">(</span><span class="fl">8</span>,<span class="va">Share</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="st">"North American Industry Classification System (NAICS)"</span><span class="op">)</span>
 
 <span class="co"># Group remaining categories together and prepare data for plot</span>
-<span class="no">plot_data</span> <span class="kw">&lt;-</span> <span class="no">cut_data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">NAICS</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span>(<span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span> <span class="no">top_categories</span>,<span class="no">`North American Industry Classification System (NAICS)`</span>,<span class="st">"Rest"</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">Date</span>, <span class="no">GEO</span>, <span class="no">NAICS</span>, <span class="no">VALUE</span>, <span class="no">Share</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">Date</span>, <span class="no">GEO</span>, <span class="no">NAICS</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span>(<span class="kw">VALUE</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">VALUE</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>),
-            <span class="kw">Share</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">Share</span>, <span class="kw">na.rm</span> <span class="kw">=</span> <span class="fl">TRUE</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span>()
-<span class="co">#&gt; `summarise()` regrouping output by 'Date', 'GEO' (override with `.groups` argument)</span></pre></body></html></div>
+<span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">cut_data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>NAICS <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> <span class="va">top_categories</span>,<span class="va">`North American Industry Classification System (NAICS)`</span>,<span class="st">"Rest"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">NAICS</span>, <span class="va">VALUE</span>, <span class="va">Share</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">NAICS</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">VALUE</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+            Share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">Share</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; `summarise()` has grouped output by 'Date', 'GEO'. You can override using the `.groups` argument.</span></code></pre></div>
 <p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">plot_data</span> <span class="kw">%&gt;%</span>
-         <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">GEO</span> <span class="kw">%in%</span> <span class="no">regions</span>),
-       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">Date</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">Share</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="no">NAICS</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="kw">position</span><span class="kw">=</span><span class="st">"stack"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="kw">labels</span> <span class="kw">=</span> <span class="kw pkg">scales</span><span class="kw ns">::</span><span class="no"><a href="https://scales.r-lib.org//reference/label_percent.html">percent</a></span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"bottom"</span>,<span class="kw">legend.direction</span> <span class="kw">=</span><span class="st">"vertical"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="kw">fill</span><span class="kw">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">3</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span><span class="kw">=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,
-       <span class="kw">subtitle</span><span class="kw">=</span><span class="no">selected_value</span>,
-       <span class="kw">x</span><span class="kw">=</span><span class="st">""</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="st">""</span>,
-       <span class="kw">caption</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"CANSIM "</span>, <span class="no">table_id</span>))</pre></body></html></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">real_construction</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span>)
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span> <span class="op">%&gt;%</span> 
+         <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">%in%</span> <span class="va">regions</span><span class="op">)</span>, 
+       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Date</span>, y <span class="op">=</span> <span class="va">Share</span>, fill <span class="op">=</span> <span class="va">NAICS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span>position<span class="op">=</span><span class="st">"stack"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/label_percent.html">percent</a></span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>,legend.direction <span class="op">=</span><span class="st">"vertical"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>fill<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,
+       subtitle<span class="op">=</span><span class="va">selected_value</span>,
+       x<span class="op">=</span><span class="st">""</span>, fill <span class="op">=</span> <span class="st">""</span>, 
+       caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="../../../../Google%20Drive/R/cansim/vignettes/figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">real_construction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span><span class="op">)</span>
 
 <span class="co"># Get the NAICS hierarchy codes just for these categories</span>
-<span class="no">rrl_hierarchy</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span> <span class="no">real_construction</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(<span class="st">"Hierarchy for North American Industry Classification System (NAICS)"</span>) <span class="kw">%&gt;%</span>
-  <span class="no">unique</span>
+<span class="va">rrl_hierarchy</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> <span class="va">real_construction</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="st">"Hierarchy for North American Industry Classification System (NAICS)"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="va">unique</span>
 
 <span class="co"># Filter out all sub-categories for Real Estate. </span>
 <span class="co"># The paste with | trick ensures that we grepl for all matches. </span>
-<span class="no">rrl_data</span> <span class="kw">&lt;-</span> <span class="no">data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="no">rrl_hierarchy</span>,<span class="kw">collapse</span><span class="kw">=</span><span class="st">"|"</span>),<span class="no">`Hierarchy for North American Industry Classification System (NAICS)`</span>))
+<span class="va">rrl_data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">rrl_hierarchy</span>,collapse<span class="op">=</span><span class="st">"|"</span><span class="op">)</span>,<span class="va">`Hierarchy for North American Industry Classification System (NAICS)`</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># Ensure we only retain the NAICS leaves and none of the aggregate subcategories</span>
-<span class="no">rrl_data</span> <span class="kw">&lt;-</span> <span class="no">rrl_data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(
-  <span class="no">`North American Industry Classification System (NAICS)`</span> <span class="kw">%in%</span>
-    <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span>(<span class="no">.</span>,<span class="st">"North American Industry Classification System (NAICS)"</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">NAICS</span><span class="kw">=</span><span class="no">`North American Industry Classification System (NAICS)`</span>)
+<span class="va">rrl_data</span> <span class="op">&lt;-</span> <span class="va">rrl_data</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span>
+  <span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> 
+    <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span><span class="op">(</span><span class="va">.</span>,<span class="st">"North American Industry Classification System (NAICS)"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>NAICS<span class="op">=</span><span class="va">`North American Industry Classification System (NAICS)`</span><span class="op">)</span>
 
 <span class="co"># Plot with labels from our original selections</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">rrl_data</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">GEO</span> <span class="kw">%in%</span> <span class="no">regions</span>),
-       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">Date</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">Share</span>, <span class="kw">fill</span> <span class="kw">=</span> <span class="no">NAICS</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span>(<span class="kw">position</span> <span class="kw">=</span> <span class="st">"stack"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span>(<span class="kw">labels</span> <span class="kw">=</span> <span class="kw pkg">scales</span><span class="kw ns">::</span><span class="no"><a href="https://scales.r-lib.org//reference/label_percent.html">percent</a></span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"bottom"</span>,<span class="kw">legend.direction</span> <span class="kw">=</span><span class="st">"vertical"</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span>(<span class="kw">fill</span><span class="kw">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span>(<span class="kw">ncol</span><span class="kw">=</span><span class="fl">1</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span><span class="kw">=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,
-       <span class="kw">subtitle</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">regions</span>,<span class="st">", "</span>, <span class="no">selected_value</span>),
-       <span class="kw">x</span><span class="kw">=</span><span class="st">""</span>,
-       <span class="kw">caption</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"CANSIM "</span>, <span class="no">table_id</span>))</pre></body></html></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-8-1.png" width="864"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">rrl_data</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">%in%</span> <span class="va">regions</span><span class="op">)</span>,
+       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Date</span>, y <span class="op">=</span> <span class="va">Share</span>, fill <span class="op">=</span> <span class="va">NAICS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"stack"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/label_percent.html">percent</a></span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>,legend.direction <span class="op">=</span><span class="st">"vertical"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>fill<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span><span class="op">(</span>ncol<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,
+       subtitle<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">regions</span>,<span class="st">", "</span>, <span class="va">selected_value</span><span class="op">)</span>,
+       x<span class="op">=</span><span class="st">""</span>,
+       caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p><img src="../../../../Google%20Drive/R/cansim/vignettes/figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
 </div>
   </div>
 
@@ -310,7 +310,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

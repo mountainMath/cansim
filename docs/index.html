@@ -56,7 +56,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -109,7 +109,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -150,22 +150,25 @@
 <h3 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h3>
 <p>The cansim package is available on CRAN and can be installed directly.</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"cansim"</span>)</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"cansim"</span><span class="op">)</span></code></pre></div>
 <p>Alternatively, the latest development version can be downloaded from Github using either the <code>remotes</code> or <code>devtools</code> packages.</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="co"># install.packages("remotes")</span>
-<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"mountainmath/cansim"</span>)</pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"mountainmath/cansim"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="basic-usage" class="section level3">
 <h3 class="hasAnchor">
 <a href="#basic-usage" class="anchor"></a>Basic Usage</h3>
 <p>The package accepts use of both old-format (“051-0013”) or new-format (“17-10-0016-01”) table catalogue numbers to download entire data tables as tidy data frames. Calling either the legacy CANSIM table number or the new NDM number will load the same data. Since the transition to the new data repository, existing tables will have retained their old-format numbers, but any newly created tables will have only new-format names.</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="co"># Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)</span>
-<span class="no">births</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"051-0013"</span>)
-<span class="no">births</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"17-10-0016-01"</span>)
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)</span>
+<span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span><span class="op">)</span>
+<span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"17-10-0016-01"</span><span class="op">)</span>
 
 <span class="co"># Retrieve data for balance of payment table 36-10-0042-01 (formerly CANSIM  376-8105)</span>
-<span class="no">bop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"3768105"</span>)
-<span class="no">bop</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"36-10-0042"</span>)</pre></div>
+<span class="va">bop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"3768105"</span><span class="op">)</span>
+<span class="va">bop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"36-10-0042"</span><span class="op">)</span></code></pre></div>
 <p>See more example usage and worfklow in the <em>Getting started with the cansim package</em> vignette.</p>
 </div>
 <div id="caching" class="section level3">
@@ -178,16 +181,19 @@
 <a href="#bilingual" class="anchor"></a>Bilingual</h3>
 <p>Statistics Canada data tables are provided in either English or French formats, including labels and formats. The <code>cansim</code> package allows for download of tables in either English or French. There is an optional language argument to retrieve tables in French:</p>
 <p>Le paquet <code>cansim</code> fonctionne en anglais ou en français. Il existe un argument de langue optionnel pour récupérer les tables en français:</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="no">naissances</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"051-0013"</span>,<span class="kw">language</span><span class="kw">=</span><span class="st">"fr"</span>)</pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">naissances</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span>,language<span class="op">=</span><span class="st">"fr"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="normalizing-values" class="section level3">
 <h3 class="hasAnchor">
 <a href="#normalizing-values" class="anchor"></a>Normalizing values</h3>
 <p>The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Statistics Canada data table values may be scaled by powers of 10.</p>
 <p>For example, values in the <code>VALUE</code> field may be reported in “millions”, so a <code>VALUE</code> of 10 means 10,000,000. The <code>normalize_cansim_values</code> function automatically scales the <code>VALUE</code> field to be a number, so the <code>VALUE</code> will be converted from 10 to 10,000,000 in the example given.</p>
-<div class="sourceCode" id="cb5"><pre class="r"><span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"17-10-0079-01"</span>) <span class="kw">%&gt;%</span> <span class="no">normalize_cansim_values</span></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"17-10-0079-01"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="va">normalize_cansim_values</span></code></pre></div>
 <p>To retain the original <code>VALUE</code> field pass the <code>replacement_value = &lt;your field name&gt;</code> option to create a field to contain the normalized values.</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span>(<span class="st">"17-10-0079-01"</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="reference/normalize_cansim_values.html">normalize_cansim_values</a></span>(<span class="kw">replacement_value</span><span class="kw">=</span><span class="st">"normalized value"</span>)</pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"17-10-0079-01"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="reference/normalize_cansim_values.html">normalize_cansim_values</a></span><span class="op">(</span>replacement_value<span class="op">=</span><span class="st">"normalized value"</span><span class="op">)</span></code></pre></div>
 <p>By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set <code>normalize_percent=FALSE</code>.</p>
 </div>
 <div id="vectors" class="section level3">
@@ -259,7 +265,8 @@ In doing any of the above, you shall:
 <h3 class="hasAnchor">
 <a href="#proxy-issues" class="anchor"></a>Proxy issues</h3>
 <p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the <code>httr</code> package.</p>
-<div class="sourceCode" id="cb14"><pre class="r"><span class="kw pkg">httr</span><span class="kw ns">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/set_config.html">set_config</a></span>(<span class="fu">use_proxy</span>(<span class="kw">url</span><span class="kw">=</span><span class="no">http_proxy</span>, <span class="kw">port</span><span class="kw">=</span><span class="no">selected_port</span>, <span class="kw">username</span><span class="kw">=</span><span class="no">your_username</span>,<span class="kw">password</span><span class="kw">=</span><span class="no">your_pass</span>))</pre></div>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/set_config.html">set_config</a></span><span class="op">(</span><span class="fu">use_proxy</span><span class="op">(</span>url<span class="op">=</span><span class="va">http_proxy</span>, port<span class="op">=</span><span class="va">selected_port</span>, username<span class="op">=</span><span class="va">your_username</span>,password<span class="op">=</span><span class="va">your_pass</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="contributing" class="section level3">
 <h3 class="hasAnchor">
@@ -339,7 +346,7 @@ In doing any of the above, you shall:
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

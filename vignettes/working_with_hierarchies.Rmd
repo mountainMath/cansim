@@ -3,7 +3,7 @@ title: "Working with Statistics Canada data table object hierarchies"
 description: >
   Data retrieved from Statistics Canada frequently has complicated hierarchical structures. The cansim provides convenience tools to make it easier to work with these structures. 
 author: ""
-date: "2020-05-14"
+date: "2021-04-22"
 output: rmarkdown::html_vignette
 ---
 
@@ -21,9 +21,12 @@ table_id = "36-10-0402"
 
 # get table overview
 get_cansim_table_overview(table_id)
+#> Accessing CANSIM NDM product 36-10-0402 from Statistics Canada
+#> Parsing data
+#> Folding in metadata
 #> Gross domestic product (GDP) at basic prices, by industry, provinces and territories
 #> CANSIM Table 36-10-0402
-#> Start Reference Period: 1997-01-01, End Reference Period: 2018-01-01, Frequency: Annual
+#> Start Reference Period: 1997-01-01, End Reference Period: 2019-01-01, Frequency: Annual
 #> 
 #> Column Geography (13)
 #> Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...
@@ -117,6 +120,7 @@ plot_data <- cut_data %>%
   summarise(VALUE = sum(VALUE, na.rm = TRUE),
             Share = sum(Share, na.rm = TRUE)) %>% 
   ungroup()
+#> `summarise()` has grouped output by 'Date', 'GEO'. You can override using the `.groups` argument.
 ```
 With the data prepared, the last step is putting it all together into a visualization using `ggplot2`. We can then see if any further adjustments are required. 
 

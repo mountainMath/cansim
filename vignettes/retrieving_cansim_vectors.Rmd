@@ -3,7 +3,7 @@ title: "Retrieving individual Statistics Canada vectors"
 description: >
   A worked example showing how to retrieve individual data vectors instead of entire tables. 
 author: ""
-date: "2020-05-14"
+date: "2021-04-22"
 output: rmarkdown::html_vignette
 ---
 
@@ -15,11 +15,12 @@ Many of the time-series data available from Statistics Canada have individual ve
 
 ### get_cansim_vector()
 
-Running `search_cansim_tables("consumer price index")` shows 33 tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+Running `search_cansim_tables("consumer price index")` shows 35 tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
 
 ```r
 get_cansim_vector("v41690973","2015-01-01")
-#> # A tibble: 63 x 9
+#> Accessing CANSIM NDM vectors from Statistics Canada
+#> # A tibble: 75 x 9
 #>    DECIMALS VALUE REF_DATE   releaseTime      SYMBOL frequencyCode SCALAR_ID COORDINATE          VECTOR   
 #>       <int> <dbl> <chr>      <chr>             <int>         <int>     <int> <chr>               <chr>    
 #>  1        1  124. 2015-01-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
@@ -32,7 +33,7 @@ get_cansim_vector("v41690973","2015-01-01")
 #>  8        1  127. 2015-08-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
 #>  9        1  127. 2015-09-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
 #> 10        1  127. 2015-10-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#> # … with 53 more rows
+#> # … with 65 more rows
 ```
 
 The call to `get_cansim_vector` takes three inputs: a string code (or codes) for `vectors`, a `start_time` in YYYY-MM-DD format, and an optional value for `end_time`, also in YYYY-MM-DD format. By default, the `start_time` and `end_time` vectors uses Statistics Canada's reference periods ("REF_DATE") for selecting the date range of the data for retrieved vectors. There are a few optional input parameters for this function. If `end_time` is not provided, the call will use the current date as the default series end time. If the optional parameter `use_ref_date` is set to `FALSE`, then vector retrieval will instead filter on the release date of the vector itself.
@@ -45,20 +46,21 @@ The below code retrieves monthly Canadian and BC CPI values for the period Janua
 vectors <- c("v41690973","v41692462")
 
 get_cansim_vector(vectors, "2017-01-01")
-#> # A tibble: 78 x 9
+#> Accessing CANSIM NDM vectors from Statistics Canada
+#> # A tibble: 102 x 9
 #>    DECIMALS VALUE REF_DATE   releaseTime      SYMBOL frequencyCode SCALAR_ID COORDINATE          VECTOR   
 #>       <int> <dbl> <chr>      <chr>             <int>         <int>     <int> <chr>               <chr>    
-#>  1        1  130. 2017-01-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  2        1  130. 2017-02-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  3        1  130. 2017-03-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  4        1  130. 2017-04-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  5        1  130. 2017-05-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  6        1  130. 2017-06-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  7        1  130. 2017-07-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  8        1  130. 2017-08-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  9        1  131. 2017-09-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#> 10        1  131. 2017-10-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#> # … with 68 more rows
+#>  1        1  130. 2017-01-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  2        1  130. 2017-02-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  3        1  130. 2017-03-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  4        1  130. 2017-04-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  5        1  130. 2017-05-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  6        1  130. 2017-06-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  7        1  130. 2017-07-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  8        1  130. 2017-08-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  9        1  131. 2017-09-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#> 10        1  131. 2017-10-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#> # … with 92 more rows
 ```
 
 ### get_cansim_vectors_for_latest_periods()
@@ -67,19 +69,20 @@ Some vectors extend backwards for a significant number of periods that may not b
 
 ```r
 get_cansim_vector_for_latest_periods("v41690973", periods = 60)
+#> Accessing CANSIM NDM vectors from Statistics Canada
 #> # A tibble: 60 x 9
 #>    DECIMALS VALUE REF_DATE   releaseTime      SYMBOL frequencyCode SCALAR_ID COORDINATE          VECTOR   
 #>       <int> <dbl> <chr>      <chr>             <int>         <int>     <int> <chr>               <chr>    
-#>  1        1  126. 2015-04-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  2        1  127. 2015-05-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  3        1  127. 2015-06-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  4        1  127. 2015-07-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  5        1  127. 2015-08-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  6        1  127. 2015-09-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  7        1  127. 2015-10-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  8        1  127. 2015-11-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#>  9        1  126. 2015-12-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
-#> 10        1  127. 2016-01-01 2018-06-12T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  1        1  128. 2016-04-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  2        1  129. 2016-05-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  3        1  129. 2016-06-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  4        1  129. 2016-07-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  5        1  129. 2016-08-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  6        1  129. 2016-09-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  7        1  129. 2016-10-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  8        1  129. 2016-11-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#>  9        1  128. 2016-12-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
+#> 10        1  130. 2017-01-01 2020-10-21T08:30      0             6         0 2.2.0.0.0.0.0.0.0.0 v41690973
 #> # … with 50 more rows
 ```
 
@@ -101,6 +104,7 @@ vectors <- c("Canadian CPI"="v41690973",
              "BC CPI"="v41692462")
 
 data <- normalize_cansim_values(get_cansim_vector(vectors, "2010-01-01"))
+#> Accessing CANSIM NDM vectors from Statistics Canada
 
 library(ggplot2)
 ggplot(data,aes(x=Date,y=VALUE,color=label)) +

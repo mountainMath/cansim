@@ -100,7 +100,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -153,7 +153,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -179,7 +179,7 @@
     <p>Generates an overview table containing metadata of available Statistics Canada data cubes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>list_cansim_cubes</span>(<span class='kw'>lite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>list_cansim_cubes</span><span class='op'>(</span>lite <span class='op'>=</span> <span class='cn'>FALSE</span>, refresh <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -202,26 +202,25 @@ start and end dates, achieve status, subject and survey codes, frequency codes a
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'>list_cansim_cubes</span>()</div><div class='output co'>#&gt; <span class='warning'>Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if `.name_repair` is omitted as of tibble 2.0.0.</span>
-#&gt; <span class='warning'>Using compatibility `.name_repair`.</span>
-#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 5,497 x 18</span><span>
-#&gt;    cansim_table_nu… cubeTitleEn cubeTitleFr productId cansimId cubeStartDate
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span>       
-#&gt; </span><span style='color: #555555;'> 1</span><span> 10-10-0001       Federal pu… Emploi du … 10100001  183-0021 1999-01-01   
-#&gt; </span><span style='color: #555555;'> 2</span><span> 10-10-0002       Central go… Dette du g… 10100002  191-0002 2009-04-01   
-#&gt; </span><span style='color: #555555;'> 3</span><span> 10-10-0003       Capital ma… Activités … 10100003  176-0079 1975-01-01   
-#&gt; </span><span style='color: #555555;'> 4</span><span> 10-10-0005       Canadian C… Classifica… 10100005  385-0041 2008-01-01   
-#&gt; </span><span style='color: #555555;'> 5</span><span> 10-10-0006       Funds adva… Avances de… 10100006  176-0091 2013-01-01   
-#&gt; </span><span style='color: #555555;'> 6</span><span> 10-10-0007       Net new is… Émissions … 10100007  176-0082 1975-03-01   
-#&gt; </span><span style='color: #555555;'> 7</span><span> 10-10-0008       Foreign ex… Taux de ch… 10100008  176-0067 1950-10-02   
-#&gt; </span><span style='color: #555555;'> 8</span><span> 10-10-0009       Foreign ex… Taux de ch… 10100009  176-0064 1950-10-01   
-#&gt; </span><span style='color: #555555;'> 9</span><span> 10-10-0010       Sales of a… Ventes de … 10100010  183-0023 2004-01-01   
-#&gt; </span><span style='color: #555555;'>10</span><span> 10-10-0011       Value of s… Valeur des… 10100011  183-0024 2004-01-01   
-#&gt; </span><span style='color: #555555;'># … with 5,487 more rows, and 12 more variables: cubeEndDate </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   releaseTime </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, archived </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span style='color: #555555;'>, subjectCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   frequencyCode </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, corrections </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, dimensions </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, surveyEn </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   surveyFr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, subjectEn </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, subjectFr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'># }
+<span class='fu'>list_cansim_cubes</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Retrieving cube information from StatCan servers...</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5,761 x 19</span><span>
+#&gt;    cansim_table_num… cubeTitleEn   cubeTitleFr  productId cansimId cubeStartDate
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>       
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 10-10-0001        Federal publ… Emploi du s… 10100001  183-0021 1999-01-01   
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 10-10-0002        Central gove… Dette du go… 10100002  191-0002 2009-04-01   
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 10-10-0003        Government o… Titres d’em… 10100003  176-0079 1975-01-01   
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 10-10-0004        Chartered ba… Banques à c… 10100004  176-0013 1978-04-01   
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 10-10-0005        Canadian Cla… Classificat… 10100005  385-0041 2008-01-01   
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 10-10-0006        Funds advanc… Avances de … 10100006  176-0091 2013-01-01   
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 10-10-0007        Net new issu… Émissions n… 10100007  176-0082 1975-03-01   
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 10-10-0008        Foreign exch… Taux de cha… 10100008  176-0067 1950-10-02   
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 10-10-0009        Foreign exch… Taux de cha… 10100009  176-0064 1950-10-01   
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 10-10-0010        Sales of alc… Ventes de b… 10100010  183-0023 2004-01-01   
+#&gt; </span><span style='color: #949494;'># … with 5,751 more rows, and 13 more variables: cubeEndDate &lt;date&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   releaseTime &lt;chr&gt;, archived &lt;lgl&gt;, subjectCode &lt;chr&gt;, surveyCode &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   frequencyCode &lt;chr&gt;, corrections &lt;chr&gt;, dimensionNameEn &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   dimensionNameFr &lt;chr&gt;, surveyEn &lt;chr&gt;, surveyFr &lt;chr&gt;, subjectEn &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   subjectFR &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
 
 </div></span></pre>
   </div>
@@ -239,7 +238,7 @@ start and end dates, achieve status, subject and survey codes, frequency codes a
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

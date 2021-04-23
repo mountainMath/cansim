@@ -32,7 +32,7 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
   }
   url=paste0("https://open.canada.ca/data/api/3/action/package_search?q=owner_org:A0F0FCFC-BC3B-4696-8B6D-E7E411D55BAC",
              "&start=",start_offset,"&rows=",max_rows)
-  raw_response <- get_with_timeout_retry(url)
+  raw_response <- suppressWarnings(get_with_timeout_retry(url))
   response <- jsonlite::fromJSON(httr::content(raw_response,type="text",encoding = "UTF-8"))$result
   results=response$results
   if (length(results)==0) return (tibble::tibble())
@@ -190,8 +190,9 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
 #' @export
 list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
   directory <- tempdir() #getOption("cansim.cache_path")
-  path <- file.path(directory,"cansim_cube_list.Rda")
+  path <- file.path(directory,paste0("cansim_cube_list_",ifelse(lite,"lite","regular"),".Rda"))
   if (refresh | !file.exists(path)) {
+    message("Retrieving cube information from StatCan servers...")
     url=ifelse(lite,"https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite","https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesList")
     r<-get_with_timeout_retry(url)
     if (r$status_code==200) {
@@ -200,52 +201,89 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
       header <- content[[1]] %>%
         tibble::enframe() %>%
         t() %>%
-        as_tibble() %>%
+        as.data.frame() %>%
         slice(1) %>%
         unlist() %>%
         as.character()
 
-      if ("dimesions" %in% header)
-        header <- c(setdiff(header,"dimensions"),"dimensionNameEn","dimensionNameFr")
+      # if ("dimesions" %in% header)
+      #   header <- c(setdiff(header,"dimensions"),"dimensionNameEn","dimensionNameFr")
 
+      h1 <- setdiff(header,"dimensions")
+
+      surveys <- get_cansim_code_set("survey")
+      surveys_en <- setNames(surveys$surveyEn,surveys$surveyCode)
+      surveys_fr <- setNames(surveys$surveyFr,surveys$surveyCode)
+      subjects <- get_cansim_code_set("subject")
+      subjects_en <- setNames(subjects$subjectEn,subjects$subjectCode)
+      subjects_fr <- setNames(subjects$subjectEn,subjects$subjectCode)
 
       if (lite) {
-        dd<-content %>% purrr::map(function(l) {
-          tibble::enframe(l) %>%
-            mutate(value=purrr::map(.data$value,function(v)
-              paste0(unlist(v),collapse = ", ")) %>%
-                unlist)
-        })
+        r<-content %>%
+          lapply(function(l){
+            lapply(l,function(d)paste0(unlist(d),collapse=", ")) %>%
+              as_tibble()
+          }) %>%
+          bind_rows()
       } else {
-        dd <- content %>% purrr::map(function(l) {
-          df <- tibble::enframe(l)
-          dimensions <- filter(df,.data$name=="dimensions")$value
-          c(df %>%
-              filter(.data$name!=dimensions) %>%
-              mutate(value=purrr::map(.data$value,function(v)
-                paste0(unlist(v),collapse = ", ")) %>%
-                  unlist),
-            purrr::map(dimensions[[1]],function(a)a$dimensionNameEn) %>% paste0(collapse=", "),
-            purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", "))
-        })
+        r<-content %>%
+          lapply(function(l){
+            lapply(l[h1],function(d)paste0(unlist(d),collapse=", ")) %>%
+              as_tibble() %>%
+              bind_cols(tibble(
+                dimensionNameEn=lapply(l[["dimensions"]],function(d)d["dimensionNameEn"]) %>% unlist %>% paste0(.,collapse = ", "),
+                dimensionNameFr=lapply(l[["dimensions"]],function(d)d["dimensionNameFr"]) %>% unlist %>% paste0(.,collapse = ", ")))
+          }) %>%
+          bind_rows()
       }
-      surveys <- get_cansim_code_set("survey")
-      subjects <- get_cansim_code_set("subject")
-      data <- lapply(dd,function(d)d$value) %>%
-        do.call(rbind,.) %>%
-        as_tibble() %>%
-        set_names(header) %>%
+
+      data <- r %>%
         mutate_at(vars(ends_with("Date")),as.Date) %>%
         mutate(archived=.data$archived==1) %>%
         mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
         select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
                setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
-        left_join(surveys,by="surveyCode") %>%
-        left_join(subjects,by="subjectCode")
+        mutate(surveyEn=lapply(surveyCode,function(d)surveys_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        mutate(surveyFr=lapply(surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        mutate(subjectEn=lapply(subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        mutate(subjectFR=lapply(subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist)
+      # if (lite) {
+      #   dd<-content %>% purrr::map(function(l) {
+      #     tibble::enframe(l) %>%
+      #       mutate(value=purrr::map(.data$value,function(v)
+      #         paste0(unlist(v),collapse = ", ")) %>%
+      #           unlist)
+      #   })
+      # } else {
+      #   dd <- content %>% purrr::map(function(l) {
+      #     df <- tibble::enframe(l)
+      #     dimensions <- filter(df,.data$name=="dimensions")$value
+      #     c(df %>%
+      #         filter(.data$name!=dimensions) %>%
+      #         mutate(value=purrr::map(.data$value,function(v)
+      #           paste0(unlist(v),collapse = ", ")) %>%
+      #             unlist),
+      #       purrr::map(dimensions[[1]],function(a)a$dimensionNameEn) %>% paste0(collapse=", "),
+      #       purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", "))
+      #   })
+      # }
+
+      # data <- lapply(dd,function(d)d$value) %>%
+      #   do.call(rbind,.) %>%
+      #   as_tibble() %>%
+      #   set_names(header) %>%
+      #   mutate_at(vars(ends_with("Date")),as.Date) %>%
+      #   mutate(archived=.data$archived==1) %>%
+      #   mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
+      #   select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
+      #          setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
+      #   left_join(surveys,by="surveyCode") %>%
+      #   left_join(subjects,by="subjectCode")
 
       saveRDS(data,path)
     }
   } else {
+    message("Retrieving cube information from temporary cache.")
     data <- readRDS(path)
   }
   data

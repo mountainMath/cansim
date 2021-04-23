@@ -851,6 +851,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' @importFrom rlang set_names
 #' @importFrom purrr map
 #' @importFrom rlang :=
+#' @importFrom stats setNames
 
 NULL
 

@@ -100,7 +100,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -153,7 +153,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -179,11 +179,11 @@
     <p>Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_data_for_table_coord_periods</span>(
-  <span class='no'>cansimTableNumber</span>,
-  <span class='no'>coordinate</span>,
-  <span class='kw'>periods</span> <span class='kw'>=</span> <span class='fl'>1</span>
-)</pre>
+    <pre class="usage"><span class='fu'>get_cansim_data_for_table_coord_periods</span><span class='op'>(</span>
+  <span class='va'>cansimTableNumber</span>,
+  <span class='va'>coordinate</span>,
+  periods <span class='op'>=</span> <span class='fl'>1</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -208,13 +208,14 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'>get_cansim_data_for_table_coord_periods</span>(<span class='st'>"35-10-0003"</span>,<span class='kw'>coordinate</span><span class='kw'>=</span><span class='st'>"1.12.0.0.0.0.0.0.0.0"</span>,<span class='kw'>periods</span><span class='kw'>=</span><span class='fl'>3</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 3 x 10</span><span>
-#&gt;   DECIMALS VALUE REF_DATE REF_DATE_2 releaseTime SYMBOL frequencyCode SCALAR_ID
-#&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;int&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>        2  51.6 2015-01… 2016-01-01 2019-05-09…      0            12         0
-#&gt; </span><span style='color: #555555;'>2</span><span>        2  48.7 2016-01… 2017-01-01 2019-05-09…      0            12         0
-#&gt; </span><span style='color: #555555;'>3</span><span>        2  54.8 2017-01… 2018-01-01 2019-05-09…      0            12         0
-#&gt; </span><span style='color: #555555;'># … with 2 more variables: COORDINATE </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, VECTOR </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'># }
+<span class='fu'>get_cansim_data_for_table_coord_periods</span><span class='op'>(</span><span class='st'>"35-10-0003"</span>,coordinate<span class='op'>=</span><span class='st'>"1.12.0.0.0.0.0.0.0.0"</span>,periods<span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM vectors from Statistics Canada</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 3 x 10</span><span>
+#&gt;   DECIMALS VALUE REF_DATE  REF_DATE_2 releaseTime SYMBOL frequencyCode SCALAR_ID
+#&gt;      </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>        2  48.7 2016-01-… 2017-01-01 2019-05-09…      0            12         0
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>        2  54.3 2017-01-… 2018-01-01 2020-12-21…      0            12         0
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span>        2  44.7 2018-01-… 2019-01-01 2020-12-21…      0            12         0
+#&gt; </span><span style='color: #949494;'># … with 2 more variables: COORDINATE &lt;chr&gt;, VECTOR &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -231,7 +232,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
