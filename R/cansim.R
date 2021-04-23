@@ -657,7 +657,8 @@ generate_table_metadata <- function(){
 #'
 #' Opens CANSIM table on Statistics Canada's website using default browser. This may be useful for getting further info on CANSIM table and survey methods.
 #'
-#' @param cansimTableNumber CANSIM or NDM table number
+#' @param cansimTableNumber CANSIM or NDM table number. If no number is provided, the vector search
+#' page on the Statistic Canada website will be opened.
 #'
 #' @return none
 #'
@@ -666,10 +667,16 @@ generate_table_metadata <- function(){
 #' view_cansim_webpage("34-10-0013")
 #' }
 #' @export
-view_cansim_webpage <- function(cansimTableNumber){
+view_cansim_webpage <- function(cansimTableNumber = NULL){
   browser <- getOption("browser")
-  cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
-  url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",gsub("-","",cansimTableNumber))
+
+  if (is.null(cansimTableNumber)) {
+    url <- 'https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action#tables'
+  } else {
+    cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
+    url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",gsub("-","",cansimTableNumber))
+  }
+
   utils::browseURL(url,browser)
 }
 
