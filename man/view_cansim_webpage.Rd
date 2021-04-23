@@ -4,10 +4,11 @@
 \alias{view_cansim_webpage}
 \title{View CANSIM table information in browser}
 \usage{
-view_cansim_webpage(cansimTableNumber)
+view_cansim_webpage(cansimTableNumber = NULL)
 }
 \arguments{
-\item{cansimTableNumber}{CANSIM or NDM table number}
+\item{cansimTableNumber}{CANSIM or NDM table number. If no number is provided, the vector search
+page on the Statistic Canada website will be opened.}
 }
 \value{
 none
