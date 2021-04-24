@@ -78,7 +78,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          install.packages("knitr", "rmarkdown")
+          install.packages("knitr")
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
