@@ -12,10 +12,14 @@ Description: Searches for, accesses, and retrieves new-format and old-format Sta
     to make it easier to work with retrieved table data. Optional caching features are provided.
 License: MIT + file LICENSE
 Encoding: UTF-8
+ByteCompile: yes
+NeedsCompilation: no
 LazyData: true
 Depends: R (>= 2.10)
-Imports: dplyr (>= 0.7),
+Imports: digest (>= 0.1),
+    dplyr (>= 0.7),
     httr (>= 1.0.0),
+    jsonlite (>= 1.0),
     readr,
     rlang,
     xml2,
@@ -23,9 +27,7 @@ Imports: dplyr (>= 0.7),
     stringr,
     purrr,
     tibble,
-    utils,
-    jsonlite,
-    digest
+    utils
 RoxygenNote: 7.1.1
 Suggests: knitr,
     rmarkdown,
