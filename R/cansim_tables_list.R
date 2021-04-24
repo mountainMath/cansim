@@ -243,10 +243,10 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
         mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
         select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
                setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
-        mutate(surveyEn=lapply(surveyCode,function(d)surveys_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(surveyFr=lapply(surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(subjectEn=lapply(subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(subjectFR=lapply(subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist)
+        mutate(surveyEn=lapply(.data$surveyCode,function(d)surveys_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        mutate(surveyFr=lapply(.data$surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        mutate(subjectEn=lapply(.data$subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        mutate(subjectFr=lapply(.data$subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist)
       # if (lite) {
       #   dd<-content %>% purrr::map(function(l) {
       #     tibble::enframe(l) %>%

@@ -180,15 +180,15 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2020). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.5.
+  von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.6.
 
 A BibTeX entry for LaTeX users is
 ```
   @Manual{,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
-    year = {2020},
-    note = {R package version 0.3.5},
+    year = {2021},
+    note = {R package version 0.3.6},
     url = {https://mountainmath.github.io/cansim/},
   }
 ```

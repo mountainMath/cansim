@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
       </span>
     </div>
 
@@ -127,7 +127,7 @@
       <h1 data-toc-skip>Working with Statistics Canada data table object hierarchies</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-04-22</h4>
+            <h4 class="date">2021-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -171,6 +171,14 @@
 <p>We see that data set come with three different measures and 307 different NAICS values. Let’s load the data and focus on just “Chained (2012) dollars”.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'dplyr'</span>
+<span class="co">#&gt; The following objects are masked from 'package:stats':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     filter, lag</span>
+<span class="co">#&gt; The following objects are masked from 'package:base':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     intersect, setdiff, setequal, union</span>
 
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="va">table_id</span><span class="op">)</span> 
 <span class="co">#&gt; Reading CANSIM NDM product 36-10-0402 from cache.</span>
@@ -240,9 +248,8 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">NAICS</span>, <span class="va">VALUE</span>, <span class="va">Share</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">NAICS</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">VALUE</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
-            Share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">Share</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; `summarise()` has grouped output by 'Date', 'GEO'. You can override using the `.groups` argument.</span></code></pre></div>
+            Share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">Share</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+            .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> </code></pre></div>
 <p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
@@ -259,7 +266,7 @@
        subtitle<span class="op">=</span><span class="va">selected_value</span>,
        x<span class="op">=</span><span class="st">""</span>, fill <span class="op">=</span> <span class="st">""</span>, 
        caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="../../../../Google%20Drive/R/cansim/vignettes/figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">real_construction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span><span class="op">)</span>
 
@@ -293,7 +300,7 @@
        subtitle<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">regions</span>,<span class="st">", "</span>, <span class="va">selected_value</span><span class="op">)</span>,
        x<span class="op">=</span><span class="st">""</span>,
        caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="../../../../Google%20Drive/R/cansim/vignettes/figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-8-1.png" width="864"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
 </div>
   </div>
 

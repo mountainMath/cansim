@@ -42,4 +42,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 
 * Exclude all vignettes and example code from compilation as this may cause CRAN check errors when StatCan servers are down or otherwise temporarily unavailable
 
+## Changes from version 0.3.5
+
+* Adapt to changes in dplyr, tidyr, and tibble
+* fix a bug that would not properly add hierarchies when category names are repeated
 

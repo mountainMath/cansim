@@ -1,3 +1,9 @@
+# cansim 0.3.6
+
+## Minor changes
+* Adapt to changes in dplyr, tidyr, and tibble
+* fix a bug that would not properly add hierarchies when category names are repeated
+
 # cansim 0.3.5 
 
 ## Minor changes

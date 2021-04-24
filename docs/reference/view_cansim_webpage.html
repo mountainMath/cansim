@@ -92,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
       </span>
     </div>
 
@@ -179,14 +179,15 @@
     <p>Opens CANSIM table on Statistics Canada's website using default browser. This may be useful for getting further info on CANSIM table and survey methods.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>view_cansim_webpage</span><span class='op'>(</span><span class='va'>cansimTableNumber</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>view_cansim_webpage</span><span class='op'>(</span>cansimTableNumber <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>cansimTableNumber</th>
-      <td><p>CANSIM or NDM table number</p></td>
+      <td><p>CANSIM or NDM table number. If no number is provided, the vector search
+page on the Statistic Canada website will be opened.</p></td>
     </tr>
     </table>
 
