@@ -56,7 +56,9 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' normalize_cansim_values(cansim_table)
 #' }
 #' @export
-normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE, default_month="01", default_day="01",factors=FALSE,strip_classification_code=FALSE){
+normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE,
+                                    default_month="01", default_day="01",
+                                    factors=FALSE,strip_classification_code=FALSE){
   language <- ifelse("VALEUR" %in% names(data),"fr","en")
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
@@ -111,18 +113,67 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   }
 
   if (factors){
-    levels_for_field <- function(field){
-      data %>%
-        select(field,paste0(hierarchy_prefix,field)) %>%
-        unique %>%
-        mutate(id=as.integer(strsplit(!!as.name(paste0(hierarchy_prefix,field)),"\\.") %>% purrr::map(last) %>% unlist)) %>%
-        arrange(id) %>%
-        pull(field)
+    parent_hierarchy <- function(hs){
+      hs %>%
+        strsplit("\\.") %>%
+        lapply(function(d)head(d,-1)) %>%
+        lapply(function(d)paste0(d,collapse = ".")) %>%
+        unlist
     }
+    hierarchy_order <- function(hs){
+      hs %>%
+        strsplit("\\.") %>%
+        lapply(function(d)stringr::str_pad(d,20,side="left",pad="0")) %>%
+        lapply(function(d)paste0(d,collapse = ".")) %>%
+        unlist
+    }
+    # for (field in fields) {
+    #   data <- data %>%
+    #     mutate(!!field:=factor(!!as.name(field),levels=levels_for_field(field)))
+    # }
     for (field in fields) {
+      hierarchy_field <- paste0(hierarchy_prefix,field)
+      parent_field <- paste0("parent ",field)
+      levels_data <- data %>%
+        select(all_of(c(field,hierarchy_field))) %>%
+        unique %>%
+        rename(...name = !!as.name(field)) %>%
+        mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
+        mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field)))
+
+      while (sum(levels_data$...dupes)>0 && nrow(filter(levels_data,.data$...parent_hierarchy!=""))>0) {
+        levels_data <- levels_data %>%
+          mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
+          left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
+                      rename(!!!rlang::set_names("...name",parent_field)),
+                    by=c(...parent_hierarchy=hierarchy_field)) %>%
+          mutate(...name=ifelse(.data$...dupes,
+                                paste0(.data$...name," (",!!as.name(parent_field),")"),
+                                .data$...name)) %>%
+          mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
+          mutate(...parent_hierarchy=parent_hierarchy(.data$...parent_hierarchy))
+      }
+      if (sum(levels_data$...dupes)>0) {
+        levels_data <- levels_data %>%
+          group_by(.data$...name) %>%
+          mutate(n=n(),nn=row_number()) %>%
+          mutate(...name=ifelse(n>1,paste0(.data$...name," - ",.data$nn),.data$...name))
+      }
+
+      # make sure order of factors is right
+      levels_data <- levels_data %>%
+        mutate(...h=hierarchy_order(!!as.name(hierarchy_field))) %>%
+        arrange(.data$...h)
+
+
       data <- data %>%
-        mutate(!!field:=factor(!!as.name(field),levels=levels_for_field(field)))
-        #mutate_at(fields,function(d)factor(d,levels=levels_for_field(d)))
+        select(-all_of(field)) %>%
+        left_join(levels_data %>%
+                    select(all_of(c(hierarchy_field,"...name"))) %>%
+                    rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
+
+      data <- data %>%
+        mutate_at(field,function(d)factor(d,levels=levels_data$...name))
     }
   }
 
@@ -867,6 +918,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' @importFrom purrr map
 #' @importFrom rlang :=
 #' @importFrom stats setNames
+#' @importFrom utils head
 
 NULL
 
