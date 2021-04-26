@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieves a Statistics Canada data table using CANSIM code or NDM table number — get_cansim • cansim</title>
+<title>Retrieve a Statistics Canada data table using NDM catalogue number — get_cansim • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Retrieves a Statistics Canada data table using CANSIM code or NDM table number — get_cansim" />
-<meta property="og:description" content="Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default." />
+<meta property="og:title" content="Retrieve a Statistics Canada data table using NDM catalogue number — get_cansim" />
+<meta property="og:description" content="Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/index.html/logo.png" />
 
 
@@ -170,20 +170,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieves a Statistics Canada data table using CANSIM code or NDM table number</h1>
+    <h1>Retrieve a Statistics Canada data table using NDM catalogue number</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
     <div class="hidden name"><code>get_cansim.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.</p>
+    <p>Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_cansim</span><span class='op'>(</span>
   <span class='va'>cansimTableNumber</span>,
   language <span class='op'>=</span> <span class='st'>"english"</span>,
   refresh <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  timeout <span class='op'>=</span> <span class='fl'>200</span>
+  timeout <span class='op'>=</span> <span class='fl'>200</span>,
+  factors <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  default_month <span class='op'>=</span> <span class='st'>"07"</span>,
+  default_day <span class='op'>=</span> <span class='st'>"01"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -191,11 +194,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>cansimTableNumber</th>
-      <td><p>the table number to load, accepts old CANSIM or new NDM table numbers</p></td>
+      <td><p>the NDM table number to load</p></td>
     </tr>
     <tr>
       <th>language</th>
-      <td><p><code>"en"</code> or <code>"english"</code> for English and <code>"fr"</code> or <code>"french"</code> for French language versions (default is set to English)</p></td>
+      <td><p><code>"en"</code> or <code>"english"</code> for English and <code>"fr"</code> or <code>"french"</code> for French language versions (defaults to English)</p></td>
     </tr>
     <tr>
       <th>refresh</th>
@@ -205,51 +208,46 @@
       <th>timeout</th>
       <td><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></td>
     </tr>
+    <tr>
+      <th>factors</th>
+      <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>default_month</th>
+      <td><p>The default month that should be used when creating Date objects for annual data (default set to "07")</p></td>
+    </tr>
+    <tr>
+      <th>default_day</th>
+      <td><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>tibble format data table output</p>
+    <p>tibble format data table output with added Date column with inferred date objects and
+a "val_norm" column with normalized VALUE using the supplied scale factor</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='co'># Retrieve a table with an NDM code</span>
 <span class='fu'>get_cansim</span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 34-10-0013 from Statistics Canada</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='output co'>#&gt; <span class='message'>Folding in metadata</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 550 x 18</span><span>
-#&gt;    REF_DATE GEO     DGUID  `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 2005     Canada  2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 2005     Newfou… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 2005     Prince… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 2005     Nova S… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 2005     New Br… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 2005     Quebec  2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 2005     Ontario 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 2005     Manito… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 2005     Saskat… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 2005     Alberta 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #949494;'># … with 540 more rows, and 10 more variables: VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   GeoUID &lt;chr&gt;, Classification Code for Type of property &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   Hierarchy for Type of property &lt;chr&gt;</span><span></div><div class='input'><span class='co'># Retrieve a table with an old-style CANSIM code</span>
-<span class='fu'>get_cansim</span><span class='op'>(</span><span class='st'>"026-0018"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Legacy table number 026-0018, converting to NDM 34-10-0013</span></div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 550 x 18</span><span>
-#&gt;    REF_DATE GEO     DGUID  `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 2005     Canada  2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 2005     Newfou… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 2005     Prince… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 2005     Nova S… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 2005     New Br… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 2005     Quebec  2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 2005     Ontario 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 2005     Manito… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 2005     Saskat… 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 2005     Alberta 2016A… Residential      Doll… 81     millions      6        
-#&gt; </span><span style='color: #949494;'># … with 540 more rows, and 10 more variables: VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   GeoUID &lt;chr&gt;, Classification Code for Type of property &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   Hierarchy for Type of property &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
+</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 34-10-0013 from Statistics Canada</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='output co'>#&gt; <span class='message'>Folding in metadata</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 550 x 20</span><span>
+#&gt;    REF_DATE GEO     DGUID UOM   UOM_ID SCALAR_FACTOR SCALAR_ID VECTOR COORDINATE
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 2005     Canada  2016… Doll… 81     millions      6         v6558… 1.1       
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 2005     Newfou… 2016… Doll… 81     millions      6         v6558… 2.1       
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 2005     Prince… 2016… Doll… 81     millions      6         v6558… 3.1       
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 2005     Nova S… 2016… Doll… 81     millions      6         v6558… 4.1       
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 2005     New Br… 2016… Doll… 81     millions      6         v6558… 5.1       
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 2005     Quebec  2016… Doll… 81     millions      6         v6558… 6.1       
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 2005     Ontario 2016… Doll… 81     millions      6         v6558… 7.1       
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 2005     Manito… 2016… Doll… 81     millions      6         v6558… 8.1       
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 2005     Saskat… 2016… Doll… 81     millions      6         v6558… 9.1       
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 2005     Alberta 2016… Doll… 81     millions      6         v6558… 10.1      
+#&gt; </span><span style='color: #949494;'># … with 540 more rows, and 11 more variables: VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Classification Code for Type of property &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Hierarchy for Type of property &lt;chr&gt;, val_norm &lt;dbl&gt;, Date &lt;date&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Type of property &lt;fct&gt;</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

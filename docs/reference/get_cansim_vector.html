@@ -183,7 +183,11 @@
   <span class='va'>vectors</span>,
   <span class='va'>start_time</span>,
   end_time <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.time</a></span><span class='op'>(</span><span class='op'>)</span>,
-  use_ref_date <span class='op'>=</span> <span class='cn'>TRUE</span>
+  use_ref_date <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  timeout <span class='op'>=</span> <span class='fl'>200</span>,
+  factors <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  default_month <span class='op'>=</span> <span class='st'>"07"</span>,
+  default_day <span class='op'>=</span> <span class='st'>"01"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -205,6 +209,22 @@
       <th>use_ref_date</th>
       <td><p>Optional, <code>TRUE</code> by default. When set to <code>TRUE</code>, uses <code>REF_DATE</code> of vector data to filter, otherwise it uses Statistics Canada's <code>releaseDate</code> value for filtering the specified vectors</p></td>
     </tr>
+    <tr>
+      <th>timeout</th>
+      <td><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></td>
+    </tr>
+    <tr>
+      <th>factors</th>
+      <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>TRUE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>default_month</th>
+      <td><p>The default month that should be used when creating Date objects for annual data (default set to "07")</p></td>
+    </tr>
+    <tr>
+      <th>default_day</th>
+      <td><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -214,7 +234,7 @@
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='fu'>get_cansim_vector</span><span class='op'>(</span><span class='st'>"v41690973"</span>,<span class='st'>"2015-01-01"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM vectors from Statistics Canada</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 75 x 9</span><span>
+</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM vectors from Statistics Canada</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 75 x 11</span><span>
 #&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE
 #&gt;       </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     
 #&gt; </span><span style='color: #BCBCBC;'> 1</span><span>        1  124. 2015-01… 2018-06-12…      0             6         0 2.2.0.0.0…
@@ -227,7 +247,8 @@
 #&gt; </span><span style='color: #BCBCBC;'> 8</span><span>        1  127. 2015-08… 2018-06-12…      0             6         0 2.2.0.0.0…
 #&gt; </span><span style='color: #BCBCBC;'> 9</span><span>        1  127. 2015-09… 2018-06-12…      0             6         0 2.2.0.0.0…
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span>        1  127. 2015-10… 2018-06-12…      0             6         0 2.2.0.0.0…
-#&gt; </span><span style='color: #949494;'># … with 65 more rows, and 1 more variable: VECTOR &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
+#&gt; </span><span style='color: #949494;'># … with 65 more rows, and 3 more variables: VECTOR &lt;chr&gt;, val_norm &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Date &lt;date&gt;</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

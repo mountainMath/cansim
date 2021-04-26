@@ -2,35 +2,42 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim}
 \alias{get_cansim}
-\title{Retrieves a Statistics Canada data table using CANSIM code or NDM table number}
+\title{Retrieve a Statistics Canada data table using NDM catalogue number}
 \usage{
 get_cansim(
   cansimTableNumber,
   language = "english",
   refresh = FALSE,
-  timeout = 200
+  timeout = 200,
+  factors = TRUE,
+  default_month = "07",
+  default_day = "01"
 )
 }
 \arguments{
-\item{cansimTableNumber}{the table number to load, accepts old CANSIM or new NDM table numbers}
+\item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default is set to English)}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).}
+
+\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "07")}
+
+\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 }
 \value{
-tibble format data table output
+tibble format data table output with added Date column with inferred date objects and
+a "val_norm" column with normalized VALUE using the supplied scale factor
 }
 \description{
-Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.
+Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 }
 \examples{
 \donttest{
-# Retrieve a table with an NDM code
 get_cansim("34-10-0013")
-# Retrieve a table with an old-style CANSIM code
-get_cansim("026-0018")
 }
 }

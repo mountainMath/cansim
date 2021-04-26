@@ -234,3 +234,4 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
   as_tibble(m) %>%
     mutate_all(unlist)
 }
+

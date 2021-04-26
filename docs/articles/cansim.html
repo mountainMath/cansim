@@ -126,7 +126,7 @@
       <h1 data-toc-skip>Getting started with the cansim package</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-04-24</h4>
+            <h4 class="date">2021-04-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/cansim.Rmd"><code>vignettes/cansim.Rmd</code></a></small>
       <div class="hidden name"><code>cansim.Rmd</code></div>
@@ -163,20 +163,22 @@
 <span class="co">#&gt; Parsing data</span>
 <span class="co">#&gt; Folding in metadata</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 21</span>
-<span class="co">#&gt;   REF_DATE GEO    DGUID  `Labour force c… Statistics  UOM   UOM_ID SCALAR_FACTOR</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;            &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;        </span>
-<span class="co">#&gt; 1 2001-03  Canada 2016A… Population       Estimate    Pers… 249    thousands    </span>
-<span class="co">#&gt; 2 2001-03  Canada 2016A… Labour force     Estimate    Pers… 249    thousands    </span>
-<span class="co">#&gt; 3 2001-03  Canada 2016A… Labour force     Standard e… Pers… 249    thousands    </span>
-<span class="co">#&gt; 4 2001-03  Canada 2016A… Labour force     Standard e… Pers… 249    thousands    </span>
-<span class="co">#&gt; 5 2001-03  Canada 2016A… Employment       Estimate    Pers… 249    thousands    </span>
-<span class="co">#&gt; 6 2001-03  Canada 2016A… Employment       Standard e… Pers… 249    thousands    </span>
-<span class="co">#&gt; # … with 13 more variables: SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span>
-<span class="co">#&gt; #   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span>
-<span class="co">#&gt; #   GeoUID &lt;chr&gt;, Classification Code for Labour force characteristics &lt;chr&gt;,</span>
+<span class="co">#&gt; # A tibble: 6 x 23</span>
+<span class="co">#&gt;   REF_DATE GEO    DGUID   UOM   UOM_ID SCALAR_FACTOR SCALAR_ID VECTOR COORDINATE</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;     </span>
+<span class="co">#&gt; 1 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.1.1     </span>
+<span class="co">#&gt; 2 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.2.1     </span>
+<span class="co">#&gt; 3 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.2.2     </span>
+<span class="co">#&gt; 4 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.2.3     </span>
+<span class="co">#&gt; 5 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.3.1     </span>
+<span class="co">#&gt; 6 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.3.2     </span>
+<span class="co">#&gt; # … with 14 more variables: VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,</span>
+<span class="co">#&gt; #   TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span>
+<span class="co">#&gt; #   Classification Code for Labour force characteristics &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Hierarchy for Labour force characteristics &lt;chr&gt;,</span>
-<span class="co">#&gt; #   Classification Code for Statistics &lt;chr&gt;, Hierarchy for Statistics &lt;chr&gt;</span></code></pre></div>
+<span class="co">#&gt; #   Classification Code for Statistics &lt;chr&gt;, Hierarchy for Statistics &lt;chr&gt;,</span>
+<span class="co">#&gt; #   val_norm &lt;dbl&gt;, Date &lt;date&gt;, Labour force characteristics &lt;fct&gt;,</span>
+<span class="co">#&gt; #   Statistics &lt;fct&gt;</span></code></pre></div>
 <p>By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into a cleaner data object and to use the included data to transform values by their appropriate scaling or unit variable. This makes it easier to work on the data directly and minimize unnecessary data manipulation. For example, data may be reported as a value in “millions” but with unitless numbers. A built-in convenience function, <code>normalize_cansim_values</code>, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using <code>dplyr</code>, applying normalization is as straightforward as piping data through the <code>normalize_cansim_values</code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
@@ -192,21 +194,21 @@
   <span class="fu"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Reading CANSIM NDM product 14-10-0293 from cache.</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 20</span>
-<span class="co">#&gt;   REF_DATE GEO    DGUID   `Labour force char… Statistics     UOM   UOM_ID VECTOR</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;               &lt;chr&gt;          &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; </span>
-<span class="co">#&gt; 1 2001-03  Canada 2016A0… Population          Estimate       Pers… 249    v9141…</span>
-<span class="co">#&gt; 2 2001-03  Canada 2016A0… Labour force        Estimate       Pers… 249    v9141…</span>
-<span class="co">#&gt; 3 2001-03  Canada 2016A0… Labour force        Standard erro… Pers… 249    v1018…</span>
-<span class="co">#&gt; 4 2001-03  Canada 2016A0… Labour force        Standard erro… Pers… 249    v1018…</span>
-<span class="co">#&gt; 5 2001-03  Canada 2016A0… Employment          Estimate       Pers… 249    v9141…</span>
-<span class="co">#&gt; 6 2001-03  Canada 2016A0… Employment          Standard erro… Pers… 249    v1018…</span>
-<span class="co">#&gt; # … with 12 more variables: COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;,</span>
-<span class="co">#&gt; #   SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span>
+<span class="co">#&gt; # A tibble: 6 x 21</span>
+<span class="co">#&gt;   REF_DATE GEO    DGUID    UOM   UOM_ID VECTOR  COORDINATE   VALUE STATUS SYMBOL</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; </span>
+<span class="co">#&gt; 1 2001-03  Canada 2016A00… Pers… 249    v91413… 1.1.1       2.43e7 &lt;NA&gt;   &lt;NA&gt;  </span>
+<span class="co">#&gt; 2 2001-03  Canada 2016A00… Pers… 249    v91413… 1.2.1       1.58e7 &lt;NA&gt;   &lt;NA&gt;  </span>
+<span class="co">#&gt; 3 2001-03  Canada 2016A00… Pers… 249    v10189… 1.2.2       3.3 e4 &lt;NA&gt;   &lt;NA&gt;  </span>
+<span class="co">#&gt; 4 2001-03  Canada 2016A00… Pers… 249    v10189… 1.2.3      NA      ..     &lt;NA&gt;  </span>
+<span class="co">#&gt; 5 2001-03  Canada 2016A00… Pers… 249    v91413… 1.3.1       1.46e7 &lt;NA&gt;   &lt;NA&gt;  </span>
+<span class="co">#&gt; 6 2001-03  Canada 2016A00… Pers… 249    v10189… 1.3.2       3.63e4 &lt;NA&gt;   &lt;NA&gt;  </span>
+<span class="co">#&gt; # … with 11 more variables: TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Classification Code for Labour force characteristics &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Hierarchy for Labour force characteristics &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Classification Code for Statistics &lt;chr&gt;, Hierarchy for Statistics &lt;chr&gt;,</span>
-<span class="co">#&gt; #   Date &lt;date&gt;</span></code></pre></div>
+<span class="co">#&gt; #   val_norm &lt;dbl&gt;, Date &lt;date&gt;, Labour force characteristics &lt;fct&gt;,</span>
+<span class="co">#&gt; #   Statistics &lt;fct&gt;</span></code></pre></div>
 <p>Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the <code><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview(table_number)</a></code> function.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"14-10-0293"</span><span class="op">)</span>
@@ -225,18 +227,14 @@
 <p>When a table number is unknown, you can browse the available tables or search by survey name, keyword or title.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/search_cansim_tables.html">search_cansim_tables</a></span><span class="op">(</span><span class="st">"housing price indexes"</span><span class="op">)</span>
-<span class="co">#&gt; Your CANSIM table overview data is 422 days old.</span>
-<span class="co">#&gt; Consider setting options(cansim.cache_path="your cache path")</span>
-<span class="co">#&gt; in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span>
-<span class="co">#&gt; The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span>
 <span class="co">#&gt; # A tibble: 11 x 21</span>
 <span class="co">#&gt;    title  title_en  title_fr  keywords_en  keywords  keywords_fr  notes notes_en</span>
 <span class="co">#&gt;    &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;        &lt;chr&gt;     &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;   </span>
 <span class="co">#&gt;  1 New h… New hous… Indice d… constructio… construc… constructio… &lt;p&gt;N… &lt;p&gt;New …</span>
-<span class="co">#&gt;  2 Resid… Resident… Indice d… housing, ho… housing,… housing, ho… &lt;p&gt;R… &lt;p&gt;Resi…</span>
+<span class="co">#&gt;  2 New h… New hous… Indice d… constructio… construc… constructio… &lt;p&gt;N… &lt;p&gt;New …</span>
 <span class="co">#&gt;  3 Resid… Resident… Indice d… housing, ho… housing,… housing, ho… &lt;p&gt;R… &lt;p&gt;Resi…</span>
 <span class="co">#&gt;  4 Build… Building… Indices … housing, ho… housing,… housing, ho… &lt;p&gt;B… &lt;p&gt;Buil…</span>
-<span class="co">#&gt;  5 New h… New hous… Indice d… constructio… construc… constructio… &lt;p&gt;N… &lt;p&gt;New …</span>
+<span class="co">#&gt;  5 Resid… Resident… Indice d… housing, ho… housing,… housing, ho… &lt;p&gt;R… &lt;p&gt;Resi…</span>
 <span class="co">#&gt;  6 Price… Price in… Indices … housing, ho… housing,… housing, ho… &lt;p&gt;T… &lt;p&gt;This…</span>
 <span class="co">#&gt;  7 New h… New hous… Indices … constructio… construc… constructio… This… This ta…</span>
 <span class="co">#&gt;  8 New h… New hous… Indices … constructio… construc… constructio… This… This ta…</span>
@@ -255,7 +253,7 @@
                   start_time <span class="op">=</span> <span class="st">"2015-05-01"</span>,
                   end_time<span class="op">=</span><span class="st">"2015-08-01"</span><span class="op">)</span>
 <span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span>
-<span class="co">#&gt; # A tibble: 5 x 10</span>
+<span class="co">#&gt; # A tibble: 5 x 12</span>
 <span class="co">#&gt;   DECIMALS VALUE REF_DATE  releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
 <span class="co">#&gt;      &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;        &lt;int&gt;         &lt;int&gt;     &lt;int&gt; &lt;chr&gt;     </span>
 <span class="co">#&gt; 1        1  122. 2015-05-… 2018-06-12…      0             6         0 27.2.0.0.…</span>
@@ -263,7 +261,8 @@
 <span class="co">#&gt; 3        1  122. 2015-07-… 2018-06-12…      0             6         0 27.2.0.0.…</span>
 <span class="co">#&gt; 4        1  123. 2015-08-… 2018-06-12…      0             6         0 27.2.0.0.…</span>
 <span class="co">#&gt; 5        1  153  2015-07-… 2015-11-10…      0             9         0 8.7.1.0.0…</span>
-<span class="co">#&gt; # … with 2 more variables: VECTOR &lt;chr&gt;, label &lt;chr&gt;</span></code></pre></div>
+<span class="co">#&gt; # … with 4 more variables: VECTOR &lt;chr&gt;, label &lt;chr&gt;, val_norm &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   Date &lt;date&gt;</span></code></pre></div>
 </div>
 <div id="license" class="section level3">
 <h3 class="hasAnchor">

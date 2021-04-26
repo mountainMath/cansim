@@ -7,7 +7,11 @@
 get_cansim_data_for_table_coord_periods(
   cansimTableNumber,
   coordinate,
-  periods = 1
+  periods = 1,
+  timeout = 200,
+  factors = TRUE,
+  default_month = "07",
+  default_day = "01"
 )
 }
 \arguments{
@@ -16,6 +20,14 @@ get_cansim_data_for_table_coord_periods(
 \item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
+
+\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).}
+
+\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "07")}
+
+\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 }
 \value{
 A tibble with data matching specified coordinate and period input arguments

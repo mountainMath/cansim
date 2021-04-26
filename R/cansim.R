@@ -3,6 +3,8 @@
 #'
 #' Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.
 #'
+#' Deprecated, use `get_cansim` instead. This will be removed in future releases.
+#'
 #' @param cansimTableNumber the table number to load, accepts old CANSIM or new NDM table numbers
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default is set to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
@@ -19,8 +21,8 @@
 #' get_cansim("026-0018")
 #' }
 #' @export
-get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
-  get_cansim_ndm(cleaned_ndm_table_number(cansimTableNumber), language, refresh, timeout = timeout)
+get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
+  get_cansim(cleaned_ndm_table_number(cansimTableNumber), language, refresh, timeout = timeout)
 }
 
 
@@ -361,16 +363,21 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
+#' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
-#' @return tibble format data table output
+#' @return tibble format data table output with added Date column with inferred date objects and
+#' a "val_norm" column with normalized VALUE using the supplied scale factor
 #'
 #' @examples
 #' \donttest{
 #' get_cansim("34-10-0013")
 #' }
 #' @export
-get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,timeout=200){
+get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200,
+                       factors=TRUE, default_month="07", default_day="01"){
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
   base_table <- naked_ndm_table_number(cansimTableNumber)
@@ -424,7 +431,9 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,
     else
       message(paste0("Lecture du produit ",cleaned_number)," de CANSIM NDM ",intToUtf8(0x00E0)," partir du cache.")
   }
-  readRDS(file=data_path)
+  readRDS(file=data_path) %>%
+    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                            default_month = default_month, default_day = default_day)
 }
 
 #' Retrieve Statistics Canada data table information
@@ -445,7 +454,7 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,
 get_cansim_table_info <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda1")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh,timeout=timeout)
+    get_cansim(cansimTableNumber,language=language,refresh = refresh,timeout=timeout)
   }
   readRDS(file=data_path)
 }
@@ -469,7 +478,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 get_cansim_table_survey <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -492,7 +501,7 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 get_cansim_table_subject <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda4")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -515,7 +524,7 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 get_cansim_table_short_notes <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -538,7 +547,7 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 get_cansim_column_list <- function(cansimTableNumber, language="english", refresh=FALSE, timeout= 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -562,7 +571,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 get_cansim_column_categories <- function(cansimTableNumber, column, language="english", refresh=FALSE, timeout = 200){
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
   if (refresh | !file.exists(data_path)){
-    get_cansim_ndm(cansimTableNumber,language=language,refresh = refresh, timeout = 200)
+    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = 200)
   }
   data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda_column_",column)
   if (!file.exists(data_path)){
