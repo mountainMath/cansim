@@ -8,6 +8,7 @@ get_cansim_data_for_table_coord_periods(
   cansimTableNumber,
   coordinate,
   periods = 1,
+  refresh = FALSE,
   timeout = 200,
   factors = TRUE,
   default_month = "07",
@@ -20,6 +21,8 @@ get_cansim_data_for_table_coord_periods(
 \item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
+
+\item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 

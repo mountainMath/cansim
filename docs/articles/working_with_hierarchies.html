@@ -127,7 +127,7 @@
       <h1 data-toc-skip>Working with Statistics Canada data table object hierarchies</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-04-25</h4>
+            <h4 class="date">2021-04-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_hierarchies.Rmd"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -187,20 +187,12 @@
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">Value</span> <span class="op">==</span> <span class="va">selected_value</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="normalizing-variables" class="section level3">
-<h3 class="hasAnchor">
-<a href="#normalizing-variables" class="anchor"></a>Normalizing variables</h3>
-<p>There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code>. By default, downloaded CANSIM data contains a <code>VALUE</code> and a <code>SCALAR_FACTOR</code> field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will apply the appropriate conversion based on the scale variable so that the <code>VALUE</code> value is more straight-forward to work with. The default data also includes a character string <code>REF_DATE</code> field, which the <code><a href="../reference/normalize_cansim_values.html">normalize_cansim_values()</a></code> function will attempt to convert into a standard date-class variable.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span><span class="op">(</span>strip_classification_code <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-</div>
 <div id="taking-advantage-of-metadata" class="section level3">
 <h3 class="hasAnchor">
 <a href="#taking-advantage-of-metadata" class="anchor"></a>Taking advantage of metadata</h3>
 <p>This table includes all the different levels of NAICS categories in one dimension. This makes working with the data at that level rather cumbersome when we are often only interested in specific sub-categories. The internal hierarchy can help with that. Let’s first get an overview of the data. We can also use this to easily compute shares instead of totals.</p>
 <p>We can extract the hierarchy using the built-in convenience function <code>categories_for_level</code> which takes in a <code>cansim</code>-package retrieved data table object with metadata as input and requires a field from which to extract categories from as well as a level indicating the target depth level of the hierarchy that we wish to extract.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Extract top-level hierarchy to calculate total</span>
 <span class="va">top_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/categories_for_level.html">categories_for_level</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"North American Industry Classification System (NAICS)"</span>,<span class="fl">0</span><span class="op">)</span>
 
@@ -209,20 +201,20 @@
 <span class="co"># but we wanted to demonstrate how to use specific hierarchy levels. </span>
 <span class="va">total_data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> <span class="va">top_level</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>Total <span class="op">=</span> <span class="va">VALUE</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>Total <span class="op">=</span> <span class="va">val_norm</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">Total</span><span class="op">)</span>
 
 <span class="co"># Merge total back in and calculate share for every NAICS code</span>
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">total_data</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Share <span class="op">=</span> <span class="va">VALUE</span><span class="op">/</span><span class="va">Total</span><span class="op">)</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Share <span class="op">=</span> <span class="va">val_norm</span><span class="op">/</span><span class="va">Total</span><span class="op">)</span>
 <span class="co">#&gt; Joining, by = c("GEO", "Date")</span></code></pre></div>
 </div>
 <div id="hierarchies-in-more-detail" class="section level3">
 <h3 class="hasAnchor">
 <a href="#hierarchies-in-more-detail" class="anchor"></a>Hierarchies in more detail</h3>
 <p>There are hundreds of NAICS codes here which is too many to make sense of at the same time. We can use <code>categories_for_level</code> again to reduce our NAICS codes just to the first sub-level which represents the industry groups. We can call this subset <code>cut_data</code>. (Note that the NAICS data also includes composite groups of industries, something like a level 0.5 hierarchy, which are prefixed with a “T” and which we want to remove as well.)</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cut_data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span>
   <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"T\\d+"</span>,<span class="va">`Classification Code for North American Industry Classification System (NAICS)`</span><span class="op">)</span>,
   <span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%in%</span> 
@@ -231,10 +223,10 @@
 <span class="co"># How many are NAICS categories left? </span>
 <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cut_data</span><span class="op">$</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op">%&gt;%</span> <span class="va">unique</span><span class="op">)</span></code></pre></div>
 <p>There are still 22 level 1 categories, too many to sensibly visualize at the same time. We can use <code>dplyr</code> functions to identify the top categories and group the rest so that we can have a plot that is easier to understand.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Specify which regions and period we want to look at </span>
 <span class="va">regions</span> <span class="op">=</span> <span class="st">"British Columbia"</span>
-<span class="va">period</span> <span class="op">=</span> <span class="st">"2017-01-01"</span>
+<span class="va">period</span> <span class="op">=</span> <span class="st">"2019-07-01"</span>
 
 <span class="co"># Select the top-8 categories for our reference region and period</span>
 <span class="va">top_categories</span> <span class="op">&lt;-</span> <span class="va">cut_data</span> <span class="op">%&gt;%</span> 
@@ -251,11 +243,10 @@
             Share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">Share</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
             .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> </code></pre></div>
 <p>With the data prepared, the last step is putting it all together into a visualization using <code>ggplot2</code>. We can then see if any further adjustments are required.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span> <span class="op">%&gt;%</span> 
-         <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">%in%</span> <span class="va">regions</span><span class="op">)</span>, 
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span> <span class="op">%&gt;%</span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">%in%</span> <span class="va">regions</span><span class="op">)</span>, 
        <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Date</span>, y <span class="op">=</span> <span class="va">Share</span>, fill <span class="op">=</span> <span class="va">NAICS</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_ribbon.html">geom_area</a></span><span class="op">(</span>position<span class="op">=</span><span class="st">"stack"</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/label_percent.html">percent</a></span><span class="op">)</span> <span class="op">+</span>
@@ -266,9 +257,9 @@
        subtitle<span class="op">=</span><span class="va">selected_value</span>,
        x<span class="op">=</span><span class="st">""</span>, fill <span class="op">=</span> <span class="st">""</span>, 
        caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">real_construction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Construction"</span>,<span class="st">"Real estate and rental and leasing"</span><span class="op">)</span>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-6-1.png" width="864"> Let’s have a closer look at the “Real estate and rental and leasing” and “Construction” categories. Once again we turn to the <code>categories_for_level</code> function to make grabbing the sub-categories an easier process.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">real_construction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Construction [23]"</span>,<span class="st">"Real estate and rental and leasing [53]"</span><span class="op">)</span>
 
 <span class="co"># Get the NAICS hierarchy codes just for these categories</span>
 <span class="va">rrl_hierarchy</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">%&gt;%</span> 
@@ -300,7 +291,7 @@
        subtitle<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">regions</span>,<span class="st">", "</span>, <span class="va">selected_value</span><span class="op">)</span>,
        x<span class="op">=</span><span class="st">""</span>,
        caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-8-1.png" width="864"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
+<p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-7-1.png" width="864"> We observe in the resulting chart that the largest contributors to GDP in this sector in British Columbia are Owner-occupied dwellings (imputed rent) and Lessors of Real estate (rent), followed by Residential building construction.</p>
 </div>
   </div>
 

@@ -127,7 +127,7 @@
       <h1 data-toc-skip>Listing Statistics Canada data tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-04-25</h4>
+            <h4 class="date">2021-04-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/listing_cansim_tables.Rmd"><code>vignettes/listing_cansim_tables.Rmd</code></a></small>
       <div class="hidden name"><code>listing_cansim_tables.Rmd</code></div>
@@ -188,12 +188,11 @@
 <span class="va">selected_table</span> <span class="op">&lt;-</span> <span class="st">"14-10-0293"</span>
 
 <span class="va">data</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="va">selected_table</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="../reference/normalize_cansim_values.html">normalize_cansim_values</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Mainland|Vancouver Island|Okanagan"</span>, <span class="va">GEO</span><span class="op">)</span>,
          <span class="va">Date</span><span class="op">&gt;=</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html">as.Date</a></span><span class="op">(</span><span class="st">"2015-01-01"</span><span class="op">)</span>,
          <span class="va">`Labour force characteristics`</span><span class="op">==</span><span class="st">"Unemployment rate"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">Statistics</span>, <span class="va">VALUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a></span><span class="op">(</span>key<span class="op">=</span><span class="st">"Statistics"</span>, value<span class="op">=</span><span class="va">VALUE</span><span class="op">)</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">Statistics</span>, <span class="va">val_norm</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a></span><span class="op">(</span>key<span class="op">=</span><span class="st">"Statistics"</span>, value<span class="op">=</span><span class="va">val_norm</span><span class="op">)</span>
 <span class="co">#&gt; Accessing CANSIM NDM product 14-10-0293 from Statistics Canada</span>
 <span class="co">#&gt; Parsing data</span>
 <span class="co">#&gt; Folding in metadata</span></code></pre></div>

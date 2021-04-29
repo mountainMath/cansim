@@ -44,13 +44,6 @@ data <- data %>%
   filter(Value == selected_value)
 ```
 
-### Normalizing variables
-
-There are several annoying characteristics to the raw data downloaded from Statistics Canada which we address with a convenience function called `normalize_cansim_values()`. By default, downloaded CANSIM data contains a `VALUE` and a `SCALAR_FACTOR` field indicating whether the value displayed is a number, a percentage, a dollar value, a million set, or something else. This can be annoying to work with so the `normalize_cansim_values()` function will apply the appropriate conversion based on the scale variable so that the `VALUE` value is more straight-forward to work with. The default data also includes a character string `REF_DATE` field, which the `normalize_cansim_values()` function will attempt to convert into a standard date-class variable.
-```{r}
-data <- data %>% 
-  normalize_cansim_values(strip_classification_code = TRUE)
-```
 
 ### Taking advantage of metadata
 
@@ -66,13 +59,13 @@ top_level <- categories_for_level(data, "North American Industry Classification 
 # but we wanted to demonstrate how to use specific hierarchy levels. 
 total_data <- data %>% 
   filter(`North American Industry Classification System (NAICS)` %in% top_level) %>% 
-  rename(Total = VALUE) %>% 
+  rename(Total = val_norm) %>% 
   select(Date, GEO, Total)
 
 # Merge total back in and calculate share for every NAICS code
 data <- data %>% 
   left_join(total_data) %>% 
-  mutate(Share = VALUE/Total)
+  mutate(Share = val_norm/Total)
 ```
 
 ### Hierarchies in more detail 
@@ -91,7 +84,7 @@ There are still `r n` level 1 categories, too many to sensibly visualize at the 
 ```{r fig.height=6, fig.width=9}
 # Specify which regions and period we want to look at 
 regions = "British Columbia"
-period = "2017-01-01"
+period = "2019-07-01"
 
 # Select the top-8 categories for our reference region and period
 top_categories <- cut_data %>% 
@@ -112,8 +105,7 @@ With the data prepared, the last step is putting it all together into a visualiz
 ```{r fig.height=6, fig.width=9}
 library(ggplot2)
 
-ggplot(plot_data %>% 
-         filter(GEO %in% regions), 
+ggplot(plot_data %>%  filter(GEO %in% regions), 
        aes(x = Date, y = Share, fill = NAICS)) +
   geom_area(position="stack") +
   scale_y_continuous(labels = scales::percent) +
@@ -128,7 +120,7 @@ ggplot(plot_data %>%
 ```
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
 ```{r fig.height=10, fig.width=9, warning=FALSE}
-real_construction <- c("Construction","Real estate and rental and leasing")
+real_construction <- c("Construction [23]","Real estate and rental and leasing [53]")
 
 # Get the NAICS hierarchy codes just for these categories
 rrl_hierarchy <- data %>% 

@@ -57,7 +57,7 @@ In these examples, we have used *v41690973* for Canada and *v41692462* for BC. T
 
 ### Normalizing data
 
-The convenience function `normalize_cansim_values()` works for data retrieved by `get_cansim_vector()` calls the same way it works for full tables retrieved by `get_cansim()` calls. While using this convenience function is entirely optional, it can save some time by adjusting vector values by their appropriate scalar (percentage) and converting character dates into standard R date objects. 
+Data retrieved as vectors also gains the additional `val_norm` column with normalized values.
 
 ### Putting it all together
 
@@ -67,10 +67,10 @@ This quick example uses a list with two named vectors and a starting date as an 
 vectors <- c("Canadian CPI"="v41690973",
              "BC CPI"="v41692462")
 
-data <- normalize_cansim_values(get_cansim_vector(vectors, "2010-01-01"))
+data <- get_cansim_vector(vectors, "2010-01-01")
 
 library(ggplot2)
-ggplot(data,aes(x=Date,y=VALUE,color=label)) +
+ggplot(data,aes(x=Date,y=val_norm,color=label)) +
   geom_line() +
   labs(title="Consumer Price Index, January 2010 to September 2018",
        subtitle = "Seasonally-unadjusted, all-items (2002 = 100)",

@@ -6,9 +6,10 @@
 \usage{
 get_cansim_vector(
   vectors,
-  start_time,
+  start_time = as.Date("1800-01-01"),
   end_time = Sys.time(),
   use_ref_date = TRUE,
+  refresh = FALSE,
   timeout = 200,
   factors = TRUE,
   default_month = "07",
@@ -23,6 +24,8 @@ get_cansim_vector(
 \item{end_time}{Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)}
 
 \item{use_ref_date}{Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors}
+
+\item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 
