@@ -5,6 +5,7 @@
 ## Minor changes
 * Adapt to changes in dplyr, tidyr, and tibble
 * fix a bug that would not properly add hierarchies when category names are repeated
+* Use system unzip if `getOption("unzip")` is set to enable unzip for files larger than 4GB on unix-like systems
 
 # cansim 0.3.5 
 

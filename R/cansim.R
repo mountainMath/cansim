@@ -394,7 +394,9 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
-    utils::unzip(path,exdir=exdir)
+    uzp <- getOption("unzip")
+    if (is.null(uzp)) uzp <- "internal"
+    utils::unzip(path,exdir=exdir,unzip=uzp)
     unlink(path)
     if(cleaned_language=="eng") {
       message("Parsing data")
