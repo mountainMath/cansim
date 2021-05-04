@@ -1,6 +1,7 @@
 # cansim 0.3.6
 ## Major changes
 * Fold part of `normalize_cansim_values` into the default table and vector output, in particular always add a scaled variable column called `val_norm` and an imputed `Date` column and covert categories to factors by default.
+* New `get_cansim_sqlite` function that stores tables in an SQLite database and facilitates access and managemet of data.
 
 ## Minor changes
 * Adapt to changes in dplyr, tidyr, and tibble

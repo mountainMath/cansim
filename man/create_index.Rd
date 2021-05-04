@@ -16,3 +16,4 @@ create_index(connection, table_name, field)
 \description{
 create database index
 }
+\keyword{internal}

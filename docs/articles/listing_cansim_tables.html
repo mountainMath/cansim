@@ -77,9 +77,11 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
-    <li class="divider">
     <li>
-      <a href="../articles/index.html">More...</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+    </li>
+    <li>
+      <a href="../articles/working_with_large_tables.html">Working with large tables</a>
     </li>
   </ul>
 </li>
@@ -91,6 +93,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6">Version 0.3.6</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5">Version 0.3.5</a>
+    </li>
     <li>
       <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
     </li>
@@ -127,7 +135,7 @@
       <h1 data-toc-skip>Listing Statistics Canada data tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-05-03</h4>
+            <h4 class="date">2021-05-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/listing_cansim_tables.Rmd"><code>vignettes/listing_cansim_tables.Rmd</code></a></small>
       <div class="hidden name"><code>listing_cansim_tables.Rmd</code></div>
@@ -194,8 +202,7 @@
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">GEO</span>, <span class="va">Statistics</span>, <span class="va">val_norm</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://tidyr.tidyverse.org/reference/spread.html">spread</a></span><span class="op">(</span>key<span class="op">=</span><span class="st">"Statistics"</span>, value<span class="op">=</span><span class="va">val_norm</span><span class="op">)</span>
 <span class="co">#&gt; Accessing CANSIM NDM product 14-10-0293 from Statistics Canada</span>
-<span class="co">#&gt; Parsing data</span>
-<span class="co">#&gt; Folding in metadata</span></code></pre></div>
+<span class="co">#&gt; Parsing data</span></code></pre></div>
 <p>We can visualize then results with <code>ggplot2</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>

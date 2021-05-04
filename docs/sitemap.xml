@@ -16,6 +16,9 @@
     <loc>https://mountainmath.github.io/cansim/index.html/reference/categories_for_level.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/collect_and_normalize.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/correspondence.html</loc>
   </url>
   <url>
@@ -26,6 +29,9 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/disconnect_cansim_sqlite.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/fold_in_metadata_for_columns.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/get_cansim.html</loc>
@@ -106,6 +112,9 @@
     <loc>https://mountainmath.github.io/cansim/index.html/reference/parse_and_fold_in_metadata.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/parse_metadata.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/remove_cansim_sqlite_cached_table.html</loc>
   </url>
   <url>
@@ -128,5 +137,8 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/articles/working_with_hierarchies.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/working_with_large_tables.html</loc>
   </url>
 </urlset>

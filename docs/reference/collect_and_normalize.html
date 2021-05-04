@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Search through Statistics Canada data tables — search_cansim_tables • cansim</title>
+<title>collect data from connection and normalize cansim table output — collect_and_normalize • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Search through Statistics Canada data tables — search_cansim_tables" />
-<meta property="og:description" content="Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not search_description is set to TRUE or not. If refresh = TRUE, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option cache_path is set it will look for and store the overview table in that directory." />
+<meta property="og:title" content="collect data from connection and normalize cansim table output — collect_and_normalize" />
+<meta property="og:description" content="collect data from connection and normalize cansim table output" />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/index.html/logo.png" />
 
 
@@ -178,60 +178,79 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Search through Statistics Canada data tables</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
-    <div class="hidden name"><code>search_cansim_tables.Rd</code></div>
+    <h1>collect data from connection and normalize cansim table output</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_sql.R'><code>R/cansim_sql.R</code></a></small>
+    <div class="hidden name"><code>collect_and_normalize.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to <code>TRUE</code>. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not <code>search_description</code> is set to <code>TRUE</code> or not. If <code>refresh = TRUE</code>, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option <code>cache_path</code> is set it will look for and store the overview table in that directory.</p>
+    <p>collect data from connection and normalize cansim table output</p>
     </div>
 
-    <pre class="usage"><span class='fu'>search_cansim_tables</span><span class='op'>(</span><span class='va'>search_term</span>, search_fields <span class='op'>=</span> <span class='st'>"both"</span>, refresh <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>collect_and_normalize</span><span class='op'>(</span>
+  <span class='va'>connection</span>,
+  replacement_value <span class='op'>=</span> <span class='st'>"val_norm"</span>,
+  normalize_percent <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  default_month <span class='op'>=</span> <span class='st'>"07"</span>,
+  default_day <span class='op'>=</span> <span class='st'>"01"</span>,
+  factors <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  strip_classification_code <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>search_term</th>
-      <td><p>User-supplied search term used to find Statistics Canada data tables with matching titles</p></td>
+      <th>connection</th>
+      <td><p>connection to database</p></td>
     </tr>
     <tr>
-      <th>search_fields</th>
-      <td><p>By default, this function will search through table titles and keywords. Setting this parameter to "title" will only search through the title, setting it to "keyword" will only search through keywords</p></td>
+      <th>replacement_value</th>
+      <td><p>(Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.</p></td>
     </tr>
     <tr>
-      <th>refresh</th>
-      <td><p>Default is <code>FALSE</code>, and will regenerate the table if set to <code>TRUE</code></p></td>
+      <th>normalize_percent</th>
+      <td><p>(Optional) When <code>true</code> (the default) normalizes percentages by changing them to rates</p></td>
+    </tr>
+    <tr>
+      <th>default_month</th>
+      <td><p>The default month that should be used when creating Date objects for annual data (default set to "01")</p></td>
+    </tr>
+    <tr>
+      <th>default_day</th>
+      <td><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")</p></td>
+    </tr>
+    <tr>
+      <th>factors</th>
+      <td><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>false</code>).</p></td>
+    </tr>
+    <tr>
+      <th>strip_classification_code</th>
+      <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to <code>false</code>).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.</p>
+    <p>a tibble with the normalized data</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'>search_cansim_tables</span><span class='op'>(</span><span class='st'>"Labour force"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 125 x 21</span><span>
-#&gt;    title  title_en  title_fr  keywords_en  keywords  keywords_fr  notes notes_en
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #949494;'># … with 115 more rows, and 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   subject &lt;chr&gt;, date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span><span></div><div class='input'>
-</div></span></pre>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘dplyr’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:stats’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    filter, lag</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    intersect, setdiff, setequal, union</span></div><div class='input'>
+<span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_cansim_sqlite.html'>get_cansim_sqlite</a></span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 34-10-0013 from Statistics Canada</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='output co'>#&gt; <span class='message'>Indexing GEO</span></div><div class='output co'>#&gt; <span class='message'>Indexing Type of property</span></div><div class='output co'>#&gt; <span class='message'>Indexing REF_DATE</span></div><div class='output co'>#&gt; <span class='message'>Indexing DGUID</span></div><div class='output co'>#&gt; <span class='message'>Indexing GeoUID</span></div><div class='input'><span class='va'>data</span> <span class='op'>&lt;-</span> <span class='va'>con</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>GEO</span><span class='op'>==</span><span class='st'>"Ontario"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>collect_and_normalize</span><span class='op'>(</span><span class='op'>)</span>
+
+<span class='fu'><a href='disconnect_cansim_sqlite.html'>disconnect_cansim_sqlite</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>
+<span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

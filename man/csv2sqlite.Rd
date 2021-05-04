@@ -43,3 +43,4 @@ csv2sqlite(
 convert csv to sqlite
 adapted from https://rdrr.io/github/coolbutuseless/csv2sqlite/src/R/csv2sqlite.R
 }
+\keyword{internal}

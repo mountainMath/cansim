@@ -76,9 +76,11 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
-    <li class="divider">
     <li>
-      <a href="../articles/index.html">More...</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+    </li>
+    <li>
+      <a href="../articles/working_with_large_tables.html">Working with large tables</a>
     </li>
   </ul>
 </li>
@@ -90,6 +92,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6">Version 0.3.6</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5">Version 0.3.5</a>
+    </li>
     <li>
       <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
     </li>
@@ -126,7 +134,7 @@
       <h1 data-toc-skip>Getting started with the cansim package</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-05-03</h4>
+            <h4 class="date">2021-05-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/cansim.Rmd"><code>vignettes/cansim.Rmd</code></a></small>
       <div class="hidden name"><code>cansim.Rmd</code></div>
@@ -161,9 +169,8 @@
 <code class="sourceCode R"><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"14-10-0293"</span><span class="op">)</span>
 <span class="co">#&gt; Accessing CANSIM NDM product 14-10-0293 from Statistics Canada</span>
 <span class="co">#&gt; Parsing data</span>
-<span class="co">#&gt; Folding in metadata</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 23</span>
+<span class="co">#&gt; # A tibble: 6 x 24</span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID   UOM   UOM_ID SCALAR_FACTOR SCALAR_ID VECTOR COORDINATE</span>
 <span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;     </span>
 <span class="co">#&gt; 1 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.1.1     </span>
@@ -172,8 +179,8 @@
 <span class="co">#&gt; 4 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.2.3     </span>
 <span class="co">#&gt; 5 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.3.1     </span>
 <span class="co">#&gt; 6 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.3.2     </span>
-<span class="co">#&gt; # … with 14 more variables: VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,</span>
-<span class="co">#&gt; #   TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;,</span>
+<span class="co">#&gt; # … with 15 more variables: VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,</span>
+<span class="co">#&gt; #   TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;, Hierarchy for GEO &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Classification Code for Labour force characteristics &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Hierarchy for Labour force characteristics &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Classification Code for Statistics &lt;chr&gt;, Hierarchy for Statistics &lt;chr&gt;,</span>

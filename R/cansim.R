@@ -49,6 +49,7 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).
 #' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
+#' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
 #'
 #' @return Returns the input tibble with with adjusted values
 #'
@@ -60,7 +61,8 @@ adjust_cansim_values_by_variable <-function(data, var){
 #' @export
 normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE,
                                     default_month="01", default_day="01",
-                                    factors=FALSE,strip_classification_code=FALSE){
+                                    factors=FALSE,strip_classification_code=FALSE,
+                                    cansimTableNumber=NULL){
   language <- ifelse("VALEUR" %in% names(data),"fr","en")
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
   scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
@@ -103,7 +105,22 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(Date=as.Date(!!as.name(date_field)))
   }
 
-  fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
+  if (!is.null(cansimTableNumber)) {
+    cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+    cleaned_language <- cleaned_ndm_language(language)
+    geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+    base_table <- naked_ndm_table_number(cansimTableNumber)
+    path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
+    data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
+    meta2 <- readRDS(paste0(data_path,"2"))
+    dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
+    fields <- pull(meta2,  dimension_name_column)
+    fields <- setdiff(fields,geography_column)
+    data <- fold_in_metadata_for_columns(data,data_path,fields)
+  } else {
+    fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
+  }
+
 
   if (strip_classification_code){
     for (field in fields) {
@@ -219,6 +236,11 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 }
 
 
+#' Parse metadata
+#' @param meta the raw metadata table
+#' @param data_path base path to save parsed metadata
+#' @return NULL
+#' @keywords internal
 parse_metadata <- function(meta,data_path){
   cleaned_language <- basename(data_path) %>% gsub("^.+-|\\..+$","",.)
   cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
@@ -306,6 +328,81 @@ parse_metadata <- function(meta,data_path){
       mutate(name=ifelse(is.na(!!as.name(classification_code_column)) | is_geo_column,!!as.name(member_name_column),paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
     saveRDS(meta_x,file=paste0(data_path,"_column_",column[[dimension_name_column]]))
   }
+  NULL
+}
+
+#' Fold in metadata and for selected columns
+#' @param data the data table
+#' @param data_path base path to save parsed metadata
+#' @param column_names the names of the columns
+#' @return data table including the metadata information
+#' @keywords internal
+fold_in_metadata_for_columns <- function(data,data_path,column_names){
+  cleaned_language <- basename(data_path) %>% gsub("^.+-|\\..+$","",.)
+  cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
+  dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
+  dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
+  classification_code_column <- ifelse(cleaned_language=="eng","Classification Code","Code sur la classification")
+  member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
+  geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+  data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  symbol_legend_grepl_field <- ifelse(cleaned_language=="eng","Symbol Legend",paste0("L",intToUtf8(0x00E9),"gende Symbole"))
+  survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
+  subject_code_grepl_field <- ifelse(cleaned_language=="eng","Subject Code","Code du sujet")
+  note_id_grepl_field <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
+  correction_id_grepl_field <- ifelse(cleaned_language=="eng","Correction ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la correction"))
+  member_id_column <- ifelse(cleaned_language=="eng","Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre"))
+  parent_member_id_column <- ifelse(cleaned_language=="eng","Parent Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre parent"))
+  hierarchy_column <- ifelse(cleaned_language=="eng","Hierarchy",paste0("Hi",intToUtf8(0x00E9),"rarchie"))
+  exceeded_hierarchy_warning_message <- ifelse(cleaned_language=="eng","Exceeded max depth for hierarchy, hierarchy information may be faulty.",
+                                               paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
+  classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
+  hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
+  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+
+  meta2 <- readRDS(paste0(data_path,"2"))
+
+  for (column_name in column_names) {
+    column_index <- which(pull(meta2,dimension_name_column)==column_name)
+
+    column <- meta2[column_index,]
+    is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
+    meta_x=readRDS(paste0(data_path,"_column_",column[[dimension_name_column]]))
+
+    coordinate_for_position <- function(coordinates,position){
+      strsplit(coordinates,"\\.") %>% lapply(function(d)d[position]) %>% unlist
+    }
+
+    if (is_geo_column) {
+      hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
+      join_column <- meta_x %>%
+        mutate(GeoUID=gsub("\\[|\\]","",!!as.name(classification_code_column)),
+               !!hierarchy_name:=!!as.name(hierarchy_column)) %>%
+        select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
+      data <- data %>%
+        dplyr::mutate(!!member_id_column:=coordinate_for_position(!!as.name(coordinate_column),column_index)) %>%
+        dplyr::left_join(join_column,by=member_id_column) %>%
+        select(-!!as.name(member_id_column))
+    } else if (column[[dimension_name_column]] %in% names(data)){
+      classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]])
+      hierarchy_name <- paste0(hierarchy_prefix," ",column[[dimension_name_column]])
+      join_column <- meta_x %>%
+        mutate(!!classification_name:=!!as.name(classification_code_column),
+               !!hierarchy_name:=!!as.name(hierarchy_column)) %>%
+        select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
+      data <- data %>%
+        dplyr::mutate(!!member_id_column:=coordinate_for_position(!!as.name(coordinate_column),column_index)) %>%
+        dplyr::left_join(join_column,by=member_id_column) %>%
+        select(-!!as.name(member_id_column))
+    } else {
+      if (cleaned_language=="eng")
+        warning(paste0("Don't know how to add metadata for ",column[[dimension_name_column]],"! Ignoring this dimension."))
+      else
+        warning(paste0("Je ne sais pas comment ajouter des m",intToUtf8(0x00E9),"tadonn",intToUtf8(0x00E9),"es pour ",column[[dimension_name_column]],"! Ignorer cette dimension."))
+    }
+  }
+  data
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package
@@ -317,7 +414,7 @@ parse_metadata <- function(meta,data_path){
 #' @keywords data
 NULL
 
-#' Parse metadata and fold into data table
+#' Parse metadata and fold into data table (deprecated)
 #' @param data the data table
 #' @param meta the raw metadata table
 #' @param data_path base path to save parsed metadata
@@ -509,7 +606,11 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
                                              col_types = list(.default = "c")))
 
     tryCatch({
-      data <- parse_and_fold_in_metadata(data,meta,data_path)
+      #data <- parse_and_fold_in_metadata(data,meta,data_path)
+      parse_metadata(meta,data_path)
+      meta2 <- readRDS(paste0(data_path,"2"))
+      dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
+      data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
     }, error = function(e) {
       warning("Could not fold in metadata")
     })

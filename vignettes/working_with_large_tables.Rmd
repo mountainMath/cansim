@@ -1,0 +1,112 @@
+---
+title: "Working with large tables"
+description: >
+  Very large StatCan tables can pose challenges for memory footprint and performace. We show how to overcome these challenges by accessing the data through an SQLite database connection.
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with large tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+Most StatCan tables are small in size and can easily processed in memory. However, some tables are so large that this is not a feasible strategy. Table `43-10-0024` is one such example and comes with a CSV file that is several gigabytes in size. In cases like this it is more useful to store and access the data as an SQLite database using the `get_cansim_sqlite` function instead of the usual `get_cansim`. In these circumstances it is also useful to cache the data for longer than just the current R session, and the `data_cache` option allows to specify a permanent location. It defaults to `getOption("cansim.cache_path")`, and if this option is not set it will only cache the data for the duration of the current session.
+
+For this vignette we use the (rather small) motor vehicle sales data as an example.
+
+```{r setup}
+library(dplyr)
+library(ggplot2)
+
+library(cansim)
+```
+
+One main difference to the `get_cansim` method is that `get_cansim_sqlite` does not return data but only a connection to the database. This allows us to filter the data before fetching the data into memory. When this is called the first time it will fetch the data, parse it into an SQLite database, index the main columns. This can take a significant amount of time, depending on the size of the table. In any subsequent call it will simply open a database connection to the cached database.
+
+```{r}
+connection <- get_cansim_sqlite("20-10-0001")
+```
+
+We can inspect the data by looking at the first few columns to get a general idea of what the data looks like.
+
+```{r}
+head(connection)
+```
+
+To make good use of the data we will have to look at the metadata and inspect the member columns and variables available. The metadata will be available in the R session after the database connection has been opened. Trying to access the metadata before the connection has been opened will result in the package to attempt to download the data via the `get_cansim` call, which the `get_cansim_sqlite` function is trying to avoid.
+
+```{r}
+get_cansim_column_list("20-10-0001")
+```
+
+Seeing the columns available we can inspect the available variables.
+
+```{r}
+get_cansim_column_categories("20-10-0001","Origin of manufacture")
+```
+
+
+```{r}
+get_cansim_column_categories("20-10-0001","Seasonal adjustment")
+```
+
+```{r}
+get_cansim_column_categories("20-10-0001","Sales")
+```
+
+This gives us an understanding of the available variables. For the purpose of this vignette we are interested in the breakdown of sales units by Vehicle type in Canada overall. The data is stored in its raw form in the database, the only processing done is that it is augmented by the GeoUID. In order to work with it we need to `collect` the data. If the only operation done is filtering, and no selection or renaming of columns was done before accessing the data, we can utilize the custom `collect_and_normalize` function to collect and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column.
+
+```{r}
+data <- connection %>%
+  filter(GEO=="Canada",
+         `Seasonal adjustment`=="Unadjusted",
+         Sales=="Units",
+         `Origin of manufacture`=="Total, country of manufacture",
+         `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
+  collect_and_normalize()
+
+data %>% head()
+```
+
+
+Given the data we can further filter the date range and plot it.
+
+```{r}
+data %>%
+  filter(Date>=as.Date("1990-01-01")) %>%
+  ggplot(aes(x=Date,y=val_norm,color=`Vehicle type`)) +
+  geom_smooth(span=0.2,method = 'loess', formula = y ~ x) +
+  theme(legend.position="bottom") +
+  scale_y_continuous(labels = function(d)scales::comma(d,scale=10^-3,suffix="k")) +
+  labs(title="Canada new motor vehicle sales",caption="StatCan Table 20-10-0001",
+       x=NULL,y="Number of units")
+```
+
+When we don't need the database connection any more we should remember to close it. This frees up resources and keeps the database handlers happy.
+
+```{r}
+disconnect_cansim_sqlite(connection)
+```
+
+## Keeping track of cached data
+Since we now have the option of a more permanent cache we should take care to manage that space properly. The `list_cansim_sqlite_cached_tables` function gives us an overview over the cached data we have.
+
+```{r}
+list_cansim_sqlite_cached_tables()
+```
+
+Cached data won't update automatically, we will have to pass the `refresh=TRUE` option to refresh it manually when we want a fresh data pull from StatCan. If we want to free up disk space we can remove a cached table.
+
+```{r}
+remove_cansim_sqlite_cached_table("20-10-0001")
+```
+
+
+

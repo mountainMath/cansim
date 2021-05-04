@@ -123,9 +123,11 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
-    <li class="divider"></li>
     <li>
-      <a href="../articles/index.html">More...</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+    </li>
+    <li>
+      <a href="../articles/working_with_large_tables.html">Working with large tables</a>
     </li>
   </ul>
 </li>
@@ -137,6 +139,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6">Version 0.3.6</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5">Version 0.3.5</a>
+    </li>
     <li>
       <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
     </li>
@@ -186,7 +194,8 @@
   default_month <span class='op'>=</span> <span class='st'>"01"</span>,
   default_day <span class='op'>=</span> <span class='st'>"01"</span>,
   factors <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  strip_classification_code <span class='op'>=</span> <span class='cn'>FALSE</span>
+  strip_classification_code <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cansimTableNumber <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -220,6 +229,10 @@
       <th>strip_classification_code</th>
       <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to <code>false</code>).</p></td>
     </tr>
+    <tr>
+      <th>cansimTableNumber</th>
+      <td><p>(Optional) Only needed when operating on results of SQLite connections.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -230,7 +243,7 @@
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
 <span class='va'>cansim_table</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_cansim.html'>get_cansim</a></span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='input'><span class='fu'>normalize_cansim_values</span><span class='op'>(</span><span class='va'>cansim_table</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 550 x 18</span><span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 550 x 19</span><span>
 #&gt;    REF_DATE GEO     DGUID  UOM    UOM_ID VECTOR COORDINATE   VALUE STATUS SYMBOL
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
 #&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 2005     Canada  2016A… Dolla… 81     v6558… 1.1        2.34</span><span style='color: #949494;'>e</span><span>12 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
@@ -243,8 +256,9 @@
 #&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 2005     Manito… 2016A… Dolla… 81     v6558… 8.1        4.93</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
 #&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 2005     Saskat… 2016A… Dolla… 81     v6558… 9.1        3.65</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span> 2005     Alberta 2016A… Dolla… 81     v6558… 10.1       2.44</span><span style='color: #949494;'>e</span><span>11 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
-#&gt; </span><span style='color: #949494;'># … with 540 more rows, and 8 more variables: TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   GeoUID &lt;chr&gt;, Classification Code for Type of property &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'># … with 540 more rows, and 9 more variables: TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   GeoUID &lt;chr&gt;, Hierarchy for GEO &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Classification Code for Type of property &lt;chr&gt;,</span><span>
 #&gt; </span><span style='color: #949494;'>#   Hierarchy for Type of property &lt;chr&gt;, val_norm &lt;dbl&gt;, Date &lt;date&gt;,</span><span>
 #&gt; </span><span style='color: #949494;'>#   Type of property &lt;fct&gt;</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>

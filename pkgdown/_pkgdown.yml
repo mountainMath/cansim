@@ -34,6 +34,7 @@ reference:
   - title: Data transformation
   - contents:
     - normalize_cansim_values
+    - collect_and_normalize
     - adjust_cansim_values_by_variable
   - title: Miscellaneous
   - contents:
@@ -41,16 +42,20 @@ reference:
     - cansim_old_to_new
     - get_cansim_code_set
 articles:
-  - title: "Finding and retrieving data"
+  - title: "Working with the cansim package"
     navbar: ~
     contents:
       - listing_cansim_tables
       - retrieving_cansim_vectors
-  - title: "Working with data"
-    contents: working_with_hierarchies
+      - working_with_hierarchies
+      - working_with_large_tables
 
 news:
   releases:
+  - text: "Version 0.3.6"
+    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6
+  - text: "Version 0.3.5"
+    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5
   - text: "Version 0.3"
     href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0
   - text: "Version 0.2"
