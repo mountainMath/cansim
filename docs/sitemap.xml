@@ -19,6 +19,15 @@
     <loc>https://mountainmath.github.io/cansim/index.html/reference/correspondence.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/create_index.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/csv2sqlite.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/disconnect_cansim_sqlite.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/get_cansim.html</loc>
   </url>
   <url>
@@ -41,6 +50,9 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/get_cansim_ndm.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/get_cansim_sqlite.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/get_cansim_table_info.html</loc>
@@ -82,6 +94,9 @@
     <loc>https://mountainmath.github.io/cansim/index.html/reference/list_cansim_cubes.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/list_cansim_sqlite_cached_tables.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/list_cansim_tables.html</loc>
   </url>
   <url>
@@ -89,6 +104,9 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/parse_and_fold_in_metadata.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/remove_cansim_sqlite_cached_table.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/search_cansim_cubes.html</loc>

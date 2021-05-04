@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get overview list for all Statistics Canada data cubes — list_cansim_cubes • cansim</title>
+<title>Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection — get_cansim_sqlite • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,10 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Get overview list for all Statistics Canada data cubes — list_cansim_cubes" />
-<meta property="og:description" content="Generates an overview table containing metadata of available Statistics Canada data cubes." />
+<meta property="og:title" content="Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection — get_cansim_sqlite" />
+<meta property="og:description" content="Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
+cached permanently if a chache path is supplied or for duration of the current R session.
+This function is useful for large tables that don't have very often." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/index.html/logo.png" />
 
 
@@ -170,58 +172,77 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get overview list for all Statistics Canada data cubes</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
-    <div class="hidden name"><code>list_cansim_cubes.Rd</code></div>
+    <h1>Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_sql.R'><code>R/cansim_sql.R</code></a></small>
+    <div class="hidden name"><code>get_cansim_sqlite.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generates an overview table containing metadata of available Statistics Canada data cubes.</p>
+    <p>Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
+cached permanently if a chache path is supplied or for duration of the current R session.
+This function is useful for large tables that don't have very often.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>list_cansim_cubes</span><span class='op'>(</span>lite <span class='op'>=</span> <span class='cn'>FALSE</span>, refresh <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_cansim_sqlite</span><span class='op'>(</span>
+  <span class='va'>cansimTableNumber</span>,
+  language <span class='op'>=</span> <span class='st'>"english"</span>,
+  refresh <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  timeout <span class='op'>=</span> <span class='fl'>1000</span>,
+  cache_path <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"cansim.cache_path"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>lite</th>
-      <td><p>Get the version without cube dimensions and comments for faster retrieval, default is <code>FALSE</code>.</p></td>
+      <th>cansimTableNumber</th>
+      <td><p>the NDM table number to load</p></td>
+    </tr>
+    <tr>
+      <th>language</th>
+      <td><p><code>"en"</code> or <code>"english"</code> for English and <code>"fr"</code> or <code>"french"</code> for French language versions (defaults to English)</p></td>
     </tr>
     <tr>
       <th>refresh</th>
-      <td><p>Default is <code>FALSE</code>, repeated calls during the same session will hit the cached data.
-To refresh the code list during a running R session set to <code>TRUE</code></p></td>
+      <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>timeout</th>
+      <td><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></td>
+    </tr>
+    <tr>
+      <th>cache_path</th>
+      <td><p>(Optional) Path to where to cache the table permanently. By default, the data is cached
+in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
-start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.</p>
+    <p>tibble format data table output with added Date column with inferred date objects and
+a "val_norm" column with normalized VALUE using the supplied scale factor</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'>list_cansim_cubes</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Retrieving cube information from StatCan servers...</span></div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5,746 x 19</span><span>
-#&gt;    cansim_table_num… cubeTitleEn   cubeTitleFr  productId cansimId cubeStartDate
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>       
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 10-10-0001        Federal publ… Emploi du s… 10100001  183-0021 1999-01-01   
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 10-10-0002        Central gove… Dette du go… 10100002  191-0002 2009-04-01   
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 10-10-0003        Government o… Titres d’em… 10100003  176-0079 1975-01-01   
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 10-10-0004        Chartered ba… Banques à c… 10100004  176-0013 1978-04-01   
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 10-10-0005        Canadian Cla… Classificat… 10100005  385-0041 2008-01-01   
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 10-10-0006        Funds advanc… Avances de … 10100006  176-0091 2013-01-01   
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 10-10-0007        Net new issu… Émissions n… 10100007  176-0082 1975-03-01   
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 10-10-0008        Foreign exch… Taux de cha… 10100008  176-0067 1950-10-02   
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 10-10-0009        Foreign exch… Taux de cha… 10100009  176-0064 1950-10-01   
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 10-10-0010        Sales of alc… Ventes de b… 10100010  183-0023 2004-01-01   
-#&gt; </span><span style='color: #949494;'># … with 5,736 more rows, and 13 more variables: cubeEndDate &lt;date&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   releaseTime &lt;chr&gt;, archived &lt;lgl&gt;, subjectCode &lt;chr&gt;, surveyCode &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   frequencyCode &lt;chr&gt;, corrections &lt;chr&gt;, dimensionNameEn &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   dimensionNameFr &lt;chr&gt;, surveyEn &lt;chr&gt;, surveyFr &lt;chr&gt;, subjectEn &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   subjectFr &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
-
+<span class='fu'>get_cansim_sqlite</span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   table&lt;cansim_34100013_eng&gt; [?? x 17]</span><span>
+#&gt; </span><span style='color: #949494;'># Database: sqlite 3.35.5
+#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpbSqxk1/cansim_34100013_eng/34100013-eng.sqlite]</span><span>
+#&gt;    REF_DATE GEO     DGUID  `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 2005     Canada  2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 2005     Newfou… 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 2005     Prince… 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 2005     Nova S… 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 2005     New Br… 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 2005     Quebec  2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 2005     Ontario 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 2005     Manito… 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 2005     Saskat… 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 2005     Alberta 2016A… Residential      Doll… 81     millions      6        
+#&gt; </span><span style='color: #949494;'># … with more rows, and 9 more variables: VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   val_norm &lt;dbl&gt;, GeoUID &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

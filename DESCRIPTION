@@ -27,7 +27,9 @@ Imports: digest (>= 0.1),
     stringr,
     purrr,
     tibble,
-    utils
+    utils,
+    DBI,
+    RSQLite
 RoxygenNote: 7.1.1
 Suggests: knitr,
     rmarkdown,

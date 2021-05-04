@@ -11,7 +11,7 @@ reference:
     desc: Retrieve data cubes, tables, and vectors from Statistics Canada
   - contents:
     - get_cansim
-    - get_cansim_ndm
+    - get_cansim_sqlite
     - get_cansim_data_for_table_coord_periods
     - get_cansim_vector
     - get_cansim_vector_for_latest_periods

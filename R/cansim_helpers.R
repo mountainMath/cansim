@@ -26,8 +26,8 @@ file_path_for_table_language <- function(cansimTableNumber, language){
   file.path(paste0(base_table,"-",language))
 }
 
-base_path_for_table_language <- function(cansimTableNumber, language){
-  file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
+base_path_for_table_language <- function(cansimTableNumber, language,base_dir = tempdir()){
+  file.path(base_dir,file_path_for_table_language(cansimTableNumber,language))
 }
 
 response_status_code_translation <- list(
