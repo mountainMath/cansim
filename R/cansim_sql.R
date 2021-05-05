@@ -234,9 +234,11 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
   result <- dplyr::tibble(path=dir(cache_path,"cansim_")) %>%
     dplyr::mutate(cansimTableNumber=gsub("^cansim_|_eng$|_fra$","",.data$path) %>% cleaned_ndm_table_number()) %>%
     dplyr::mutate(language=gsub("^cansim_\\d+_","",.data$path)) %>%
-    dplyr::mutate(timeCached=NA_character_,
+    dplyr::mutate(title=NA_character_,
+                  timeCached=NA_character_,
                   sqliteSize=NA_character_) %>%
-    dplyr::select(.data$cansimTableNumber,.data$language,.data$timeCached,.data$sqliteSize,.data$path)
+    dplyr::select(.data$cansimTableNumber,.data$language,.data$timeCached,.data$sqliteSize,
+                  .data$title,.data$path)
 
   if (nrow(result)>0) {
     result$timeCached <- do.call("c",
@@ -261,6 +263,17 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                                    }
                                    dd
                                  }))
+    result$title <- do.call("c",
+                            lapply(result$path,function(p){
+                              pp <- dir(file.path(cache_path,p),"\\.Rda1")
+                              if (length(pp)==1) {
+                                d <- readRDS(file.path(cache_path,p,pp))
+                                dd <- as.character(d[1,1])
+                                } else {
+                                  dd <- NA
+                                }
+                                dd
+                            }))
   }
 
   result

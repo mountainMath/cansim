@@ -2,6 +2,8 @@
 title: "Working with large tables"
 description: >
   Very large StatCan tables can pose challenges for memory footprint and performace. We show how to overcome these challenges by accessing the data through an SQLite database connection.
+author: ""
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with large tables}
