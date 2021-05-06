@@ -45,23 +45,9 @@ head(connection)
 To make good use of the data we will have to look at the metadata and inspect the member columns and variables available. The metadata will be available in the R session after the database connection has been opened. Trying to access the metadata before the connection has been opened will result in the package to attempt to download the data via the `get_cansim` call, which the `get_cansim_sqlite` function is trying to avoid.
 
 ```{r}
-get_cansim_column_list("20-10-0001")
+get_cansim_table_overview("20-10-0001")
 ```
 
-Seeing the columns available we can inspect the available variables.
-
-```{r}
-get_cansim_column_categories("20-10-0001","Origin of manufacture")
-```
-
-
-```{r}
-get_cansim_column_categories("20-10-0001","Seasonal adjustment")
-```
-
-```{r}
-get_cansim_column_categories("20-10-0001","Sales")
-```
 
 This gives us an understanding of the available variables. For the purpose of this vignette we are interested in the breakdown of sales units by Vehicle type in Canada overall. The data is stored in its raw form in the database, the only processing done is that it is augmented by the GeoUID. In order to work with it we need to `collect` the data. If the only operation done is filtering, and no selection or renaming of columns was done before accessing the data, we can utilize the custom `collect_and_normalize` function to collect and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column.
 
