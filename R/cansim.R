@@ -22,6 +22,7 @@
 #' }
 #' @export
 get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
+  warning("The `get_cansim_ndm` method is deprecated and will be removed in future releases, please use `get_cansim` instead.")
   get_cansim(cleaned_ndm_table_number(cansimTableNumber), language, refresh, timeout = timeout)
 }
 

@@ -11,10 +11,16 @@ reference:
     desc: Retrieve data cubes, tables, and vectors from Statistics Canada
   - contents:
     - get_cansim
-    - get_cansim_sqlite
     - get_cansim_data_for_table_coord_periods
     - get_cansim_vector
     - get_cansim_vector_for_latest_periods
+  - title: SQLite database
+    desc: Managing data in local SQLite database
+  - contents:
+    - get_cansim_sqlite
+    - disconnect_cansim_sqlite
+    - list_cansim_sqlite_cached_tables
+    - remove_cansim_sqlite_cached_table
   - title: Locating data
   - contents:
     - list_cansim_cubes

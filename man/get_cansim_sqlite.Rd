@@ -35,6 +35,11 @@ This function is useful for large tables that don't have very often.
 }
 \examples{
 \donttest{
-get_cansim_sqlite("34-10-0013")
+con <- get_cansim_sqlite("34-10-0013")
+
+# Work with the data connection
+head(con)
+
+disconnect_cansim_sqlite(con)
 }
 }

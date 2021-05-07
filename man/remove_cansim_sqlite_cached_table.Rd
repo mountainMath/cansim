@@ -26,7 +26,8 @@ Remove cached cansim SQLite database
 }
 \examples{
 \donttest{
-get_cansim_sqlite("34-10-0013")
+con <- get_cansim_sqlite("34-10-0013")
+disconnect_cansim_sqlite(con)
 remove_cansim_sqlite_cached_table("34-10-0013")
 }
 }

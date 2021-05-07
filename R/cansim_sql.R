@@ -21,7 +21,12 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #'
 #' @examples
 #' \donttest{
-#' get_cansim_sqlite("34-10-0013")
+#' con <- get_cansim_sqlite("34-10-0013")
+#'
+#' # Work with the data connection
+#' head(con)
+#'
+#' disconnect_cansim_sqlite(con)
 #' }
 #' @export
 get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=1000,
@@ -289,7 +294,8 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #'
 #' @examples
 #' \donttest{
-#' get_cansim_sqlite("34-10-0013")
+#' con <- get_cansim_sqlite("34-10-0013")
+#' disconnect_cansim_sqlite(con)
 #' remove_cansim_sqlite_cached_table("34-10-0013")
 #' }
 #' @export
