@@ -68,7 +68,7 @@ The package also contains a convenience function that will re-scale and re-label
 
 For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. By default the {cansim} package adds a `val_norm` column with scaled values, so to get the value of the `val_norm` the `VALUE` column will be converted from 10 to 10,000,000 in the example given. Similarly, percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1 in the `val_norm` column.
 
-Prior to version 0.3.6 this was achieved by calling the `normalize_cansim_values` functions, the use of which is now redundant and is deprecated.
+Prior to version 0.3.7 this was achieved by calling the `normalize_cansim_values` functions, the use of which is now redundant and is deprecated.
 
 ### Vectors
 
@@ -173,7 +173,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.6.
+  von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.7.
 
 A BibTeX entry for LaTeX users is
 ```
@@ -181,7 +181,7 @@ A BibTeX entry for LaTeX users is
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2021},
-    note = {R package version 0.3.6},
+    note = {R package version 0.3.7},
     url = {https://mountainmath.github.io/cansim/},
   }
 ```

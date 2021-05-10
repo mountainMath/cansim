@@ -347,12 +347,12 @@ create_index <- function(connection,table_name,field){
 #' @param append optional parameter, append to database or overwrite, defaul=`FALSE`
 #' @param col_types optional parameter for csv column types
 #' @param na na character strings
-#' @param text_encoding encoding of csv file (default UTF8)
+#' @param text_encoding encoding of csv file (default UTF-8)
 #' @param delim (Optional) csv deliminator, default is ","
 #' @keywords internal
 csv2sqlite <- function(csv_file, sqlite_file, table_name, transform=NULL,chunk_size=5000000,
                        append=FALSE,col_types=NULL,na=c(NA,"..","","...","F"),
-                       text_encoding="UTF8",delim = ",") {
+                       text_encoding="UTF-8",delim = ",") {
   # Connect to database.
   if (!append && file.exists(sqlite_file)) file.remove(sqlite_file)
   con <- DBI::dbConnect(RSQLite::SQLite(), dbname=sqlite_file)

@@ -1,3 +1,8 @@
+# cansim 0.3.7
+## Minor changes
+* Fix problem with UTF-8 encoding on solaris
+* move dbplyr dependence from Imports to Suggests
+
 # cansim 0.3.6
 ## Major changes
 * Fold part of `normalize_cansim_values` into the default table and vector output, in particular always add a scaled variable column called `val_norm` and an imputed `Date` column and covert categories to factors by default.

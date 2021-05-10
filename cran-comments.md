@@ -1,6 +1,6 @@
 ## Test environments
-* local OS X install, R 3.6.2
-* ubuntu 14.04.5 LTS (on travis-ci), R 3.6.2
+* local OS X install, R 4.0.5
+* GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-16.04 (devel, release, oldrel), ubuntu-16.04 (3.4, 3.5)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs or NOTEs. 
@@ -49,3 +49,6 @@ There were no ERRORs or WARNINGs or NOTEs.
 * fix a bug that would not properly add hierarchies when category names are repeated
 * Use system unzip if `getOption("unzip")` is set to enable unzip for files larger than 4GB on unix-like systems
 
+# Changes from version 0.3.6
+* Fix problem with UTF-8 encoding on solaris
+* move dbplyr dependence from Imports to Suggests
