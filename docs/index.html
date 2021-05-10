@@ -48,7 +48,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.7</span>
       </span>
     </div>
 
@@ -197,7 +197,7 @@
 <a href="#normalizing-values" class="anchor"></a>Normalizing values</h3>
 <p>The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Statistics Canada data table values may be scaled by powers of 10.</p>
 <p>For example, values in the <code>VALUE</code> field may be reported in “millions”, so a <code>VALUE</code> of 10 means 10,000,000. By default the {cansim} package adds a <code>val_norm</code> column with scaled values, so to get the value of the <code>val_norm</code> the <code>VALUE</code> column will be converted from 10 to 10,000,000 in the example given. Similarly, percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1 in the <code>val_norm</code> column.</p>
-<p>Prior to version 0.3.6 this was achieved by calling the <code>normalize_cansim_values</code> functions, the use of which is now redundant and is deprecated.</p>
+<p>Prior to version 0.3.7 this was achieved by calling the <code>normalize_cansim_values</code> functions, the use of which is now redundant and is deprecated.</p>
 </div>
 <div id="vectors" class="section level3">
 <h3 class="hasAnchor">
@@ -290,13 +290,13 @@ In doing any of the above, you shall:
 <h3 class="hasAnchor">
 <a href="#cite-cansim" class="anchor"></a>Cite cansim</h3>
 <p>If you wish to cite the <code>cansim</code> package in your work:</p>
-<p>von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.6.</p>
+<p>von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.7.</p>
 <p>A BibTeX entry for LaTeX users is</p>
 <pre><code>  @Manual{,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2021},
-    note = {R package version 0.3.6},
+    note = {R package version 0.3.7},
     url = {https://mountainmath.github.io/cansim/},
   }</code></pre>
 </div>

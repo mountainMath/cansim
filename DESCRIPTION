@@ -1,7 +1,7 @@
 Package: cansim
 Type: Package
 Title: Accessing Statistics Canada Data Table and Vectors
-Version: 0.3.6
+Version: 0.3.7
 Authors@R: c(
     person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
@@ -29,14 +29,14 @@ Imports: digest (>= 0.1),
     tibble,
     utils,
     DBI,
-    RSQLite,
-    dbplyr
+    RSQLite
 RoxygenNote: 7.1.1
 Suggests: knitr,
     rmarkdown,
     scales, 
     tidyr,
-    ggplot2
+    ggplot2,
+    dbplyr
 URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
 BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr

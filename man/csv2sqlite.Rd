@@ -14,7 +14,7 @@ csv2sqlite(
   append = FALSE,
   col_types = NULL,
   na = c(NA, "..", "", "...", "F"),
-  text_encoding = "UTF8",
+  text_encoding = "UTF-8",
   delim = ","
 )
 }
@@ -35,7 +35,7 @@ csv2sqlite(
 
 \item{na}{na character strings}
 
-\item{text_encoding}{encoding of csv file (default UTF8)}
+\item{text_encoding}{encoding of csv file (default UTF-8)}
 
 \item{delim}{(Optional) csv deliminator, default is ","}
 }
