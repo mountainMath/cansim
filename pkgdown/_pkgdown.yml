@@ -58,14 +58,22 @@ articles:
 
 news:
   releases:
+  - text: "Version 0.3.7"
+    href: https://github.com/mountainMath/cansim/releases/tag/v0.3.7
   - text: "Version 0.3.6"
-    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6
+    href: https://github.com/mountainMath/cansim/releases/tag/0.3.6
   - text: "Version 0.3.5"
-    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5
+    href: https://github.com/mountainMath/cansim/releases/tag/0.3.5
+  - text: "Version 0.3.4"
+    href: https://github.com/mountainMath/cansim/releases/tag/0.3.4
+  - text: "Version 0.3.2"
+    href: https://github.com/mountainMath/cansim/releases/tag/0.3.2
+  - text: "Version 0.3.1"
+    href: https://github.com/mountainMath/cansim/releases/tag/0.3.1
   - text: "Version 0.3"
-    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0
-  - text: "Version 0.2"
-    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-2-2
+    href: https://github.com/mountainMath/cansim/releases/tag/0.3
+  - text: "Version 0.2.2"
+    href: https://github.com/mountainMath/cansim/releases/tag/0.2.2
 
 authors:
   Jens von Bergmann:
@@ -75,4 +83,12 @@ authors:
 template:
   params:
     ganalytics: UA-107390160-2
+  opengraph:
+    image:
+      src: 'https://mountainmath.github.io/cansim/logo.png'
+      alt: "cansim"
+    twitter:
+      creator: "@vb_jens"
+      card: summary_large_image
+      site: "https://mountainmath.github.io/cansim/"
 
