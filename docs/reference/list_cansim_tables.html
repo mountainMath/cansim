@@ -92,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
       </span>
     </div>
 
@@ -100,7 +100,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -123,9 +123,11 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
-    <li class="divider"></li>
     <li>
-      <a href="../articles/index.html">More...</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+    </li>
+    <li>
+      <a href="../articles/working_with_large_tables.html">Working with large tables</a>
     </li>
   </ul>
 </li>
@@ -137,6 +139,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6">Version 0.3.6</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5">Version 0.3.5</a>
+    </li>
     <li>
       <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
     </li>
@@ -153,7 +161,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -179,7 +187,7 @@
     <p>Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to <code>FALSE</code> by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option <code>cansim.cache_path</code> is set it will look for and store the overview table in that directory.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>list_cansim_tables</span>(<span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>list_cansim_tables</span><span class='op'>(</span>refresh <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -196,27 +204,25 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='fu'>list_cansim_tables</span>()</div><div class='output co'>#&gt; <span class='message'>Your CANSIM table overview data is 73 days old.</span>
-#&gt; <span class='message'>Consider setting options(cansim.cache_path="your cache path")</span>
-#&gt; <span class='message'>in your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).</span>
-#&gt; <span class='message'></span></div><div class='output co'>#&gt; <span class='message'>The table won't be able to be refreshed if options(cansim.cache_path="your cache path") is not set.</span></div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5,367 x 21</span><span>
-#&gt;    title title_en title_fr keywords_en keywords keywords_fr notes notes_en
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>   
-#&gt; </span><span style='color: #555555;'> 1</span><span> Week… Weekly … Indicat… rail trans… rail tr… rail trans… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #555555;'> 2</span><span> Week… Weekly … Indicat… rail trans… rail tr… rail trans… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #555555;'> 3</span><span> Week… Weekly … Indicat… rail trans… rail tr… rail trans… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #555555;'> 4</span><span> Week… Weekly … Indicat… rail trans… rail tr… rail trans… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #555555;'> 5</span><span> Job … Job ten… Durée d… hours of w… hours o… hours of w… Numb… Number …
-#&gt; </span><span style='color: #555555;'> 6</span><span> Job … Job ten… Durée d… hours of w… hours o… hours of w… Numb… Number …
-#&gt; </span><span style='color: #555555;'> 7</span><span> Dura… Duratio… Durée d… employment… employm… employment… Numb… Number …
-#&gt; </span><span style='color: #555555;'> 8</span><span> Job … Job ten… Durée d… hours of w… hours o… hours of w… Numb… Number …
-#&gt; </span><span style='color: #555555;'> 9</span><span> Job … Job ten… Durée d… hours of w… hours o… hours of w… Numb… Number …
-#&gt; </span><span style='color: #555555;'>10</span><span> Reas… Reason … Raison … employment… employm… employment… Numb… Number …
-#&gt; </span><span style='color: #555555;'># … with 5,357 more rows, and 13 more variables: notes_fr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, state </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   subject </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, date_published </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, frequency </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, revision_id </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   time_period_coverage_start </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, time_period_coverage_end </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   metadata_created </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, metadata_modified </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, url_en </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   url_fr </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, cansim_table_number </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+<span class='fu'>list_cansim_tables</span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5,768 x 21</span><span>
+#&gt;    title  title_en  title_fr  keywords_en  keywords  keywords_fr  notes notes_en
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Weekl… Weekly r… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Weekl… Weekly r… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Weekl… Weekly r… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Weekl… Weekly p… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Consu… Consumer… Statisti… consumer pr… consumer… consumer pr… This… This ta…
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Civil… Civil av… Statisti… air transpo… air tran… air transpo… &lt;p&gt;Q… &lt;p&gt;Quar…
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Civil… Civil av… Statisti… air transpo… air tran… air transpo… &lt;p&gt;Q… &lt;p&gt;Quar…
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Bank … Bank of … Taux du … government,… governme… government,… This… This ta…
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Selec… Selected… Quelques… government,… governme… government,… This… This ta…
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Fishe… Fisher c… Indice F… consumer pr… consumer… consumer pr… This… This ta…
+#&gt; </span><span style='color: #949494;'># … with 5,758 more rows, and 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   subject &lt;chr&gt;, date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -233,7 +239,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

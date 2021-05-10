@@ -1,5 +1,0 @@
-language: r
-cache: packages
-sudo: false
-latex: false
-pandoc: false

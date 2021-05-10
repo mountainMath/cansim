@@ -4,12 +4,30 @@
 \alias{get_cansim_vector_for_latest_periods}
 \title{Retrieve data for specified Statistics Canada data vector(s) for last N periods}
 \usage{
-get_cansim_vector_for_latest_periods(vectors, periods = 1)
+get_cansim_vector_for_latest_periods(
+  vectors,
+  periods = 1,
+  refresh = FALSE,
+  timeout = 200,
+  factors = TRUE,
+  default_month = "07",
+  default_day = "01"
+)
 }
 \arguments{
 \item{vectors}{The list of vectors to retrieve}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
+
+\item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
+
+\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).}
+
+\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "07")}
+
+\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 }
 \value{
 A tibble with data for specified vector(s) for the last N periods

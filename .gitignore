@@ -7,3 +7,5 @@ doc
 R/.Rapp.history
 .Ruserdata
 inst/doc
+/doc/
+/Meta/

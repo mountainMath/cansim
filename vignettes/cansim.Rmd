@@ -4,7 +4,7 @@ author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{"Getting started with the cansim package"}
+  %\VignetteIndexEntry{Getting started with the cansim package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,15 +12,14 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
 	collapse = TRUE,
-	comment = "#>",
-	eval = nzchar(Sys.getenv("COMPILE_VIG"))
+	comment = "#>"
 )
 library(cansim)
 ```
 
 ### About
 
-The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and frequently referred to in this package, and elsewhere, as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table catalogue numbers. 
+The `cansim` package provides R bindings to [Statistics Canada’s main socioeconomic time series database](https://www150.statcan.gc.ca/n1/en/type/data), previously known as (and frequently referred to in this package, and elsewhere, as) CANSIM. Data can be accessed by table number, vector or both table number and coordinate. The package accepts both old and new (NDM) CANSIM table catalogue numbers.
 
 ### Installing cansim
 
@@ -43,14 +42,13 @@ If you know the data table catalogue number you are interested in, use `get_cans
 data <- get_cansim("14-10-0293")
 head(data)
 ```
-By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada, but often it is convenient to cast the data into a cleaner data object and to use the included data to transform values by their appropriate scaling or unit variable. This makes it easier to work on the data directly and minimize unnecessary data manipulation. For example, data may be reported as a value in "millions" but with unitless numbers. A built-in convenience function, `normalize_cansim_values`, refers to the appropriate scaling unit and transforms the raw values into the appropriate absolute value. If using `dplyr`, applying normalization is as straightforward as piping data through the `normalize_cansim_values` function.
-```{r}
-library(dplyr)
-data <- get_cansim("14-10-0293") %>% 
-  normalize_cansim_values
-head(data)
-```
-Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the `get_cansim_table_overview(table_number)` function. 
+By default, the data tables retrieved by the package comes in the original format provided by Statistics Canada and is enriched by several added columns and transformations.
+
+* An additional `Date` column is added that tries to intelligently infer a Date object from the `REF_DATE` column.
+* An additional `val_norm` column is added, that applies the appropriate scaling factor to the `VALUE` column. So if data is coded as "thousands of dollars", a value of `2.4` in the `VALUE` column is converte to a value of `2400` in the `val_norm` column. Similarly, a percentage of `12.2` in the `VALUE` column is converted to a value of `0.122` in the `val_norm` column.
+* Categorical variables are converted to factors and, if necessarily, de-duplicated by appending the name of the "parent" category in parenthesis. This ensures that column variables are unique and that they retain their original ordering.
+
+Taking a look at an overview of the data within a table is a common first step. This is implemented in the package with the `get_cansim_table_overview(table_number)` function.
 ```{r}
 get_cansim_table_overview("14-10-0293")
 ```
@@ -68,16 +66,17 @@ get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
 
 ### License
 
-The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that: 
+The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the R folder. The Statistics Canada Open Licence Agreement requires that:
+
 ```
 Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive licence to:
- 
+
   - use, reproduce, publish, freely distribute, or sell the Information;
   - use, reproduce, publish, freely distribute, or sell Value-added Products; and,
   - sublicence any or all such rights, under terms consistent with this agreement.
 
 In doing any of the above, you shall:
- 
+
   - reproduce the Information accurately;
   - not use the Information in a way that suggests that Statistics Canada endorses you or your use of the Information;
   - not misrepresent the Information or its source;
@@ -89,13 +88,14 @@ In doing any of the above, you shall:
 ### Attribution
 
 Subject to the Statistics Canada Open Licence Agreement, licensed products using Statistics Canada data should employ the following acknowledgement of source:
+
 ```
 Acknowledgment of Source
 
 (a) You shall include and maintain the following notice on all licensed rights of the Information:
 
   - Source: Statistics Canada, name of product, reference date. Reproduced and distributed on an "as is" basis with the permission of Statistics Canada.
- 
+
 (b) Where any Information is contained within a Value-added Product, you shall include on such Value-added Product the following notice:
 
   - Adapted from Statistics Canada, name of product, reference date. This does not constitute an endorsement by Statistics Canada of this product.

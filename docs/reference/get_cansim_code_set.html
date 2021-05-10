@@ -92,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
       </span>
     </div>
 
@@ -100,7 +100,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -123,9 +123,11 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
-    <li class="divider"></li>
     <li>
-      <a href="../articles/index.html">More...</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+    </li>
+    <li>
+      <a href="../articles/working_with_large_tables.html">Working with large tables</a>
     </li>
   </ul>
 </li>
@@ -137,6 +139,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6">Version 0.3.6</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5">Version 0.3.5</a>
+    </li>
     <li>
       <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
     </li>
@@ -153,7 +161,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -179,11 +187,11 @@
     <p>Useful to get a list of surveys  or subjects and used internally</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_code_set</span>(
-  <span class='kw'>code_set</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"scalar"</span>, <span class='st'>"frequency"</span>, <span class='st'>"symbol"</span>, <span class='st'>"status"</span>, <span class='st'>"uom"</span>, <span class='st'>"survey"</span>, <span class='st'>"subject"</span>,
-    <span class='st'>"wdsResponseStatus"</span>),
-  <span class='kw'>refresh</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>get_cansim_code_set</span><span class='op'>(</span>
+  code_set <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"scalar"</span>, <span class='st'>"frequency"</span>, <span class='st'>"symbol"</span>, <span class='st'>"status"</span>, <span class='st'>"uom"</span>, <span class='st'>"survey"</span>, <span class='st'>"subject"</span>,
+    <span class='st'>"wdsResponseStatus"</span><span class='op'>)</span>,
+  refresh <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -205,20 +213,21 @@ To refresh the code list during a running R session set to <code>TRUE</code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'>get_cansim_code_set</span>(<span class='st'>"survey"</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 801 x 3</span><span>
+<span class='fu'>get_cansim_code_set</span><span class='op'>(</span><span class='st'>"survey"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 815 x 3</span><span>
 #&gt;    surveyCode surveyEn                          surveyFr                        
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                             </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>                           
-#&gt; </span><span style='color: #555555;'> 1</span><span> 1105       Business Register                 Registre des entreprises        
-#&gt; </span><span style='color: #555555;'> 2</span><span> 1141       Average Fair Market Value/Purcha… Juste valeur marchande/prix d'a…
-#&gt; </span><span style='color: #555555;'> 3</span><span> 1209       Survey of Environmental Goods an… Enquête sur les biens et servic…
-#&gt; </span><span style='color: #555555;'> 4</span><span> 1301       Gross Domestic Product by Indust… Produit intérieur brut par indu…
-#&gt; </span><span style='color: #555555;'> 5</span><span> 1302       Gross Domestic Product by Indust… Produit intérieur brut par indu…
-#&gt; </span><span style='color: #555555;'> 6</span><span> 1303       Gross Domestic Product by Indust… Produit intérieur brut par indu…
-#&gt; </span><span style='color: #555555;'> 7</span><span> 1401       Supply, Use and Input-Output Tab… Tableaux des ressources, des em…
-#&gt; </span><span style='color: #555555;'> 8</span><span> 1402       Productivity Measures and Relate… Mesures de la productivité et d…
-#&gt; </span><span style='color: #555555;'> 9</span><span> 1529       Capital Invested Abroad by Canad… Capitaux investis à l'étranger …
-#&gt; </span><span style='color: #555555;'>10</span><span> 1530       Capital Invested in secondary fo… Capitaux investis dans les soci…
-#&gt; </span><span style='color: #555555;'># … with 791 more rows</span><span></div><div class='input'># }
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>                             </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>                           
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 1105       Business Register                 Registre des entreprises        
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 1141       Average Fair Market Value/Purcha… Juste valeur marchande/prix d'a…
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 1209       Survey of Environmental Goods an… Enquête sur les biens et servic…
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 1301       Gross Domestic Product by Indust… Produit intérieur brut par indu…
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 1302       Gross Domestic Product by Indust… Produit intérieur brut par indu…
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 1303       Gross Domestic Product by Indust… Produit intérieur brut par indu…
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 1401       Supply, Use and Input-Output Tab… Tableaux des ressources, des em…
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 1402       Productivity Measures and Relate… Mesures de la productivité et d…
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 1529       Capital Invested Abroad by Canad… Capitaux investis à l'étranger …
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 1530       Capital Invested in secondary fo… Capitaux investis dans les soci…
+#&gt; </span><span style='color: #949494;'># … with 805 more rows</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -235,7 +244,7 @@ To refresh the code list during a running R session set to <code>TRUE</code></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

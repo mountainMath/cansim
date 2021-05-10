@@ -6,7 +6,8 @@
 ^\.Rproj\.user$
 ^docs
 ^pkgdown
-.travis.yml
+^\.travis.yml
+^\.travis_disabled.yml
 cran-comments.md
 vignettes/listing_cansim_tables.Rmd
 vignettes/working_with_hierarchies.Rmd
@@ -15,3 +16,5 @@ R/hex_sticker.R
 images
 images/*
 fix_meta.sh
+^\.github
+^\.github/*

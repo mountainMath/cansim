@@ -1,0 +1,12 @@
+language: R
+cache:
+  - packages
+  - ccache
+sudo: false
+latex: false
+pandoc: false
+os: linux
+dist: bionic
+
+r:
+  - release

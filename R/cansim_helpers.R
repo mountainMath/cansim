@@ -26,8 +26,8 @@ file_path_for_table_language <- function(cansimTableNumber, language){
   file.path(paste0(base_table,"-",language))
 }
 
-base_path_for_table_language <- function(cansimTableNumber, language){
-  file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
+base_path_for_table_language <- function(cansimTableNumber, language,base_dir = tempdir()){
+  file.path(base_dir,file_path_for_table_language(cansimTableNumber,language))
 }
 
 response_status_code_translation <- list(
@@ -233,4 +233,51 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
   m[m=="NULL"] <- NA
   as_tibble(m) %>%
     mutate_all(unlist)
+}
+
+
+# copied from unexported utils:::format.object_size
+format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ...)
+{
+  known_bases <- c(legacy = 1024, IEC = 1024, SI = 1000)
+  known_units <- list(SI = c("B", "kB", "MB", "GB", "TB", "PB",
+                             "EB", "ZB", "YB"), IEC = c("B", "KiB", "MiB", "GiB",
+                                                        "TiB", "PiB", "EiB", "ZiB", "YiB"), legacy = c("b", "Kb",
+                                                                                                       "Mb", "Gb", "Tb", "Pb"), LEGACY = c("B", "KB", "MB",
+                                                                                                                                           "GB", "TB", "PB"))
+  units <- match.arg(units, c("auto", unique(unlist(known_units),
+                                             use.names = FALSE)))
+  standard <- match.arg(standard, c("auto", names(known_bases)))
+  if (is.null(digits))
+    digits <- 1L
+  if (standard == "auto") {
+    standard <- "legacy"
+    if (units != "auto") {
+      if (endsWith(units, "iB"))
+        standard <- "IEC"
+      else if (endsWith(units, "b"))
+        standard <- "legacy"
+      else if (units == "kB")
+        stop("For SI units, specify 'standard = \"SI\"'")
+    }
+  }
+  base <- known_bases[[standard]]
+  units_map <- known_units[[standard]]
+  if (units == "auto") {
+    power <- if (x <= 0)
+      0L
+    else min(as.integer(log(x, base = base)), length(units_map) -
+               1L)
+  }
+  else {
+    power <- match(toupper(units), toupper(units_map)) -
+      1L
+    if (is.na(power))
+      stop(gettextf("Unit \"%s\" is not part of standard \"%s\"",
+                    sQuote(units), sQuote(standard)), domain = NA)
+  }
+  unit <- units_map[power + 1L]
+  if (power == 0 && standard == "legacy")
+    unit <- "bytes"
+  paste(round(x/base^power, digits = digits), unit)
 }

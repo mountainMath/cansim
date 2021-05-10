@@ -11,10 +11,16 @@ reference:
     desc: Retrieve data cubes, tables, and vectors from Statistics Canada
   - contents:
     - get_cansim
-    - get_cansim_ndm
     - get_cansim_data_for_table_coord_periods
     - get_cansim_vector
     - get_cansim_vector_for_latest_periods
+  - title: SQLite database
+    desc: Managing data in local SQLite database
+  - contents:
+    - get_cansim_sqlite
+    - disconnect_cansim_sqlite
+    - list_cansim_sqlite_cached_tables
+    - remove_cansim_sqlite_cached_table
   - title: Locating data
   - contents:
     - list_cansim_cubes
@@ -34,6 +40,7 @@ reference:
   - title: Data transformation
   - contents:
     - normalize_cansim_values
+    - collect_and_normalize
     - adjust_cansim_values_by_variable
   - title: Miscellaneous
   - contents:
@@ -41,16 +48,20 @@ reference:
     - cansim_old_to_new
     - get_cansim_code_set
 articles:
-  - title: "Finding and retrieving data"
+  - title: "Working with the cansim package"
     navbar: ~
     contents:
       - listing_cansim_tables
       - retrieving_cansim_vectors
-  - title: "Working with data"
-    contents: working_with_hierarchies
+      - working_with_hierarchies
+      - working_with_large_tables
 
 news:
   releases:
+  - text: "Version 0.3.6"
+    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6
+  - text: "Version 0.3.5"
+    href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5
   - text: "Version 0.3"
     href: https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0
   - text: "Version 0.2"

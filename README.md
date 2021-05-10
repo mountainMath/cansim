@@ -1,6 +1,6 @@
 # cansim
 
-[![Build Status](https://travis-ci.org/mountainMath/cansim.svg?branch=master)](https://travis-ci.org/mountainMath/cansim)
+[![R build status](https://github.com/mountainMath/cansim/workflows/R-CMD-check/badge.svg)](https://github.com/mountainMath/cansim/actions)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cansim)](https://cran.r-project.org/package=cansim)
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/cansim)](https://cranlogs.r-pkg.org/badges/cansim)
 
@@ -17,7 +17,7 @@ This package:
 * Offers caching of downloaded data for faster loading and less waiting
 * Includes convenience functions for relabelling and rescaling as well as tools for working with data hierarchies in downloaded table objects
 
-[![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](http://www.awesomeofficialstatistics.org)
+[![Mentioned in Awesome Official Statistics ](https://awesome.re/mentioned-badge.svg)](https://github.com/SNStatComp/awesome-official-statistics-software/)
 
 ### Documentation
 [Cansim R package home page and reference guide](https://mountainmath.github.io/cansim/index.html)
@@ -66,16 +66,9 @@ naissances <- get_cansim("051-0013",language="fr")
 
 The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Statistics Canada data table values may be scaled by powers of 10. 
 
-For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. The `normalize_cansim_values` function automatically scales the `VALUE` field to be a number, so the `VALUE` will be converted from 10 to 10,000,000 in the example given.
-```r
-data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values
-``` 
-To retain the original `VALUE` field pass the `replacement_value = <your field name>` option to create a field to contain the normalized values.
-```r
-data <- get_cansim("17-10-0079-01") %>% normalize_cansim_values(replacement_value="normalized value")
-```
-By default percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1. To change that behaviour set `normalize_percent=FALSE`.
+For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. By default the {cansim} package adds a `val_norm` column with scaled values, so to get the value of the `val_norm` the `VALUE` column will be converted from 10 to 10,000,000 in the example given. Similarly, percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1 in the `val_norm` column.
 
+Prior to version 0.3.6 this was achieved by calling the `normalize_cansim_values` functions, the use of which is now redundant and is deprecated.
 
 ### Vectors
 
@@ -180,15 +173,15 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2020). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.5.
+  von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.6.
 
 A BibTeX entry for LaTeX users is
 ```
   @Manual{,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
-    year = {2020},
-    note = {R package version 0.3.5},
+    year = {2021},
+    note = {R package version 0.3.6},
     url = {https://mountainmath.github.io/cansim/},
   }
 ```

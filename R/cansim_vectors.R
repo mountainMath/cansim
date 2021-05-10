@@ -20,7 +20,7 @@ extract_vector_data <- function(data1){
       x[sapply(x, is.null)] <- NA
       unlist(x)
     }) %>%
-      tibble::as.tibble() %>%
+      tibble::as_tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
              VECTOR=paste0("v",d$object$vectorId))
     value_data
@@ -47,7 +47,7 @@ extract_vector_metadata <- function(data1){
       if (is.null(x)) x <- NA
       x
     }) %>%
-      tibble::as.tibble()
+      tibble::as_tibble()
     value_data
   }) %>%
     dplyr::bind_rows() %>%
@@ -73,6 +73,11 @@ rename_vectors <- function(data,vectors){
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
 #' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
 #' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
+#' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #'
 #' @return A tibble with data for vectors released between start and end time
 #'
@@ -81,39 +86,52 @@ rename_vectors <- function(data,vectors){
 #' get_cansim_vector("v41690973","2015-01-01")
 #' }
 #' @export
-get_cansim_vector<-function(vectors, start_time, end_time=Sys.time(), use_ref_date=TRUE){
+get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_time = Sys.time(), use_ref_date = TRUE,
+                            refresh = FALSE, timeout = 200,
+                            factors = TRUE, default_month = "07", default_day = "01"){
   start_time=as.Date(start_time)
   original_end_time=as.Date(end_time)
-  if (use_ref_date) end_time=pmax(Sys.time(),end_time) else end_time=original_end_time
+  if (use_ref_date) end_time=as.Date(pmax(Sys.time(),end_time))+1 else end_time=original_end_time
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
   vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
   time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
                      '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
-  response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"))
-  if (is.null(response)) return(response)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-  }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-    data2 %>% purrr::map(function(x){
-      message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-    })
-  }
+  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(list(vectors_string,time_string), algo = "md5"), ".rda"))
+  if (!file.exists(cache_path)) {
+    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+    response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"),
+                                        timeout = timeout)
+    if (is.null(response)) return(response)
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+      data2 %>% purrr::map(function(x){
+        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+      })
+    }
 
-  if (length(data1)>0)
-    result <- extract_vector_data(data1) %>% rename_vectors(vectors)
-  else
-    result <- tibble::tibble()
+    if (length(data1)>0)
+      result <- extract_vector_data(data1) %>% rename_vectors(vectors)
+    else
+      result <- tibble::tibble()
+    saveRDS(result,cache_path)
+  } else {
+    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
+    result <- readRDS(cache_path)
+  }
   if (use_ref_date) {
     result <- result %>%
       filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
   }
-  result
+  result %>%
+    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                            default_month = default_month, default_day = default_day)
 }
 
 #' Retrieve data for specified Statistics Canada data vector(s) for last N periods
@@ -122,6 +140,11 @@ get_cansim_vector<-function(vectors, start_time, end_time=Sys.time(), use_ref_da
 #'
 #' @param vectors The list of vectors to retrieve
 #' @param periods Numeric value for number of latest periods to retrieve data for
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
+#' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #'
 #' @return A tibble with data for specified vector(s) for the last N periods
 #'
@@ -130,7 +153,9 @@ get_cansim_vector<-function(vectors, start_time, end_time=Sys.time(), use_ref_da
 #' get_cansim_vector_for_latest_periods("v41690973",10)
 #' }
 #' @export
-get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
+get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
+                                               refresh = FALSE, timeout = 200,
+                                               factors = TRUE, default_month = "07", default_day = "01"){
   if (periods*length(vectors)>MAX_PERIODS) {
     periods=pmin(periods,floor(as.numeric(MAX_PERIODS)/length(vectors)))
     warning(paste0("Can access at most ",MAX_PERIODS," data points, capping value to ",periods," periods per vector."))
@@ -138,26 +163,36 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
-  response <- post_with_timeout_retry(url, body=vectors_string)
-  if (is.null(response)) return(response)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-  }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-    data2 %>% purrr::map(function(x){
-      message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-    })
-  }
-  if (length(data1)>0)
-    result <- extract_vector_data(data1) %>%
+  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(vectors_string, algo = "md5"), ".rda"))
+  if (refresh || !file.exists(cache_path)) {
+    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+    response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
+    if (is.null(response)) return(response)
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+      data2 %>% purrr::map(function(x){
+        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+      })
+    }
+    if (length(data1)>0)
+      result <- extract_vector_data(data1) %>%
       rename_vectors(vectors)
-  else
-    result <- tibble::tibble()
-  result
+    else
+      result <- tibble::tibble()
+    saveRDS(result,cache_path)
+  } else {
+    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
+    result <- readRDS(cache_path)
+  }
+  result %>%
+    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                            default_month = default_month, default_day = default_day)
 }
 
 
@@ -168,6 +203,11 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
 #' @param cansimTableNumber Statistics Canada data table number
 #' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}
 #' @param periods Numeric value for number of latest periods to retrieve data for
+#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
+#' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #'
 #' @return A tibble with data matching specified coordinate and period input arguments
 #'
@@ -176,25 +216,36 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1){
 #' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12.0.0.0.0.0.0.0.0",periods=3)
 #' }
 #' @export
-get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1){
+get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1,
+                                                  refresh = FALSE, timeout = 200,
+                                                  factors=TRUE, default_month="07", default_day="01"){
   table=naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
-  response <- post_with_timeout_retry(url, body=body_string)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))
+  if (refresh || !file.exists(cache_path)) {
+    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+    response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
+    if (response$status_code!=200) {
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    }
+    data <- httr::content(response)
+    data1 <- Filter(function(x)x$status=="SUCCESS",data)
+    data2 <- Filter(function(x)x$status!="SUCCESS",data)
+    if (length(data2)>0) {
+      message(paste0("Failed to load metadata for ",length(data2)," tables "))
+      data2 %>% purrr::map(function(x){
+        message(x$object)
+      })
+    }
+    saveRDS(data1,cache_path)
+  } else {
+    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
+    data1 <- readRDS(cache_path)
   }
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load metadata for ",length(data2)," tables "))
-    data2 %>% purrr::map(function(x){
-      message(x$object)
-    })
-  }
-
-  extract_vector_data(data1)
+  extract_vector_data(data1) %>%
+    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                            default_month = default_month, default_day = default_day)
 }
 
 

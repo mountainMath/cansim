@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{get_cansim_ndm}
 \alias{get_cansim_ndm}
-\title{Retrieve a Statistics Canada data table using NDM catalogue number}
+\title{Retrieves a Statistics Canada data table using CANSIM code or NDM table number}
 \usage{
 get_cansim_ndm(
   cansimTableNumber,
@@ -12,9 +12,9 @@ get_cansim_ndm(
 )
 }
 \arguments{
-\item{cansimTableNumber}{the NDM table number to load}
+\item{cansimTableNumber}{the table number to load, accepts old CANSIM or new NDM table numbers}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default is set to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
@@ -24,10 +24,16 @@ get_cansim_ndm(
 tibble format data table output
 }
 \description{
-Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
+Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.
+}
+\details{
+Deprecated, use `get_cansim` instead. This will be removed in future releases.
 }
 \examples{
 \donttest{
+# Retrieve a table with an NDM code
 get_cansim("34-10-0013")
+# Retrieve a table with an old-style CANSIM code
+get_cansim("026-0018")
 }
 }

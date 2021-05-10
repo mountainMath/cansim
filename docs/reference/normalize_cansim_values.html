@@ -92,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.6</span>
       </span>
     </div>
 
@@ -100,7 +100,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -123,9 +123,11 @@
     <li>
       <a href="../articles/retrieving_cansim_vectors.html">Retrieving individual Statistics Canada vectors</a>
     </li>
-    <li class="divider"></li>
     <li>
-      <a href="../articles/index.html">More...</a>
+      <a href="../articles/working_with_hierarchies.html">Working with Statistics Canada data table object hierarchies</a>
+    </li>
+    <li>
+      <a href="../articles/working_with_large_tables.html">Working with large tables</a>
     </li>
   </ul>
 </li>
@@ -137,6 +139,12 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-6">Version 0.3.6</a>
+    </li>
+    <li>
+      <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-5">Version 0.3.5</a>
+    </li>
     <li>
       <a href="https://mountainmath.github.io/cansim/docs/news/index.html#cansim-0-3-0">Version 0.3</a>
     </li>
@@ -153,7 +161,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/mountainMath/cansim/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -179,15 +187,16 @@
     <p>Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the <code>VALUE</code> field with normalized values and drop the <code>scale</code> column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the <code>REF_DATE</code> field and create an R date variable. This is currently experimental.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>normalize_cansim_values</span>(
-  <span class='no'>data</span>,
-  <span class='kw'>replacement_value</span> <span class='kw'>=</span> <span class='fl'>NA</span>,
-  <span class='kw'>normalize_percent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>default_month</span> <span class='kw'>=</span> <span class='st'>"01"</span>,
-  <span class='kw'>default_day</span> <span class='kw'>=</span> <span class='st'>"01"</span>,
-  <span class='kw'>factors</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>strip_classification_code</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>normalize_cansim_values</span><span class='op'>(</span>
+  <span class='va'>data</span>,
+  replacement_value <span class='op'>=</span> <span class='cn'>NA</span>,
+  normalize_percent <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  default_month <span class='op'>=</span> <span class='st'>"01"</span>,
+  default_day <span class='op'>=</span> <span class='st'>"01"</span>,
+  factors <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  strip_classification_code <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  cansimTableNumber <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -220,6 +229,10 @@
       <th>strip_classification_code</th>
       <td><p>(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to <code>false</code>).</p></td>
     </tr>
+    <tr>
+      <th>cansimTableNumber</th>
+      <td><p>(Optional) Only needed when operating on results of SQLite connections.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -228,23 +241,26 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='no'>cansim_table</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='get_cansim.html'>get_cansim</a></span>(<span class='st'>"34-10-0013"</span>)</div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='input'><span class='fu'>normalize_cansim_values</span>(<span class='no'>cansim_table</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 550 x 17</span><span>
-#&gt;    REF_DATE GEO   DGUID `Type of proper… UOM   UOM_ID VECTOR COORDINATE   VALUE
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 2005     Cana… 2016… Residential      Doll… 81     v6558… 1.1        2.34</span><span style='color: #555555;'>e</span><span>12
-#&gt; </span><span style='color: #555555;'> 2</span><span> 2005     Newf… 2016… Residential      Doll… 81     v6558… 2.1        1.85</span><span style='color: #555555;'>e</span><span>10
-#&gt; </span><span style='color: #555555;'> 3</span><span> 2005     Prin… 2016… Residential      Doll… 81     v6558… 3.1        4.33</span><span style='color: #555555;'>e</span><span> 9
-#&gt; </span><span style='color: #555555;'> 4</span><span> 2005     Nova… 2016… Residential      Doll… 81     v6558… 4.1        4.43</span><span style='color: #555555;'>e</span><span>10
-#&gt; </span><span style='color: #555555;'> 5</span><span> 2005     New … 2016… Residential      Doll… 81     v6558… 5.1        2.26</span><span style='color: #555555;'>e</span><span>10
-#&gt; </span><span style='color: #555555;'> 6</span><span> 2005     Queb… 2016… Residential      Doll… 81     v6558… 6.1        4.05</span><span style='color: #555555;'>e</span><span>11
-#&gt; </span><span style='color: #555555;'> 7</span><span> 2005     Onta… 2016… Residential      Doll… 81     v6558… 7.1        1.03</span><span style='color: #555555;'>e</span><span>12
-#&gt; </span><span style='color: #555555;'> 8</span><span> 2005     Mani… 2016… Residential      Doll… 81     v6558… 8.1        4.93</span><span style='color: #555555;'>e</span><span>10
-#&gt; </span><span style='color: #555555;'> 9</span><span> 2005     Sask… 2016… Residential      Doll… 81     v6558… 9.1        3.65</span><span style='color: #555555;'>e</span><span>10
-#&gt; </span><span style='color: #555555;'>10</span><span> 2005     Albe… 2016… Residential      Doll… 81     v6558… 10.1       2.44</span><span style='color: #555555;'>e</span><span>11
-#&gt; </span><span style='color: #555555;'># … with 540 more rows, and 8 more variables: STATUS </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, SYMBOL </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   TERMINATED </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, DECIMALS </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, GeoUID </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, `Classification Code for</span><span>
-#&gt; </span><span style='color: #555555;'>#   Type of property` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>, `Hierarchy for Type of property` </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   Date </span><span style='color: #555555;font-style: italic;'>&lt;date&gt;</span><span></div><div class='input'># }
+<span class='va'>cansim_table</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_cansim.html'>get_cansim</a></span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Reading CANSIM NDM product 34-10-0013 from cache.</span></div><div class='input'><span class='fu'>normalize_cansim_values</span><span class='op'>(</span><span class='va'>cansim_table</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 550 x 19</span><span>
+#&gt;    REF_DATE GEO     DGUID  UOM    UOM_ID VECTOR COORDINATE   VALUE STATUS SYMBOL
+#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> 
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 2005     Canada  2016A… Dolla… 81     v6558… 1.1        2.34</span><span style='color: #949494;'>e</span><span>12 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 2005     Newfou… 2016A… Dolla… 81     v6558… 2.1        1.85</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 2005     Prince… 2016A… Dolla… 81     v6558… 3.1        4.33</span><span style='color: #949494;'>e</span><span> 9 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 2005     Nova S… 2016A… Dolla… 81     v6558… 4.1        4.43</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 2005     New Br… 2016A… Dolla… 81     v6558… 5.1        2.26</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 2005     Quebec  2016A… Dolla… 81     v6558… 6.1        4.05</span><span style='color: #949494;'>e</span><span>11 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 2005     Ontario 2016A… Dolla… 81     v6558… 7.1        1.03</span><span style='color: #949494;'>e</span><span>12 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 2005     Manito… 2016A… Dolla… 81     v6558… 8.1        4.93</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 2005     Saskat… 2016A… Dolla… 81     v6558… 9.1        3.65</span><span style='color: #949494;'>e</span><span>10 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 2005     Alberta 2016A… Dolla… 81     v6558… 10.1       2.44</span><span style='color: #949494;'>e</span><span>11 </span><span style='color: #BB0000;'>NA</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    
+#&gt; </span><span style='color: #949494;'># … with 540 more rows, and 9 more variables: TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   GeoUID &lt;chr&gt;, Hierarchy for GEO &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Classification Code for Type of property &lt;chr&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Hierarchy for Type of property &lt;chr&gt;, val_norm &lt;dbl&gt;, Date &lt;date&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'>#   Type of property &lt;fct&gt;</span><span></div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -261,7 +277,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

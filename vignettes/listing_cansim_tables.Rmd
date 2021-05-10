@@ -5,6 +5,10 @@ description: >
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Listing Statistics Canada data tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -43,12 +47,11 @@ library(tidyr)
 selected_table <- "14-10-0293"
 
 data <-get_cansim(selected_table) %>% 
-  normalize_cansim_values() %>%
   filter(grepl("Mainland|Vancouver Island|Okanagan", GEO),
          Date>=as.Date("2015-01-01"),
          `Labour force characteristics`=="Unemployment rate") %>%
-  select(Date, GEO, Statistics, VALUE) %>%
-  spread(key="Statistics", value=VALUE)
+  select(Date, GEO, Statistics, val_norm) %>%
+  spread(key="Statistics", value=val_norm)
 ```
 We can visualize then results with `ggplot2`. 
 ```{r}

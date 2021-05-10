@@ -11,7 +11,8 @@ normalize_cansim_values(
   default_month = "01",
   default_day = "01",
   factors = FALSE,
-  strip_classification_code = FALSE
+  strip_classification_code = FALSE,
+  cansimTableNumber = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ normalize_cansim_values(
 \item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).}
 
 \item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
+
+\item{cansimTableNumber}{(Optional) Only needed when operating on results of SQLite connections.}
 }
 \value{
 Returns the input tibble with with adjusted values
