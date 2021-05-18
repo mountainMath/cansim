@@ -1077,6 +1077,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
+#' @return A tibble with table notes.
 #'
 #' @examples
 #' \donttest{
@@ -1106,6 +1107,43 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
     full_join(notes,by=note_id_column) %>%
     arrange(!!as.name(note_id_column))
   full_notes
+}
+
+
+#' Get the latest release data for a StatCan table, if available
+#'
+#' This can be used to check when a table has last been updated.
+#'
+#' @param cansimTableNumber the NDM table number
+#' @return A datatime object if a release data is available, NULL otherwise.
+#'
+#' @examples
+#' \donttest{
+#' get_cansim_table_last_release_date("34-10-0013")
+#' }
+#' @export
+get_cansim_table_last_release_date <- function(cansimTableNumber){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
+  pid <- paste0(naked_ndm_table_number(cansimTableNumber),"01")
+  url <- "https://www150.statcan.gc.ca/n1/en/metadata.json"
+  response <- purrr::safely(httr::GET)(url,query=list(productid=pid))
+  if (!is.null(response$error) || response$result$status_code!=200) {
+    warning(paste0("Could not access information for table ",cansimTableNumber,
+                   " (productID: ",pid,").\n",
+                   response$error))
+    release_date <- NULL
+  } else {
+    c <- httr::content(response$result)
+    r<-c$result
+    if (length(r)>0) {
+      rd <- unique(unlist(lapply(r,function(rr)rr$releasedate)))
+      release_date <- strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
+        max()
+    } else {
+      release_date <- NULL
+    }
+  }
+  release_date
 }
 
 

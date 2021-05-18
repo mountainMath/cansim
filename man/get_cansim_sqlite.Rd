@@ -30,8 +30,9 @@ a "val_norm" column with normalized VALUE using the supplied scale factor
 }
 \description{
 Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
-cached permanently if a chache path is supplied or for duration of the current R session.
-This function is useful for large tables that don't have very often.
+cached permanently if a cache path is supplied or for duration of the current R session.
+The function will check against the lastest release data for the table and emit a warning message
+if the cached table is out of date.
 }
 \examples{
 \donttest{

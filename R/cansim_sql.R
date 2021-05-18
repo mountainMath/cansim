@@ -5,8 +5,9 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection
 #'
 #' Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
-#' cached permanently if a chache path is supplied or for duration of the current R session.
-#' This function is useful for large tables that don't have very often.
+#' cached permanently if a cache path is supplied or for duration of the current R session.
+#' The function will check against the lastest release data for the table and emit a warning message
+#' if the cached table is out of date.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
@@ -146,6 +147,25 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
 
   } else {
+    last_downloaded <- list_cansim_sqlite_cached_tables() %>%
+      filter(.data$cansimTableNumber==cleaned_number) %>%
+      pull(.data$timeCached)
+    last_updated <- get_cansim_table_last_release_date(cleaned_number)
+    if (is.null(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
+    if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
+    if (!is.null(last_downloaded) && !is.null(last_updated) &&
+        as.numeric(last_downloaded)<as.numeric(last_updated)) {
+      ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
+      lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
+      if (ld_date==lu_date) {
+        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+      }
+      warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
+                     "There is a newer version of the table available, it was last updated ",
+                     lu_date,".\n",
+                     "Consider updating the cached version by passing the `refresh=TRUE` option."))
+    }
     if (cleaned_language=="eng")
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
     else

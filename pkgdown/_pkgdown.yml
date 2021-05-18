@@ -28,6 +28,7 @@ reference:
     - search_cansim_cubes
     - search_cansim_tables
     - get_cansim_changed_tables
+    - get_cansim_table_last_release_date
   - title: Metadata and information
   - contents:
     - get_cansim_cube_metadata

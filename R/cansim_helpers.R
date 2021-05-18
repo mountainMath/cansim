@@ -48,9 +48,15 @@ response_error_translation <- list(
 
 get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
   if (!is.na(path)) {
-    response <- purrr::safely(httr::GET)(url,httr::timeout(timeout),httr::write_disk(path,overwrite = TRUE))
+    response <- purrr::safely(httr::GET)(url,encode="json",
+                                         httr::add_headers("Content-Type"="application/json"),
+                                         httr::timeout(timeout),
+                                         httr::write_disk(path,overwrite = TRUE))
   } else {
-    response <- purrr::safely(httr::GET)(url,httr::timeout(timeout))
+    response <- purrr::safely(httr::GET)(url,
+                                         encode="json",
+                                         httr::add_headers("Content-Type"="application/json"),
+                                         httr::timeout(timeout))
   }
   if (!is.null(response$error)){
     if (retry>0) {
@@ -98,28 +104,6 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
   response
 }
 
-get_with_timeout_retry <- function(url,timeout=200,retry=3){
-  response <- purrr::safely(httr::GET)(url,
-                                        encode="json",
-                                        httr::add_headers("Content-Type"="application/json"),
-                                        httr::timeout(timeout))
-  if (!is.null(response$error)){
-    if (retry>0) {
-      message("Got timeout from StatCan, trying again")
-      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1)
-    } else {
-      message("Got timeout from StatCan, giving up")
-      response=response$result
-    }
-  } else {
-    response=response$result
-  }
-
-  if (is.null(response) && retry == 0) {
-    stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
-  }
-  response
-}
 
 
 short_prov.en <- c(

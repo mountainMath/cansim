@@ -151,7 +151,7 @@
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-05-10</h4>
+            <h4 class="date">2021-05-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_large_tables.Rmd"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -193,7 +193,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 19]</span>
 <span class="co">#&gt; # Database: sqlite 3.35.5</span>
-<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpWufpEI/cansim_20100001_eng/20100001-eng.sqlite]</span>
+<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpzWxLcp/cansim_20100001_eng/20100001-eng.sqlite]</span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID  `Vehicle type`  `Origin of manu… Sales `Seasonal adjus…</span>
 <span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;           </span>
 <span class="co">#&gt; 1 1946-01  Canada 2016A… Total, new mot… Total, country … Units Unadjusted      </span>
@@ -210,7 +210,7 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>
 <span class="co">#&gt; New motor vehicle sales</span>
 <span class="co">#&gt; CANSIM Table 20-10-0001</span>
-<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2021-02-01, Frequency: Monthly</span>
+<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2021-03-01, Frequency: Monthly</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Column Geography (11)</span>
 <span class="co">#&gt; Canada, Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, ...</span>
@@ -279,7 +279,7 @@
 <span class="co">#&gt; # A tibble: 1 x 6</span>
 <span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title      path     </span>
 <span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;    &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;    </span>
-<span class="co">#&gt; 1 20-10-0001        eng      2021-05-10 10:19:00 44 Mb      New motor… cansim_2…</span></code></pre></div>
+<span class="co">#&gt; 1 20-10-0001        eng      2021-05-17 21:26:42 44.1 Mb    New motor… cansim_2…</span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the <code>refresh=TRUE</code> option to refresh it manually when we want a fresh data pull from StatCan. If we want to free up disk space we can remove a cached table.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/remove_cansim_sqlite_cached_table.html">remove_cansim_sqlite_cached_table</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>

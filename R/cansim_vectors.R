@@ -72,7 +72,7 @@ rename_vectors <- function(data,vectors){
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
 #' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
-#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors
+#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses StatisticsCanada's \code{releaseDate} value for filtering the specified vectors.
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
@@ -95,7 +95,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   #if (use_ref_date) end_time=as.Date(pmax(Sys.time(),end_time))+1 else end_time=original_end_time
   if (use_ref_date){
     url = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorByReferencePeriodRange"
-    vectors_string=paste0('vectorIds=',paste(lapply(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"")
+    vectors_string=paste0('vectorIds=',paste(lapply(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ","),"")
     time_string=paste0('startRefPeriod=',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
                        '&endReferencePeriod=',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'')
     body=paste0(vectors_string,"&",time_string)
