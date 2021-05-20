@@ -103,6 +103,11 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
     meta2 <- readRDS(paste0(meta_base_path,"2"))
     geo_column_pos <- which(pull(meta2,dimension_name_column)==geography_column)
+    if (length(geo_column_pos)==0) {
+      geography_column <- ifelse(cleaned_language=="eng","Geography of origin",
+                                 paste0("G",intToUtf8(0x00E9),"ographie d'origine"))
+      geo_column_pos <- which(pull(meta2,dimension_name_column)==geography_column)
+    }
 
     if (length(geo_column_pos)==1) {
       hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
@@ -151,9 +156,9 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       filter(.data$cansimTableNumber==cleaned_number) %>%
       pull(.data$timeCached)
     last_updated <- get_cansim_table_last_release_date(cleaned_number)
-    if (is.null(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
+    if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
     if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
-    if (!is.null(last_downloaded) && !is.null(last_updated) &&
+    if (!is.na(last_downloaded) && !is.null(last_updated) &&
         as.numeric(last_downloaded)<as.numeric(last_updated)) {
       ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
       lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
