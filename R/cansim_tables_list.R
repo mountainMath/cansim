@@ -239,6 +239,9 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
 
       data <- r %>%
         mutate_at(vars(ends_with("Date")),as.Date) %>%
+        mutate_at(vars(matches("releaseTime")),function(d)readr::parse_datetime(d,
+                                                                                format=STATCAN_TIME_FORMAT,
+                                                                                locale=readr::locale(tz="UTC"))) %>%
         mutate(archived=.data$archived==1) %>%
         mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
         select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),

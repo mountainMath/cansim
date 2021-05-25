@@ -50,8 +50,9 @@
 
 <meta property="og:title" content="Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection — get_cansim_sqlite" />
 <meta property="og:description" content="Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
-cached permanently if a chache path is supplied or for duration of the current R session.
-This function is useful for large tables that don't have very often." />
+cached permanently if a cache path is supplied or for duration of the current R session.
+The function will check against the lastest release data for the table and emit a warning message
+if the cached table is out of date." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta property="og:image:alt" content="cansim" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -98,7 +99,7 @@ This function is useful for large tables that don't have very often." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8</span>
       </span>
     </div>
 
@@ -203,8 +204,9 @@ This function is useful for large tables that don't have very often." />
 
     <div class="ref-description">
     <p>Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
-cached permanently if a chache path is supplied or for duration of the current R session.
-This function is useful for large tables that don't have very often.</p>
+cached permanently if a cache path is supplied or for duration of the current R session.
+The function will check against the lastest release data for the table and emit a warning message
+if the cached table is out of date.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_cansim_sqlite</span><span class='op'>(</span>
@@ -254,7 +256,7 @@ a "val_norm" column with normalized VALUE using the supplied scale factor</p>
 <span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span style='color: #949494;'># Source:   lazy query [?? x 16]</span><span>
 #&gt; </span><span style='color: #949494;'># Database: sqlite 3.35.5
-#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpKd8m3X/cansim_34100013_eng/34100013-eng.sqlite]</span><span>
+#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpNQrwDu/cansim_34100013_eng/34100013-eng.sqlite]</span><span>
 #&gt;   REF_DATE GEO      DGUID  `Type of proper… UOM   UOM_ID SCALAR_FACTOR SCALAR_ID
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>    
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> 2005     Canada   2016A… Residential      Doll… 81     millions      6        

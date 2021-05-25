@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieve metadata for specified Statistics Canada data vectors — get_cansim_vector_info • cansim</title>
+<title>Get the latest release data for a StatCan table, if available — get_cansim_table_last_release_date • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Retrieve metadata for specified Statistics Canada data vectors — get_cansim_vector_info" />
-<meta property="og:description" content="Allows for the retrieval of metadatadata for Statistics Canada data vectors" />
+<meta property="og:title" content="Get the latest release data for a StatCan table, if available — get_cansim_table_last_release_date" />
+<meta property="og:description" content="This can be used to check when a table has last been updated." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta property="og:image:alt" content="cansim" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -194,39 +194,35 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieve metadata for specified Statistics Canada data vectors</h1>
-    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_vectors.R'><code>R/cansim_vectors.R</code></a></small>
-    <div class="hidden name"><code>get_cansim_vector_info.Rd</code></div>
+    <h1>Get the latest release data for a StatCan table, if available</h1>
+    <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
+    <div class="hidden name"><code>get_cansim_table_last_release_date.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Allows for the retrieval of metadatadata for Statistics Canada data vectors</p>
+    <p>This can be used to check when a table has last been updated.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_vector_info</span><span class='op'>(</span><span class='va'>vectors</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_cansim_table_last_release_date</span><span class='op'>(</span><span class='va'>cansimTableNumber</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>vectors</th>
-      <td><p>a vector of cansim vectors</p></td>
+      <th>cansimTableNumber</th>
+      <td><p>the NDM table number</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tibble with metadata for selected vectors</p>
+    <p>A datatime object if a release data is available, NULL otherwise.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'>get_cansim_vector_info</span><span class='op'>(</span><span class='st'>"v41690973"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 1 x 10</span><span>
-#&gt;   DECIMALS VECTOR  table   COORDINATE   title_en   title_fr    UOM frequencyCode
-#&gt;      </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;int&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>        1 v41690… 18-10-… 2.2.0.0.0.0… Canada;Al… Canada;E…    17             6
-#&gt; </span><span style='color: #949494;'># … with 2 more variables: SCALAR_ID &lt;int&gt;, title &lt;chr&gt;</span><span></div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+<span class='fu'>get_cansim_table_last_release_date</span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "2018-05-09 12:30:00 UTC"</div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -977,7 +977,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
   }
   fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
               "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
-              "surveyCode",  "dimension")
+              "surveyCode",  "dimension","releaseTime")
   l <- lapply(fields, function(field){
     purrr::map(data1,function(d){
       dd<-d$object[[field]]
@@ -987,7 +987,10 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
   }) %>%
     purrr::set_names(fields) %>%
     tibble::as_tibble() %>%
-    dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId))
+    dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
+    dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
+                                                    format=STATCAN_TIME_FORMAT,
+                                                    locale=readr::locale(tz=STATCAN_TIMEZONE)))
   l
 }
 
@@ -1144,6 +1147,7 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
     }
   }
   release_date
+  #get_cansim_cube_metadata(cansimTableNumber) %>% pull(releaseTime)
 }
 
 
