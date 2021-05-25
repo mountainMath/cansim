@@ -12,6 +12,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
+#' @param auto_refresh (Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
 #' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
@@ -30,7 +31,8 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' disconnect_cansim_sqlite(con)
 #' }
 #' @export
-get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=1000,
+get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, auto_refresh = FALSE,
+                              timeout=1000,
                        cache_path=getOption("cansim.cache_path")){
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
@@ -42,6 +44,18 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
   if (!dir.exists(cache_path)) dir.create(cache_path)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
   sqlite_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".sqlite")
+
+  last_downloaded <- list_cansim_sqlite_cached_tables() %>%
+    filter(.data$cansimTableNumber==cleaned_number) %>%
+    pull(.data$timeCached)
+  last_updated <- get_cansim_table_last_release_date(cleaned_number)
+
+  if (file.exists(sqlite_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
+      as.numeric(last_downloaded)<as.numeric(last_updated)) {
+    message(paste0("A newer version of ",cleaned_number," is available, auto-refreshing the table..."))
+    refresh=TRUE
+  }
+
   if (refresh | !file.exists(sqlite_path)){
     if (cleaned_language=="eng")
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
@@ -152,10 +166,6 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
 
   } else {
-    last_downloaded <- list_cansim_sqlite_cached_tables() %>%
-      filter(.data$cansimTableNumber==cleaned_number) %>%
-      pull(.data$timeCached)
-    last_updated <- get_cansim_table_last_release_date(cleaned_number)
     if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
     if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
     if (!is.na(last_downloaded) && !is.null(last_updated) &&
@@ -261,7 +271,7 @@ collect_and_normalize <- function(connection,
 list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path")){
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
-  result <- dplyr::tibble(path=dir(cache_path,"cansim_")) %>%
+  result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_")) %>%
     dplyr::mutate(cansimTableNumber=gsub("^cansim_|_eng$|_fra$","",.data$path) %>% cleaned_ndm_table_number()) %>%
     dplyr::mutate(language=gsub("^cansim_\\d+_","",.data$path)) %>%
     dplyr::mutate(title=NA_character_,

@@ -59,6 +59,8 @@ articles:
 
 news:
   releases:
+  - text: "Version 0.3.8"
+    href: https://github.com/mountainMath/cansim/releases/tag/v0.3.8
   - text: "Version 0.3.7"
     href: https://github.com/mountainMath/cansim/releases/tag/v0.3.7
   - text: "Version 0.3.6"

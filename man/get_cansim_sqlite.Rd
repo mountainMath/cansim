@@ -8,6 +8,7 @@ get_cansim_sqlite(
   cansimTableNumber,
   language = "english",
   refresh = FALSE,
+  auto_refresh = FALSE,
   timeout = 1000,
   cache_path = getOption("cansim.cache_path")
 )
@@ -18,6 +19,8 @@ get_cansim_sqlite(
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
+
+\item{auto_refresh}{(Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})}
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 

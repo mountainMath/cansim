@@ -57,3 +57,4 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Minor changes
 * Exclude vignette from CRAN checks
 * add release date info to cube metadata and cube list calls
+* add auto-refresh option for sqlite tables
