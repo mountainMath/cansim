@@ -72,7 +72,7 @@ rename_vectors <- function(data,vectors){
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
 #' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
-#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors
+#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses StatisticsCanada's \code{releaseDate} value for filtering the specified vectors.
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
@@ -91,17 +91,35 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
                             factors = TRUE, default_month = "07", default_day = "01"){
   start_time=as.Date(start_time)
   original_end_time=as.Date(end_time)
-  if (use_ref_date) end_time=as.Date(pmax(Sys.time(),end_time))+1 else end_time=original_end_time
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
-  url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
-  vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
-  time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
-                     '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
+  #if (use_ref_date) end_time=as.Date(pmax(Sys.time(),end_time))+1 else end_time=original_end_time
+  if (use_ref_date){
+    url = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorByReferencePeriodRange"
+    vectors_string=paste0('vectorIds=',paste(lapply(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ","),"")
+    time_string=paste0('startRefPeriod=',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
+                       '&endReferencePeriod=',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'')
+    body=paste0(vectors_string,"&",time_string)
+    # vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
+    # time_string=paste0('"startRefPeriod": "',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
+    #                    '","endReferencePeriod": "',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'"')
+    # body=paste0("{",vectors_string,",",time_string,"}")
+  } else {
+    url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
+    vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
+    time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
+                       '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
+    body=paste0("{",vectors_string,",",time_string,"}")
+  }
   cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(list(vectors_string,time_string), algo = "md5"), ".rda"))
   if (!file.exists(cache_path)) {
     message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
-    response <- post_with_timeout_retry(url, body=paste0("{",vectors_string,",",time_string,"}"),
-                                        timeout = timeout)
+    if (use_ref_date){
+      response <- get_with_timeout_retry(paste0(url,"?",body),
+                                         timeout = timeout)
+    } else {
+      response <- post_with_timeout_retry(url, body=body,
+                                          timeout = timeout)
+    }
     if (is.null(response)) return(response)
     if (response$status_code!=200) {
       stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
@@ -125,10 +143,10 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
     message(paste0("Reading CANSIM NDM vectors from temporary cache"))
     result <- readRDS(cache_path)
   }
-  if (use_ref_date) {
-    result <- result %>%
-      filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
-  }
+  # if (use_ref_date) {
+  #   result <- result %>%
+  #     filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
+  # }
   result %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                             default_month = default_month, default_day = default_day)

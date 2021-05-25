@@ -1,3 +1,9 @@
+# cansim 0.3.8
+## Minor changes
+* Exclude vignette from CRAN checks
+* add release date info to cube metadata and cube list calls
+* add auto-refresh option for sqlite tables
+
 # cansim 0.3.7
 ## Minor changes
 * Fix problem with UTF-8 encoding on solaris

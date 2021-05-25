@@ -52,3 +52,9 @@ There were no ERRORs or WARNINGs or NOTEs.
 # Changes from version 0.3.6
 * Fix problem with UTF-8 encoding on solaris
 * move dbplyr dependence from Imports to Suggests
+
+# Changes from version 0.3.7
+## Minor changes
+* Exclude vignette from CRAN checks
+* add release date info to cube metadata and cube list calls
+* add auto-refresh option for sqlite tables

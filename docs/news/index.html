@@ -95,7 +95,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8</span>
       </span>
     </div>
 
@@ -142,6 +142,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li class="dropdown-header">Releases</li>
+    <li>
+      <a href="https://github.com/mountainMath/cansim/releases/tag/v0.3.8">Version 0.3.8</a>
+    </li>
     <li>
       <a href="https://github.com/mountainMath/cansim/releases/tag/v0.3.7">Version 0.3.7</a>
     </li>
@@ -197,13 +200,27 @@
       <small>Source: <a href='https://github.com/mountainMath/cansim/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="cansim-037" class="section level1">
-<h1 class="page-header" data-toc-text="0.3.7">
-<a href="#cansim-037" class="anchor"></a>cansim 0.3.7<small> 2021-05-10 </small>
+    <div id="cansim-038" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.8">
+<a href="#cansim-038" class="anchor"></a>cansim 0.3.8<small> Unreleased </small>
 </h1>
 <div id="minor-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li>Exclude vignette from CRAN checks</li>
+<li>add release date info to cube metadata and cube list calls</li>
+<li>add auto-refresh option for sqlite tables</li>
+</ul>
+</div>
+</div>
+    <div id="cansim-037" class="section level1">
+<h1 class="page-header" data-toc-text="0.3.7">
+<a href="#cansim-037" class="anchor"></a>cansim 0.3.7<small> 2021-05-10 </small>
+</h1>
+<div id="minor-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Fix problem with UTF-8 encoding on solaris</li>
 <li>move dbplyr dependence from Imports to Suggests</li>
@@ -222,9 +239,9 @@
 <li>New <code>get_cansim_sqlite</code> function that stores tables in an SQLite database and facilitates access and managemet of data.</li>
 </ul>
 </div>
-<div id="minor-changes-1" class="section level2">
+<div id="minor-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Adapt to changes in dplyr, tidyr, and tibble</li>
 <li>fix a bug that would not properly add hierarchies when category names are repeated</li>
@@ -236,9 +253,9 @@
 <h1 class="page-header" data-toc-text="0.3.5">
 <a href="#cansim-035" class="anchor"></a>cansim 0.3.5<small> 2020-03-13 </small>
 </h1>
-<div id="minor-changes-2" class="section level2">
+<div id="minor-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-3" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Exclude all vignettes and example code from compilation as this may cause CRAN check errors when StatCan servers are down or otherwise temporarily unavailable</li>
 </ul>
@@ -248,9 +265,9 @@
 <h1 class="page-header" data-toc-text="0.3.4">
 <a href="#cansim-034" class="anchor"></a>cansim 0.3.4<small> 2020-03-05 </small>
 </h1>
-<div id="minor-changes-3" class="section level2">
+<div id="minor-changes-4" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-3" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-4" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Expand <code><a href="../reference/get_cansim_table_notes.html">get_cansim_table_notes()</a></code> functionality</li>
 <li>Add functionality to access the new cube list API</li>
@@ -261,9 +278,9 @@
 <h1 class="page-header" data-toc-text="0.3.3">
 <a href="#cansim-033" class="anchor"></a>cansim 0.3.3<small> 2019-10-15 </small>
 </h1>
-<div id="minor-changes-4" class="section level2">
+<div id="minor-changes-5" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-4" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-5" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Fix time zone problem when parsing and formatting times for the StatCan API</li>
 </ul>
@@ -273,9 +290,9 @@
 <h1 class="page-header" data-toc-text="0.3.2">
 <a href="#cansim-032" class="anchor"></a>cansim 0.3.2<small> 2019-08-26 </small>
 </h1>
-<div id="minor-changes-5" class="section level2">
+<div id="minor-changes-6" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-5" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-6" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Adjust package for changes in StatCan API with different metadata format</li>
 </ul>
@@ -292,9 +309,9 @@
 <li>Fixes issues arising from StatCan changing their API row limit</li>
 </ul>
 </div>
-<div id="minor-changes-6" class="section level2">
+<div id="minor-changes-7" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-6" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-7" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Optimize vector retrieval by REF_DATE</li>
 </ul>
@@ -304,9 +321,9 @@
 <h1 class="page-header" data-toc-text="0.3.0">
 <a href="#cansim-030" class="anchor"></a>cansim 0.3.0<small> 2019-07-18 </small>
 </h1>
-<div id="minor-changes-7" class="section level2">
+<div id="minor-changes-8" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-7" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-8" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Fixes issues arising from StatCan changing their API</li>
 <li>Member Names come concatenated with Classification Code by default, this could break existing code.</li>
@@ -320,9 +337,9 @@
 <h1 class="page-header" data-toc-text="0.2.3">
 <a href="#cansim-023" class="anchor"></a>cansim 0.2.3<small> 2019-01-07 </small>
 </h1>
-<div id="minor-changes-8" class="section level2">
+<div id="minor-changes-9" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-8" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-9" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>More robust table download functions</li>
 <li>Improved documentation</li>

@@ -23,7 +23,7 @@ get_cansim_vector(
 
 \item{end_time}{Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)}
 
-\item{use_ref_date}{Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors}
+\item{use_ref_date}{Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses StatisticsCanada's \code{releaseDate} value for filtering the specified vectors.}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 

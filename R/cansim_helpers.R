@@ -48,9 +48,15 @@ response_error_translation <- list(
 
 get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
   if (!is.na(path)) {
-    response <- purrr::safely(httr::GET)(url,httr::timeout(timeout),httr::write_disk(path,overwrite = TRUE))
+    response <- purrr::safely(httr::GET)(url,encode="json",
+                                         httr::add_headers("Content-Type"="application/json"),
+                                         httr::timeout(timeout),
+                                         httr::write_disk(path,overwrite = TRUE))
   } else {
-    response <- purrr::safely(httr::GET)(url,httr::timeout(timeout))
+    response <- purrr::safely(httr::GET)(url,
+                                         encode="json",
+                                         httr::add_headers("Content-Type"="application/json"),
+                                         httr::timeout(timeout))
   }
   if (!is.null(response$error)){
     if (retry>0) {
@@ -97,6 +103,7 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
   }
   response
 }
+
 
 
 short_prov.en <- c(

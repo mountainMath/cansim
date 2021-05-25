@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Retrieve Statistics Canada data table column list — get_cansim_column_list • cansim</title>
+<title>Get the latest release data for a StatCan table, if available — get_cansim_table_last_release_date • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Retrieve Statistics Canada data table column list — get_cansim_column_list" />
-<meta property="og:description" content="Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only." />
+<meta property="og:title" content="Get the latest release data for a StatCan table, if available — get_cansim_table_last_release_date" />
+<meta property="og:description" content="This can be used to check when a table has last been updated." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta property="og:image:alt" content="cansim" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -197,53 +197,35 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Retrieve Statistics Canada data table column list</h1>
+    <h1>Get the latest release data for a StatCan table, if available</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim.R'><code>R/cansim.R</code></a></small>
-    <div class="hidden name"><code>get_cansim_column_list.Rd</code></div>
+    <div class="hidden name"><code>get_cansim_table_last_release_date.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.</p>
+    <p>This can be used to check when a table has last been updated.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_cansim_column_list</span><span class='op'>(</span>
-  <span class='va'>cansimTableNumber</span>,
-  language <span class='op'>=</span> <span class='st'>"english"</span>,
-  refresh <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  timeout <span class='op'>=</span> <span class='fl'>200</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>get_cansim_table_last_release_date</span><span class='op'>(</span><span class='va'>cansimTableNumber</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>cansimTableNumber</th>
-      <td><p>the NDM table number to load</p></td>
-    </tr>
-    <tr>
-      <th>language</th>
-      <td><p><code>"en"</code> or <code>"english"</code> for English and <code>"fr"</code> or <code>"french"</code> for French language versions (default set to English)</p></td>
-    </tr>
-    <tr>
-      <th>refresh</th>
-      <td><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></td>
-    </tr>
-    <tr>
-      <th>timeout</th>
-      <td><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></td>
+      <td><p>the NDM table number</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A datatime object if a release data is available, NULL otherwise.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='fu'>get_cansim_column_list</span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 4</span><span>
-#&gt;   `Dimension ID` `Dimension name` `Dimension Notes` `Dimension Definitions`
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>                  
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> 1              Geography        </span><span style='color: #BB0000;'>NA</span><span>                </span><span style='color: #BB0000;'>NA</span><span>                     
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> 2              Type of property </span><span style='color: #BB0000;'>NA</span><span>                </span><span style='color: #BB0000;'>NA</span><span>                     </div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+<span class='fu'>get_cansim_table_last_release_date</span><span class='op'>(</span><span class='st'>"34-10-0013"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "2018-05-09 12:30:00 UTC"</div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
