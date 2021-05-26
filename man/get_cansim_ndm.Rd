@@ -21,7 +21,7 @@ get_cansim_ndm(
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
 \value{
-tibble format data table output
+A tibble with the StatCan table data
 }
 \description{
 Retrieves a data table as a tidy dataframe using either an old-style CANSIM code or a new-format NDM table number. This function will automatically convert old-style CANSIM codes into their new equivalents. Retrieved table data is cached for the duration of the current R session only by default.

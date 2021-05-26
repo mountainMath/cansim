@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim.R
 \name{parse_and_fold_in_metadata}
 \alias{parse_and_fold_in_metadata}
-\title{Parse metadata and fold into data table (deprecated)}
+\title{Parse metadata and fold into tibble (deprecated)}
 \usage{
 parse_and_fold_in_metadata(data, meta, data_path)
 }
@@ -14,9 +14,9 @@ parse_and_fold_in_metadata(data, meta, data_path)
 \item{data_path}{base path to save parsed metadata}
 }
 \value{
-data table including the metadata information
+A tibble including the metadata information
 }
 \description{
-Parse metadata and fold into data table (deprecated)
+Parse metadata and fold into tibble (deprecated)
 }
 \keyword{internal}

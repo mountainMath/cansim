@@ -23,6 +23,9 @@ get_cansim_column_categories(
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
+\value{
+A tibble with detailed information on StatCan table categories for the specified field
+}
 \description{
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }

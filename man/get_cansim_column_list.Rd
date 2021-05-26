@@ -20,6 +20,9 @@ get_cansim_column_list(
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
+\value{
+A tibble listing the column names of the StatCan table.
+}
 \description{
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }

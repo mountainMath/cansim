@@ -11,7 +11,7 @@
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
-#' @return tibble format data table output
+#' @return A tibble with the StatCan table data
 #'
 #' @examples
 #' \donttest{
@@ -27,17 +27,6 @@ get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE,
 }
 
 
-#' (Deprecated) Adjust values in a retrieved Statistics Canada data table using a scaling variable
-#'
-#' (Deprecated) Adjust retrieved data table values by a scaled amount; however French does not work, probably due to encoding issues. This function is now deprecated and should not be used.
-#'
-#' @param data A downloaded CANSIM data table
-#' @param var A now deprecated input
-#'
-#' @export
-adjust_cansim_values_by_variable <-function(data, var){
-  normalize_cansim_values(data)
-}
 
 #' Normalize retrieved data table values to appropriate scales
 #'
@@ -206,7 +195,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 #'
 #' @param oldCansimTableNumber deprecated style CANSIM table number (e.g. "427-0001")
 #'
-#' @return new-format NDM table number
+#' @return A character string with the new-format NDM table number
 #'
 #' @examples
 #' \donttest{
@@ -240,6 +229,7 @@ cansim_old_to_new <- function(oldCansimTableNumber){
 #' Parse metadata
 #' @param meta the raw metadata table
 #' @param data_path base path to save parsed metadata
+#'
 #' @return NULL
 #' @keywords internal
 parse_metadata <- function(meta,data_path){
@@ -333,10 +323,11 @@ parse_metadata <- function(meta,data_path){
 }
 
 #' Fold in metadata and for selected columns
-#' @param data the data table
+#' @param data A tibble with StatCan table data as e.g. returned by \code{get_cansim}.
 #' @param data_path base path to save parsed metadata
 #' @param column_names the names of the columns
-#' @return data table including the metadata information
+#'
+#' @return A tibble including the metadata information
 #' @keywords internal
 fold_in_metadata_for_columns <- function(data,data_path,column_names){
   cleaned_language <- basename(data_path) %>% gsub("^.+-|\\..+$","",.)
@@ -415,11 +406,12 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 #' @keywords data
 NULL
 
-#' Parse metadata and fold into data table (deprecated)
+#' Parse metadata and fold into tibble (deprecated)
 #' @param data the data table
 #' @param meta the raw metadata table
 #' @param data_path base path to save parsed metadata
-#' @return data table including the metadata information
+#'
+#' @return A tibble including the metadata information
 #' @keywords internal
 parse_and_fold_in_metadata <- function(data,meta,data_path){
   cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
@@ -555,8 +547,8 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
-#' @return tibble format data table output with added Date column with inferred date objects and
-#' a "val_norm" column with normalized VALUE using the supplied scale factor
+#' @return A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
+#' added \code{val_norm} column with normalized value from the \code{VALUE} column.
 #'
 #' @examples
 #' \donttest{
@@ -639,6 +631,8 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
+#' @return A tibble with the table overview information
+#'
 #' @examples
 #' \donttest{
 #' get_cansim_table_info("34-10-0013")
@@ -663,6 +657,8 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
+#' @return A tibble with the table survey code and name
+#'
 #' @examples
 #' \donttest{
 #' get_cansim_table_survey("34-10-0013")
@@ -685,6 +681,8 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
+#'
+#' @return A tibble with the table subject code and name.
 #'
 #' @examples
 #' \donttest{
@@ -709,6 +707,8 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
+#' @return A tibble with the StatCan Notes for the table
+#'
 #' @examples
 #' \donttest{
 #' get_cansim_table_short_notes("34-10-0013")
@@ -731,6 +731,8 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
+#'
+#' @return A tibble listing the column names of the StatCan table.
 #'
 #' @examples
 #' \donttest{
@@ -755,6 +757,8 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
+#'
+#' @return A tibble with detailed information on StatCan table categories for the specified field
 #'
 #' @examples
 #' \donttest{

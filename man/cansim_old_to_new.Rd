@@ -10,7 +10,7 @@ cansim_old_to_new(oldCansimTableNumber)
 \item{oldCansimTableNumber}{deprecated style CANSIM table number (e.g. "427-0001")}
 }
 \value{
-new-format NDM table number
+A character string with the new-format NDM table number
 }
 \description{
 Returns NDM table catalogue equivalent given a standard old-format CANSIM table number

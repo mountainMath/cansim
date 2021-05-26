@@ -208,9 +208,10 @@
 <h2 class="hasAnchor">
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
 <ul>
-<li>Exclude vignette from CRAN checks</li>
+<li>Exclude vignette from automatic CRAN checks to fix problem of CRAN checks failing when StatCan servers are down and lead to the package being removed from CRAN (checks are still active in local environment and when using GitHub action checks)</li>
 <li>add release date info to cube metadata and cube list calls</li>
 <li>add auto-refresh option for sqlite tables</li>
+<li>remove deprecated <code>adjust_cansim_values_by_variable</code> function</li>
 </ul>
 </div>
 </div>

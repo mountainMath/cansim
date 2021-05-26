@@ -39,6 +39,9 @@ csv2sqlite(
 
 \item{delim}{(Optional) csv deliminator, default is ","}
 }
+\value{
+A database connection
+}
 \description{
 convert csv to sqlite
 adapted from https://rdrr.io/github/coolbutuseless/csv2sqlite/src/R/csv2sqlite.R

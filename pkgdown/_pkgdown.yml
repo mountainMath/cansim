@@ -42,7 +42,6 @@ reference:
   - contents:
     - normalize_cansim_values
     - collect_and_normalize
-    - adjust_cansim_values_by_variable
   - title: Miscellaneous
   - contents:
     - add_provincial_abbreviations

@@ -18,8 +18,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
 #  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
 #'
-#' @return tibble format data table output with added Date column with inferred date objects and
-#' a "val_norm" column with normalized VALUE using the supplied scale factor
+#' @return A database connection to a local SQLite database with the StatCan Table data.
 #'
 #' @examples
 #' \donttest{
@@ -201,7 +200,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
   con
 }
 
-#' disconnect from a cansim database connection
+#' Disconnect from a cansim database connection
 #'
 #' @param connection connection to database
 #' @return `NULL``
@@ -216,16 +215,17 @@ disconnect_cansim_sqlite <- function(connection){
   DBI::dbDisconnect(connection$src$con)
 }
 
-#' collect data from connection and normalize cansim table output
+#' Collect data from connection and normalize cansim table output
 #'
-#' @param connection connection to database
+#' @param connection A connection to a local StatCan table SQLite database as returned by \code{get_cansim_sqlite},
+#' possibly with filters or other \code{dbplyr} verbs applied
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).
 #' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
-#' @return a tibble with the normalized data
+#' @return A tibble with the collected and normalized data
 #'
 #' @examples
 #' \donttest{
@@ -358,6 +358,7 @@ remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,ca
 #' @param connection connection to database
 #' @param table_name sql table name
 #' @param field name of field to index
+#' @return `NULL``
 #' @keywords internal
 create_index <- function(connection,table_name,field){
   field_index=paste0("index_",gsub("[^[:alnum:]]","_",field))
@@ -384,6 +385,8 @@ create_index <- function(connection,table_name,field){
 #' @param na na character strings
 #' @param text_encoding encoding of csv file (default UTF-8)
 #' @param delim (Optional) csv deliminator, default is ","
+#'
+#' @return A database connection
 #' @keywords internal
 csv2sqlite <- function(csv_file, sqlite_file, table_name, transform=NULL,chunk_size=5000000,
                        append=FALSE,col_types=NULL,na=c(NA,"..","","...","F"),

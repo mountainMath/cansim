@@ -13,6 +13,9 @@ create_index(connection, table_name, field)
 
 \item{field}{name of field to index}
 }
+\value{
+`NULL``
+}
 \description{
 create database index
 }

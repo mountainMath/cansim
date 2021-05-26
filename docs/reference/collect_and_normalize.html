@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>collect data from connection and normalize cansim table output — collect_and_normalize • cansim</title>
+<title>Collect data from connection and normalize cansim table output — collect_and_normalize • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,8 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="collect data from connection and normalize cansim table output — collect_and_normalize" />
-<meta property="og:description" content="collect data from connection and normalize cansim table output" />
+<meta property="og:title" content="Collect data from connection and normalize cansim table output — collect_and_normalize" />
+<meta property="og:description" content="Collect data from connection and normalize cansim table output" />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta property="og:image:alt" content="cansim" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -197,13 +197,13 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>collect data from connection and normalize cansim table output</h1>
+    <h1>Collect data from connection and normalize cansim table output</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_sql.R'><code>R/cansim_sql.R</code></a></small>
     <div class="hidden name"><code>collect_and_normalize.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>collect data from connection and normalize cansim table output</p>
+    <p>Collect data from connection and normalize cansim table output</p>
     </div>
 
     <pre class="usage"><span class='fu'>collect_and_normalize</span><span class='op'>(</span>
@@ -221,7 +221,8 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>connection</th>
-      <td><p>connection to database</p></td>
+      <td><p>A connection to a local StatCan table SQLite database as returned by <code>get_cansim_sqlite</code>,
+possibly with filters or other <code>dbplyr</code> verbs applied</p></td>
     </tr>
     <tr>
       <th>replacement_value</th>
@@ -251,7 +252,7 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a tibble with the normalized data</p>
+    <p>A tibble with the collected and normalized data</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>

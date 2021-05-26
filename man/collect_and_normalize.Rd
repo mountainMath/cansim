@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{collect_and_normalize}
 \alias{collect_and_normalize}
-\title{collect data from connection and normalize cansim table output}
+\title{Collect data from connection and normalize cansim table output}
 \usage{
 collect_and_normalize(
   connection,
@@ -15,7 +15,8 @@ collect_and_normalize(
 )
 }
 \arguments{
-\item{connection}{connection to database}
+\item{connection}{A connection to a local StatCan table SQLite database as returned by \code{get_cansim_sqlite},
+possibly with filters or other \code{dbplyr} verbs applied}
 
 \item{replacement_value}{(Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.}
 
@@ -30,10 +31,10 @@ collect_and_normalize(
 \item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
 }
 \value{
-a tibble with the normalized data
+A tibble with the collected and normalized data
 }
 \description{
-collect data from connection and normalize cansim table output
+Collect data from connection and normalize cansim table output
 }
 \examples{
 \donttest{

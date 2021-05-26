@@ -28,8 +28,7 @@ get_cansim_sqlite(
 in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.}
 }
 \value{
-tibble format data table output with added Date column with inferred date objects and
-a "val_norm" column with normalized VALUE using the supplied scale factor
+A database connection to a local SQLite database with the StatCan Table data.
 }
 \description{
 Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is

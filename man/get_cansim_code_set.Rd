@@ -17,7 +17,7 @@ get_cansim_code_set(
 To refresh the code list during a running R session set to \code{TRUE}}
 }
 \value{
-a tibble with english and french labels for the given code set
+A tibble with english and french labels for the given code set
 }
 \description{
 Useful to get a list of surveys  or subjects and used internally

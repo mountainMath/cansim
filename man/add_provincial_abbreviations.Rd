@@ -7,10 +7,10 @@
 add_provincial_abbreviations(data)
 }
 \arguments{
-\item{data}{code{cansim} package data frame with provincial level data}
+\item{data}{A tibble as returned by \code{get_cansim} with provincial level data}
 }
 \value{
-a code{cansim} package data frame with additional factor GEO.abb that contains language-specific provincial abbreviations
+The input tibble with additional factor GEO.abb that contains language-specific provincial abbreviations
 }
 \description{
 Add provincial abbreviations as factor

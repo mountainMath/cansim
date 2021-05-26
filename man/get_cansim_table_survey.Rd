@@ -20,6 +20,9 @@ get_cansim_table_survey(
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
+\value{
+A tibble with the table survey code and name
+}
 \description{
 Returns table survey detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }

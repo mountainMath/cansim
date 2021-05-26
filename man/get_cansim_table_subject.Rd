@@ -20,6 +20,9 @@ get_cansim_table_subject(
 
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 }
+\value{
+A tibble with the table subject code and name.
+}
 \description{
 Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }

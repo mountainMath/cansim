@@ -7,14 +7,14 @@
 fold_in_metadata_for_columns(data, data_path, column_names)
 }
 \arguments{
-\item{data}{the data table}
+\item{data}{A tibble with StatCan table data as e.g. returned by \code{get_cansim}.}
 
 \item{data_path}{base path to save parsed metadata}
 
 \item{column_names}{the names of the columns}
 }
 \value{
-data table including the metadata information
+A tibble including the metadata information
 }
 \description{
 Fold in metadata and for selected columns

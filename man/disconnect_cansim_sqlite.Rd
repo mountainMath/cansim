@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{disconnect_cansim_sqlite}
 \alias{disconnect_cansim_sqlite}
-\title{disconnect from a cansim database connection}
+\title{Disconnect from a cansim database connection}
 \usage{
 disconnect_cansim_sqlite(connection)
 }
@@ -13,7 +13,7 @@ disconnect_cansim_sqlite(connection)
 `NULL``
 }
 \description{
-disconnect from a cansim database connection
+Disconnect from a cansim database connection
 }
 \examples{
 \donttest{

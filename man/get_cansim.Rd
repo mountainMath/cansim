@@ -30,8 +30,8 @@ get_cansim(
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 }
 \value{
-tibble format data table output with added Date column with inferred date objects and
-a "val_norm" column with normalized VALUE using the supplied scale factor
+A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
+added \code{val_norm} column with normalized value from the \code{VALUE} column.
 }
 \description{
 Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.

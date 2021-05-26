@@ -180,8 +180,8 @@ short_prov.fr <- purrr::set_names(c(
 
 #' Add provincial abbreviations as factor
 #' @export
-#' @param data code{cansim} package data frame with provincial level data
-#' @return a code{cansim} package data frame with additional factor GEO.abb that contains language-specific provincial abbreviations
+#' @param data A tibble as returned by \code{get_cansim} with provincial level data
+#' @return The input tibble with additional factor GEO.abb that contains language-specific provincial abbreviations
 #'
 #' @examples
 #' \donttest{
@@ -210,7 +210,8 @@ add_provincial_abbreviations <- function(data){
 #' @param code_set the code set to retrieve.
 #' @param refresh Default is \code{FALSE}, repeated calls during the same session will hit the cached data.
 #' To refresh the code list during a running R session set to \code{TRUE}
-#' @return a tibble with english and french labels for the given code set
+#'
+#' @return A tibble with english and french labels for the given code set
 #'
 #' @examples
 #' \donttest{
