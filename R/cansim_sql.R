@@ -316,6 +316,13 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                             }))
   }
 
+  result <- result %>%
+    dplyr::mutate(timeReleased=.data$cansimTableNumber %>%
+                    lapply(get_cansim_table_last_release_date) %>%
+                    do.call(c, .)) %>%
+    dplyr::mutate(upToDate=.data$timeReleased<.data$timeCached)
+
+
   result
 }
 

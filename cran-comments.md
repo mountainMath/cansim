@@ -59,3 +59,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 * add release date info to cube metadata and cube list calls
 * add auto-refresh option for sqlite tables
 * remove deprecated `adjust_cansim_values_by_variable` function
+
+# Changes from version 0.3.7
+## Minor changes
+* Check for expired tables in `list_cansim_sqlite_cached_tables`
+
