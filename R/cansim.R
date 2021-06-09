@@ -150,9 +150,10 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
         mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
         mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field)))
 
-      while (sum(levels_data$...dupes)>0 && nrow(filter(levels_data,.data$...parent_hierarchy!=""))>0) {
+      while (nrow(levels_data %>%filter(.data$...dupes,.data$...parent_hierarchy!=""))>0) {
         levels_data <- levels_data %>%
           mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
+          select(-one_of(parent_field)) %>%
           left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
                       rename(!!!rlang::set_names("...name",parent_field)),
                     by=c(...parent_hierarchy=hierarchy_field)) %>%
