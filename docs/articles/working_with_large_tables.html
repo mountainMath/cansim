@@ -148,13 +148,13 @@
 
       
 
-      </header><script src="working_with_large_tables_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="working_with_large_tables_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-06-01</h4>
+            <h4 class="date">2021-06-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_large_tables.Rmd"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -181,6 +181,7 @@
 <p>One main difference to the <code>get_cansim</code> method is that <code>get_cansim_sqlite</code> does not return data but only a connection to the database. This allows us to filter the data before fetching the data into memory. When this is called the first time it will fetch the data, parse it into an SQLite database, index the main columns. This can take a significant amount of time, depending on the size of the table. In any subsequent call it will simply open a database connection to the cached database.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">connection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_sqlite.html">get_cansim_sqlite</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>
+<span class="co">#&gt; Warning in check_tzones(e1, e2): 'tzone' attributes are inconsistent</span>
 <span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span>
 <span class="co">#&gt; Parsing data</span>
 <span class="co">#&gt; Indexing GEO</span>
@@ -196,7 +197,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 19]</span>
 <span class="co">#&gt; # Database: sqlite 3.35.5</span>
-<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/Rtmp0Hh7Xg/cansim_20100001_eng/20100001-eng.sqlite]</span>
+<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpktsT19/cansim_20100001_eng/20100001-eng.sqlite]</span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID  `Vehicle type`  `Origin of manu… Sales `Seasonal adjus…</span>
 <span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;           </span>
 <span class="co">#&gt; 1 1946-01  Canada 2016A… Total, new mot… Total, country … Units Unadjusted      </span>
@@ -213,7 +214,7 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>
 <span class="co">#&gt; New motor vehicle sales</span>
 <span class="co">#&gt; CANSIM Table 20-10-0001</span>
-<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2021-03-01, Frequency: Monthly</span>
+<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2021-04-01, Frequency: Monthly</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Column Geography (11)</span>
 <span class="co">#&gt; Canada, Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, ...</span>
@@ -279,14 +280,16 @@
 <p>Since we now have the option of a more permanent cache we should take care to manage that space properly. The <code>list_cansim_sqlite_cached_tables</code> function gives us an overview over the cached data we have.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/list_cansim_sqlite_cached_tables.html">list_cansim_sqlite_cached_tables</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; Warning in check_tzones(e1, e2): 'tzone' attributes are inconsistent</span>
 <span class="co">#&gt; # A tibble: 1 x 8</span>
 <span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title      path     </span>
 <span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;    &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;    </span>
-<span class="co">#&gt; 1 20-10-0001        eng      2021-06-01 08:52:26 44.1 Mb    New motor… cansim_2…</span>
+<span class="co">#&gt; 1 20-10-0001        eng      2021-06-19 13:33:25 44.1 Mb    New motor… cansim_2…</span>
 <span class="co">#&gt; # … with 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the <code>refresh=TRUE</code> option to refresh it manually when we want a fresh data pull from StatCan. If we want to free up disk space we can remove a cached table.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/remove_cansim_sqlite_cached_table.html">remove_cansim_sqlite_cached_table</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>
+<span class="co">#&gt; Warning in check_tzones(e1, e2): 'tzone' attributes are inconsistent</span>
 <span class="co">#&gt; Removing cached data for 20-10-0001 (eng)</span>
 <span class="co">#&gt; NULL</span></code></pre></div>
 </div>

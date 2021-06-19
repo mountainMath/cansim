@@ -1,6 +1,8 @@
 # cansim 0.3.9
 ## Minor changes
+* Fix issues with top level duplicate categories
 * Check for expired tables in `list_cansim_sqlite_cached_tables`
+* New auto-update feature for sqlite tables
 
 # cansim 0.3.8
 ## Minor changes

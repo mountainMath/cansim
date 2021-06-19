@@ -11,7 +11,8 @@ collect_and_normalize(
   default_month = "07",
   default_day = "01",
   factors = FALSE,
-  strip_classification_code = FALSE
+  strip_classification_code = FALSE,
+  disconnect = FALSE
 )
 }
 \arguments{
@@ -22,13 +23,15 @@ possibly with filters or other \code{dbplyr} verbs applied}
 
 \item{normalize_percent}{(Optional) When \code{true} (the default) normalizes percentages by changing them to rates}
 
-\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "01")}
+\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "07")}
 
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 
-\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).}
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{FALSE}).}
 
-\item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
+\item{strip_classification_code}{(Optional) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
+
+\item{disconnect}{(Optional) Logical value to indicate if the database connection should be disconnected. (Default is \code{FALSE})}
 }
 \value{
 A tibble with the collected and normalized data

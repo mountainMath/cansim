@@ -60,7 +60,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 * add auto-refresh option for sqlite tables
 * remove deprecated `adjust_cansim_values_by_variable` function
 
-# Changes from version 0.3.7
+# Changes from version 0.3.8
 ## Minor changes
+* Fix issues with top level duplicate categories
 * Check for expired tables in `list_cansim_sqlite_cached_tables`
 
