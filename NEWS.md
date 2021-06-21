@@ -1,3 +1,9 @@
+# cansim 0.3.9
+## Minor changes
+* Fix issues with top level duplicate categories
+* Check for expired tables in `list_cansim_sqlite_cached_tables`
+* New auto-update feature for sqlite tables
+
 # cansim 0.3.8
 ## Minor changes
 * Exclude vignette from automatic CRAN checks to fix problem of CRAN checks failing when StatCan servers are down and lead to the package being removed from CRAN (checks are still active in local environment and when using GitHub action checks)

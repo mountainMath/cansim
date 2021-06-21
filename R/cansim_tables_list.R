@@ -322,5 +322,31 @@ search_cansim_cubes <- function(search_term, refresh=FALSE){
              grepl(search_term,.data$productId,ignore.case = TRUE))
 }
 
+#' Major economic indicator release schedule
+#'
+#' Returns every release date of major economic indicators since March 14, 2012.
+#' This also includes scheduled future releases.
+#'
+#' @return a tibble with data, and details for major economic indicator release
+#'
+#' @examples
+#' \donttest{
+#' get_cansim_key_release_schedule()
+#' }
+#'
+#' @export
+get_cansim_key_release_schedule <- function(){
+  url <- "https://www150.statcan.gc.ca/n1/dai-quo/ssi/homepage/schedule-key_indicators-eng.json"
+  response <- get_with_timeout_retry(url)
+
+  if (response$status_code!=200){
+    stop("Problem accessing release schedule.")
+  }
+
+  data <- httr::content(response) %>%
+    lapply(dplyr::as_tibble) %>%
+    dplyr::bind_rows() %>%
+    mutate(date=strftime(date,STATCAN_TIME_FORMAT_S,tz="UTC") %>% as.Date)
+}
 
 

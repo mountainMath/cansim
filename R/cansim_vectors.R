@@ -1,7 +1,7 @@
 MAX_PERIODS = 6000
 STATCAN_TIMEZONE = "America/Toronto"
 STATCAN_TIME_FORMAT="%Y-%m-%dT%H:%M"
-
+STATCAN_TIME_FORMAT_S="%Y-%m-%dT%H:%M:%S"
 
 extract_vector_data <- function(data1){
   vf=list("DECIMALS"="decimals",
