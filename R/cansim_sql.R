@@ -178,7 +178,8 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
                      "There is a newer version of the table available, it was last updated ",
                      lu_date,".\n",
-                     "Consider updating the cached version by passing the `refresh=TRUE` option."))
+                     "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
+                     "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
     }
     if (cleaned_language=="eng")
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
@@ -323,7 +324,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
     dplyr::mutate(timeReleased=.data$cansimTableNumber %>%
                     lapply(get_cansim_table_last_release_date) %>%
                     do.call(c, .)) %>%
-    dplyr::mutate(upToDate=.data$timeReleased<.data$timeCached)
+    dplyr::mutate(upToDate=as.numeric(.data$timeReleased)<as.numeric(.data$timeCached))
 
 
   result
