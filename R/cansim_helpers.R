@@ -184,7 +184,7 @@ short_prov.fr <- purrr::set_names(c(
 #' @return The input tibble with additional factor GEO.abb that contains language-specific provincial abbreviations
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' df <- get_cansim("17-10-0005")
 #' df <- add_provincial_abbreviations(df)
 #' }
@@ -214,7 +214,7 @@ add_provincial_abbreviations <- function(data){
 #' @return A tibble with english and french labels for the given code set
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cansim_code_set("survey")
 #' }
 get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "status", "uom", "survey",  "subject", "wdsResponseStatus"),

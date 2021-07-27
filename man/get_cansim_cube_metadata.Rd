@@ -16,7 +16,7 @@ a tibble containing the table metadata
 Retrieves table metadata given an input table number or vector of table numbers using either the new or old table number format. Patience is suggested as the Statistics Canada API can be very slow. The `list_cansim_tables()` function can be used as an alternative to retrieve a (cached) list of CANSIM tables with (more limited) metadata.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_cube_metadata("34-10-0013")
 }
 }

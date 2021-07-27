@@ -16,7 +16,7 @@ A character string with the new-format NDM table number
 Returns NDM table catalogue equivalent given a standard old-format CANSIM table number
 }
 \examples{
-\donttest{
+\dontrun{
 cansim_old_to_new("026-0018")
 }
 }

@@ -21,7 +21,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' @return A database connection to a local SQLite database with the StatCan Table data.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' con <- get_cansim_sqlite("34-10-0013")
 #'
 #' # Work with the data connection
@@ -207,7 +207,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 #' @return `NULL``
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' con <- get_cansim_sqlite("34-10-0013")
 #' disconnect_cansim_sqlite(con)
 #' }
@@ -230,7 +230,7 @@ disconnect_cansim_sqlite <- function(connection){
 #' @return A tibble with the collected and normalized data
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' library(dplyr)
 #'
 #' con <- get_cansim_sqlite("34-10-0013")
@@ -269,7 +269,7 @@ collect_and_normalize <- function(connection,
 #' @param cache_path Optional, default value is `getOption("cansim.cache_path")`.
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' list_cansim_sqlite_cached_tables()
 #' }
 #' @export
@@ -339,7 +339,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' @return `NULL``
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' con <- get_cansim_sqlite("34-10-0013")
 #' disconnect_cansim_sqlite(con)
 #' remove_cansim_sqlite_cached_table("34-10-0013")

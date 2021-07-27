@@ -14,7 +14,7 @@ Returns every release date of major economic indicators since March 14, 2012.
 This also includes scheduled future releases.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_key_release_schedule()
 }
 

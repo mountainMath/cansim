@@ -27,7 +27,7 @@ A tibble listing the column names of the StatCan table.
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_column_list("34-10-0013")
 }
 }

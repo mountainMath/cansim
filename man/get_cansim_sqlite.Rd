@@ -37,7 +37,7 @@ The function will check against the lastest release data for the table and emit 
 if the cached table is out of date.
 }
 \examples{
-\donttest{
+\dontrun{
 con <- get_cansim_sqlite("34-10-0013")
 
 # Work with the data connection

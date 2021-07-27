@@ -204,14 +204,17 @@
 <h1 class="page-header" data-toc-text="0.3.9">
 <a href="#cansim-039" class="anchor"></a>cansim 0.3.9<small> Unreleased </small>
 </h1>
-<div id="minor-changes" class="section level2">
+<div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<a href="#major-changes" class="anchor"></a>Major changes</h2>
 <ul>
-<li>Fix issues with top level duplicate categories</li>
-<li>Check for expired tables in <code>list_cansim_sqlite_cached_tables</code>
+<li>
+<p>deprecate <code>list_cansim_tables</code> and <code>serach_cansim_tables</code> and fallback to corresponding "_cube" methods as Open Data Canada API has changed and similar functionality is available through the "_cube" methods that tie directly into StatCan APIS</p>
+<h2 id="minor-changes">Minor changes</h2>
 </li>
-<li>New auto-update feature for sqlite tables</li>
+<li><p>Fix issues with top level duplicate categories</p></li>
+<li><p>Check for expired tables in <code>list_cansim_sqlite_cached_tables</code></p></li>
+<li><p>New auto-update feature for sqlite tables</p></li>
 </ul>
 </div>
 </div>
@@ -247,9 +250,9 @@
 <h1 class="page-header" data-toc-text="0.3.6">
 <a href="#cansim-036" class="anchor"></a>cansim 0.3.6<small> 2021-05-08 </small>
 </h1>
-<div id="major-changes" class="section level2">
+<div id="major-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
 <ul>
 <li>Fold part of <code>normalize_cansim_values</code> into the default table and vector output, in particular always add a scaled variable column called <code>val_norm</code> and an imputed <code>Date</code> column and covert categories to factors by default.</li>
 <li>New <code>get_cansim_sqlite</code> function that stores tables in an SQLite database and facilitates access and managemet of data.</li>
@@ -318,9 +321,9 @@
 <h1 class="page-header" data-toc-text="0.3.1">
 <a href="#cansim-031" class="anchor"></a>cansim 0.3.1<small> 2019-08-19 </small>
 </h1>
-<div id="major-changes-1" class="section level2">
+<div id="major-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
 <ul>
 <li>Fixes issues arising from StatCan changing their API row limit</li>
 </ul>
@@ -366,9 +369,9 @@
 <h1 class="page-header" data-toc-text="0.2.2">
 <a href="#cansim-022" class="anchor"></a>cansim 0.2.2<small> 2018-12-18 </small>
 </h1>
-<div id="major-changes-2" class="section level2">
+<div id="major-changes-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#major-changes-2" class="anchor"></a>Major changes</h2>
+<a href="#major-changes-3" class="anchor"></a>Major changes</h2>
 <ul>
 <li>Initial CRAN release</li>
 <li>French metadata implemented</li>

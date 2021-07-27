@@ -16,7 +16,7 @@ The input tibble with additional factor GEO.abb that contains language-specific 
 Add provincial abbreviations as factor
 }
 \examples{
-\donttest{
+\dontrun{
 df <- get_cansim("17-10-0005")
 df <- add_provincial_abbreviations(df)
 }

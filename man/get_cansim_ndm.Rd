@@ -30,7 +30,7 @@ Retrieves a data table as a tidy dataframe using either an old-style CANSIM code
 Deprecated, use `get_cansim` instead. This will be removed in future releases.
 }
 \examples{
-\donttest{
+\dontrun{
 # Retrieve a table with an NDM code
 get_cansim("34-10-0013")
 # Retrieve a table with an old-style CANSIM code

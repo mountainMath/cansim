@@ -65,6 +65,52 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
       dplyr::mutate(cansim_table_number=table_number_from_url(.data$url_en))
   }))
 
+
+
+  # rows <- tibble::as_tibble(results) %>%
+  #   dplyr::bind_cols(url_rows) %>%
+  #   dplyr::filter(.data$source=="CANSIM",
+  #                 grepl("^\\d{2}-\\d{2}-\\d{4}",.data$cansim_table_number))
+  #
+  # dfs <- rows %>% select_if(is.data.frame) %>% names
+  # lists <- rows %>% select_if(is.list) %>% names
+  #
+  # for (n in dfs) {
+  #   rows <- rows %>%
+  #     dplyr::mutate(!!paste0(n,"_en"):=!!(as.name(n)) %>% pull(.data$en),
+  #                   !!paste0(n,"_fr"):=!!(as.name(n)) %>% pull(.data$fr)) %>%
+  #     dplyr::select(-!!as.name(n))
+  # }
+  # for (n in lists) {
+  #   rows <- rows %>%
+  #     dplyr::mutate(!!paste0(n,"_en"):=!!(as.name(n))[["en"]],
+  #                   !!paste0(n,"_fr"):=!!(as.name(n))[["fr"]]) %>%
+  #     dplyr::select(-!!as.name(n))
+  # }
+  #
+  #   mutate(title_en=.data$title_translated$en,
+  #          title_fr=.data$title_translated$fr,
+  #          notes_en=.data$notes_translated$en,
+  #          notes_fr=.data$notes_translated$fr,
+  #          keywords_en=string_list(.data$keywords$en),
+  #          keywords_fr=string_list(.data$keywords$en),
+  #          subject=string_list(.data$subject),
+  #          organization_en=.data$organization$en,
+  #          organization_fr=.data$organization$fr,
+  #          program_page_url_en=.data$program_page_url$en,
+  #          program_page_url_fr=.data$program_page_url$fr,
+  #          data_series_name_en=.data$data_series_name$en,
+  #          data_series_name_fr=.data$data_series_name$fr,
+  #          org_title_at_publication_en=.data$org_title_at_publication$en,
+  #          org_title_at_publication_fr=.data$org_title_at_publication$fr) %>%
+  #   select(-.data$title_translated,
+  #          -.data$notes_translated,
+  #          -.data$keywords,
+  #          -.data$organization,
+  #          -.data$program_page_url,
+  #          -.data$data_series_name,
+  #          -.data$org_title_at_publication)
+
   rows <- tibble::tibble(title=results$title,
                          title_en=results$title_translated$en,
                          title_fr=results$title_translated$fr,
@@ -93,8 +139,9 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 
 
 
-#' Get overview list for all Statistics Canada data tables
+#' Get overview list for all Statistics Canada data tables (deprecated)
 #'
+#' This method is deprecated, please use `list_cansim_cubes` instead.
 #' Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to \code{FALSE} by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option \code{cansim.cache_path} is set it will look for and store the overview table in that directory.
 #'
 #' @param refresh Default is \code{FALSE}, and will regenerate the table if set to \code{TRUE}
@@ -102,11 +149,14 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography
 #'
 #' @examples
-#'
+#' \dontrun{
 #' list_cansim_tables()
+#' }
 #'
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
+  warning("This method is deprecated, please use `list_cansim_cubes` instead.")
+  if (FALSE) {
   # flow: if cansim.cache_path version exists, use that, otherwise fall back on package version
   # if refresh is TRUE, refresh cache path
 
@@ -139,10 +189,13 @@ list_cansim_tables <- function(refresh=FALSE){
     }
   }
   result
+  }
+  list_cansim_cubes(lite=FALSE,refresh=refresh)
 }
 
-#' Search through Statistics Canada data tables
+#' Search through Statistics Canada data tables (deprecated)
 #'
+#' This method is deprecated, please use `search_cansim_cubes` instead.
 #' Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to \code{TRUE}. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not \code{search_description} is set to \code{TRUE} or not. If \code{refresh = TRUE}, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option \code{cache_path} is set it will look for and store the overview table in that directory.
 #'
 #' @param search_term User-supplied search term used to find Statistics Canada data tables with matching titles
@@ -152,11 +205,14 @@ list_cansim_tables <- function(refresh=FALSE){
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.
 #'
 #' @examples
-#'
+#' \dontrun{
 #' search_cansim_tables("Labour force")
+#' }
 #'
 #' @export
 search_cansim_tables <- function(search_term, search_fields = "both", refresh=FALSE){
+  warning("This method is deprecated, please use `search_cansim_cubes` instead.")
+  if (FALSE) {
   tables <- list_cansim_tables(refresh = refresh)
   if(search_fields=="title") {
     tables %>%
@@ -168,6 +224,8 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
     tables %>%
       filter(grepl(search_term, .data$subject, ignore.case = TRUE) | grepl(search_term, .data$keywords, ignore.case = TRUE) | grepl(search_term, .data$title, ignore.case = TRUE))
   }
+  }
+  search_cansim_cubes(search_term = search_term, refresh=refresh)
 }
 
 
@@ -183,7 +241,7 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
 #' start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' list_cansim_cubes()
 #' }
 #'
@@ -303,7 +361,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE){
 #' @return A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' search_cansim_cubes("Labour force")
 #' }
 #'
@@ -330,7 +388,7 @@ search_cansim_cubes <- function(search_term, refresh=FALSE){
 #' @return a tibble with data, and details for major economic indicator release
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cansim_key_release_schedule()
 #' }
 #'

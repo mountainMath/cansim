@@ -40,7 +40,7 @@ A tibble with the collected and normalized data
 Collect data from connection and normalize cansim table output
 }
 \examples{
-\donttest{
+\dontrun{
 library(dplyr)
 
 con <- get_cansim_sqlite("34-10-0013")

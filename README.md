@@ -93,15 +93,15 @@ get_cansim_table_overview(36-10-040)
 
 ### Listing available tables
 
-Calling `list_cansim_tables` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
+Calling `list_cansim_cubes` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
 ```{r}
-list_cansim_tables()
+list_cansim_cubes()
 ```
 The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard `dplyr` verbs.  
 ```{r}
-list_cansim_tables() %>% 
-  filter(grepl("Labour force characteristics",title), grepl("economic region",title)) %>% 
-  select("cansim_table_number","title")
+list_cansim_cubes() %>% 
+  filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %>% 
+  select("cansim_table_number","cubeTitleEn")
 ```
 As table search functions require a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cansim.cache_path="your cache path")` option so that table information is cached across R sessions.
 
@@ -109,7 +109,7 @@ The _Listing Statistics Canada data tables_ vignette has additional detail and e
 
 ### License
 
-The code in this package is licensed under the MIT license. The bundled table metadata in Sysdata.R, as well as all Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the `inst` folder. The Statistics Canada Open Licence Agreement requires that: 
+The code in this package is licensed under the MIT license. All Statistics Canada data retrieved using this package is made available under the Statistics Canada Open Licence Agreement, a copy of which is included in the `inst` folder. The Statistics Canada Open Licence Agreement requires that: 
 
 ```
 Subject to this agreement, Statistics Canada grants you a worldwide, royalty-free, non-exclusive licence to:
@@ -173,7 +173,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.8.
+  von Bergmann, J., Dmitry Shkolnik (2021). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.9.
 
 A BibTeX entry for LaTeX users is
 ```
@@ -181,7 +181,7 @@ A BibTeX entry for LaTeX users is
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2021},
-    note = {R package version 0.3.8},
+    note = {R package version 0.3.9},
     url = {https://mountainmath.github.io/cansim/},
   }
 ```

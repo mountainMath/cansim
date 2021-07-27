@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_tables_list.R
 \name{list_cansim_tables}
 \alias{list_cansim_tables}
-\title{Get overview list for all Statistics Canada data tables}
+\title{Get overview list for all Statistics Canada data tables (deprecated)}
 \usage{
 list_cansim_tables(refresh = FALSE)
 }
@@ -13,10 +13,12 @@ list_cansim_tables(refresh = FALSE)
 A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography
 }
 \description{
+This method is deprecated, please use `list_cansim_cubes` instead.
 Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to \code{FALSE} by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option \code{cansim.cache_path} is set it will look for and store the overview table in that directory.
 }
 \examples{
-
+\dontrun{
 list_cansim_tables()
+}
 
 }

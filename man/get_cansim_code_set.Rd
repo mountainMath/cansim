@@ -23,7 +23,7 @@ A tibble with english and french labels for the given code set
 Useful to get a list of surveys  or subjects and used internally
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_code_set("survey")
 }
 }

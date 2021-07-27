@@ -37,7 +37,7 @@ added \code{val_norm} column with normalized value from the \code{VALUE} column.
 Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim("34-10-0013")
 }
 }

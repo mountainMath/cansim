@@ -16,7 +16,7 @@ A tibble with the list of all tables that are currently cached at the given cach
 List cached cansim SQLite database
 }
 \examples{
-\donttest{
+\dontrun{
 list_cansim_sqlite_cached_tables()
 }
 }
