@@ -27,7 +27,7 @@ A tibble with the table overview information
 Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_table_info("34-10-0013")
 }
 }

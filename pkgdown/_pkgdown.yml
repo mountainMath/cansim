@@ -24,11 +24,12 @@ reference:
   - title: Locating data
   - contents:
     - list_cansim_cubes
-    - list_cansim_tables
+    #- list_cansim_tables
     - search_cansim_cubes
-    - search_cansim_tables
+    #- search_cansim_tables
     - get_cansim_changed_tables
     - get_cansim_table_last_release_date
+    - get_cansim_key_release_schedule
   - title: Metadata and information
   - contents:
     - get_cansim_cube_metadata

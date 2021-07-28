@@ -59,3 +59,13 @@ There were no ERRORs or WARNINGs or NOTEs.
 * add release date info to cube metadata and cube list calls
 * add auto-refresh option for sqlite tables
 * remove deprecated `adjust_cansim_values_by_variable` function
+
+# Changes from version 0.3.8
+## Major changes
+* deprecate `list_cansim_tables` and `serach_cansim_tables` and fallback to corresponding "_cube" methods as Open Data Canada API has changed and similar functionality is available through the "_cube" methods that tie directly into StatCan APIs
+* change `\donttest` to `\dontrun` in examples to exclude examples that make API calls running (and occasionally failing) on CRAN
+## Minor changes
+* Fix issues with top level duplicate categories
+* Check for expired tables in `list_cansim_sqlite_cached_tables`
+* New auto-update feature for sqlite tables
+

@@ -50,7 +50,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.9</span>
       </span>
     </div>
 
@@ -148,13 +148,13 @@
 
       
 
-      </header><script src="listing_cansim_tables_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="listing_cansim_tables_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Listing Statistics Canada data tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-05-26</h4>
+            <h4 class="date">2021-07-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/listing_cansim_tables.Rmd"><code>vignettes/listing_cansim_tables.Rmd</code></a></small>
       <div class="hidden name"><code>listing_cansim_tables.Rmd</code></div>
@@ -164,30 +164,23 @@
     
     
 <p>This vignette details how to use the internal table search functions in the <code>cansim</code> package with a simple example using employment data for economic regions in British Columbia.</p>
-<div id="a-note-on-caching-and-refreshing-table-lists" class="section level3">
-<h3 class="hasAnchor">
-<a href="#a-note-on-caching-and-refreshing-table-lists" class="anchor"></a>A note on caching and refreshing table lists</h3>
-<p>As the table search function requires a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code><a href="https://rdrr.io/r/base/options.html">options(cache_path="your cache path")</a></code> option so that table information is cached across R sessions.</p>
-</div>
+<p>The list of available tables is cached in the current R session to avoid repeated downloading of data.</p>
 <div id="listing-and-filtering-tables" class="section level3">
 <h3 class="hasAnchor">
 <a href="#listing-and-filtering-tables" class="anchor"></a>Listing and filtering tables</h3>
-<p>Calling <code>list_cansim_tables</code> returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers.</p>
+<p>Calling <code>list_cansim_cubes</code> returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mountainMath/cansim">cansim</a></span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "title"                      "title_en"                  </span>
-<span class="co">#&gt;  [3] "title_fr"                   "keywords_en"               </span>
-<span class="co">#&gt;  [5] "keywords"                   "keywords_fr"               </span>
-<span class="co">#&gt;  [7] "notes"                      "notes_en"                  </span>
-<span class="co">#&gt;  [9] "notes_fr"                   "state"                     </span>
-<span class="co">#&gt; [11] "subject"                    "date_published"            </span>
-<span class="co">#&gt; [13] "frequency"                  "revision_id"               </span>
-<span class="co">#&gt; [15] "time_period_coverage_start" "time_period_coverage_end"  </span>
-<span class="co">#&gt; [17] "metadata_created"           "metadata_modified"         </span>
-<span class="co">#&gt; [19] "url_en"                     "url_fr"                    </span>
-<span class="co">#&gt; [21] "cansim_table_number"</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="fu"><a href="../reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Retrieving cube information from StatCan servers...</span>
+<span class="co">#&gt;  [1] "cansim_table_number" "cubeTitleEn"         "cubeTitleFr"        </span>
+<span class="co">#&gt;  [4] "productId"           "cansimId"            "cubeStartDate"      </span>
+<span class="co">#&gt;  [7] "cubeEndDate"         "releaseTime"         "archived"           </span>
+<span class="co">#&gt; [10] "subjectCode"         "surveyCode"          "frequencyCode"      </span>
+<span class="co">#&gt; [13] "corrections"         "dimensionNameEn"     "dimensionNameFr"    </span>
+<span class="co">#&gt; [16] "surveyEn"            "surveyFr"            "subjectEn"          </span>
+<span class="co">#&gt; [19] "subjectFr"</span></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
@@ -200,14 +193,16 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     intersect, setdiff, setequal, union</span>
 
-<span class="fu"><a href="../reference/list_cansim_tables.html">list_cansim_tables</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">title</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">title</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"title"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, 
+         <span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">cansim_table_number</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>
+<span class="co">#&gt; Retrieving cube information from temporary cache.</span>
 <span class="co">#&gt; # A tibble: 2 x 2</span>
-<span class="co">#&gt;   cansim_table_number title                                                     </span>
+<span class="co">#&gt;   cansim_table_number cubeTitleEn                                               </span>
 <span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;                                                     </span>
-<span class="co">#&gt; 1 14-10-0293          Labour force characteristics by economic region, three-mo…</span>
-<span class="co">#&gt; 2 14-10-0090          Labour force characteristics by province, territory and e…</span></code></pre></div>
+<span class="co">#&gt; 1 14-10-0090          Labour force characteristics by province, territory and e…</span>
+<span class="co">#&gt; 2 14-10-0293          Labour force characteristics by economic region, three-mo…</span></code></pre></div>
 <p>The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the <code>tidyr</code> package here to reshape data from a long format to a wider format.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span>

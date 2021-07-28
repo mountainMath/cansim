@@ -20,25 +20,24 @@ knitr::opts_chunk$set(
 ```
 This vignette details how to use the internal table search functions in the `cansim` package with a simple example using employment data for economic regions in British Columbia. 
 
-### A note on caching and refreshing table lists
-
-As the table search function requires a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cache_path="your cache path")` option so that table information is cached across R sessions.
+The list of available tables is cached in the current R session to avoid repeated downloading of data.
 
 ### Listing and filtering tables
 
-Calling `list_cansim_tables` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
+Calling `list_cansim_cubes` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
 ```{r}
 library(cansim)
 
-names(list_cansim_tables())
+names(list_cansim_cubes())
 ```
 The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. 
 ```{r}
 library(dplyr)
 
-list_cansim_tables() %>% 
-  filter(grepl("Labour force characteristics",title), grepl("economic region",title)) %>% 
-  select("cansim_table_number","title")
+list_cansim_cubes() %>% 
+  filter(grepl("Labour force characteristics",cubeTitleEn), 
+         grepl("economic region",cubeTitleEn)) %>% 
+  select(cansim_table_number,cubeTitleEn)
 ```
 The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the `tidyr` package here to reshape data from a long format to a wider format. 
 ```{r}

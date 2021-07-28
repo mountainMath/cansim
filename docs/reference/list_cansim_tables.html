@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get overview list for all Statistics Canada data tables — list_cansim_tables • cansim</title>
+<title>Get overview list for all Statistics Canada data tables (deprecated) — list_cansim_tables • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,9 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Get overview list for all Statistics Canada data tables — list_cansim_tables" />
-<meta property="og:description" content="Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to FALSE by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option cansim.cache_path is set it will look for and store the overview table in that directory." />
+<meta property="og:title" content="Get overview list for all Statistics Canada data tables (deprecated) — list_cansim_tables" />
+<meta property="og:description" content="This method is deprecated, please use `list_cansim_cubes` instead.
+Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to FALSE by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option cansim.cache_path is set it will look for and store the overview table in that directory." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta property="og:image:alt" content="cansim" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -96,7 +97,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.9</span>
       </span>
     </div>
 
@@ -197,13 +198,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get overview list for all Statistics Canada data tables</h1>
+    <h1>Get overview list for all Statistics Canada data tables (deprecated)</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
     <div class="hidden name"><code>list_cansim_tables.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to <code>FALSE</code> by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option <code>cansim.cache_path</code> is set it will look for and store the overview table in that directory.</p>
+    <p>This method is deprecated, please use `list_cansim_cubes` instead.
+Generates an overview table containing metadata of available Statistics Canada data tables. A new and updated table will be generated if this table does not already exist in cached form or if the force refresh option is selected (set to <code>FALSE</code> by default). This can take some time as this process involves scraping through hundreds of Statistics Canada web pages to gather the required metadata. If option <code>cansim.cache_path</code> is set it will look for and store the overview table in that directory.</p>
     </div>
 
     <pre class="usage"><span class='fu'>list_cansim_tables</span><span class='op'>(</span>refresh <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
@@ -222,27 +224,11 @@
     <p>A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='fu'>list_cansim_tables</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5,794 x 21</span><span>
-#&gt;    title  title_en  title_fr  keywords_en  keywords  keywords_fr  notes notes_en
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Weekl… Weekly r… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Weekl… Weekly r… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Weekl… Weekly r… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Weekl… Weekly p… Indicate… rail transp… rail tra… rail transp… &lt;p&gt;T… &lt;p&gt;This…
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Chart… Chartere… Banques … business pe… business… business pe… This… This ta…
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Curre… Currency… Monnaie … business pe… business… business pe… This… This ta…
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Chart… Chartere… Actif et… business pe… business… business pe… This… This ta…
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Bank … Bank of … Taux du … government,… governme… government,… This… This ta…
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Selec… Selected… Quelques… government,… governme… government,… This… This ta…
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Careg… Caregive… Les aida… health, hea… health, … health, hea… Popu… Populat…
-#&gt; </span><span style='color: #949494;'># … with 5,784 more rows, and 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   subject &lt;chr&gt;, date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span><span></div><div class='input'>
-</div></span></pre>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

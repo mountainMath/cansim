@@ -55,7 +55,7 @@ get_cansim_table_overview("14-10-0293")
 ```
 When a table number is unknown, you can browse the available tables or search by survey name, keyword or title.
 ```{r}
-search_cansim_tables("housing price indexes")
+search_cansim_cubes("housing price indexes")
 ```
 Individual series in Statistics Canada data tables can also be accessed by using individual numbered vectors. This is especially useful when building reports using specific indicators. For convenience, the `cansim` package allows users to specify named vectors, where the `label` field will be added to the returned data frame containing the specified name for each vector.
 ```{r}

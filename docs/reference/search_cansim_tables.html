@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Search through Statistics Canada data tables — search_cansim_tables • cansim</title>
+<title>Search through Statistics Canada data tables (deprecated) — search_cansim_tables • cansim</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -48,8 +48,9 @@
   <link href="../extra.css" rel="stylesheet">
   
 
-<meta property="og:title" content="Search through Statistics Canada data tables — search_cansim_tables" />
-<meta property="og:description" content="Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not search_description is set to TRUE or not. If refresh = TRUE, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option cache_path is set it will look for and store the overview table in that directory." />
+<meta property="og:title" content="Search through Statistics Canada data tables (deprecated) — search_cansim_tables" />
+<meta property="og:description" content="This method is deprecated, please use `search_cansim_cubes` instead.
+Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to TRUE. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not search_description is set to TRUE or not. If refresh = TRUE, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option cache_path is set it will look for and store the overview table in that directory." />
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png" />
 <meta property="og:image:alt" content="cansim" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -96,7 +97,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.9</span>
       </span>
     </div>
 
@@ -197,13 +198,14 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Search through Statistics Canada data tables</h1>
+    <h1>Search through Statistics Canada data tables (deprecated)</h1>
     <small class="dont-index">Source: <a href='https://github.com/mountainMath/cansim/blob/master/R/cansim_tables_list.R'><code>R/cansim_tables_list.R</code></a></small>
     <div class="hidden name"><code>search_cansim_tables.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to <code>TRUE</code>. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not <code>search_description</code> is set to <code>TRUE</code> or not. If <code>refresh = TRUE</code>, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option <code>cache_path</code> is set it will look for and store the overview table in that directory.</p>
+    <p>This method is deprecated, please use `search_cansim_cubes` instead.
+Searches through Statistics Canada data tables using a search term. A new table is generated if it already does not exist or if refresh option is set to <code>TRUE</code>. Search-terms are case insensitive, but will accept regular expressions for more advanced searching. The search function can search either through table titles or through table descriptions, depending on the whether or not <code>search_description</code> is set to <code>TRUE</code> or not. If <code>refresh = TRUE</code>, the table will be updated and regenerated using Statistics Canada's latest data. This can take some time since this process involves scraping through several hundred web pages to gather the required metadata. If option <code>cache_path</code> is set it will look for and store the overview table in that directory.</p>
     </div>
 
     <pre class="usage"><span class='fu'>search_cansim_tables</span><span class='op'>(</span><span class='va'>search_term</span>, search_fields <span class='op'>=</span> <span class='st'>"both"</span>, refresh <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
@@ -230,27 +232,11 @@
     <p>A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='fu'>search_cansim_tables</span><span class='op'>(</span><span class='st'>"Labour force"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 127 x 21</span><span>
-#&gt;    title  title_en  title_fr  keywords_en  keywords  keywords_fr  notes notes_en
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Labou… Labour f… Caractér… employment … employme… employment … &lt;p&gt;N… &lt;p&gt;Numb…
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Labou… Labour f… Caractér… employment … employme… employment … Numb… Number …
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Labou… Labour f… Caractér… employment … employme… employment … &lt;p&gt;N… &lt;p&gt;Numb…
-#&gt; </span><span style='color: #949494;'># … with 117 more rows, and 13 more variables: notes_fr &lt;chr&gt;, state &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   subject &lt;chr&gt;, date_published &lt;chr&gt;, frequency &lt;chr&gt;, revision_id &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   time_period_coverage_start &lt;chr&gt;, time_period_coverage_end &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   metadata_created &lt;chr&gt;, metadata_modified &lt;chr&gt;, url_en &lt;chr&gt;,</span><span>
-#&gt; </span><span style='color: #949494;'>#   url_fr &lt;chr&gt;, cansim_table_number &lt;chr&gt;</span><span></div><div class='input'>
-</div></span></pre>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

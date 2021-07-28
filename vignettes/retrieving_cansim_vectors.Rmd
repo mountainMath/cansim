@@ -28,7 +28,7 @@ Many of the time-series data available from Statistics Canada have individual ve
 
 ### get_cansim_vector()
 
-Running `search_cansim_tables("consumer price index")` shows `r search_cansim_tables("consumer price index") %>% pull(title) %>% length()` tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+Running `search_cansim_cubes("consumer price index")` shows `r search_cansim_cubes("consumer price index") %>% nrow()` tables as results. However, if you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
 ```{r}
 get_cansim_vector("v41690973","2015-01-01")
 ```

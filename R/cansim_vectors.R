@@ -1,7 +1,7 @@
 MAX_PERIODS = 6000
 STATCAN_TIMEZONE = "America/Toronto"
 STATCAN_TIME_FORMAT="%Y-%m-%dT%H:%M"
-
+STATCAN_TIME_FORMAT_S="%Y-%m-%dT%H:%M:%S"
 
 extract_vector_data <- function(data1){
   vf=list("DECIMALS"="decimals",
@@ -82,7 +82,7 @@ rename_vectors <- function(data,vectors){
 #' @return A tibble with data for vectors released between start and end time
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cansim_vector("v41690973","2015-01-01")
 #' }
 #' @export
@@ -167,7 +167,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #' @return A tibble with data for specified vector(s) for the last N periods
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cansim_vector_for_latest_periods("v41690973",10)
 #' }
 #' @export
@@ -230,7 +230,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' @return A tibble with data matching specified coordinate and period input arguments
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12.0.0.0.0.0.0.0.0",periods=3)
 #' }
 #' @export
@@ -276,7 +276,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
 #' @return A tibble with metadata for selected vectors
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' get_cansim_vector_info("v41690973")
 #' }
 #' @export

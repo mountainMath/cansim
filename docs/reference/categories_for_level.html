@@ -96,7 +96,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.9</span>
       </span>
     </div>
 
@@ -244,96 +244,10 @@
     <p>A vector of categories</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
 <span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='get_cansim.html'>get_cansim</a></span><span class='op'>(</span><span class='st'>"16-10-0117"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='message'>Accessing CANSIM NDM product 16-10-0117 from Statistics Canada</span></div><div class='output co'>#&gt; <span class='message'>Parsing data</span></div><div class='input'><span class='fu'>categories_for_level</span><span class='op'>(</span><span class='va'>data</span>,<span class='st'>"North American Industry Classification System (NAICS)"</span>,level<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "Animal food manufacturing [3111]"                                                                  
-#&gt;  [2] "Grain and oilseed milling [3112]"                                                                  
-#&gt;  [3] "Sugar and confectionery product manufacturing [3113]"                                              
-#&gt;  [4] "Fruit and vegetable preserving and specialty food manufacturing [3114]"                            
-#&gt;  [5] "Dairy product manufacturing [3115]"                                                                
-#&gt;  [6] "Meat product manufacturing [3116]"                                                                 
-#&gt;  [7] "Seafood product preparation and packaging [3117]"                                                  
-#&gt;  [8] "Bakeries and tortilla manufacturing [3118]"                                                        
-#&gt;  [9] "Other food manufacturing [3119]"                                                                   
-#&gt; [10] "Beverage manufacturing [3121]"                                                                     
-#&gt; [11] "Tobacco manufacturing [3122]"                                                                      
-#&gt; [12] "Fibre, yarn and thread mills [3131]"                                                               
-#&gt; [13] "Fabric mills [3132]"                                                                               
-#&gt; [14] "Textile and fabric finishing and fabric coating [3133]"                                            
-#&gt; [15] "Textile furnishings mills [3141]"                                                                  
-#&gt; [16] "Other textile product mills [3149]"                                                                
-#&gt; [17] "Clothing knitting mills [3151]"                                                                    
-#&gt; [18] "Cut and sew clothing manufacturing [3152]"                                                         
-#&gt; [19] "Clothing accessories and other clothing manufacturing [3159]"                                      
-#&gt; [20] "Leather and hide tanning and finishing [3161]"                                                     
-#&gt; [21] "Footwear manufacturing [3162]"                                                                     
-#&gt; [22] "Other leather and allied product manufacturing [3169]"                                             
-#&gt; [23] "Sawmills and wood preservation [3211]"                                                             
-#&gt; [24] "Veneer, plywood and engineered wood product manufacturing [3212]"                                  
-#&gt; [25] "Other wood product manufacturing [3219]"                                                           
-#&gt; [26] "Pulp, paper and paperboard mills [3221]"                                                           
-#&gt; [27] "Converted paper product manufacturing [3222]"                                                      
-#&gt; [28] "Printing and related support activities [3231]"                                                    
-#&gt; [29] "Petroleum and coal product manufacturing [3241]"                                                   
-#&gt; [30] "Basic chemical manufacturing [3251]"                                                               
-#&gt; [31] "Resin, synthetic rubber, and artificial and synthetic fibres and filaments manufacturing [3252]"   
-#&gt; [32] "Pesticide, fertilizer and other agricultural chemical manufacturing [3253]"                        
-#&gt; [33] "Pharmaceutical and medicine manufacturing [3254]"                                                  
-#&gt; [34] "Paint, coating and adhesive manufacturing [3255]"                                                  
-#&gt; [35] "Soap, cleaning compound and toilet preparation manufacturing [3256]"                               
-#&gt; [36] "Other chemical product manufacturing [3259]"                                                       
-#&gt; [37] "Plastic product manufacturing [3261]"                                                              
-#&gt; [38] "Rubber product manufacturing [3262]"                                                               
-#&gt; [39] "Clay product and refractory manufacturing [3271]"                                                  
-#&gt; [40] "Glass and glass product manufacturing [3272]"                                                      
-#&gt; [41] "Cement and concrete product manufacturing [3273]"                                                  
-#&gt; [42] "Lime and gypsum product manufacturing [3274]"                                                      
-#&gt; [43] "Other non-metallic mineral product manufacturing [3279]"                                           
-#&gt; [44] "Iron and steel mills and ferro-alloy manufacturing [3311]"                                         
-#&gt; [45] "Steel product manufacturing from purchased steel [3312]"                                           
-#&gt; [46] "Alumina and aluminum production and processing [3313]"                                             
-#&gt; [47] "Non-ferrous metal (except aluminum) production and processing [3314]"                              
-#&gt; [48] "Foundries [3315]"                                                                                  
-#&gt; [49] "Forging and stamping [3321]"                                                                       
-#&gt; [50] "Cutlery and hand tool manufacturing [3322]"                                                        
-#&gt; [51] "Architectural and structural metals manufacturing [3323]"                                          
-#&gt; [52] "Boiler, tank and shipping container manufacturing [3324]"                                          
-#&gt; [53] "Hardware manufacturing [3325]"                                                                     
-#&gt; [54] "Spring and wire product manufacturing [3326]"                                                      
-#&gt; [55] "Machine shops, turned product, and screw, nut and bolt manufacturing [3327]"                       
-#&gt; [56] "Coating, engraving, cold and heat treating and allied activities [3328]"                           
-#&gt; [57] "Other fabricated metal product manufacturing [3329]"                                               
-#&gt; [58] "Agricultural, construction and mining machinery manufacturing [3331]"                              
-#&gt; [59] "Industrial machinery manufacturing [3332]"                                                         
-#&gt; [60] "Commercial and service industry machinery manufacturing [3333]"                                    
-#&gt; [61] "Ventilation, heating, air-conditioning and commercial refrigeration equipment manufacturing [3334]"
-#&gt; [62] "Metalworking machinery manufacturing [3335]"                                                       
-#&gt; [63] "Engine, turbine and power transmission equipment manufacturing [3336]"                             
-#&gt; [64] "Other general-purpose machinery manufacturing [3339]"                                              
-#&gt; [65] "Computer and peripheral equipment manufacturing [3341]"                                            
-#&gt; [66] "Communications equipment manufacturing [3342]"                                                     
-#&gt; [67] "Audio and video equipment manufacturing [3343]"                                                    
-#&gt; [68] "Semiconductor and other electronic component manufacturing [3344]"                                 
-#&gt; [69] "Navigational, measuring, medical and control instruments manufacturing [3345]"                     
-#&gt; [70] "Manufacturing and reproducing magnetic and optical media [3346]"                                   
-#&gt; [71] "Electric lighting equipment manufacturing [3351]"                                                  
-#&gt; [72] "Household appliance manufacturing [3352]"                                                          
-#&gt; [73] "Electrical equipment manufacturing [3353]"                                                         
-#&gt; [74] "Other electrical equipment and component manufacturing [3359]"                                     
-#&gt; [75] "Motor vehicle manufacturing [3361]"                                                                
-#&gt; [76] "Motor vehicle body and trailer manufacturing [3362]"                                               
-#&gt; [77] "Motor vehicle parts manufacturing [3363]"                                                          
-#&gt; [78] "Aerospace product and parts manufacturing [3364]"                                                  
-#&gt; [79] "Railroad rolling stock manufacturing [3365]"                                                       
-#&gt; [80] "Ship and boat building [3366]"                                                                     
-#&gt; [81] "Other transportation equipment manufacturing [3369]"                                               
-#&gt; [82] "Household and institutional furniture and kitchen cabinet manufacturing [3371]"                    
-#&gt; [83] "Office furniture (including fixtures) manufacturing [3372]"                                        
-#&gt; [84] "Other furniture-related product manufacturing [3379]"                                              
-#&gt; [85] "Medical equipment and supplies manufacturing [3391]"                                               
-#&gt; [86] "Other miscellaneous manufacturing [3399]"                                                          
-#&gt; [87] "Cannabis product manufacturing [3123]"                                                             </div><div class='input'><span class='co'># }</span>
+<span class='fu'>categories_for_level</span><span class='op'>(</span><span class='va'>data</span>,<span class='st'>"North American Industry Classification System (NAICS)"</span>,level<span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

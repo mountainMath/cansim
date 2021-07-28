@@ -17,7 +17,7 @@ none
 Opens CANSIM table on Statistics Canada's website using default browser. This may be useful for getting further info on CANSIM table and survey methods.
 }
 \examples{
-\donttest{
+\dontrun{
 view_cansim_webpage("34-10-0013")
 }
 }

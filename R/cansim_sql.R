@@ -21,7 +21,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' @return A database connection to a local SQLite database with the StatCan Table data.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' con <- get_cansim_sqlite("34-10-0013")
 #'
 #' # Work with the data connection
@@ -178,7 +178,8 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
                      "There is a newer version of the table available, it was last updated ",
                      lu_date,".\n",
-                     "Consider updating the cached version by passing the `refresh=TRUE` option."))
+                     "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
+                     "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
     }
     if (cleaned_language=="eng")
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
@@ -206,7 +207,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 #' @return `NULL``
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' con <- get_cansim_sqlite("34-10-0013")
 #' disconnect_cansim_sqlite(con)
 #' }
@@ -221,14 +222,15 @@ disconnect_cansim_sqlite <- function(connection){
 #' possibly with filters or other \code{dbplyr} verbs applied
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
-#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).
-#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{FALSE}).
+#' @param strip_classification_code (Optional) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
+#' @param disconnect (Optional) Logical value to indicate if the database connection should be disconnected. (Default is \code{FALSE})
 #' @return A tibble with the collected and normalized data
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' library(dplyr)
 #'
 #' con <- get_cansim_sqlite("34-10-0013")
@@ -242,13 +244,14 @@ disconnect_cansim_sqlite <- function(connection){
 collect_and_normalize <- function(connection,
                                   replacement_value="val_norm", normalize_percent=TRUE,
                                   default_month="07", default_day="01",
-                                  factors=FALSE,strip_classification_code=FALSE){
+                                  factors=FALSE,strip_classification_code=FALSE,
+                                  disconnect=FALSE){
   c <- connection$ops
   while ("x" %in% names(c)) {c <- c$x}
   cansimTableNumber <- c[[1]] %>%
     gsub("^cansim_|_fra$|_eng$","",.) %>%
     cleaned_ndm_table_number()
-  connection %>%
+  d <- connection %>%
     collect() %>%
     normalize_cansim_values(replacement_value=replacement_value,
                             normalize_percent=normalize_percent,
@@ -256,6 +259,8 @@ collect_and_normalize <- function(connection,
                             default_day=default_day,
                             factors=TRUE,
                             cansimTableNumber = cansimTableNumber)
+  if (disconnect) disconnect_cansim_sqlite(connection)
+  d
 }
 
 
@@ -264,7 +269,7 @@ collect_and_normalize <- function(connection,
 #' @param cache_path Optional, default value is `getOption("cansim.cache_path")`.
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' list_cansim_sqlite_cached_tables()
 #' }
 #' @export
@@ -288,9 +293,8 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                                      d<-readRDS(file.path(cache_path,p,pp))
                                      dd<- strptime(d,format=TIME_FORMAT)
                                    } else {
-                                     dd <- NA
+                                     dd <- strptime("1900-01-01 01:00:00",format=TIME_FORMAT)
                                    }
-                                   dd
                                  }))
     result$sqliteSize <- do.call("c",
                                  lapply(result$path,function(p){
@@ -299,7 +303,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                                      d<-file.size(file.path(cache_path,p,pp))
                                      dd<- format_file_size(d,"auto")
                                    } else {
-                                     dd <- NA
+                                     dd <- NA_character_
                                    }
                                    dd
                                  }))
@@ -310,11 +314,18 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                                 d <- readRDS(file.path(cache_path,p,pp))
                                 dd <- as.character(d[1,1])
                                 } else {
-                                  dd <- NA
+                                  dd <- NA_character_
                                 }
                                 dd
                             }))
   }
+
+  result <- result %>%
+    dplyr::mutate(timeReleased=.data$cansimTableNumber %>%
+                    lapply(get_cansim_table_last_release_date) %>%
+                    do.call(c, .)) %>%
+    dplyr::mutate(upToDate=as.numeric(.data$timeReleased)<as.numeric(.data$timeCached))
+
 
   result
 }
@@ -328,7 +339,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' @return `NULL``
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' con <- get_cansim_sqlite("34-10-0013")
 #' disconnect_cansim_sqlite(con)
 #' remove_cansim_sqlite_cached_table("34-10-0013")

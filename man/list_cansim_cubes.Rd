@@ -20,7 +20,7 @@ start and end dates, achieve status, subject and survey codes, frequency codes a
 Generates an overview table containing metadata of available Statistics Canada data cubes.
 }
 \examples{
-\donttest{
+\dontrun{
 list_cansim_cubes()
 }
 

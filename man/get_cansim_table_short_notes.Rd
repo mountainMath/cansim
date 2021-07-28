@@ -27,7 +27,7 @@ A tibble with the StatCan Notes for the table
 Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_table_short_notes("34-10-0013")
 }
 }

@@ -16,7 +16,7 @@ A datatime object if a release data is available, NULL otherwise.
 This can be used to check when a table has last been updated.
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_table_last_release_date("34-10-0013")
 }
 }

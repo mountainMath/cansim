@@ -42,7 +42,7 @@ A tibble with data for vectors released between start and end time
 Retrieve data for a Statistics Canada data vector released within a given time frame
 }
 \examples{
-\donttest{
+\dontrun{
 get_cansim_vector("v41690973","2015-01-01")
 }
 }
