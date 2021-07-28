@@ -190,7 +190,14 @@ list_cansim_tables <- function(refresh=FALSE){
   }
   result
   }
-  list_cansim_cubes(lite=FALSE,refresh=refresh)
+  list_cansim_cubes(lite=FALSE,refresh=refresh) %>%
+    mutate(title=.data$cubeTitleEn,
+           subject=.data$subjectEn,
+           date_published=as.Date(.data$releaseTime)) %>%
+    rename(title_en=.data$cubeTitleEn,
+           title_fr=.data$cubeTitleFr,
+           time_period_coverage_start=.data$cubeStartDate,
+           time_period_coverage_end=.data$cubeEndDate)
 }
 
 #' Search through Statistics Canada data tables (deprecated)
@@ -225,7 +232,14 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
       filter(grepl(search_term, .data$subject, ignore.case = TRUE) | grepl(search_term, .data$keywords, ignore.case = TRUE) | grepl(search_term, .data$title, ignore.case = TRUE))
   }
   }
-  search_cansim_cubes(search_term = search_term, refresh=refresh)
+  search_cansim_cubes(search_term = search_term, refresh=refresh) %>%
+    mutate(title=.data$cubeTitleEn,
+           subject=.data$subjectEn,
+           date_published=as.Date(.data$releaseTime)) %>%
+    rename(title_en=.data$cubeTitleEn,
+           title_fr=.data$cubeTitleFr,
+           time_period_coverage_start=.data$cubeStartDate,
+           time_period_coverage_end=.data$cubeEndDate)
 }
 
 
