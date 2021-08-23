@@ -619,6 +619,8 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
     }, error = function(e) {
       warning("Could not fold in metadata")
+      if (nrow(data)==0) warning(paste0("StatCan returned zero rows of data for table ",cleaned_number,
+                                        ", this is likely a problem with StatCan."))
     })
 
     saveRDS(data,file=data_path)
