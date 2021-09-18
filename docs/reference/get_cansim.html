@@ -213,8 +213,7 @@
   timeout <span class='op'>=</span> <span class='fl'>200</span>,
   factors <span class='op'>=</span> <span class='cn'>TRUE</span>,
   default_month <span class='op'>=</span> <span class='st'>"07"</span>,
-  default_day <span class='op'>=</span> <span class='st'>"01"</span>,
-  callback <span class='op'>=</span> <span class='cn'>NULL</span>
+  default_day <span class='op'>=</span> <span class='st'>"01"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -248,11 +247,6 @@
       <th>default_day</th>
       <td><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 Set to higher values for large tables and slow network connection. (Default is <code>200</code>).</p></td>
-    </tr>
-    <tr>
-      <th>callback</th>
-      <td><p>Optional, callback function for chunked reading. Calback function has two arguments, the data frame chunk
-and the current offset. Useful for filtering large csv files while reading.</p></td>
     </tr>
     </table>
 

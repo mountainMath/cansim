@@ -562,8 +562,6 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #'  Set to higher values for large tables and slow network connection. (Default is \code{200}).
-#' @param callback Optional, callback function for chunked reading. Calback function has two arguments, the data frame chunk
-#' and the current offset. Useful for filtering large csv files while reading.
 #'
 #' @return A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
 #' added \code{val_norm} column with normalized value from the \code{VALUE} column.
@@ -574,8 +572,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' }
 #' @export
 get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200,
-                       factors=TRUE, default_month="07", default_day="01",
-                       callback=NULL){
+                       factors=TRUE, default_month="07", default_day="01"){
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
   base_table <- naked_ndm_table_number(cansimTableNumber)
@@ -599,32 +596,19 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     if(cleaned_language=="eng") {
       message("Parsing data")
       csv_reader <- readr::read_csv
-      csv_reader_chunked <- readr::read_csv_chunked
       value_column="VALUE"
     } else {
       message(paste0("Analyser les donn",intToUtf8(0x00E9),"es"))
       csv_reader <- readr::read_csv2
-      csv_reader_chunked <- readr::read_csv2_chunked
       value_column="VALEUR"
     }
-    if (!is.null(callback)) {
-      h<-csv_reader(file.path(exdir, paste0(base_table, ".csv")),n_max = 1,
-                            locale=readr::locale(encoding="UTF-8"),
-                            col_types = list(.default = "c")) %>% names
-      data <- csv_reader_chunked(file.path(exdir, paste0(base_table, ".csv")),
-                                 na=na_strings,
-                                 locale=readr::locale(encoding="UTF-8"),
-                                 col_names = h,
-                                 callback =readr::DataFrameCallback$new(callback),
-                                 col_types = list(.default = "c")) %>%
-        dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
-    } else {
-      data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
-                         na=na_strings,
-                         locale=readr::locale(encoding="UTF-8"),
-                         col_types = list(.default = "c")) %>%
-        dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
-    }
+
+    data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
+                       na=na_strings,
+                       locale=readr::locale(encoding="UTF-8"),
+                       col_types = list(.default = "c")) %>%
+      dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+
 
     meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                              na=na_strings,

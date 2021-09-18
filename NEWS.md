@@ -1,7 +1,6 @@
 # cansim 0.3.10
 ## Minor changes
 * Better error handling when StatCan returns empty tables
-* Allow callback function for filering cansim tables when reading to reduce memory footprint
 
 # cansim 0.3.9
 ## Major changes

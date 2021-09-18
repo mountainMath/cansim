@@ -72,5 +72,4 @@ There were no ERRORs or WARNINGs or NOTEs.
 # Changes from version 0.3.9
 ## Minor changes
 * Better error handling when StatCan returns empty tables
-* Allow callback function for filering cansim tables when reading to reduce memory footprint
 

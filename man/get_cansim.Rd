@@ -11,8 +11,7 @@ get_cansim(
   timeout = 200,
   factors = TRUE,
   default_month = "07",
-  default_day = "01",
-  callback = NULL
+  default_day = "01"
 )
 }
 \arguments{
@@ -30,9 +29,6 @@ get_cansim(
 
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 Set to higher values for large tables and slow network connection. (Default is \code{200}).}
-
-\item{callback}{Optional, callback function for chunked reading. Calback function has two arguments, the data frame chunk
-and the current offset. Useful for filtering large csv files while reading.}
 }
 \value{
 A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
