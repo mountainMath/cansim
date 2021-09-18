@@ -50,7 +50,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.10</span>
       </span>
     </div>
 
@@ -148,13 +148,13 @@
 
       
 
-      </header><script src="working_with_large_tables_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="working_with_large_tables_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-07-28</h4>
+            <h4 class="date">2021-09-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_large_tables.Rmd"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -195,16 +195,16 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 19]</span>
-<span class="co">#&gt; # Database: sqlite 3.35.5</span>
-<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/Rtmp5cP6I4/cansim_20100001_eng/20100001-eng.sqlite]</span>
-<span class="co">#&gt;   REF_DATE GEO    DGUID  `Vehicle type`  `Origin of manu… Sales `Seasonal adjus…</span>
-<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;           </span>
-<span class="co">#&gt; 1 1946-01  Canada 2016A… Total, new mot… Total, country … Units Unadjusted      </span>
-<span class="co">#&gt; 2 1946-01  Canada 2016A… Total, new mot… Total, country … Doll… Unadjusted      </span>
-<span class="co">#&gt; 3 1946-01  Canada 2016A… Passenger cars  Total, country … Units Unadjusted      </span>
-<span class="co">#&gt; 4 1946-01  Canada 2016A… Passenger cars  Total, country … Units Seasonally adju…</span>
-<span class="co">#&gt; 5 1946-01  Canada 2016A… Passenger cars  Total, country … Doll… Unadjusted      </span>
-<span class="co">#&gt; 6 1946-01  Canada 2016A… Trucks          Total, country … Units Unadjusted      </span>
+<span class="co">#&gt; # Database: sqlite 3.36.0</span>
+<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/Rtmps6D6kU/cansim_20100001_eng/20100001-eng.sqlite]</span>
+<span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type` `Origin of manu… Sales `Seasonal adjus…</span>
+<span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;           </span>
+<span class="co">#&gt; 1 1946-01  Canada 2016A000011124 Total, new mo… Total, country … Units Unadjusted      </span>
+<span class="co">#&gt; 2 1946-01  Canada 2016A000011124 Total, new mo… Total, country … Doll… Unadjusted      </span>
+<span class="co">#&gt; 3 1946-01  Canada 2016A000011124 Passenger cars Total, country … Units Unadjusted      </span>
+<span class="co">#&gt; 4 1946-01  Canada 2016A000011124 Passenger cars Total, country … Units Seasonally adju…</span>
+<span class="co">#&gt; 5 1946-01  Canada 2016A000011124 Passenger cars Total, country … Doll… Unadjusted      </span>
+<span class="co">#&gt; 6 1946-01  Canada 2016A000011124 Trucks         Total, country … Units Unadjusted      </span>
 <span class="co">#&gt; # … with 12 more variables: UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;, SCALAR_FACTOR &lt;chr&gt;,</span>
 <span class="co">#&gt; #   SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;,</span>
 <span class="co">#&gt; #   SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;</span></code></pre></div>
@@ -213,7 +213,7 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>
 <span class="co">#&gt; New motor vehicle sales</span>
 <span class="co">#&gt; CANSIM Table 20-10-0001</span>
-<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2021-05-01, Frequency: Monthly</span>
+<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2021-07-01, Frequency: Monthly</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Column Geography (11)</span>
 <span class="co">#&gt; Canada, Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, ...</span>
@@ -240,7 +240,7 @@
   <span class="fu"><a href="../reference/collect_and_normalize.html">collect_and_normalize</a></span><span class="op">(</span><span class="op">)</span>
 
 <span class="va">data</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 6 x 29</span>
+<span class="co">#&gt; # A tibble: 6 × 29</span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID   UOM   UOM_ID SCALAR_FACTOR SCALAR_ID VECTOR COORDINATE</span>
 <span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;     </span>
 <span class="co">#&gt; 1 1946-01  Canada 2016A0… Units 300    "units "      0         v4216… 1.2.1.1.1 </span>
@@ -255,10 +255,7 @@
 <span class="co">#&gt; #   Hierarchy for Vehicle type &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Classification Code for Origin of manufacture &lt;chr&gt;,</span>
 <span class="co">#&gt; #   Hierarchy for Origin of manufacture &lt;chr&gt;,</span>
-<span class="co">#&gt; #   Classification Code for Sales &lt;chr&gt;, Hierarchy for Sales &lt;chr&gt;,</span>
-<span class="co">#&gt; #   Classification Code for Seasonal adjustment &lt;chr&gt;,</span>
-<span class="co">#&gt; #   Hierarchy for Seasonal adjustment &lt;chr&gt;, Vehicle type &lt;fct&gt;,</span>
-<span class="co">#&gt; #   Origin of manufacture &lt;fct&gt;, Sales &lt;fct&gt;, Seasonal adjustment &lt;fct&gt;</span></code></pre></div>
+<span class="co">#&gt; #   Classification Code for Sales &lt;chr&gt;, Hierarchy for Sales &lt;chr&gt;, …</span></code></pre></div>
 <p>Given the data we can further filter the date range and plot it.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">data</span> <span class="op">%&gt;%</span>
@@ -279,10 +276,10 @@
 <p>Since we now have the option of a more permanent cache we should take care to manage that space properly. The <code>list_cansim_sqlite_cached_tables</code> function gives us an overview over the cached data we have.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/list_cansim_sqlite_cached_tables.html">list_cansim_sqlite_cached_tables</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 1 x 8</span>
-<span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title      path     </span>
-<span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;    &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;    </span>
-<span class="co">#&gt; 1 20-10-0001        eng      2021-07-28 13:34:20 44.2 Mb    New motor… cansim_2…</span>
+<span class="co">#&gt; # A tibble: 1 × 8</span>
+<span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title       path    </span>
+<span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;    &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   </span>
+<span class="co">#&gt; 1 20-10-0001        eng      2021-09-17 23:09:53 44.3 Mb    New motor … cansim_…</span>
 <span class="co">#&gt; # … with 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the <code>refresh=TRUE</code> option to refresh it manually when we want a fresh data pull from StatCan. If we want to free up disk space we can remove a cached table.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
