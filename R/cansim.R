@@ -267,6 +267,9 @@ parse_metadata <- function(meta,data_path){
   classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
   hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
 
+  m<-suppressWarnings(setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta)))
+  m<-NULL
+
   cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
   cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]]))
   meta1 <- meta[seq(1,cut_indices[1]-1),]
@@ -610,7 +613,6 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
                                              #col_names=FALSE,
                                              locale=readr::locale(encoding="UTF-8"),
                                              col_types = list(.default = "c")))
-
     tryCatch({
       #data <- parse_and_fold_in_metadata(data,meta,data_path)
       parse_metadata(meta,data_path)
