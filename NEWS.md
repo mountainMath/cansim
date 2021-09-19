@@ -1,6 +1,7 @@
 # cansim 0.3.10
 ## Minor changes
 * Better error handling when StatCan returns empty tables
+* Add Hierachy for Geography in sqlite tables
 
 # cansim 0.3.9
 ## Major changes

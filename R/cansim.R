@@ -105,8 +105,9 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     meta2 <- readRDS(paste0(data_path,"2"))
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     fields <- pull(meta2,  dimension_name_column)
-    fields <- setdiff(fields,geography_column)
+    #fields <- setdiff(fields,geography_column)
     data <- fold_in_metadata_for_columns(data,data_path,fields)
+    fields <- setdiff(fields,geography_column)
   } else {
     fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
   }
