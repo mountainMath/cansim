@@ -153,49 +153,59 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
           mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
           mutate(...original_name = .data$...name)
 
-        max_iterations <- 20 # failsafe
-        while (nrow(levels_data %>%filter(.data$...dupes,.data$...parent_hierarchy!=""))>0 & max_iterations > 0) {
+        h <- levels_data[,hierarchy_field]
+        if (nrow(h) != nrow(unique(h))) {
+           warning(paste0("There is inconsitent naming of categories in column ",field,", cannot convert to factors.\n",
+                   "This is likely a problem with StatCan data, proceed with caution when filtering on this field\n",
+                   "to ensure data integrity. If this turns out to be a problem with the {cansim} package rather\n",
+                   "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
+                   "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
+        } else {
+          max_iterations <- 20 # failsafe
+          while (nrow(levels_data %>%filter(.data$...dupes,.data$...parent_hierarchy!=""))>0 & max_iterations > 0) {
+            levels_data <- levels_data %>%
+              mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
+              select(setdiff(names(.),parent_field)) %>%
+              left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
+                          rename(!!!rlang::set_names("...name",parent_field)),
+                        by=c(...parent_hierarchy=hierarchy_field)) %>%
+              mutate(...name=ifelse(.data$...dupes & .data$...parent_hierarchy != "",
+                                    paste0(.data$...original_name," (",!!as.name(parent_field),")"),
+                                    .data$...name)) %>%
+              mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
+              mutate(...parent_hierarchy=parent_hierarchy(.data$...parent_hierarchy))
+            max_iterations <- max_iterations -1
+          }
+          if (max_iterations == 0) warning(paste0("Maximum iterations reached for field ",field,"."))
+          if (sum(levels_data$...dupes)>0) {
+            levels_data <- levels_data %>%
+              group_by(.data$...name) %>%
+              mutate(n=n(),nn=row_number()) %>%
+              mutate(...name=ifelse(n>1,paste0(.data$...name," - ",.data$nn),.data$...name))
+          }
+
+          # make sure order of factors is right
           levels_data <- levels_data %>%
-            mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
-            select(setdiff(names(.),parent_field)) %>%
-            left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
-                        rename(!!!rlang::set_names("...name",parent_field)),
-                      by=c(...parent_hierarchy=hierarchy_field)) %>%
-            mutate(...name=ifelse(.data$...dupes,
-                                  paste0(.data$...original_name," (",!!as.name(parent_field),")"),
-                                  .data$...name)) %>%
-            mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
-            mutate(...parent_hierarchy=parent_hierarchy(.data$...parent_hierarchy))
-          max_iterations <- max_iterations -1
+            mutate(...h=hierarchy_order(!!as.name(hierarchy_field))) %>%
+            arrange(.data$...h)
+
+
+          data <- data %>%
+            select(-all_of(field)) %>%
+            left_join(levels_data %>%
+                        select(all_of(c(hierarchy_field,"...name"))) %>%
+                        rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
+
+          data <- data %>%
+            mutate_at(field,function(d)factor(d,levels=levels_data$...name))
         }
-        if (max_iterations == 0) warning(paste0("Maximum iterations reached for field ",field,"."))
-        if (sum(levels_data$...dupes)>0) {
-          levels_data <- levels_data %>%
-            group_by(.data$...name) %>%
-            mutate(n=n(),nn=row_number()) %>%
-            mutate(...name=ifelse(n>1,paste0(.data$...name," - ",.data$nn),.data$...name))
-        }
-
-        # make sure order of factors is right
-        levels_data <- levels_data %>%
-          mutate(...h=hierarchy_order(!!as.name(hierarchy_field))) %>%
-          arrange(.data$...h)
-
-
-        data <- data %>%
-          select(-all_of(field)) %>%
-          left_join(levels_data %>%
-                      select(all_of(c(hierarchy_field,"...name"))) %>%
-                      rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
-
-        data <- data %>%
-          mutate_at(field,function(d)factor(d,levels=levels_data$...name))
       },
       error=function(cond){
         warning(paste0("Could not convert field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
       },
       warning=function(cond) {
-        warning(paste0("Encountered a warning when converting field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
+        warning(cond$message)
+        #warning(paste0("Encountered a warning when converting field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
       })
     }
   }

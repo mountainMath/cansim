@@ -73,4 +73,5 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Minor changes
 * Better error handling when StatCan returns empty tables
 * Add Hierachy for Geography in sqlite tables
+* Better fallback and warning messages when StatCan table categories are internally inconsistent
 
