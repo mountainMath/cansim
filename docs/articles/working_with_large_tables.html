@@ -154,7 +154,7 @@
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 class="author"></h4>
             
-            <h4 class="date">2021-09-22</h4>
+            <h4 class="date">2021-09-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/master/vignettes/working_with_large_tables.Rmd"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -196,7 +196,7 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 19]</span>
 <span class="co">#&gt; # Database: sqlite 3.36.0</span>
-<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpJUIa2G/cansim_20100001_eng/20100001-eng.sqlite]</span>
+<span class="co">#&gt; #   [/private/var/folders/m1/ptq5j32n35ngc_qmbyptppn40000gn/T/RtmpDikkxa/cansim_20100001_eng/20100001-eng.sqlite]</span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type` `Origin of manu… Sales `Seasonal adjus…</span>
 <span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;          &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt;           </span>
 <span class="co">#&gt; 1 1946-01  Canada 2016A000011124 Total, new mo… Total, country … Units Unadjusted      </span>
@@ -279,7 +279,7 @@
 <span class="co">#&gt; # A tibble: 1 × 8</span>
 <span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title       path    </span>
 <span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;    &lt;dttm&gt;              &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;   </span>
-<span class="co">#&gt; 1 20-10-0001        eng      2021-09-22 20:40:05 44.3 Mb    New motor … cansim_…</span>
+<span class="co">#&gt; 1 20-10-0001        eng      2021-09-26 13:56:40 44.3 Mb    New motor … cansim_…</span>
 <span class="co">#&gt; # … with 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the <code>refresh=TRUE</code> option to refresh it manually when we want a fresh data pull from StatCan. If we want to free up disk space we can remove a cached table.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
