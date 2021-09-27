@@ -62,6 +62,9 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   classification_prefix <- ifelse(language=="fr","Code de classification pour ","Classification Code for ")
   hierarchy_prefix <- ifelse(language=="fr",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
+
+  if (!is.null(getOption("cansim.debug"))) message('Normalizing cansim values')
+
   data <- data %>%
     mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
   if (is.na(replacement_value)) { # remove scale columns
@@ -105,8 +108,9 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     meta2 <- readRDS(paste0(data_path,"2"))
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     fields <- pull(meta2,  dimension_name_column)
-    fields <- setdiff(fields,geography_column)
+    #fields <- setdiff(fields,geography_column)
     data <- fold_in_metadata_for_columns(data,data_path,fields)
+    fields <- setdiff(fields,geography_column)
   } else {
     fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
   }
@@ -122,6 +126,8 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   }
 
   if (factors){
+    if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
+
     parent_hierarchy <- function(hs){
       hs %>%
         strsplit("\\.") %>%
@@ -141,6 +147,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     #     mutate(!!field:=factor(!!as.name(field),levels=levels_for_field(field)))
     # }
     for (field in fields) {
+      if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
         hierarchy_field <- paste0(hierarchy_prefix,field)
         parent_field <- paste0("parent ",field)
@@ -152,49 +159,61 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
           mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
           mutate(...original_name = .data$...name)
 
-        max_iterations <- 20 # failsafe
-        while (nrow(levels_data %>%filter(.data$...dupes,.data$...parent_hierarchy!=""))>0 & max_iterations > 0) {
+        h <- levels_data[,hierarchy_field]
+        if (nrow(h) != nrow(unique(h))) {
+           warning(paste0("There is inconsitent naming of categories in column ",field,", cannot convert to factors.\n",
+                   "This is likely a problem with StatCan data, proceed with caution when filtering on this field\n",
+                   "to ensure data integrity. If this turns out to be a problem with the {cansim} package rather\n",
+                   "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
+                   "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
+        } else {
+          max_iterations <- 20 # failsafe
+          while (nrow(levels_data %>%filter(.data$...dupes,.data$...parent_hierarchy!=""))>0 & max_iterations > 0) {
+            if (!is.null(getOption("cansim.debug"))) message(paste0('Deduping ',field,' categories'))
+            levels_data <- levels_data %>%
+              mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
+              select(setdiff(names(.),parent_field)) %>%
+              left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
+                          rename(!!!rlang::set_names("...name",parent_field)),
+                        by=c(...parent_hierarchy=hierarchy_field)) %>%
+              mutate(...name=ifelse(.data$...dupes & .data$...parent_hierarchy != "",
+                                    paste0(.data$...original_name," (",!!as.name(parent_field),")"),
+                                    .data$...name)) %>%
+              mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
+              mutate(...parent_hierarchy=parent_hierarchy(.data$...parent_hierarchy))
+            max_iterations <- max_iterations -1
+          }
+          if (max_iterations == 0) warning(paste0("Maximum iterations reached for field ",field,"."))
+          if (sum(levels_data$...dupes)>0) {
+            levels_data <- levels_data %>%
+              group_by(.data$...name) %>%
+              mutate(n=n(),nn=row_number()) %>%
+              mutate(...name=ifelse(n>1,paste0(.data$...name," - ",.data$nn),.data$...name))
+          }
+
+          # make sure order of factors is right
           levels_data <- levels_data %>%
-            mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
-            select(setdiff(names(.),parent_field)) %>%
-            left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
-                        rename(!!!rlang::set_names("...name",parent_field)),
-                      by=c(...parent_hierarchy=hierarchy_field)) %>%
-            mutate(...name=ifelse(.data$...dupes,
-                                  paste0(.data$...original_name," (",!!as.name(parent_field),")"),
-                                  .data$...name)) %>%
-            mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
-            mutate(...parent_hierarchy=parent_hierarchy(.data$...parent_hierarchy))
-          max_iterations <- max_iterations -1
+            mutate(...h=hierarchy_order(!!as.name(hierarchy_field))) %>%
+            arrange(.data$...h)
+
+
+          data <- data %>%
+            select(-all_of(field)) %>%
+            left_join(levels_data %>%
+                        select(all_of(c(hierarchy_field,"...name"))) %>%
+                        rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
+
+          if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' values to factor.'))
+          data <- data %>%
+            mutate_at(field,function(d)factor(d,levels=levels_data$...name))
         }
-        if (max_iterations == 0) warning(paste0("Maximum iterations reached for field ",field,"."))
-        if (sum(levels_data$...dupes)>0) {
-          levels_data <- levels_data %>%
-            group_by(.data$...name) %>%
-            mutate(n=n(),nn=row_number()) %>%
-            mutate(...name=ifelse(n>1,paste0(.data$...name," - ",.data$nn),.data$...name))
-        }
-
-        # make sure order of factors is right
-        levels_data <- levels_data %>%
-          mutate(...h=hierarchy_order(!!as.name(hierarchy_field))) %>%
-          arrange(.data$...h)
-
-
-        data <- data %>%
-          select(-all_of(field)) %>%
-          left_join(levels_data %>%
-                      select(all_of(c(hierarchy_field,"...name"))) %>%
-                      rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
-
-        data <- data %>%
-          mutate_at(field,function(d)factor(d,levels=levels_data$...name))
       },
       error=function(cond){
         warning(paste0("Could not convert field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
       },
       warning=function(cond) {
-        warning(paste0("Encountered a warning when converting field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
+        warning(cond$message)
+        #warning(paste0("Encountered a warning when converting field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
       })
     }
   }
@@ -266,6 +285,9 @@ parse_metadata <- function(meta,data_path){
                                                paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
   classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
   hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
+
+  m<-suppressWarnings(setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta)))
+  m<-NULL
 
   cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
   cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]]))
@@ -368,16 +390,18 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 
   meta2 <- readRDS(paste0(data_path,"2"))
 
+  if (!is.null(getOption("cansim.debug"))) message('Generating base hierarchy')
+  hierarchy_data <- tibble(X=pull(data,coordinate_column) %>% unique) %>%
+    setNames(coordinate_column) %>%
+    mutate(...pos=strsplit(!!as.name(coordinate_column),"\\."))
+
   for (column_name in column_names) {
+    if (!is.null(getOption("cansim.debug"))) message(paste0("Generating ",column_name," hierarchy"))
     column_index <- which(pull(meta2,dimension_name_column)==column_name)
 
     column <- meta2[column_index,]
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column[[dimension_name_column]]))
-
-    coordinate_for_position <- function(coordinates,position){
-      strsplit(coordinates,"\\.") %>% lapply(function(d)d[position]) %>% unlist
-    }
 
     if (is_geo_column) {
       hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
@@ -385,10 +409,11 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         mutate(GeoUID=gsub("\\[|\\]","",!!as.name(classification_code_column)),
                !!hierarchy_name:=!!as.name(hierarchy_column)) %>%
         select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
-      data <- data %>%
-        dplyr::mutate(!!member_id_column:=coordinate_for_position(!!as.name(coordinate_column),column_index)) %>%
+
+      hierarchy_data <- hierarchy_data %>%
+        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
-        select(-!!as.name(member_id_column))
+        dplyr::select(-!!as.name(member_id_column))
     } else if (column[[dimension_name_column]] %in% names(data)){
       classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]])
       hierarchy_name <- paste0(hierarchy_prefix," ",column[[dimension_name_column]])
@@ -396,10 +421,11 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         mutate(!!classification_name:=!!as.name(classification_code_column),
                !!hierarchy_name:=!!as.name(hierarchy_column)) %>%
         select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
-      data <- data %>%
-        dplyr::mutate(!!member_id_column:=coordinate_for_position(!!as.name(coordinate_column),column_index)) %>%
+
+      hierarchy_data <- hierarchy_data %>%
+        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
-        select(-!!as.name(member_id_column))
+        dplyr::select(-!!as.name(member_id_column))
     } else {
       if (cleaned_language=="eng")
         warning(paste0("Don't know how to add metadata for ",column[[dimension_name_column]],"! Ignoring this dimension."))
@@ -407,7 +433,8 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         warning(paste0("Je ne sais pas comment ajouter des m",intToUtf8(0x00E9),"tadonn",intToUtf8(0x00E9),"es pour ",column[[dimension_name_column]],"! Ignorer cette dimension."))
     }
   }
-  data
+  if (!is.null(getOption("cansim.debug"))) message('Folding in hierarchy')
+  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-.data$...pos), by=coordinate_column)
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package
@@ -418,133 +445,6 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 #' @references \url{https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv}
 #' @keywords data
 NULL
-
-#' Parse metadata and fold into tibble (deprecated)
-#' @param data the data table
-#' @param meta the raw metadata table
-#' @param data_path base path to save parsed metadata
-#'
-#' @return A tibble including the metadata information
-#' @keywords internal
-parse_and_fold_in_metadata <- function(data,meta,data_path){
-  cleaned_language <- ifelse("VALEUR" %in% names(data),"fra","eng")
-  if (cleaned_language=="eng") {
-    message("Folding in metadata")
-  } else {
-    message(paste0("Plier dans les m",intToUtf8(0x00E9),"tadonn",intToUtf8(0x00E9),"es"))
-  }
-  cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
-  dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
-  dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
-  classification_code_column <- ifelse(cleaned_language=="eng","Classification Code","Code sur la classification")
-  member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
-  geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
-  data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
-  symbol_legend_grepl_field <- ifelse(cleaned_language=="eng","Symbol Legend",paste0("L",intToUtf8(0x00E9),"gende Symbole"))
-  survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
-  subject_code_grepl_field <- ifelse(cleaned_language=="eng","Subject Code","Code du sujet")
-  note_id_grepl_field <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
-  correction_id_grepl_field <- ifelse(cleaned_language=="eng","Correction ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la correction"))
-  member_id_column <- ifelse(cleaned_language=="eng","Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre"))
-  parent_member_id_column <- ifelse(cleaned_language=="eng","Parent Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre parent"))
-  hierarchy_column <- ifelse(cleaned_language=="eng","Hierarchy",paste0("Hi",intToUtf8(0x00E9),"rarchie"))
-  exceeded_hierarchy_warning_message <- ifelse(cleaned_language=="eng","Exceeded max depth for hierarchy, hierarchy information may be faulty.",
-                                               paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
-  classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
-  hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
-
-  cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
-  cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]]))
-  meta1 <- meta[seq(1,cut_indices[1]-1),]
-  saveRDS(meta1,file=paste0(data_path,"1"))
-  names2 <- meta[cut_indices[1],]  %>%
-    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
-    as.character()
-  meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
-    rlang::set_names(names2)
-  saveRDS(meta2,file=paste0(data_path,"2"))
-  names3 <- meta[cut_indices[2],]  %>%
-    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
-    as.character()
-  meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
-    rlang::set_names(names3)
-  correction_index <- grep(correction_id_grepl_field,meta[[cube_title_column]])
-  if (length(correction_index)==0) correction_index=nrow(meta)
-  additional_indices=c(grep(survey_code_grepl_field,meta[[cube_title_column]]),
-                       grep(subject_code_grepl_field,meta[[cube_title_column]]),
-                       grep(note_id_grepl_field,meta[[cube_title_column]]),
-                       correction_index)
-  saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
-  saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
-  saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
-  add_hierarchy <- function(meta_x){
-    parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
-    current_top <- function(c){
-      strsplit(c,"\\.") %>%
-        purrr::map(dplyr::first) %>%
-        unlist
-    }
-    parent_for_current_top <- function(c){
-      as.character(parent_lookup[current_top(c)])
-    }
-    meta_x <- meta_x %>%
-      dplyr::mutate(!!as.name(hierarchy_column):=.data[[member_id_column]])
-    added=TRUE
-    max_depth=100
-    count=0
-    while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
-      old <- meta_x[[hierarchy_column]]
-      meta_x <- meta_x %>%
-        dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
-        dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
-        dplyr::select(-.data$p)
-      added <- sum(old != meta_x[[hierarchy_column]])>0
-      count=count+1
-    }
-    if (added) warning(exceeded_hierarchy_warning_message)
-    meta_x
-  }
-  for (column_index in seq(1:nrow(meta2))) { # iterate through columns for which we have meta data
-    column <- meta2[column_index,]
-    is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
-    meta_x <- meta3 %>%
-      dplyr::filter(.data[[dimension_id_column]]==column[[dimension_id_column]]) %>%
-      add_hierarchy %>%
-      mutate(name=ifelse(is.na(!!as.name(classification_code_column)) | is_geo_column,!!as.name(member_name_column),paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
-    saveRDS(meta_x,file=paste0(data_path,"_column_",column[[dimension_name_column]]))
-    classification_lookup <- rlang::set_names(meta_x[[classification_code_column]],meta_x$name)
-    classification_lookup_id <- rlang::set_names(meta_x[[classification_code_column]],meta_x$`Member ID`)
-    hierarchy_lookup <- rlang::set_names(meta_x[[hierarchy_column]],meta_x$name)
-    hierarchy_lookup_id <- rlang::set_names(meta_x[[hierarchy_column]],meta_x$`Member ID`)
-    if (is_geo_column) {
-      data <- data %>%
-        dplyr::mutate(GeoUID=gsub("\\[|\\]","",as.character(classification_lookup[.data[[data_geography_column]]])))
-    } else if (column[[dimension_name_column]] %in% names(data)){
-      classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]]) %>%
-        as.name
-      hierarchy_name <- paste0(hierarchy_prefix," ",column[[dimension_name_column]]) %>%
-        as.name
-      # member_name <- paste0(member_prefix," ",column[[dimension_name_column]]) %>%
-      #   as.name
-      data <- data %>%
-        dplyr::mutate(`...Member ID`=.data$COORDINATE %>% strsplit("\\.") %>% lapply(function(d)d[[column_index]]) %>% unlist) %>%
-        # dplyr::mutate(!!classification_name:=as.character(classification_lookup[!!as.name(column[[dimension_name_column]])]),
-        #               !!hierarchy_name:=as.character(hierarchy_lookup[!!as.name(column[[dimension_name_column]])]))
-        dplyr::mutate(!!classification_name:=as.character(classification_lookup_id[.data$`...Member ID`]),
-                      !!hierarchy_name:=as.character(hierarchy_lookup_id[.data$`...Member ID`])) %>%
-        select(-.data$`...Member ID`)
-    } else {
-      if (cleaned_language=="eng")
-        warning(paste0("Don't know how to add metadata for ",column[[dimension_name_column]],"! Ignoring this dimension."))
-      else
-        warning(paste0("Je ne sais pas comment ajouter des m",intToUtf8(0x00E9),"tadonn",intToUtf8(0x00E9),"es pour ",column[[dimension_name_column]],"! Ignorer cette dimension."))
-    }
-  }
-  data
-}
 
 
 #' Retrieve a Statistics Canada data table using NDM catalogue number
@@ -558,7 +458,7 @@ parse_and_fold_in_metadata <- function(data,meta,data_path){
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#  Set to higher values for large tables and slow network connection. (Default is \code{200}).
+#'  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
 #' added \code{val_norm} column with normalized value from the \code{VALUE} column.
@@ -601,16 +501,17 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     }
 
     data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
-                            na=na_strings,
-                            locale=readr::locale(encoding="UTF-8"),
-                            col_types = list(.default = "c")) %>%
+                       na=na_strings,
+                       locale=readr::locale(encoding="UTF-8"),
+                       col_types = list(.default = "c")) %>%
       dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+
+
     meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                              na=na_strings,
                                              #col_names=FALSE,
                                              locale=readr::locale(encoding="UTF-8"),
                                              col_types = list(.default = "c")))
-
     tryCatch({
       #data <- parse_and_fold_in_metadata(data,meta,data_path)
       parse_metadata(meta,data_path)
@@ -619,8 +520,11 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
     }, error = function(e) {
       warning("Could not fold in metadata")
+      if (nrow(data)==0) warning(paste0("StatCan returned zero rows of data for table ",cleaned_number,
+                                        ", this is likely a problem with StatCan."))
     })
 
+    if (!is.null(getOption("cansim.debug"))) message('saving data')
     saveRDS(data,file=data_path)
     unlink(exdir,recursive = TRUE)
   } else {
@@ -628,8 +532,11 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
     else
       message(paste0("Lecture du produit ",cleaned_number)," de CANSIM NDM ",intToUtf8(0x00E0)," partir du cache.")
+    data <- readRDS(file=data_path)
   }
-  readRDS(file=data_path) %>%
+
+  if (!is.null(getOption("cansim.debug"))) message('Initiating normalization')
+  data  %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                             default_month = default_month, default_day = default_day)
 }

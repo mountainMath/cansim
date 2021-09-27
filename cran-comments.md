@@ -69,3 +69,10 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Check for expired tables in `list_cansim_sqlite_cached_tables`
 * New auto-update feature for sqlite tables
 
+# Changes from version 0.3.9
+## Minor changes
+* Better error handling when StatCan returns empty tables
+* Add Hierachy for Geography in sqlite tables
+* Better fallback and warning messages when StatCan table categories are internally inconsistent
+* Performance improvements
+

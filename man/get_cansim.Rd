@@ -27,7 +27,8 @@ get_cansim(
 
 \item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "07")}
 
-\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
+\item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
+Set to higher values for large tables and slow network connection. (Default is \code{200}).}
 }
 \value{
 A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
