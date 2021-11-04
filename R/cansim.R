@@ -1058,7 +1058,7 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
     warning(paste0("Could not access information for table ",cansimTableNumber,
                    " (productID: ",pid,").\n",
                    response$error))
-    release_date <- NULL
+    release_date <- NA
   } else {
     c <- httr::content(response$result)
     r<-c$result
@@ -1067,7 +1067,7 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
       release_date <- strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
         max()
     } else {
-      release_date <- NULL
+      release_date <- NA
     }
   }
   release_date

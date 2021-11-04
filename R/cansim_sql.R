@@ -44,15 +44,20 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
   sqlite_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".sqlite")
 
-  last_downloaded <- list_cansim_sqlite_cached_tables() %>%
-    filter(.data$cansimTableNumber==cleaned_number) %>%
-    pull(.data$timeCached)
-  last_updated <- get_cansim_table_last_release_date(cleaned_number)
+  last_updated <- tryCatch(get_cansim_table_last_release_date(cleaned_number), error=function(cond)return(NA))
 
-  if (file.exists(sqlite_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
-      as.numeric(last_downloaded)<as.numeric(last_updated)) {
-    message(paste0("A newer version of ",cleaned_number," is available, auto-refreshing the table..."))
-    refresh=TRUE
+  if (is.na(last_updated)) {
+    warning("Could not determine if existing table is out of date.")
+  } else {
+    last_downloaded <- list_cansim_sqlite_cached_tables() %>%
+      filter(.data$cansimTableNumber==cleaned_number) %>%
+      pull(.data$timeCached)
+
+    if (file.exists(sqlite_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
+        as.numeric(last_downloaded)<as.numeric(last_updated)) {
+      message(paste0("A newer version of ",cleaned_number," is available, auto-refreshing the table..."))
+      refresh=TRUE
+    }
   }
 
   if (refresh | !file.exists(sqlite_path)){
@@ -165,21 +170,23 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
 
   } else {
-    if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
-    if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
-    if (!is.na(last_downloaded) && !is.null(last_updated) &&
-        as.numeric(last_downloaded)<as.numeric(last_updated)) {
-      ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
-      lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
-      if (ld_date==lu_date) {
-        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
-        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+    if (!is.na(last_updated)) {
+      if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
+      if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
+      if (!is.na(last_downloaded) && !is.null(last_updated) &&
+          as.numeric(last_downloaded)<as.numeric(last_updated)) {
+        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
+        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
+        if (ld_date==lu_date) {
+          ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+          lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+        }
+        warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
+                       "There is a newer version of the table available, it was last updated ",
+                       lu_date,".\n",
+                       "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
+                       "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
       }
-      warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
-                     "There is a newer version of the table available, it was last updated ",
-                     lu_date,".\n",
-                     "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
-                     "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
     }
     if (cleaned_language=="eng")
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
