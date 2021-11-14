@@ -159,9 +159,17 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
     if (length(geo_column_pos)==1) fields <- c(fields,"GeoUID")
 
     con <- DBI::dbConnect(RSQLite::SQLite(), dbname=sqlite_path)
+    db_fields <- con %>% tbl(table_name) %>% head(1) %>% collect() %>% names
     for (field in fields) {
-      message(paste0("Indexing ",field))
-      create_index(con,table_name,field)
+      if (!(field %in% db_fields)) {
+        if (grepl("Geography",field) && "GEO" %in% db_fields) field="GEO"
+      }
+      if (field %in% db_fields) {
+        message(paste0("Indexing ",field))
+        create_index(con,table_name,field)
+      } else {
+        warning("did not know how to index field ",field)
+      }
     }
     DBI::dbDisconnect(con)
 
