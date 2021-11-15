@@ -162,7 +162,11 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
     db_fields <- con %>% tbl(table_name) %>% head(1) %>% collect() %>% names
     for (field in fields) {
       if (!(field %in% db_fields)) {
-        if (grepl("Geography",field) && "GEO" %in% db_fields) field="GEO"
+        geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+        data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+        if (grepl(geography_column,field) && data_geography_column %in% db_fields) {
+          field=data_geography_column
+        }
       }
       if (field %in% db_fields) {
         message(paste0("Indexing ",field))

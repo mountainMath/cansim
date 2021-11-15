@@ -149,6 +149,13 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
+        if (!(field %in% names(data))) {
+          geography_column <- ifelse(language=="en","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+          data_geography_column <- ifelse(language=="en","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+          if (grepl(geography_column,field) && data_geography_column %in% names(data)) {
+            field=data_geography_column
+          }
+        }
         hierarchy_field <- paste0(hierarchy_prefix,field)
         parent_field <- paste0("parent ",field)
         levels_data <- data %>%
