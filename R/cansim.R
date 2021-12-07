@@ -65,6 +65,11 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 
   if (!is.null(getOption("cansim.debug"))) message('Normalizing cansim values')
 
+  if (nrow(data)==0) {
+    message("No data, try to adjust filters.")
+    return (data)
+  }
+
   data <- data %>%
     mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
   if (is.na(replacement_value)) { # remove scale columns
