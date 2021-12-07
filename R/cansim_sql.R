@@ -97,15 +97,24 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                                                col_types = list(.default = "c")))
 
 
-    meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
-    parse_metadata(meta,data_path = meta_base_path)
-
-
     headers <- readr::read_delim(file.path(exdir, paste0(base_table, ".csv")),
                                  delim=delim,
                                  col_types = list(.default = "c"),
                                  n_max = 1) %>%
       names()
+
+    hd <- headers[duplicated(toupper(headers))]
+
+    if (length(hd)>0) {
+      dupes <- headers[toupper(headers) %in% hd]
+      unlink(exdir, recursive=TRUE)
+      stop(paste0("This table has duplicated columns names: ",paste0(dupes,collapse = ", "),
+                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."))
+    }
+
+    meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
+    parse_metadata(meta,data_path = meta_base_path)
+
 
     to_drop <- intersect(headers,"TERMINATED") # not in use yet
 
