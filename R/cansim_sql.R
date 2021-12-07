@@ -280,13 +280,19 @@ collect_and_normalize <- function(connection,
     gsub("^cansim_|_fra$|_eng$","",.) %>%
     cleaned_ndm_table_number()
   d <- connection %>%
-    collect() %>%
-    normalize_cansim_values(replacement_value=replacement_value,
-                            normalize_percent=normalize_percent,
-                            default_month=default_month,
-                            default_day=default_day,
-                            factors=TRUE,
-                            cansimTableNumber = cansimTableNumber)
+    collect()
+
+  if (nrow(d)>0){
+    d <- d %>%
+      normalize_cansim_values(replacement_value=replacement_value,
+                              normalize_percent=normalize_percent,
+                              default_month=default_month,
+                              default_day=default_day,
+                              factors=TRUE,
+                              cansimTableNumber = cansimTableNumber)
+  } else {
+    message("No data selected, try adjusting your filters.")
+  }
   if (disconnect) disconnect_cansim_sqlite(connection)
   d
 }
