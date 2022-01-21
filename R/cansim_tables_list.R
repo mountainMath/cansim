@@ -415,7 +415,7 @@ get_cansim_key_release_schedule <- function(){
     stop("Problem accessing release schedule.")
   }
 
-  data <- httr::content(response) %>%
+  httr::content(response) %>%
     lapply(dplyr::as_tibble) %>%
     dplyr::bind_rows() %>%
     mutate(date=strftime(date,STATCAN_TIME_FORMAT_S,tz="UTC") %>% as.Date)
