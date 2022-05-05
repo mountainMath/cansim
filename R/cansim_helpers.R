@@ -243,6 +243,59 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
     mutate_all(unlist)
 }
 
+# transforms the value column to nomeric. If table is in semi-wide form it converts the wide for dimension
+# to long form and creates and modifies the COORDINATE column as needed.
+transform_value_column <- function(data,value_column){
+  symbol_grep_string <- "^Symbol...\\d+$|^Symbol$|^Symbol_\\d+$"
+  if (!(value_column %in% names(data)) & sum(grepl(symbol_grep_string,names(data)))>1) {
+    symbols <- which(grepl(symbol_grep_string,names(data)))
+    dimension_grep_string <- paste0("^.+ \\(",length(symbols),"\\):.+\\[\\d+\\]$")
+    dimensions <- which(grepl(dimension_grep_string,names(data)))
+    if (sum(symbols!=dimensions+1)>0) {
+      warning("Unable to identify dimensions")
+    } else {
+      dimension_members <- gsub(paste0("^.+ \\(",length(symbols),"\\): *"),"",names(data)[dimensions]) %>%
+        gsub(" *\\[\\d+\\]$","",.)
+      member_ids <- stringr::str_extract(names(data)[dimensions],"\\[\\d+\\]$") %>% gsub("\\[|\\]","",.)
+      dimension_name <- gsub(paste0(" \\(",length(symbols),"\\):.+\\[\\d+\\]"),"",names(data)[dimensions]) %>%
+        unique() %>% paste0(.," (",length(symbols),")")
+
+      if (length(dimension_name)>1) {
+        warning("Unable to identify dimension name")
+      } else {
+        data_short <- data %>%
+          select(-c(symbols,dimensions))
+        data <- data_short %>%
+          dplyr::left_join(
+            data %>%
+              dplyr::select(-symbols) %>%
+              tidyr::pivot_longer(matches(dimension_grep_string),names_to=dimension_name,values_to="VALUE") %>%
+              dplyr::mutate(!!paste0("Member ID: ",dimension_name):=
+                              stringr::str_extract(.data[[dimension_name]],"\\[\\d+\\]$") %>% gsub("\\[|\\]","",.)) %>%
+              dplyr::mutate_at(dimension_name,function(d)
+                gsub(paste0("^.+ \\(",length(symbols),"\\): *"),"",d) %>%
+                  gsub(" *\\[\\d+\\]$","",.)),
+            by=names(data_short))
+        if ("Coordinate" %in% names(data)) {
+          data <- data %>%
+            dplyr::mutate(COORDINATE = paste0(.data$Coordinate,".",!!as.name(paste0("Member ID: ",dimension_name)))) %>%
+            select(-.data$Coordinate)
+        }
+        data <- data %>%
+          dplyr::select(-dplyr::all_of(paste0("Member ID: ",dimension_name)))
+        data_short <- NULL
+      }
+    }
+  }
+
+  if (value_column %in% names(data)) {
+    data <- data %>%
+      dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+  } else {
+    warning("Unkown table type")
+  }
+  data
+}
 
 # copied from unexported utils:::format.object_size
 format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ...)

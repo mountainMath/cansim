@@ -148,8 +148,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                na = na_strings,
                delim = delim,
                transform=function(data){
-                 data <- data %>%
-                   dplyr::mutate_at(value_string,as.numeric)
+                 data <- data %>% transform_value_column(value_string)
                  if (length(geo_column_pos)==1)
                    data <- data %>%
                      fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
