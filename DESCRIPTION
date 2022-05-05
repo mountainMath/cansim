@@ -1,7 +1,7 @@
 Package: cansim
 Type: Package
 Title: Accessing Statistics Canada Data Table and Vectors
-Version: 0.3.10
+Version: 0.3.11
 Authors@R: c(
     person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))

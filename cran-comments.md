@@ -76,3 +76,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Better fallback and warning messages when StatCan table categories are internally inconsistent
 * Performance improvements
 
+# Changes from version 0.3.10
+## Major changes
+* Support for new semi-wide table format, e.g. Census data releases
+## Minor changes
+* Improvement in offline handling of sqlite tables

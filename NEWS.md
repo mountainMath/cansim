@@ -1,3 +1,9 @@
+# cansim 0.3.11
+## Major changes
+* Support for new semi-wide table format, e.g. Census data releases
+## Minor changes
+* Improvement in offline handling of sqlite tables
+
 # cansim 0.3.10
 ## Minor changes
 * Better error handling when StatCan returns empty tables

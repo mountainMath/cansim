@@ -1,10 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/404.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/cansim.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/listing_cansim_tables.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/retrieving_cansim_vectors.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/working_with_hierarchies.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/articles/working_with_large_tables.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/authors.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/index.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/add_provincial_abbreviations.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/add_provincial_appreviations.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/adjust_cansim_values_by_variable.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/cansim_old_to_new.html</loc>
@@ -100,6 +139,9 @@
     <loc>https://mountainmath.github.io/cansim/index.html/reference/get_cansim_vector_info.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/index.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/list_cansim_cubes.html</loc>
   </url>
   <url>
@@ -110,6 +152,9 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/normalize_cansim_values.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/index.html/reference/parse_and_fold_in_metadata.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/parse_metadata.html</loc>
@@ -125,20 +170,5 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/index.html/reference/view_cansim_webpage.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/index.html/articles/cansim.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/index.html/articles/listing_cansim_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/index.html/articles/retrieving_cansim_vectors.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/index.html/articles/working_with_hierarchies.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/index.html/articles/working_with_large_tables.html</loc>
   </url>
 </urlset>
