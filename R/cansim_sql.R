@@ -44,15 +44,20 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
   sqlite_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".sqlite")
 
-  last_downloaded <- list_cansim_sqlite_cached_tables() %>%
-    filter(.data$cansimTableNumber==cleaned_number) %>%
-    pull(.data$timeCached)
-  last_updated <- get_cansim_table_last_release_date(cleaned_number)
+  last_updated <- tryCatch(get_cansim_table_last_release_date(cleaned_number), error=function(cond)return(NA))
 
-  if (file.exists(sqlite_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
-      as.numeric(last_downloaded)<as.numeric(last_updated)) {
-    message(paste0("A newer version of ",cleaned_number," is available, auto-refreshing the table..."))
-    refresh=TRUE
+  if (is.na(last_updated)) {
+    warning("Could not determine if existing table is out of date.")
+  } else {
+    last_downloaded <- list_cansim_sqlite_cached_tables() %>%
+      filter(.data$cansimTableNumber==cleaned_number) %>%
+      pull(.data$timeCached)
+
+    if (file.exists(sqlite_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
+        as.numeric(last_downloaded)<as.numeric(last_updated)) {
+      message(paste0("A newer version of ",cleaned_number," is available, auto-refreshing the table..."))
+      refresh=TRUE
+    }
   }
 
   if (refresh | !file.exists(sqlite_path)){
@@ -92,15 +97,24 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                                                col_types = list(.default = "c")))
 
 
-    meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
-    parse_metadata(meta,data_path = meta_base_path)
-
-
     headers <- readr::read_delim(file.path(exdir, paste0(base_table, ".csv")),
                                  delim=delim,
                                  col_types = list(.default = "c"),
                                  n_max = 1) %>%
       names()
+
+    hd <- headers[duplicated(toupper(headers))]
+
+    if (length(hd)>0) {
+      dupes <- headers[toupper(headers) %in% hd]
+      unlink(exdir, recursive=TRUE)
+      stop(paste0("This table has duplicated columns names: ",paste0(dupes,collapse = ", "),
+                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."))
+    }
+
+    meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
+    parse_metadata(meta,data_path = meta_base_path)
+
 
     to_drop <- intersect(headers,"TERMINATED") # not in use yet
 
@@ -134,8 +148,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                na = na_strings,
                delim = delim,
                transform=function(data){
-                 data <- data %>%
-                   dplyr::mutate_at(value_string,as.numeric)
+                 data <- data %>% transform_value_column(value_string)
                  if (length(geo_column_pos)==1)
                    data <- data %>%
                      fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
@@ -154,9 +167,21 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
     if (length(geo_column_pos)==1) fields <- c(fields,"GeoUID")
 
     con <- DBI::dbConnect(RSQLite::SQLite(), dbname=sqlite_path)
+    db_fields <- con %>% tbl(table_name) %>% head(1) %>% collect() %>% names
     for (field in fields) {
-      message(paste0("Indexing ",field))
-      create_index(con,table_name,field)
+      if (!(field %in% db_fields)) {
+        geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+        data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+        if (grepl(geography_column,field) && data_geography_column %in% db_fields) {
+          field=data_geography_column
+        }
+      }
+      if (field %in% db_fields) {
+        message(paste0("Indexing ",field))
+        create_index(con,table_name,field)
+      } else {
+        warning("did not know how to index field ",field)
+      }
     }
     DBI::dbDisconnect(con)
 
@@ -165,21 +190,23 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
 
   } else {
-    if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
-    if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
-    if (!is.na(last_downloaded) && !is.null(last_updated) &&
-        as.numeric(last_downloaded)<as.numeric(last_updated)) {
-      ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
-      lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
-      if (ld_date==lu_date) {
-        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
-        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+    if (!is.na(last_updated)) {
+      if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
+      if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
+      if (!is.na(last_downloaded) && !is.null(last_updated) &&
+          as.numeric(last_downloaded)<as.numeric(last_updated)) {
+        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
+        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
+        if (ld_date==lu_date) {
+          ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+          lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+        }
+        warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
+                       "There is a newer version of the table available, it was last updated ",
+                       lu_date,".\n",
+                       "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
+                       "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
       }
-      warning(paste0("Cached SQLite table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
-                     "There is a newer version of the table available, it was last updated ",
-                     lu_date,".\n",
-                     "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
-                     "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
     }
     if (cleaned_language=="eng")
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from cache.")
@@ -252,13 +279,19 @@ collect_and_normalize <- function(connection,
     gsub("^cansim_|_fra$|_eng$","",.) %>%
     cleaned_ndm_table_number()
   d <- connection %>%
-    collect() %>%
-    normalize_cansim_values(replacement_value=replacement_value,
-                            normalize_percent=normalize_percent,
-                            default_month=default_month,
-                            default_day=default_day,
-                            factors=TRUE,
-                            cansimTableNumber = cansimTableNumber)
+    collect()
+
+  if (nrow(d)>0){
+    d <- d %>%
+      normalize_cansim_values(replacement_value=replacement_value,
+                              normalize_percent=normalize_percent,
+                              default_month=default_month,
+                              default_day=default_day,
+                              factors=TRUE,
+                              cansimTableNumber = cansimTableNumber)
+  } else {
+    message("No data selected, try adjusting your filters.")
+  }
   if (disconnect) disconnect_cansim_sqlite(connection)
   d
 }

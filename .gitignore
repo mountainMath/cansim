@@ -9,3 +9,5 @@ R/.Rapp.history
 inst/doc
 /doc/
 /Meta/
+.DS_Store
+CRAN-RELEASE

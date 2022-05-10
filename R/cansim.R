@@ -63,10 +63,19 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   hierarchy_prefix <- ifelse(language=="fr",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
 
+  trad_cansim <- scale_string %in% names(data)
+
   if (!is.null(getOption("cansim.debug"))) message('Normalizing cansim values')
 
-  data <- data %>%
-    mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
+  if (nrow(data)==0) {
+    message("No data, try to adjust filters.")
+    return (data)
+  }
+
+  if (trad_cansim) {
+    data <- data %>%
+      mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
+  }
   if (is.na(replacement_value)) { # remove scale columns
     data <- data %>%
       select(-one_of(intersect(c(scale_string,scale_string2),names(data))))
@@ -77,11 +86,15 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
       mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
   }
+
+
   date_field=ifelse(language=="fr",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
   sample_date <- data[[date_field]] %>%
     na.omit %>%
     first()
-  if (grepl("^\\d{4}$",sample_date)) {
+  if (!trad_cansim) {
+    # do nothing
+  } else if (grepl("^\\d{4}$",sample_date)) {
     # year
     data <- data %>%
       mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
@@ -149,6 +162,13 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
+        if (!(field %in% names(data))) {
+          geography_column <- ifelse(language=="en","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+          data_geography_column <- ifelse(language=="en","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+          if (grepl(geography_column,field) && data_geography_column %in% names(data)) {
+            field=data_geography_column
+          }
+        }
         hierarchy_field <- paste0(hierarchy_prefix,field)
         parent_field <- paste0("parent ",field)
         levels_data <- data %>%
@@ -290,7 +310,7 @@ parse_metadata <- function(meta,data_path){
   m<-NULL
 
   cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
-  cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]]))
+  cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]])) %>% sort()
   meta1 <- meta[seq(1,cut_indices[1]-1),]
   saveRDS(meta1,file=paste0(data_path,"1"))
   names2 <- meta[cut_indices[1],]  %>%
@@ -314,8 +334,9 @@ parse_metadata <- function(meta,data_path){
             rlang::set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
   saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
             rlang::set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
-  saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
+  if (length(additional_indices)>3)
+    saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
+              rlang::set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
 
   add_hierarchy <- function(meta_x){
     parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
@@ -350,7 +371,7 @@ parse_metadata <- function(meta,data_path){
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% column_names)
     meta_x <- meta3 %>%
       dplyr::filter(.data[[dimension_id_column]]==column[[dimension_id_column]]) %>%
-      add_hierarchy %>%
+      add_hierarchy() %>%
       mutate(name=ifelse(is.na(!!as.name(classification_code_column)) | is_geo_column,!!as.name(member_name_column),paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
     saveRDS(meta_x,file=paste0(data_path,"_column_",column[[dimension_name_column]]))
   }
@@ -503,9 +524,9 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
                        na=na_strings,
                        locale=readr::locale(encoding="UTF-8"),
-                       col_types = list(.default = "c")) %>%
-      dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+                       col_types = list(.default = "c"))
 
+    data <- data %>% transform_value_column(value_column)
 
     meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                              na=na_strings,
@@ -1058,7 +1079,7 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
     warning(paste0("Could not access information for table ",cansimTableNumber,
                    " (productID: ",pid,").\n",
                    response$error))
-    release_date <- NULL
+    release_date <- NA
   } else {
     c <- httr::content(response$result)
     r<-c$result
@@ -1067,7 +1088,7 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
       release_date <- strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
         max()
     } else {
-      release_date <- NULL
+      release_date <- NA
     }
   }
   release_date
