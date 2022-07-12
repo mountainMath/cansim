@@ -81,3 +81,9 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Support for new semi-wide table format, e.g. Census data releases
 ## Minor changes
 * Improvement in offline handling of sqlite tables
+
+# Changes from version 0.3.11
+## Major changes
+* Fix bug that causes collect_and_normalize not to function on some operating systems
+
+

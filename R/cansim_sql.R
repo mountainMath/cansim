@@ -33,6 +33,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, auto_refresh = FALSE,
                               timeout=1000,
                        cache_path=getOption("cansim.cache_path")){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
@@ -273,9 +274,18 @@ collect_and_normalize <- function(connection,
                                   default_month="07", default_day="01",
                                   factors=FALSE,strip_classification_code=FALSE,
                                   disconnect=FALSE){
-  c <- connection$ops
-  while ("x" %in% names(c)) {c <- c$x}
-  cansimTableNumber <- c[[1]] %>%
+
+  if (!is.null(connection$src) && !is.null(connection$src$con)) {
+    ctn <-  DBI::dbListTables(connection$src$con)
+  } else {
+    c <- connection$ops
+    while ("x" %in% names(c)) {c <- c$x}
+    ctn <- c[[1]]
+  }
+  if (is.null(ctn)||is.na(ctn)) {
+    stop("Could not infer cansim table number!")
+  }
+  cansimTableNumber <- ctn %>%
     gsub("^cansim_|_fra$|_eng$","",.) %>%
     cleaned_ndm_table_number()
   d <- connection %>%
@@ -379,6 +389,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' }
 #' @export
 remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=getOption("cansim.cache_path")){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)

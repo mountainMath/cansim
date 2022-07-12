@@ -1,14 +1,30 @@
 cleaned_ndm_table_number <- function(cansimTableNumber){
-  n<-gsub("-","",as.character(cansimTableNumber)) %>%
+  if (is.numeric(cansimTableNumber)) {
+    warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",
+                   "it is safer to encode table numbers as character strings."))
+    cansimTableNumber <- as.character(cansimTableNumber)
+  }
+  n<-gsub("-","",cansimTableNumber) %>%
     purrr::map(function(t){
       if (nchar(t)<=7) {
         tt<-cansim_old_to_new(t)
         message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
         t=gsub("-","",tt)
       }
-      t
+      tn <- paste0(substr(t,1,2),"-",substr(t,3,4),"-",substr(t,5,8))
+
+      if (nchar(t)==10) {
+        end_string <- substr(t,9,10)
+        if (end_string !="01") {
+          warning(paste0("The {cansim} package can only retrieve 'base' tables, those ending in '-01'.\n",
+                         "To get derived tables like ",tn,"-",end_string," you will have to perform the\n",
+                         "necessary data manipulations manually."))
+        }
+      }
+      tn
     }) %>% unlist
-  paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
+
+  n
 }
 
 naked_ndm_table_number <- function(cansimTableNumber){
