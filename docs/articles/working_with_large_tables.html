@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.12</span>
       </span>
     </div>
 
@@ -212,8 +212,8 @@ general idea of what the data looks like.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># Source:   lazy query [?? x 19]</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.2</span></span>
-<span class="co"><span style="color: #949494;">#&gt; #   [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/Rtmpy1Ja09/cansim_20100001_eng/20100001-eng.sqlite]</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.5</span></span>
+<span class="co"><span style="color: #949494;">#&gt; #   [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/Rtmphzws8A/cansim_20100001_eng/20100001-eng.sqlite]</span></span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID   `Vehicle type` `Origin of man…` Sales `Seasonal adju…`</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 2016A0… Total, new mo… Total, country … Units Unadjusted      </span>
@@ -317,7 +317,7 @@ overview over the cached data we have.</p>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title          path </span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2022-07-12 <span style="color: #949494;">11:13:53</span> 45 Mb      New motor veh… cans…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2022-07-12 <span style="color: #949494;">11:50:14</span> 45 Mb      New motor veh… cans…</span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the
 <code>refresh=TRUE</code> option to refresh it manually when we want a
