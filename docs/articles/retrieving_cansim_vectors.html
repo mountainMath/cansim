@@ -317,6 +317,9 @@ To access metadata for vectors we can use the
 <code>get_cansim_vector_info</code> call</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span><span class="op">(</span><span class="va">vectors</span><span class="op">)</span>
+<span class="co">#&gt; Warning in cleaned_ndm_table_number(table): The cansim table number 18100004 used in this query is numeric,</span>
+<span class="co">#&gt; it is safer to encode table numbers as character strings.The cansim table number 18100004 used in this query is numeric,</span>
+<span class="co">#&gt; it is safer to encode table numbers as character strings.</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 10</span></span>
 <span class="co">#&gt;   DECIMALS VECTOR    table      COORDINATE title_en title_fr   UOM frequencyCode</span>
 <span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>

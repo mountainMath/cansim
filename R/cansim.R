@@ -112,6 +112,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   }
 
   if (!is.null(cansimTableNumber)) {
+    cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
     cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
     cleaned_language <- cleaned_ndm_language(language)
     geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
@@ -493,20 +494,20 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
                        factors=TRUE, default_month="07", default_day="01"){
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
-  base_table <- naked_ndm_table_number(cansimTableNumber)
-  path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
+  base_table <- naked_ndm_table_number(cleaned_number)
+  path <- paste0(base_path_for_table_language(cleaned_number,language),".zip")
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda")
   if (refresh | !file.exists(data_path)){
     if (cleaned_language=="eng")
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
       message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
-    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
+    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cleaned_number,language),".zip")
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
     if (is.null(response)) return(response)
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
-    exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
+    exdir=file.path(tempdir(),file_path_for_table_language(cleaned_number,language))
     uzp <- getOption("unzip")
     if (is.null(uzp)) uzp <- "internal"
     utils::unzip(path,exdir=exdir,unzip=uzp)
@@ -580,9 +581,10 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 #' }
 #' @export
 get_cansim_table_info <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda1")
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda1")
   if (refresh | !file.exists(data_path)){
-    get_cansim(cansimTableNumber,language=language,refresh = refresh,timeout=timeout)
+    get_cansim(cleaned_number,language=language,refresh = refresh,timeout=timeout)
   }
   readRDS(file=data_path)
 }
@@ -606,9 +608,10 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' }
 #' @export
 get_cansim_table_survey <- function(cansimTableNumber, language="english", refresh=FALSE, timeout=200){
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda3")
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda3")
   if (refresh | !file.exists(data_path)){
-    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cleaned_number,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -631,9 +634,10 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' }
 #' @export
 get_cansim_table_subject <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda4")
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda4")
   if (refresh | !file.exists(data_path)){
-    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cleaned_number,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -656,9 +660,10 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' }
 #' @export
 get_cansim_table_short_notes <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda5")
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda5")
   if (refresh | !file.exists(data_path)){
-    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cleaned_number,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -681,9 +686,10 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #' }
 #' @export
 get_cansim_column_list <- function(cansimTableNumber, language="english", refresh=FALSE, timeout= 200){
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda2")
   if (refresh | !file.exists(data_path)){
-    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = timeout)
+    get_cansim(cleaned_number,language=language,refresh = refresh, timeout = timeout)
   }
   readRDS(file=data_path)
 }
@@ -707,11 +713,12 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #' }
 #' @export
 get_cansim_column_categories <- function(cansimTableNumber, column, language="english", refresh=FALSE, timeout = 200){
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda2")
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda2")
   if (refresh | !file.exists(data_path)){
-    get_cansim(cansimTableNumber,language=language,refresh = refresh, timeout = 200)
+    get_cansim(cleaned_number,language=language,refresh = refresh, timeout = 200)
   }
-  data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda_column_",column)
+  data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda_column_",column)
   if (!file.exists(data_path)){
     stop(paste0("Unkown column ",column))
   }
@@ -900,6 +907,7 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' }
 #' @export
 get_cansim_cube_metadata <- function(cansimTableNumber){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   table_id=naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
   response <- httr::POST(url,
@@ -955,6 +963,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
 #' }
 #' @export
 get_cansim_table_url <- function(cansimTableNumber, language = "en"){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
@@ -1033,6 +1042,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #' }
 #' @export
 get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE, timeout = 200) {
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
   dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
   dimenion_note_column <- ifelse(cleaned_language=="eng","Dimension Notes","Notes sur la dimension")

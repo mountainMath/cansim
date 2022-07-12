@@ -33,6 +33,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, auto_refresh = FALSE,
                               timeout=1000,
                        cache_path=getOption("cansim.cache_path")){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
@@ -388,6 +389,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' }
 #' @export
 remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=getOption("cansim.cache_path")){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
