@@ -151,7 +151,7 @@
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2022-05-05</h4>
+            <h4 data-toc-skip class="date">2022-07-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_large_tables.Rmd" class="external-link"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -213,7 +213,7 @@ general idea of what the data looks like.</p>
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># Source:   lazy query [?? x 19]</span></span>
 <span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.38.2</span></span>
-<span class="co"><span style="color: #949494;">#&gt; #   [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpXPA2QT/cansim_20100001_eng/20100001-eng.sqlite]</span></span>
+<span class="co"><span style="color: #949494;">#&gt; #   [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpJ64Q0S/cansim_20100001_eng/20100001-eng.sqlite]</span></span>
 <span class="co">#&gt;   REF_DATE GEO    DGUID   `Vehicle type` `Origin of man…` Sales `Seasonal adju…`</span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           </span>
 <span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 2016A0… Total, new mo… Total, country … Units Unadjusted      </span>
@@ -236,7 +236,7 @@ the <code>get_cansim</code> call, which the
 <code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span>
 <span class="co">#&gt; New motor vehicle sales</span>
 <span class="co">#&gt; CANSIM Table 20-10-0001</span>
-<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2022-02-01, Frequency: Monthly</span>
+<span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2022-04-01, Frequency: Monthly</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Column Geography (11)</span>
 <span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia and the Territories, ...</span>
@@ -317,7 +317,7 @@ overview over the cached data we have.</p>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 8</span></span>
 <span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title          path </span>
 <span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2022-05-05 <span style="color: #949494;">10:52:12</span> 44.8 Mb    New motor veh… cans…</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2022-07-12 <span style="color: #949494;">10:48:32</span> 45 Mb      New motor veh… cans…</span>
 <span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the
 <code>refresh=TRUE</code> option to refresh it manually when we want a

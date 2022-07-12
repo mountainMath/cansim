@@ -273,9 +273,18 @@ collect_and_normalize <- function(connection,
                                   default_month="07", default_day="01",
                                   factors=FALSE,strip_classification_code=FALSE,
                                   disconnect=FALSE){
-  c <- connection$ops
-  while ("x" %in% names(c)) {c <- c$x}
-  cansimTableNumber <- c[[1]] %>%
+
+  if (!is.null(connection$src) && !is.null(connection$src$con)) {
+    ctn <-  DBI::dbListTables(connection$src$con)
+  } else {
+    c <- connection$ops
+    while ("x" %in% names(c)) {c <- c$x}
+    ctn <- c[[1]]
+  }
+  if (is.null(ctn)||is.na(ctn)) {
+    stop("Could not infer cansim table number!")
+  }
+  cansimTableNumber <- ctn %>%
     gsub("^cansim_|_fra$|_eng$","",.) %>%
     cleaned_ndm_table_number()
   d <- connection %>%
