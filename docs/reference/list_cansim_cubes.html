@@ -117,29 +117,34 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">list_cansim_cubes</span><span class="op">(</span>lite <span class="op">=</span> <span class="cn">FALSE</span>, refresh <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">list_cansim_cubes</span><span class="op">(</span>lite <span class="op">=</span> <span class="cn">FALSE</span>, refresh <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>lite</dt>
 <dd><p>Get the version without cube dimensions and comments for faster retrieval, default is <code>FALSE</code>.</p></dd>
+
+
 <dt>refresh</dt>
 <dd><p>Default is <code>FALSE</code>, repeated calls during the same session will hit the cached data.
 To refresh the code list during a running R session set to <code>TRUE</code></p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
+    
+
+<p>A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
 start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">list_cansim_cubes</span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">list_cansim_cubes</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -154,7 +159,7 @@ start and end dates, achieve status, subject and survey codes, frequency codes a
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

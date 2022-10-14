@@ -153,6 +153,7 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #' list_cansim_tables()
 #' }
 #'
+#' @keywords internal
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
   warning("This method is deprecated, please use `list_cansim_cubes` instead.")
@@ -216,6 +217,7 @@ list_cansim_tables <- function(refresh=FALSE){
 #' search_cansim_tables("Labour force")
 #' }
 #'
+#' @keywords internal
 #' @export
 search_cansim_tables <- function(search_term, search_fields = "both", refresh=FALSE){
   warning("This method is deprecated, please use `search_cansim_cubes` instead.")

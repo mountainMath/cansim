@@ -20,6 +20,8 @@
 #' # Retrieve a table with an old-style CANSIM code
 #' get_cansim("026-0018")
 #' }
+#'
+#' @keywords internal
 #' @export
 get_cansim_ndm <- function(cansimTableNumber, language="english", refresh=FALSE, timeout = 200){
   warning("The `get_cansim_ndm` method is deprecated and will be removed in future releases, please use `get_cansim` instead.")
@@ -465,7 +467,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 #' @docType data
 #' @author Statistics Canada
 #' @references \url{https://www.statcan.gc.ca/eng/developers-developpeurs/cansim_id-product_id-concordance.csv}
-#' @keywords data
+#' @keywords data internal
 NULL
 
 

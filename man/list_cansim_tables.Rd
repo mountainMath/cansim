@@ -22,3 +22,4 @@ list_cansim_tables()
 }
 
 }
+\keyword{internal}

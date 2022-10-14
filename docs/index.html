@@ -175,24 +175,24 @@
 </h3>
 <p>The cansim package is available on CRAN and can be installed directly.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cansim"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cansim"</span><span class="op">)</span></span></code></pre></div>
 <p>Alternatively, the latest development version can be downloaded from Github using either the <code>remotes</code> or <code>devtools</code> packages.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mountainmath/cansim"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mountainmath/cansim"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h3>
 <p>The package accepts use of both old-format (“051-0013”) or new-format (“17-10-0016-01”) table catalogue numbers to download entire data tables as tidy data frames. Calling either the legacy CANSIM table number or the new NDM number will load the same data. Since the transition to the new data repository, existing tables will have retained their old-format numbers, but any newly created tables will have only new-format names.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)</span>
-<span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span><span class="op">)</span>
-<span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"17-10-0016-01"</span><span class="op">)</span>
-
-<span class="co"># Retrieve data for balance of payment table 36-10-0042-01 (formerly CANSIM  376-8105)</span>
-<span class="va">bop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"3768105"</span><span class="op">)</span>
-<span class="va">bop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"36-10-0042"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)</span></span>
+<span><span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span><span class="op">)</span></span>
+<span><span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"17-10-0016-01"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Retrieve data for balance of payment table 36-10-0042-01 (formerly CANSIM  376-8105)</span></span>
+<span><span class="va">bop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"3768105"</span><span class="op">)</span></span>
+<span><span class="va">bop</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"36-10-0042"</span><span class="op">)</span></span></code></pre></div>
 <p>See more example usage and worfklow in the <em>Getting started with the cansim package</em> vignette.</p>
 </div>
 <div class="section level3">
@@ -206,7 +206,7 @@
 <p>Statistics Canada data tables are provided in either English or French formats, including labels and formats. The <code>cansim</code> package allows for download of tables in either English or French. There is an optional language argument to retrieve tables in French:</p>
 <p>Le paquet <code>cansim</code> fonctionne en anglais ou en français. Il existe un argument de langue optionnel pour récupérer les tables en français:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">naissances</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span>,language<span class="op">=</span><span class="st">"fr"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">naissances</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span>,language<span class="op">=</span><span class="st">"fr"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="normalizing-values">Normalizing values<a class="anchor" aria-label="anchor" href="#normalizing-values"></a>
@@ -219,26 +219,26 @@
 <h3 id="vectors">Vectors<a class="anchor" aria-label="anchor" href="#vectors"></a>
 </h3>
 <p>Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: <em>v41690973</em>. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the <code><a href="reference/get_cansim_vector.html">get_cansim_vector()</a></code> function with the vector code and the date onwards from which we want to get vector results for.</p>
-<pre class="{r}"><code><span class="fu"><a href="reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span><span class="fu"><a href="reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span></code></pre>
 <p>To access metadata for the vectors, use</p>
-<pre class="{r}"><code><span class="fu"><a href="reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span><span class="op">(</span><span class="st">"v41690973"</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span><span class="fu"><a href="reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span><span class="op">(</span><span class="st">"v41690973"</span><span class="op">)</span></span></code></pre>
 <p>More detailed usage examples are available in the <em>Retrieving individual Statistics Canada vectors</em> vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="table-overview-metadata">Table overview metadata<a class="anchor" aria-label="anchor" href="#table-overview-metadata"></a>
 </h3>
 <p>The <code>get_cansim_table_overview</code> function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let’s take a look what’s in the table we are interested in.</p>
-<pre class="{r}"><code><span class="fu"><a href="reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="fl">36</span><span class="op">-</span><span class="fl">10</span><span class="op">-</span><span class="fl">040</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span><span class="fu"><a href="reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="fl">36</span><span class="op">-</span><span class="fl">10</span><span class="op">-</span><span class="fl">040</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="listing-available-tables">Listing available tables<a class="anchor" aria-label="anchor" href="#listing-available-tables"></a>
 </h3>
 <p>Calling <code>list_cansim_cubes</code> returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers.</p>
-<pre class="{r}"><code><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard <code>dplyr</code> verbs.</p>
-<pre class="{r}"><code><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></code></pre>
+<pre class="{r}"><code><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></span></code></pre>
 <p>As table search functions require a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cansim.cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
 <p>The <em>Listing Statistics Canada data tables</em> vignette has additional detail and examples.</p>
 </div>
@@ -285,7 +285,7 @@ In doing any of the above, you shall:
 </h3>
 <p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the <code>httr</code> package.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/set_config.html" class="external-link">set_config</a></span><span class="op">(</span><span class="fu">use_proxy</span><span class="op">(</span>url<span class="op">=</span><span class="va">http_proxy</span>, port<span class="op">=</span><span class="va">selected_port</span>, username<span class="op">=</span><span class="va">your_username</span>,password<span class="op">=</span><span class="va">your_pass</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/set_config.html" class="external-link">set_config</a></span><span class="op">(</span><span class="fu">use_proxy</span><span class="op">(</span>url<span class="op">=</span><span class="va">http_proxy</span>, port<span class="op">=</span><span class="va">selected_port</span>, username<span class="op">=</span><span class="va">your_username</span>,password<span class="op">=</span><span class="va">your_pass</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
@@ -375,7 +375,7 @@ In doing any of the above, you shall:
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

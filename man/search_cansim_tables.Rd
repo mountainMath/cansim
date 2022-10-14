@@ -26,3 +26,4 @@ search_cansim_tables("Labour force")
 }
 
 }
+\keyword{internal}

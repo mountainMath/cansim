@@ -117,50 +117,69 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_cansim_vector</span><span class="op">(</span>
-  <span class="va">vectors</span>,
-  start_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1800-01-01"</span><span class="op">)</span>,
-  end_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>,
-  use_ref_date <span class="op">=</span> <span class="cn">TRUE</span>,
-  refresh <span class="op">=</span> <span class="cn">FALSE</span>,
-  timeout <span class="op">=</span> <span class="fl">200</span>,
-  factors <span class="op">=</span> <span class="cn">TRUE</span>,
-  default_month <span class="op">=</span> <span class="st">"07"</span>,
-  default_day <span class="op">=</span> <span class="st">"01"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_cansim_vector</span><span class="op">(</span></span>
+<span>  <span class="va">vectors</span>,</span>
+<span>  start_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1800-01-01"</span><span class="op">)</span>,</span>
+<span>  end_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  use_ref_date <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  refresh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  timeout <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  factors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  default_month <span class="op">=</span> <span class="st">"07"</span>,</span>
+<span>  default_day <span class="op">=</span> <span class="st">"01"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>vectors</dt>
 <dd><p>The list of vectors to retrieve</p></dd>
+
+
 <dt>start_time</dt>
 <dd><p>Starting date in <code>YYYY-MM-DD</code> format, applies to <code>REF_DATE</code> or <code>releaseTime</code>, depending on <code>use_ref_date</code> parameter</p></dd>
+
+
 <dt>end_time</dt>
 <dd><p>Set an optional end time filter in <code>YYYY-MM-DD</code> format (defaults to current system time)</p></dd>
+
+
 <dt>use_ref_date</dt>
 <dd><p>Optional, <code>TRUE</code> by default. When set to <code>TRUE</code>, uses <code>REF_DATE</code> of vector data to filter, otherwise it uses StatisticsCanada's <code>releaseDate</code> value for filtering the specified vectors.</p></dd>
+
+
 <dt>refresh</dt>
 <dd><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></dd>
+
+
 <dt>timeout</dt>
 <dd><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></dd>
+
+
 <dt>factors</dt>
 <dd><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>TRUE</code>).</p></dd>
+
+
 <dt>default_month</dt>
 <dd><p>The default month that should be used when creating Date objects for annual data (default set to "07")</p></dd>
+
+
 <dt>default_day</dt>
 <dd><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with data for vectors released between start and end time</p>
+    
+
+<p>A tibble with data for vectors released between start and end time</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">get_cansim_vector</span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">get_cansim_vector</span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -175,7 +194,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

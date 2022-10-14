@@ -117,35 +117,42 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">remove_cansim_sqlite_cached_table</span><span class="op">(</span>
-  <span class="va">cansimTableNumber</span>,
-  language <span class="op">=</span> <span class="cn">NULL</span>,
-  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cansim.cache_path"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">remove_cansim_sqlite_cached_table</span><span class="op">(</span></span>
+<span>  <span class="va">cansimTableNumber</span>,</span>
+<span>  language <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cansim.cache_path"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>cansimTableNumber</dt>
 <dd><p>Number of the table to be removed</p></dd>
+
+
 <dt>language</dt>
 <dd><p>Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages
 will be removed</p></dd>
+
+
 <dt>cache_path</dt>
 <dd><p>Optional, default value is `getOption("cansim.cache_path")`</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>`NULL``</p>
+    
+
+<p>`NULL``</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_cansim_sqlite.html">get_cansim_sqlite</a></span><span class="op">(</span><span class="st">"34-10-0013"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="disconnect_cansim_sqlite.html">disconnect_cansim_sqlite</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">remove_cansim_sqlite_cached_table</span><span class="op">(</span><span class="st">"34-10-0013"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_cansim_sqlite.html">get_cansim_sqlite</a></span><span class="op">(</span><span class="st">"34-10-0013"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="disconnect_cansim_sqlite.html">disconnect_cansim_sqlite</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">remove_cansim_sqlite_cached_table</span><span class="op">(</span><span class="st">"34-10-0013"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -160,7 +167,7 @@ will be removed</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -30,7 +30,7 @@ Imports: digest (>= 0.1),
     utils,
     DBI,
     RSQLite
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Suggests: knitr,
     rmarkdown,
     scales, 

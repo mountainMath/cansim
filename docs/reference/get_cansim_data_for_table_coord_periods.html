@@ -117,47 +117,64 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_cansim_data_for_table_coord_periods</span><span class="op">(</span>
-  <span class="va">cansimTableNumber</span>,
-  <span class="va">coordinate</span>,
-  periods <span class="op">=</span> <span class="fl">1</span>,
-  refresh <span class="op">=</span> <span class="cn">FALSE</span>,
-  timeout <span class="op">=</span> <span class="fl">200</span>,
-  factors <span class="op">=</span> <span class="cn">TRUE</span>,
-  default_month <span class="op">=</span> <span class="st">"07"</span>,
-  default_day <span class="op">=</span> <span class="st">"01"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_cansim_data_for_table_coord_periods</span><span class="op">(</span></span>
+<span>  <span class="va">cansimTableNumber</span>,</span>
+<span>  <span class="va">coordinate</span>,</span>
+<span>  periods <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  refresh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  timeout <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  factors <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  default_month <span class="op">=</span> <span class="st">"07"</span>,</span>
+<span>  default_day <span class="op">=</span> <span class="st">"01"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>cansimTableNumber</dt>
 <dd><p>Statistics Canada data table number</p></dd>
+
+
 <dt>coordinate</dt>
 <dd><p>A string of table coordinates in the form <code>"1.1.1.36.1.0.0.0.0.0"</code></p></dd>
+
+
 <dt>periods</dt>
 <dd><p>Numeric value for number of latest periods to retrieve data for</p></dd>
+
+
 <dt>refresh</dt>
 <dd><p>(Optional) When set to <code>TRUE</code>, forces a reload of data table (default is <code>FALSE</code>)</p></dd>
+
+
 <dt>timeout</dt>
 <dd><p>(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.</p></dd>
+
+
 <dt>factors</dt>
 <dd><p>(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to <code>TRUE</code>).</p></dd>
+
+
 <dt>default_month</dt>
 <dd><p>The default month that should be used when creating Date objects for annual data (default set to "07")</p></dd>
+
+
 <dt>default_day</dt>
 <dd><p>The default day of the month that should be used when creating Date objects for monthly data (default set to "01")</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A tibble with data matching specified coordinate and period input arguments</p>
+    
+
+<p>A tibble with data matching specified coordinate and period input arguments</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="fu">get_cansim_data_for_table_coord_periods</span><span class="op">(</span><span class="st">"35-10-0003"</span>,coordinate<span class="op">=</span><span class="st">"1.12.0.0.0.0.0.0.0.0"</span>,periods<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="fu">get_cansim_data_for_table_coord_periods</span><span class="op">(</span><span class="st">"35-10-0003"</span>,coordinate<span class="op">=</span><span class="st">"1.12.0.0.0.0.0.0.0.0"</span>,periods<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -172,7 +189,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

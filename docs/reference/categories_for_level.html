@@ -117,39 +117,50 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">categories_for_level</span><span class="op">(</span>
-  <span class="va">data</span>,
-  <span class="va">column_name</span>,
-  level <span class="op">=</span> <span class="cn">NA</span>,
-  strict <span class="op">=</span> <span class="cn">FALSE</span>,
-  remove_duplicates <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">categories_for_level</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">column_name</span>,</span>
+<span>  level <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  strict <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  remove_duplicates <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>data table object as returned from <code><a href="get_cansim.html">get_cansim()</a></code></p></dd>
+
+
 <dt>column_name</dt>
 <dd><p>the quoted name of the column to extract categories from</p></dd>
+
+
 <dt>level</dt>
 <dd><p>the hierarchy level depth to which to extract categories, where 0 is top category</p></dd>
+
+
 <dt>strict</dt>
 <dd><p>(default <code>FALSE</code>) when <code>TRUE</code> will only extract that specific hierarchy level</p></dd>
+
+
 <dt>remove_duplicates</dt>
 <dd><p>(default <code>TRUE</code>) When set to <code>TRUE</code> higher level grouping categories already captured by lower level hierarchy data will be removed</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A vector of categories</p>
+    
+
+<p>A vector of categories</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"16-10-0117"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">categories_for_level</span><span class="op">(</span><span class="va">data</span>,<span class="st">"North American Industry Classification System (NAICS)"</span>,level<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"16-10-0117"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">categories_for_level</span><span class="op">(</span><span class="va">data</span>,<span class="st">"North American Industry Classification System (NAICS)"</span>,level<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -164,7 +175,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

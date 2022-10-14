@@ -152,7 +152,7 @@
 vectors</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2022-07-12</h4>
+            <h4 data-toc-skip class="date">2022-10-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/retrieving_cansim_vectors.Rmd" class="external-link"><code>vignettes/retrieving_cansim_vectors.Rmd</code></a></small>
       <div class="hidden name"><code>retrieving_cansim_vectors.Rmd</code></div>
@@ -187,23 +187,23 @@ without all of the additional data available in related tables, we can
 use the <code><a href="../reference/get_cansim_vector.html">get_cansim_vector()</a></code> function with the vector code
 and the date onwards from which we want to get vector results for.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span>
-<span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 89 × 11</span></span>
-<span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
-<span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  124. 2015-01… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  125. 2015-02… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  126. 2015-03… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  126. 2015-04… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  127. 2015-05… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  127. 2015-06… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  127. 2015-07… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  127. 2015-08… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  127. 2015-09… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  127. 2015-10… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 79 more rows, and 3 more variables: VECTOR &lt;chr&gt;, val_norm &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   Date &lt;date&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 92 × 11</span></span></span>
+<span><span class="co">#&gt;    DECIMALS VALUE REF_DATE relea…¹ SYMBOL frequ…² SCALA…³ COORD…⁴ VECTOR val_n…⁵</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  124. 2015-01… 2021-0…      0       6       0 2.2.0.… v4169…    124.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  125. 2015-02… 2021-0…      0       6       0 2.2.0.… v4169…    125.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  126. 2015-03… 2021-0…      0       6       0 2.2.0.… v4169…    126.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  126. 2015-04… 2021-0…      0       6       0 2.2.0.… v4169…    126.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  127. 2015-05… 2021-0…      0       6       0 2.2.0.… v4169…    127.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  127. 2015-06… 2021-0…      0       6       0 2.2.0.… v4169…    127.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  127. 2015-07… 2021-0…      0       6       0 2.2.0.… v4169…    127.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  127. 2015-08… 2021-0…      0       6       0 2.2.0.… v4169…    127.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  127. 2015-09… 2021-0…      0       6       0 2.2.0.… v4169…    127.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  127. 2015-10… 2021-0…      0       6       0 2.2.0.… v4169…    127.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 82 more rows, 1 more variable: Date &lt;date&gt;, and abbreviated variable</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   names ¹​releaseTime, ²​frequencyCode, ³​SCALAR_ID, ⁴​COORDINATE, ⁵​val_norm</span></span></span></code></pre></div>
 <p>The call to <code>get_cansim_vector</code> takes three inputs: a
 string code (or codes) for <code>vectors</code>, a
 <code>start_time</code> in YYYY-MM-DD format, and an optional value for
@@ -224,25 +224,25 @@ code for British Columbia all-items CPI is <em>v41692462</em>.</p>
 period January 2015 to December 2017 only. Monthly data series are
 always dated to the first day of the month.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">vectors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"v41692462"</span><span class="op">)</span>
-
-<span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="va">vectors</span>, <span class="st">"2017-01-01"</span><span class="op">)</span>
-<span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 130 × 11</span></span>
-<span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
-<span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  130. 2017-01… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  130. 2017-02… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  130. 2017-03… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  130. 2017-04… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  130. 2017-05… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  130. 2017-06… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  130. 2017-07… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  130. 2017-08… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  131. 2017-09… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  131. 2017-10… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 120 more rows, and 3 more variables: VECTOR &lt;chr&gt;, val_norm &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   Date &lt;date&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">vectors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"v41692462"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="va">vectors</span>, <span class="st">"2017-01-01"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 136 × 11</span></span></span>
+<span><span class="co">#&gt;    DECIMALS VALUE REF_DATE relea…¹ SYMBOL frequ…² SCALA…³ COORD…⁴ VECTOR val_n…⁵</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  130. 2017-01… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  130. 2017-02… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  130. 2017-03… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  130. 2017-04… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  130. 2017-05… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  130. 2017-06… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  130. 2017-07… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  130. 2017-08… 2021-0…      0       6       0 2.2.0.… v4169…    130.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  131. 2017-09… 2021-0…      0       6       0 2.2.0.… v4169…    131.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  131. 2017-10… 2021-0…      0       6       0 2.2.0.… v4169…    131.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 126 more rows, 1 more variable: Date &lt;date&gt;, and abbreviated variable</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   names ¹​releaseTime, ²​frequencyCode, ³​SCALAR_ID, ⁴​COORDINATE, ⁵​val_norm</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="get_cansim_vectors_for_latest_periods">get_cansim_vectors_for_latest_periods()<a class="anchor" aria-label="anchor" href="#get_cansim_vectors_for_latest_periods"></a>
@@ -256,23 +256,23 @@ instead of arguments for <code>start_time</code> and
 the last <code>n</code> periods for which data is available,
 irrespective of dates.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods</a></span><span class="op">(</span><span class="st">"v41690973"</span>, periods <span class="op">=</span> <span class="fl">60</span><span class="op">)</span>
-<span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 11</span></span>
-<span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span>
-<span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  130. 2017-06… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  130. 2017-07… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  130. 2017-08… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  131. 2017-09… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  131. 2017-10… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  131. 2017-11… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  131. 2017-12… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  132. 2018-01… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  132. 2018-02… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  133. 2018-03… 2021-07-28…      0             6         0 2.2.0.0.0…</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 50 more rows, and 3 more variables: VECTOR &lt;chr&gt;, val_norm &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   Date &lt;date&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods</a></span><span class="op">(</span><span class="st">"v41690973"</span>, periods <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 11</span></span></span>
+<span><span class="co">#&gt;    DECIMALS VALUE REF_DATE relea…¹ SYMBOL frequ…² SCALA…³ COORD…⁴ VECTOR val_n…⁵</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  131. 2017-09… 2021-0…      0       6       0 2.2.0.… v4169…    131.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  131. 2017-10… 2021-0…      0       6       0 2.2.0.… v4169…    131.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  131. 2017-11… 2021-0…      0       6       0 2.2.0.… v4169…    131.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  131. 2017-12… 2021-0…      0       6       0 2.2.0.… v4169…    131.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  132. 2018-01… 2021-0…      0       6       0 2.2.0.… v4169…    132.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  132. 2018-02… 2021-0…      0       6       0 2.2.0.… v4169…    132.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  133. 2018-03… 2021-0…      0       6       0 2.2.0.… v4169…    133.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  133. 2018-04… 2021-0…      0       6       0 2.2.0.… v4169…    133.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  133. 2018-05… 2021-0…      0       6       0 2.2.0.… v4169…    133.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  134. 2018-06… 2021-0…      0       6       0 2.2.0.… v4169…    134.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 50 more rows, 1 more variable: Date &lt;date&gt;, and abbreviated variable</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   names ¹​releaseTime, ²​frequencyCode, ³​SCALAR_ID, ⁴​COORDINATE, ⁵​val_norm</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="naming-vector-series">Naming vector series<a class="anchor" aria-label="anchor" href="#naming-vector-series"></a>
@@ -299,33 +299,34 @@ become easy to lose track of.</p>
 date as an input value, converts values (“normalizes”) on the fly, and
 prepares a simple <code>ggplot2</code> graphic.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">vectors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Canadian CPI"</span><span class="op">=</span><span class="st">"v41690973"</span>,
-             <span class="st">"BC CPI"</span><span class="op">=</span><span class="st">"v41692462"</span><span class="op">)</span>
-
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="va">vectors</span>, <span class="st">"2010-01-01"</span><span class="op">)</span>
-<span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span>
-
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Date</span>,y<span class="op">=</span><span class="va">val_norm</span>,color<span class="op">=</span><span class="va">label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Consumer Price Index, January 2010 to September 2018"</span>,
-       subtitle <span class="op">=</span> <span class="st">"Seasonally-unadjusted, all-items (2002 = 100)"</span>,
-       caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"CANSIM vectors "</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">vectors</span>,collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span>,x<span class="op">=</span><span class="st">""</span>,y<span class="op">=</span><span class="st">""</span>,color<span class="op">=</span><span class="st">""</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">vectors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Canadian CPI"</span><span class="op">=</span><span class="st">"v41690973"</span>,</span>
+<span>             <span class="st">"BC CPI"</span><span class="op">=</span><span class="st">"v41692462"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="va">vectors</span>, <span class="st">"2010-01-01"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data</span>,<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Date</span>,y<span class="op">=</span><span class="va">val_norm</span>,color<span class="op">=</span><span class="va">label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Consumer Price Index, January 2010 to September 2018"</span>,</span>
+<span>       subtitle <span class="op">=</span> <span class="st">"Seasonally-unadjusted, all-items (2002 = 100)"</span>,</span>
+<span>       caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"CANSIM vectors "</span>,<span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">vectors</span>,collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span><span class="op">)</span>,x<span class="op">=</span><span class="st">""</span>,y<span class="op">=</span><span class="st">""</span>,color<span class="op">=</span><span class="st">""</span><span class="op">)</span></span></code></pre></div>
 <p><img src="retrieving_cansim_vectors_files/figure-html/unnamed-chunk-4-1.png" width="700">
 To access metadata for vectors we can use the
 <code>get_cansim_vector_info</code> call</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span><span class="op">(</span><span class="va">vectors</span><span class="op">)</span>
-<span class="co">#&gt; Warning in cleaned_ndm_table_number(table): The cansim table number 18100004 used in this query is numeric,</span>
-<span class="co">#&gt; it is safer to encode table numbers as character strings.The cansim table number 18100004 used in this query is numeric,</span>
-<span class="co">#&gt; it is safer to encode table numbers as character strings.</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 10</span></span>
-<span class="co">#&gt;   DECIMALS VECTOR    table      COORDINATE title_en title_fr   UOM frequencyCode</span>
-<span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>        1 v41690973 18-10-0004 2.2.0.0.0… Canada;… Canada;…    17             6</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>        1 v41692462 18-10-0004 26.2.0.0.… British… Colombi…    17             6</span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: SCALAR_ID &lt;int&gt;, title &lt;chr&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span><span class="op">(</span><span class="va">vectors</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in cleaned_ndm_table_number(table): The cansim table number 18100004 used in this query is numeric,</span></span>
+<span><span class="co">#&gt; it is safer to encode table numbers as character strings.The cansim table number 18100004 used in this query is numeric,</span></span>
+<span><span class="co">#&gt; it is safer to encode table numbers as character strings.</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 10</span></span></span>
+<span><span class="co">#&gt;   DECIMALS VECTOR    table   COORD…¹ title…² title…³   UOM frequ…⁴ SCALA…⁵ title</span></span>
+<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>        1 v41690973 18-10-… 2.2.0.… Canada… Canada…    17       6       0 Cana…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>        1 v41692462 18-10-… 26.2.0… Britis… Colomb…    17       6       0 Brit…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​COORDINATE, ²​title_en, ³​title_fr,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ⁴​frequencyCode, ⁵​SCALAR_ID</span></span></span></code></pre></div>
 </div>
   </div>
 
@@ -344,7 +345,7 @@ To access metadata for vectors we can use the
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

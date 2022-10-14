@@ -14,3 +14,4 @@ The correspondence file for old to new StatCan table numbers is included in the 
 Statistics Canada
 }
 \keyword{data}
+\keyword{internal}

@@ -36,4 +36,6 @@ get_cansim("34-10-0013")
 # Retrieve a table with an old-style CANSIM code
 get_cansim("026-0018")
 }
+
 }
+\keyword{internal}

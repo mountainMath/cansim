@@ -1,7 +1,7 @@
 pandoc: 2.3.1
 pkgdown_sha: ~
 
-url: https://mountainmath.github.io/cansim/index.html
+url: https://mountainmath.github.io/cansim/
 
 home:
   title: Retrieve and work with public Statistics Canada data tables in R
