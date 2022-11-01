@@ -1,3 +1,7 @@
+cansium 0.3.13
+## Minor changes
+* Speed up access to cached sqlite tables
+
 cansium 0.3.12
 ## Major changes
 * Fix bug that causes collect_and_normalize not to function on some operating systems

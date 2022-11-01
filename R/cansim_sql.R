@@ -310,13 +310,14 @@ collect_and_normalize <- function(connection,
 #' List cached cansim SQLite database
 #'
 #' @param cache_path Optional, default value is `getOption("cansim.cache_path")`.
+#' @param refresh Optional, refresh the last updated date of cached cansim tables
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
 #' list_cansim_sqlite_cached_tables()
 #' }
 #' @export
-list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path")){
+list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
   result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_")) %>%
@@ -363,10 +364,11 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                             }))
   }
 
+  cube_info <- list_cansim_cubes(lite=TRUE,refresh = refresh,quiet=TRUE) |>
+    select(cansimTableNumber=.data$cansim_table_number,timeReleased=.data$releaseTime)
+
   result <- result %>%
-    dplyr::mutate(timeReleased=.data$cansimTableNumber %>%
-                    lapply(get_cansim_table_last_release_date) %>%
-                    do.call(c, .)) %>%
+    dplyr::left_join(cube_info,by="cansimTableNumber")  %>%
     dplyr::mutate(upToDate=as.numeric(.data$timeReleased)<as.numeric(.data$timeCached))
 
 

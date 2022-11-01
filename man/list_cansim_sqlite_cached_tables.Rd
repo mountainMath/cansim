@@ -4,10 +4,15 @@
 \alias{list_cansim_sqlite_cached_tables}
 \title{List cached cansim SQLite database}
 \usage{
-list_cansim_sqlite_cached_tables(cache_path = getOption("cansim.cache_path"))
+list_cansim_sqlite_cached_tables(
+  cache_path = getOption("cansim.cache_path"),
+  refresh = FALSE
+)
 }
 \arguments{
 \item{cache_path}{Optional, default value is `getOption("cansim.cache_path")`.}
+
+\item{refresh}{Optional, refresh the last updated date of cached cansim tables}
 }
 \value{
 A tibble with the list of all tables that are currently cached at the given cache path.

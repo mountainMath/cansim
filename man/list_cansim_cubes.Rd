@@ -4,12 +4,14 @@
 \alias{list_cansim_cubes}
 \title{Get overview list for all Statistics Canada data cubes}
 \usage{
-list_cansim_cubes(lite = FALSE, refresh = FALSE)
+list_cansim_cubes(lite = FALSE, refresh = FALSE, quiet = FALSE)
 }
 \arguments{
 \item{lite}{Get the version without cube dimensions and comments for faster retrieval, default is \code{FALSE}.}
 
-\item{refresh}{Default is \code{FALSE}, repeated calls during the same session will hit the cached data.
+\item{refresh}{Default is \code{FALSE}, repeated calls during the same session will hit the cached data.}
+
+\item{quiet}{Optional, suppress messages
 To refresh the code list during a running R session set to \code{TRUE}}
 }
 \value{
