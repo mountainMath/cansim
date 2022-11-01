@@ -364,7 +364,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                             }))
   }
 
-  cube_info <- list_cansim_cubes(lite=TRUE,refresh = refresh,quiet=TRUE) |>
+  cube_info <- list_cansim_cubes(lite=TRUE,refresh = refresh,quiet=TRUE) %>%
     select(cansimTableNumber=.data$cansim_table_number,timeReleased=.data$releaseTime)
 
   result <- result %>%

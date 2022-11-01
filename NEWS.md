@@ -1,6 +1,7 @@
 cansium 0.3.13
 ## Minor changes
 * Speed up access to cached sqlite tables
+* Fix problem with `get_cansim_vector_info()`
 
 cansium 0.3.12
 ## Major changes
