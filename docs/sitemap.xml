@@ -40,12 +40,6 @@
     <loc>https://mountainmath.github.io/cansim/reference/add_provincial_abbreviations.html</loc>
   </url>
   <url>
-    <loc>https://mountainmath.github.io/cansim/reference/add_provincial_appreviations.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/adjust_cansim_values_by_variable.html</loc>
-  </url>
-  <url>
     <loc>https://mountainmath.github.io/cansim/reference/cansim_old_to_new.html</loc>
   </url>
   <url>
@@ -152,9 +146,6 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/normalize_cansim_values.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/parse_and_fold_in_metadata.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/parse_metadata.html</loc>

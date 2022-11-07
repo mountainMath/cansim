@@ -56,7 +56,7 @@ extract_vector_metadata <- function(data1){
     dplyr::bind_rows() %>%
     dplyr::mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
     dplyr::mutate(title=.data$title_en) %>%
-    dplyr::mutate(table=cleaned_ndm_table_number(table))
+    dplyr::mutate(table=cleaned_ndm_table_number(as.character(table)))
 
   result
 }
