@@ -1,6 +1,6 @@
 ## Test environments
-* local OS X install, R 4.0.5
-* GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-16.04 (devel, release, oldrel), ubuntu-16.04 (3.4, 3.5)
+* local OS X install, R 4.2.2
+* GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-20.04 (devel, release)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs or NOTEs. 
@@ -90,5 +90,10 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Minor changes
 * Speed up access to cached sqlite tables
 * Fix problem with `get_cansim_vector_info()`
+
+# cansim 0.3.13
+## Minor changes
+* Better header parsing to avoid warning messages
+* Fix problem with some semi-wide tables
 
 
