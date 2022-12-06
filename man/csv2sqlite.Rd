@@ -15,7 +15,8 @@ csv2sqlite(
   col_types = NULL,
   na = c(NA, "..", "", "...", "F"),
   text_encoding = "UTF-8",
-  delim = ","
+  delim = ",",
+  ...
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ csv2sqlite(
 \item{text_encoding}{encoding of csv file (default UTF-8)}
 
 \item{delim}{(Optional) csv deliminator, default is ","}
+
+\item{...}{(Optional) additional parameters passed to `readr::read_delim_chunked`}
 }
 \value{
 A database connection
