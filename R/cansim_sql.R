@@ -142,12 +142,34 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
     }
 
+
+    header <- readr::read_delim(file.path(exdir, paste0(base_table, ".csv")),
+                                n_max=1,
+                                delim=delim,
+                                na=na_strings,
+                                locale=readr::locale(encoding="UTF-8"),
+                                col_types = list(.default = "c"),
+                                col_names = FALSE) %>%
+      as.character()
+
+    symbols <- which(grepl("^Symbol( .+)*$",header,ignore.case = TRUE))
+    sl <- length(symbols)
+
+    if (sl>1) {
+      header[symbols] <- paste0("Symbol ",seq(1,sl))
+    }
+
+    chunk_size=ceiling(5000000/pmax(sl,1))
+
     csv2sqlite(file.path(exdir, paste0(base_table, ".csv")),
                sqlite_file = sqlite_path,
                table_name=table_name,
                col_types = list(.default = "c"),
+               col_names = header,
+               skip=1,
                na = na_strings,
                delim = delim,
+               chunk_size=chunk_size,
                transform=function(data){
                  data <- data %>% transform_value_column(value_string)
                  if (length(geo_column_pos)==1)
@@ -442,12 +464,13 @@ create_index <- function(connection,table_name,field){
 #' @param na na character strings
 #' @param text_encoding encoding of csv file (default UTF-8)
 #' @param delim (Optional) csv deliminator, default is ","
+#' @param ... (Optional) additional parameters passed to `readr::read_delim_chunked`
 #'
 #' @return A database connection
 #' @keywords internal
 csv2sqlite <- function(csv_file, sqlite_file, table_name, transform=NULL,chunk_size=5000000,
                        append=FALSE,col_types=NULL,na=c(NA,"..","","...","F"),
-                       text_encoding="UTF-8",delim = ",") {
+                       text_encoding="UTF-8",delim = ",",...) {
   # Connect to database.
   if (!append && file.exists(sqlite_file)) file.remove(sqlite_file)
   con <- DBI::dbConnect(RSQLite::SQLite(), dbname=sqlite_file)
@@ -463,7 +486,8 @@ csv2sqlite <- function(csv_file, sqlite_file, table_name, transform=NULL,chunk_s
                           col_types=col_types,
                           chunk_size = chunk_size,
                           locale=readr::locale(encoding = text_encoding),
-                          na=na)
+                          na=na,
+                          ...)
 
   DBI::dbDisconnect(con)
 }

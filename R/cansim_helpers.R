@@ -215,7 +215,8 @@ add_provincial_abbreviations <- function(data){
     short_prov <- short_prov.fr
   }
   data <- data %>%
-    mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]), levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+    mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]),
+                          levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
 }
 
 
@@ -262,44 +263,43 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
 # transforms the value column to nomeric. If table is in semi-wide form it converts the wide for dimension
 # to long form and creates and modifies the COORDINATE column as needed.
 transform_value_column <- function(data,value_column){
-  symbol_grep_string <- "^Symbol...\\d+$|^Symbol$|^Symbol_\\d+$"
-  if (!(value_column %in% names(data)) & sum(grepl(symbol_grep_string,names(data)))>1) {
-    symbols <- which(grepl(symbol_grep_string,names(data)))
-    dimension_grep_string <- paste0("^.+ \\(",length(symbols),"\\):.+\\[\\d+\\]$")
+  symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
+  if (!(value_column %in% names(data)) & length(symbols)>1) {
+    #message("\nTransforming to long form.")
+    dimension_grep_string <- paste0("^.+ \\(",length(symbols),"[A-Z]*\\):.+\\[\\d+\\]$")
     dimensions <- which(grepl(dimension_grep_string,names(data)))
     if (sum(symbols!=dimensions+1)>0) {
       warning("Unable to identify dimensions")
     } else {
-      dimension_members <- gsub(paste0("^.+ \\(",length(symbols),"\\): *"),"",names(data)[dimensions]) %>%
+      count_type <- stringr::str_match(names(data)[dimensions][1],paste0("(\\(",length(symbols),"[A-Z]*\\))"))[1,2]
+      dimension_members <- gsub(paste0("^.+ \\(",length(symbols),"[A-Z]*\\): *"),"",names(data)[dimensions]) %>%
         gsub(" *\\[\\d+\\]$","",.)
       member_ids <- stringr::str_extract(names(data)[dimensions],"\\[\\d+\\]$") %>% gsub("\\[|\\]","",.)
-      dimension_name <- gsub(paste0(" \\(",length(symbols),"\\):.+\\[\\d+\\]"),"",names(data)[dimensions]) %>%
-        unique() %>% paste0(.," (",length(symbols),")")
+      dimension_name <- gsub(paste0(" \\(",length(symbols),"[A-Z]*\\):.+\\[\\d+\\]"),"",names(data)[dimensions]) %>%
+        unique() %>% paste0(.," ",count_type)
 
       if (length(dimension_name)>1) {
         warning("Unable to identify dimension name")
       } else {
-        data_short <- data %>%
-          select(-c(symbols,dimensions))
-        data <- data_short %>%
-          dplyr::left_join(
-            data %>%
-              dplyr::select(-symbols) %>%
-              tidyr::pivot_longer(matches(dimension_grep_string),names_to=dimension_name,values_to="VALUE") %>%
-              dplyr::mutate(!!paste0("Member ID: ",dimension_name):=
-                              stringr::str_extract(.data[[dimension_name]],"\\[\\d+\\]$") %>% gsub("\\[|\\]","",.)) %>%
-              dplyr::mutate_at(dimension_name,function(d)
-                gsub(paste0("^.+ \\(",length(symbols),"\\): *"),"",d) %>%
-                  gsub(" *\\[\\d+\\]$","",.)),
-            by=names(data_short))
+        renames <- c(setNames(names(data)[dimensions],paste0(member_ids," --- ",value_column)),
+                     setNames(names(data)[symbols],paste0(member_ids," --- Symbol")))
+
+        member_names <- dplyr::tibble(!!as.name(paste0("Member ID: ",dimension_name)):=member_ids,
+                                      !!as.name(dimension_name):=dimension_members)
+
+        data <- data %>%
+          dplyr::rename(!!!renames) %>%
+          tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
+                              names_to=c(paste0("Member ID: ",dimension_name),".value")) %>%
+          dplyr::left_join(member_names,by=paste0("Member ID: ",dimension_name))
         if ("Coordinate" %in% names(data)) {
           data <- data %>%
             dplyr::mutate(COORDINATE = paste0(.data$Coordinate,".",!!as.name(paste0("Member ID: ",dimension_name)))) %>%
-            select(-.data$Coordinate)
+            dplyr::select(-.data$Coordinate)
         }
+
         data <- data %>%
           dplyr::select(-dplyr::all_of(paste0("Member ID: ",dimension_name)))
-        data_short <- NULL
       }
     }
   }
@@ -318,9 +318,12 @@ format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ..
 {
   known_bases <- c(legacy = 1024, IEC = 1024, SI = 1000)
   known_units <- list(SI = c("B", "kB", "MB", "GB", "TB", "PB",
-                             "EB", "ZB", "YB"), IEC = c("B", "KiB", "MiB", "GiB",
-                                                        "TiB", "PiB", "EiB", "ZiB", "YiB"), legacy = c("b", "Kb",
-                                                                                                       "Mb", "Gb", "Tb", "Pb"), LEGACY = c("B", "KB", "MB",
+                             "EB", "ZB", "YB"),
+                      IEC = c("B", "KiB", "MiB", "GiB",
+                              "TiB", "PiB", "EiB", "ZiB", "YiB"),
+                      legacy = c("b", "Kb",
+                                 "Mb", "Gb", "Tb", "Pb"),
+                      LEGACY = c("B", "KB", "MB",
                                                                                                                                            "GB", "TB", "PB"))
   units <- match.arg(units, c("auto", unique(unlist(known_units),
                                              use.names = FALSE)))
