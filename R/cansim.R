@@ -524,10 +524,27 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       value_column="VALEUR"
     }
 
+    header <- csv_reader(file.path(exdir, paste0(base_table, ".csv")), n_max=1,
+                                 na=na_strings,
+                                 locale=readr::locale(encoding="UTF-8"),
+                                 col_types = list(.default = "c"),
+                                 col_names = FALSE) %>%
+      as.character()
+
+    symbols <- which(header=="Symbol")
+
+    if (length(symbols)>1) {
+      header[symbols] <- paste0("Symbol ",seq(1,length(symbols)))
+    }
+
+
+
     data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
                        na=na_strings,
                        locale=readr::locale(encoding="UTF-8"),
-                       col_types = list(.default = "c"))
+                       col_types = list(.default = "c"),
+                       skip=1,
+                       col_names = header)
 
     data <- data %>% transform_value_column(value_column)
 
