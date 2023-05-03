@@ -48,14 +48,14 @@ jobs:
       COMPILE_VIG: ${{ secrets.COMPILE_VIG }}
 
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: r-lib/actions/setup-r@v1
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
 
-      - uses: r-lib/actions/setup-pandoc@v1
+      - uses: r-lib/actions/setup-pandoc@v2
 
       - name: Query dependencies
         run: |
