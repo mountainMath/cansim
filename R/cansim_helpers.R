@@ -292,10 +292,9 @@ transform_value_column <- function(data,value_column){
           tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
                               names_to=c(paste0("Member ID: ",dimension_name),".value")) %>%
           dplyr::left_join(member_names,by=paste0("Member ID: ",dimension_name))
-        if ("Coordinate" %in% names(data)) {
+        if ("COORDINATE" %in% names(data)) {
           data <- data %>%
-            dplyr::mutate(COORDINATE = paste0(.data$Coordinate,".",!!as.name(paste0("Member ID: ",dimension_name)))) %>%
-            dplyr::select(-.data$Coordinate)
+            dplyr::mutate(COORDINATE = paste0(.data$COORDINATE,".",!!as.name(paste0("Member ID: ",dimension_name))))
         }
 
         data <- data %>%

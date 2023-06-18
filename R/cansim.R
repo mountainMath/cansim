@@ -414,6 +414,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 
   meta2 <- readRDS(paste0(data_path,"2"))
 
+
   if (!is.null(getOption("cansim.debug"))) message('Generating base hierarchy')
   hierarchy_data <- tibble(X=pull(data,coordinate_column) %>% unique) %>%
     setNames(coordinate_column) %>%
@@ -532,11 +533,21 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       as.character()
 
     symbols <- which(header=="Symbol")
+    if (length(symbols)==0) {
+      symbols <- which(header=="Symbols")
+    }
 
     if (length(symbols)>1) {
       header[symbols] <- paste0("Symbol ",seq(1,length(symbols)))
     }
 
+    coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+    if (!(coordinate_column %in% header)) {
+      ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
+      if (length(ci)==1) {
+        header[ci] <- coordinate_column
+      }
+    }
 
 
     data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
