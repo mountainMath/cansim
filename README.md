@@ -88,7 +88,7 @@ More detailed usage examples are available in the _Retrieving individual Statist
 
 The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
 ```{r}
-get_cansim_table_overview(36-10-040)
+get_cansim_table_overview("36-10-040")
 ```
 
 ### Listing available tables
