@@ -1,3 +1,7 @@
+# cansim 0.3.15
+## Minor changes
+* accommodate quirks in table 98-10-0017
+
 # cansim 0.3.14
 ## Minor changes
 * Better header parsing to avoid warning messages

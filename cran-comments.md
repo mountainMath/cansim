@@ -96,4 +96,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Better header parsing to avoid warning messages
 * Fix problem with some semi-wide tables
 
+# cansim 0.3.14
+## Minor changes
+* accommodate quirks in table 98-10-0017
+
 
