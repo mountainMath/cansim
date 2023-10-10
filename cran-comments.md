@@ -1,5 +1,5 @@
 ## Test environments
-* local OS X install, R 4.2.2
+* local OS X install, R 4.3.1
 * GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-20.04 (devel, release)
 
 ## R CMD check results
