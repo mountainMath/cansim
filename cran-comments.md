@@ -1,5 +1,5 @@
 ## Test environments
-* local OS X install, R 4.2.2
+* local OS X install, R 4.3.1
 * GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-20.04 (devel, release)
 
 ## R CMD check results
@@ -95,5 +95,9 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Minor changes
 * Better header parsing to avoid warning messages
 * Fix problem with some semi-wide tables
+
+# cansim 0.3.14
+## Minor changes
+* accommodate quirks in table 98-10-0017
 
 

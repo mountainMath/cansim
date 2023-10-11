@@ -98,26 +98,9 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                                                col_types = list(.default = "c")))
 
 
-    headers <- readr::read_delim(file.path(exdir, paste0(base_table, ".csv")),
-                                 delim=delim,
-                                 col_types = list(.default = "c"),
-                                 n_max = 1) %>%
-      names()
-
-    hd <- headers[duplicated(toupper(headers))]
-
-    if (length(hd)>0) {
-      dupes <- headers[toupper(headers) %in% hd]
-      unlink(exdir, recursive=TRUE)
-      stop(paste0("This table has duplicated columns names: ",paste0(dupes,collapse = ", "),
-                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."))
-    }
 
     meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
     parse_metadata(meta,data_path = meta_base_path)
-
-
-    to_drop <- intersect(headers,"TERMINATED") # not in use yet
 
 
     scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
@@ -153,11 +136,33 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       as.character()
 
     symbols <- which(grepl("^Symbol( .+)*$",header,ignore.case = TRUE))
+    if (length(symbols)==0) {
+      symbols <-  which(grepl("^Symbols( .+)*$",header,ignore.case = TRUE))
+    }
+
     sl <- length(symbols)
 
     if (sl>1) {
       header[symbols] <- paste0("Symbol ",seq(1,sl))
     }
+
+    if (!(coordinate_column %in% header)) {
+      ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
+        if (length(ci)==1) {
+          header[ci] <- coordinate_column
+        }
+    }
+
+    hd <- header[duplicated(toupper(header))]
+
+    if (length(hd)>0) {
+      dupes <- header[toupper(header) %in% hd]
+      unlink(exdir, recursive=TRUE)
+      stop(paste0("This table has duplicated columns names: ",paste0(dupes,collapse = ", "),
+                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."))
+    }
+
+
 
     chunk_size=ceiling(5000000/pmax(sl,1))
 

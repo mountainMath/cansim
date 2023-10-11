@@ -266,16 +266,16 @@ transform_value_column <- function(data,value_column){
   symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
   if (!(value_column %in% names(data)) & length(symbols)>1) {
     #message("\nTransforming to long form.")
-    dimension_grep_string <- paste0("^.+ \\(",length(symbols),"[A-Z]*\\):.+\\[\\d+\\]$")
+    dimension_grep_string <- paste0("^.+ \\(",length(symbols),"[A-Za-z]*\\):.+\\[\\d+\\]$")
     dimensions <- which(grepl(dimension_grep_string,names(data)))
     if (sum(symbols!=dimensions+1)>0) {
       warning("Unable to identify dimensions")
     } else {
-      count_type <- stringr::str_match(names(data)[dimensions][1],paste0("(\\(",length(symbols),"[A-Z]*\\))"))[1,2]
-      dimension_members <- gsub(paste0("^.+ \\(",length(symbols),"[A-Z]*\\): *"),"",names(data)[dimensions]) %>%
+      count_type <- stringr::str_match(names(data)[dimensions][1],paste0("(\\(",length(symbols),"[A-Za-z]*\\))"))[1,2]
+      dimension_members <- gsub(paste0("^.+ \\(",length(symbols),"[A-Za-z]*\\): *"),"",names(data)[dimensions]) %>%
         gsub(" *\\[\\d+\\]$","",.)
       member_ids <- stringr::str_extract(names(data)[dimensions],"\\[\\d+\\]$") %>% gsub("\\[|\\]","",.)
-      dimension_name <- gsub(paste0(" \\(",length(symbols),"[A-Z]*\\):.+\\[\\d+\\]"),"",names(data)[dimensions]) %>%
+      dimension_name <- gsub(paste0(" \\(",length(symbols),"[A-Za-z]*\\):.+\\[\\d+\\]"),"",names(data)[dimensions]) %>%
         unique() %>% paste0(.," ",count_type)
 
       if (length(dimension_name)>1) {
@@ -292,10 +292,9 @@ transform_value_column <- function(data,value_column){
           tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
                               names_to=c(paste0("Member ID: ",dimension_name),".value")) %>%
           dplyr::left_join(member_names,by=paste0("Member ID: ",dimension_name))
-        if ("Coordinate" %in% names(data)) {
+        if ("COORDINATE" %in% names(data)) {
           data <- data %>%
-            dplyr::mutate(COORDINATE = paste0(.data$Coordinate,".",!!as.name(paste0("Member ID: ",dimension_name)))) %>%
-            dplyr::select(-.data$Coordinate)
+            dplyr::mutate(COORDINATE = paste0(.data$COORDINATE,".",!!as.name(paste0("Member ID: ",dimension_name))))
         }
 
         data <- data %>%

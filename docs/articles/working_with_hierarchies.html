@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.14</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.15</span>
       </span>
     </div>
 
@@ -152,7 +152,7 @@
 hierarchies</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-01-19</h4>
+            <h4 data-toc-skip class="date">2023-10-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_hierarchies.Rmd" class="external-link"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -184,7 +184,7 @@ in the table we are interested in.</p>
 <span><span class="co">#&gt; Parsing data</span></span>
 <span><span class="co">#&gt; Gross domestic product (GDP) at basic prices, by industry, provinces and territories</span></span>
 <span><span class="co">#&gt; CANSIM Table 36-10-0402</span></span>
-<span><span class="co">#&gt; Start Reference Period: 1997-01-01, End Reference Period: 2021-01-01, Frequency: Annual</span></span>
+<span><span class="co">#&gt; Start Reference Period: 1997-01-01, End Reference Period: 2022-01-01, Frequency: Annual</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Column Geography (13)</span></span>
 <span><span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...</span></span>
@@ -250,7 +250,7 @@ wish to extract.</p>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">total_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Share <span class="op">=</span> <span class="va">val_norm</span><span class="op">/</span><span class="va">Total</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Joining, by = c("GEO", "Date")</span></span></code></pre></div>
+<span><span class="co">#&gt; Joining with `by = join_by(GEO, Date)`</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="hierarchies-in-more-detail">Hierarchies in more detail<a class="anchor" aria-label="anchor" href="#hierarchies-in-more-detail"></a>
@@ -371,7 +371,7 @@ building construction.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
