@@ -91,13 +91,16 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Speed up access to cached sqlite tables
 * Fix problem with `get_cansim_vector_info()`
 
-# cansim 0.3.13
+# Changes from version 0.3.13
 ## Minor changes
 * Better header parsing to avoid warning messages
 * Fix problem with some semi-wide tables
 
-# cansim 0.3.14
+# Changes from version 0.3.14
 ## Minor changes
 * accommodate quirks in table 98-10-0017
 
+# Changes from version 0.3.14
+## Minor changes
+* improve offline handling when StatCan servers are down
 

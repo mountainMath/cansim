@@ -58,6 +58,8 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
         as.numeric(last_downloaded)<as.numeric(last_updated)) {
       message(paste0("A newer version of ",cleaned_number," is available, auto-refreshing the table..."))
       refresh=TRUE
+    } else if (file.exists(sqlite_path) && auto_refresh && (is.na(last_updated)||is.na(last_downloaded))){
+      message(paste0("Could not determine if ",cleaned_number," is up to date..."))
     }
   }
 
@@ -391,13 +393,18 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
                             }))
   }
 
-  cube_info <- list_cansim_cubes(lite=TRUE,refresh = refresh,quiet=TRUE) %>%
-    select(cansimTableNumber=.data$cansim_table_number,timeReleased=.data$releaseTime)
+  cube_info <- list_cansim_cubes(lite=TRUE,refresh = refresh,quiet=TRUE)
 
-  result <- result %>%
-    dplyr::left_join(cube_info,by="cansimTableNumber")  %>%
-    dplyr::mutate(upToDate=as.numeric(.data$timeReleased)<as.numeric(.data$timeCached))
-
+  if (!is.null(cube_info)) {
+    cube_info <- cube_info %>%
+      select(cansimTableNumber=.data$cansim_table_number,timeReleased=.data$releaseTime)
+    result <- result %>%
+      dplyr::left_join(cube_info,by="cansimTableNumber")  %>%
+      dplyr::mutate(upToDate=as.numeric(.data$timeReleased)<as.numeric(.data$timeCached))
+  } else {
+    result <- result %>%
+      dplyr::mutate(timeReleased=NA,upToDate=NA)
+  }
 
   result
 }

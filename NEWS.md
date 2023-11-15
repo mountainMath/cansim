@@ -1,3 +1,7 @@
+# cansim 0.3.16
+## Minor changes
+* improve offline handling when StatCan servers are down
+
 # cansim 0.3.15
 ## Minor changes
 * accommodate quirks in table 98-10-0017

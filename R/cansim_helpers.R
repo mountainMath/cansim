@@ -62,7 +62,7 @@ response_error_translation <- list(
   "503"="StatCan website is currently unavailable"
 )
 
-get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
+get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FALSE){
   if (!is.na(path)) {
     response <- purrr::safely(httr::GET)(url,encode="json",
                                          httr::add_headers("Content-Type"="application/json"),
@@ -80,23 +80,37 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
       response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path)
     } else {
       message("Got timeout from StatCan, giving up")
-      response=response$result
     }
   } else if (response$result$status_code %in% names(response_error_translation)){
-    stop(sprintf("%s\nReturned status code %s",response_error_translation[[as.character(response$result$status_code)]], response$result$status_code),call.=FALSE)
+    if (warn_only) {
+      warning(sprintf("%s\nReturned status code %s",response_error_translation[[as.character(response$result$status_code)]], response$result$status_code),call.=FALSE)
+      response=response$result
+    } else {
+      stop(sprintf("%s\nReturned status code %s",response_error_translation[[as.character(response$result$status_code)]], response$result$status_code),call.=FALSE)
+    }
   } else if (response$result$status_code != 200){
-    stop(sprintf("Problem downloading data, returned status code %s.",response$result$status_code),call.=FALSE)
+    if (warn_only) {
+      warning(sprintf("Problem downloading data, returned status code %s.",response$result$status_code),call.=FALSE)
+      response=response$result
+    } else {
+      stop(sprintf("Problem downloading data, returned status code %s.",response$result$status_code),call.=FALSE)
+    }
   } else {
     response=response$result
   }
 
   if (is.null(response) && retry == 0) {
-    stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
+    if (warn_only) {
+      warning(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
+      response=response$result
+    } else {
+      stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
+    }
   }
   response
 }
 
-post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
+post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE){
   response <- purrr::safely(httr::POST)(url,
                                         body=body,
                                         encode="json",
@@ -115,7 +129,12 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
   }
 
   if (is.null(response) && retry == 0) {
-    stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
+    if (warn_only) {
+      warning(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
+      response=NULL
+    } else {
+      stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
+    }
   }
   response
 }

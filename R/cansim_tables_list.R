@@ -264,12 +264,13 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
 #'
 #' @export
 list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
+  data <- NULL
   directory <- tempdir() #getOption("cansim.cache_path")
   path <- file.path(directory,paste0("cansim_cube_list_",ifelse(lite,"lite","regular"),".Rda"))
   if (refresh | !file.exists(path)) {
     if (!quiet) message("Retrieving cube information from StatCan servers...")
     url=ifelse(lite,"https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite","https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesList")
-    r<-get_with_timeout_retry(url)
+    r<-get_with_timeout_retry(url,retry=0,warn_only=TRUE)
     if (r$status_code==200) {
       content <- httr::content(r)
 
@@ -325,40 +326,10 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
         mutate(surveyFr=lapply(.data$surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
         mutate(subjectEn=lapply(.data$subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
         mutate(subjectFr=lapply(.data$subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist)
-      # if (lite) {
-      #   dd<-content %>% purrr::map(function(l) {
-      #     tibble::enframe(l) %>%
-      #       mutate(value=purrr::map(.data$value,function(v)
-      #         paste0(unlist(v),collapse = ", ")) %>%
-      #           unlist)
-      #   })
-      # } else {
-      #   dd <- content %>% purrr::map(function(l) {
-      #     df <- tibble::enframe(l)
-      #     dimensions <- filter(df,.data$name=="dimensions")$value
-      #     c(df %>%
-      #         filter(.data$name!=dimensions) %>%
-      #         mutate(value=purrr::map(.data$value,function(v)
-      #           paste0(unlist(v),collapse = ", ")) %>%
-      #             unlist),
-      #       purrr::map(dimensions[[1]],function(a)a$dimensionNameEn) %>% paste0(collapse=", "),
-      #       purrr::map(dimensions[[1]],function(a)a$dimensionNameFr) %>% paste0(collapse=", "))
-      #   })
-      # }
-
-      # data <- lapply(dd,function(d)d$value) %>%
-      #   do.call(rbind,.) %>%
-      #   as_tibble() %>%
-      #   set_names(header) %>%
-      #   mutate_at(vars(ends_with("Date")),as.Date) %>%
-      #   mutate(archived=.data$archived==1) %>%
-      #   mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
-      #   select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
-      #          setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
-      #   left_join(surveys,by="surveyCode") %>%
-      #   left_join(subjects,by="subjectCode")
 
       saveRDS(data,path)
+    } else {
+      warning("Could not retrieve cube list from StatCan servers.")
     }
   } else {
     if (!quiet) message("Retrieving cube information from temporary cache.")
