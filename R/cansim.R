@@ -423,9 +423,9 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
   for (column_name in column_names) {
     if (!is.null(getOption("cansim.debug"))) message(paste0("Generating ",column_name," hierarchy"))
     #column_index <- which(pull(meta2,dimension_name_column)==column_name)
-    column_index <- meta2 |>
-      filter(!!as.name(dimension_name_column)==column_name) |>
-      pull(!!as.name(dimension_id_column)) |>
+    column_index <- meta2 %>%
+      filter(!!as.name(dimension_name_column)==column_name) %>%
+      pull(!!as.name(dimension_id_column)) %>%
       as.integer()
 
     if (length(column_index)!=1) { # failsafe
@@ -433,7 +433,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
       column_index <- which(pull(meta2,dimension_name_column)==column_name)
     }
 
-    column <- meta2 |> filter(!!as.name(dimension_id_column)==column_index)
+    column <- meta2 %>% filter(!!as.name(dimension_id_column)==column_index)
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column[[dimension_name_column]]))
 
