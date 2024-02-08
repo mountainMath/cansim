@@ -1,6 +1,7 @@
 # cansim 0.3.16
 ## Minor changes
 * improve offline handling when StatCan servers are down
+* improve metadata handling when Member ID order is mixed up in metadata
 
 # cansim 0.3.15
 ## Minor changes
