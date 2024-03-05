@@ -114,7 +114,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
     body=paste0("{",vectors_string,",",time_string,"}")
   }
   cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(list(vectors_string,time_string), algo = "md5"), ".rda"))
-  if (!file.exists(cache_path)) {
+  if (!file.exists(cache_path)||refresh) {
     message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
     if (use_ref_date){
       response <- get_with_timeout_retry(paste0(url,"?",body),
