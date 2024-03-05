@@ -138,7 +138,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
     }
 
     if (length(data1)>0)
-      result <- extract_vector_data(data1) %>% rename_vectors(vectors)
+      result <- extract_vector_data(data1)
     else
       result <- tibble::tibble()
     saveRDS(result,cache_path)
@@ -150,9 +150,15 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   #   result <- result %>%
   #     filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
   # }
-  result %>%
-    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day)
+
+  if (nrow(result)>0) {
+    result <-  result %>%
+      rename_vectors(vectors)  %>%
+      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                              default_month = default_month, default_day = default_day)
+  }
+
+  result
 }
 
 #' Retrieve data for specified Statistics Canada data vector(s) for last N periods
