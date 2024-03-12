@@ -1,5 +1,5 @@
 ## Test environments
-* local OS X install, R 4.3.1
+* local OS X install, R 4.3.2
 * GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-20.04 (devel, release)
 
 ## R CMD check results
@@ -91,13 +91,18 @@ There were no ERRORs or WARNINGs or NOTEs.
 * Speed up access to cached sqlite tables
 * Fix problem with `get_cansim_vector_info()`
 
-# cansim 0.3.13
+# Changes from version 0.3.13
 ## Minor changes
 * Better header parsing to avoid warning messages
 * Fix problem with some semi-wide tables
 
-# cansim 0.3.14
+# Changes from version 0.3.14
 ## Minor changes
 * accommodate quirks in table 98-10-0017
 
+# Changes from version 0.3.15
+## Minor changes
+* improve offline handling when StatCan servers are down
+* improve metadata handling when Member ID order is mixed up in metadata
+* fix problem with refreshing data in get_cansim_vectors
 
