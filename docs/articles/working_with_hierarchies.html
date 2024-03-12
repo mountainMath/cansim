@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.16</span>
       </span>
     </div>
 
@@ -152,7 +152,7 @@
 hierarchies</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-10-10</h4>
+            <h4 data-toc-skip class="date">2024-03-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_hierarchies.Rmd" class="external-link"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -190,17 +190,17 @@ in the table we are interested in.</p>
 <span><span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Column Value (3)</span></span>
-<span><span class="co">#&gt; Current dollars, Chained (2012) dollars, Contributions to percent change</span></span>
+<span><span class="co">#&gt; Current dollars, Chained (2017) dollars, Contributions to percent change</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Column North American Industry Classification System (NAICS) (337)</span></span>
-<span><span class="co">#&gt; Service-producing industries, Industrial production, Non-durable manufacturing industries, Durable manufacturing industries, Information and communication technology sector, Energy sector, Agriculture, forestry, fishing and hunting, Mining, quarrying, and oil and gas extraction, Management of companies and enterprises, Administrative and support, waste management and remediation services, ...</span></span></code></pre></div>
+<span><span class="co">#&gt; Durable manufacturing industries, Information and communication technology sector, Energy sector, Agriculture, forestry, fishing and hunting, Mining, quarrying, and oil and gas extraction, Utilities, Wholesale trade, Construction, Manufacturing, Retail trade, ...</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="accessing-table-data">Accessing table data<a class="anchor" aria-label="anchor" href="#accessing-table-data"></a>
 </h3>
 <p>We see that data set come with three different measures and 307
 different NAICS values. Let’s load the data and focus on just “Chained
-(2012) dollars”.</p>
+(2017) dollars”.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
