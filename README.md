@@ -173,7 +173,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2023). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.17.
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.17.
 
 A BibTeX entry for LaTeX users is
 ```
