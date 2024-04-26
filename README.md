@@ -25,10 +25,13 @@ This package:
 ### Installation
 
 The cansim package is available on CRAN and can be installed directly.
+
 ```r
 install.packages("cansim")
 ```
+
 Alternatively, the latest development version can be downloaded from Github using either the `remotes` or `devtools` packages. 
+
 ```r
 # install.packages("remotes")
 remotes::install_github("mountainmath/cansim")
@@ -47,6 +50,7 @@ births <- get_cansim("17-10-0016-01")
 bop <- get_cansim("3768105")
 bop <- get_cansim("36-10-0042")
 ```
+
 See more example usage and worfklow in the _Getting started with the cansim package_ vignette. 
 
 ### Caching
@@ -58,6 +62,7 @@ Many of the data tables available in Statistics Canada's data repository are qui
 Statistics Canada data tables are provided in either English or French formats, including labels and formats. The `cansim` package allows for download of tables in either English or French. There is an optional language argument to retrieve tables in French: 
 
 Le paquet `cansim` fonctionne en anglais ou en français. Il existe un argument de langue optionnel pour récupérer les tables en français:
+
 ```r
 naissances <- get_cansim("051-0013",language="fr")
 ```    
@@ -73,6 +78,7 @@ Prior to version 0.3.7 this was achieved by calling the `normalize_cansim_values
 ### Vectors
 
 Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+
 ```{r}
 get_cansim_vector("v41690973","2015-01-01")
 ```
@@ -87,6 +93,7 @@ More detailed usage examples are available in the _Retrieving individual Statist
 ### Table overview metadata
 
 The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
+
 ```{r}
 get_cansim_table_overview("36-10-040")
 ```
@@ -94,15 +101,19 @@ get_cansim_table_overview("36-10-040")
 ### Listing available tables
 
 Calling `list_cansim_cubes` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
+
 ```{r}
 list_cansim_cubes()
 ```
-The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard `dplyr` verbs.  
+
+The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard `dplyr` verbs.
+
 ```{r}
 list_cansim_cubes() %>% 
   filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %>% 
   select("cansim_table_number","cubeTitleEn")
 ```
+
 As table search functions require a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cansim.cache_path="your cache path")` option so that table information is cached across R sessions.
 
 The _Listing Statistics Canada data tables_ vignette has additional detail and examples. 
@@ -163,11 +174,13 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 ### Related packages
 
-* There exists a [CANSIM2R package](https://CRAN.R-project.org/package=CANSIM2R) on CRAN that shares some functionality.
+* The [CANSIM2R package](https://CRAN.R-project.org/package=CANSIM2R) provides functionality to download entire StatCan tables.
+
+* The [statcanR package](https://CRAN.R-project.org/package=statcanR) provides functionality to download entire StatCan tables and basic data discovery functionality.
 
 * [CANSIM-dataviewer](https://github.com/bcgov/CANSIM-dataviewer) is another tool that depends on the existing *CANSIM2R* package with a focus on uses for the Province of British Columbia.
 
-* [cancensus](https://github.com/mountainMath/cancensus) is a package designed to access, retrieve, and work with Canadian Census data and geography. A stable version is available on CRAN and a development version is on Github. 
+* [cancensus](https://github.com/mountainMath/cancensus) is a package designed to access, retrieve, and work with Canadian Census data and geography. The *cansim* package is designed to work in conjunction with *cancensus* and data can easily be joined on standard geographic identifiers exposed and harmonized by both packages.
 
 ### Cite cansim
 
@@ -180,7 +193,7 @@ A BibTeX entry for LaTeX users is
   @Manual{cansim,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
-    year = {2023},
+    year = {2024},
     note = {R package version 0.3.17},
     url = {https://mountainmath.github.io/cansim/}
   }

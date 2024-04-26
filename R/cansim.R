@@ -947,8 +947,8 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' @export
 get_cansim_cube_metadata <- function(cansimTableNumber){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-  table_id=naked_ndm_table_number(cansimTableNumber)
-  url="https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
+  table_id <- naked_ndm_table_number(cansimTableNumber)
+  url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
   response <- httr::POST(url,
                      #body=jsonlite::toJSON(list("productId"=table_id),auto_unbox =TRUE),
                      body=paste0("[",paste(paste0('{"productId":',table_id,'}'),collapse = ", "),"]"),
