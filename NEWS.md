@@ -1,3 +1,7 @@
+# cansim 0.3.17
+## Minor changes
+* fix problem with reading french tables released by the census division
+
 # cansim 0.3.16
 ## Minor changes
 * improve offline handling when StatCan servers are down

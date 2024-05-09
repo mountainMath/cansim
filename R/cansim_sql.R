@@ -63,7 +63,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
     }
   }
 
-  if (refresh | !file.exists(sqlite_path)){
+  if (refresh || !file.exists(sqlite_path)){
     if (cleaned_language=="eng")
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
@@ -111,11 +111,14 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+    geography_columns <- ifelse(cleaned_language=="eng",c("Geography","Geographic name"),
+                                c(paste0("G",intToUtf8(0x00E9),"ographie"),
+                                  paste0("Nom g",intToUtf8(0x00E9),"ographique")))
     data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
     coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
 
     meta2 <- readRDS(paste0(meta_base_path,"2"))
-    geo_column_pos <- which(pull(meta2,dimension_name_column)==geography_column)
+    geo_column_pos <- which(pull(meta2,dimension_name_column) %in% geography_columns)
     if (length(geo_column_pos)==0) {
       geography_column <- ifelse(cleaned_language=="eng","Geography of origin",
                                  paste0("G",intToUtf8(0x00E9),"ographie d'origine"))
@@ -137,10 +140,15 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                                 col_names = FALSE) %>%
       as.character()
 
-    symbols <- which(grepl("^Symbol( .+)*$",header,ignore.case = TRUE))
+    symbols <- which(header=="Symbol")
     if (length(symbols)==0) {
-      symbols <-  which(grepl("^Symbols( .+)*$",header,ignore.case = TRUE))
+      symbols <- which(header=="Symbols"|header=="Symboles")
     }
+
+    # symbols <- which(grepl("^Symbol( .+)*$",header,ignore.case = TRUE))
+    # if (length(symbols)==0) {
+    #   symbols <-  which(grepl("^Symbols( .+)*$",header,ignore.case = TRUE))
+    # }
 
     sl <- length(symbols)
 
@@ -148,12 +156,24 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       header[symbols] <- paste0("Symbol ",seq(1,sl))
     }
 
+    # if (!(coordinate_column %in% header)) {
+    #   ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
+    #     if (length(ci)==1) {
+    #       header[ci] <- coordinate_column
+    #     }
+    # }
+
     if (!(coordinate_column %in% header)) {
       ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
-        if (length(ci)==1) {
-          header[ci] <- coordinate_column
-        }
+      if (length(ci)==0 && (paste0("Coordonn",intToUtf8(0x00E9),"es") %in% header | paste0("Coordonn",intToUtf8(0x00E9),"e") %in% header)) {
+        ci <- which(header==paste0("Coordonn",intToUtf8(0x00E9),"es") | header==paste0("Coordonn",intToUtf8(0x00E9),"e"))
+      }
+
+      if (length(ci)==1) {
+        header[ci] <- coordinate_column
+      }
     }
+
 
     hd <- header[duplicated(toupper(header))]
 
@@ -178,6 +198,8 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                delim = delim,
                chunk_size=chunk_size,
                transform=function(data){
+                 attr(data,"language") <- cleaned_language
+                 attr(data,"cansimTableNumber") <- cleaned_number
                  data <- data %>% transform_value_column(value_string)
                  if (length(geo_column_pos)==1)
                    data <- data %>%
@@ -202,7 +224,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
       if (!(field %in% db_fields)) {
         geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
         data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
-        if (grepl(geography_column,field) && data_geography_column %in% db_fields) {
+        if ((grepl(geography_column,field) || field %in% geography_columns )&& data_geography_column %in% db_fields) {
           field=data_geography_column
         }
       }
@@ -317,8 +339,15 @@ collect_and_normalize <- function(connection,
   cansimTableNumber <- ctn %>%
     gsub("^cansim_|_fra$|_eng$","",.) %>%
     cleaned_ndm_table_number()
+
+  cleaned_language <- NULL
+
   d <- connection %>%
     collect()
+
+  attr(d,"language") <- cleaned_language
+  attr(d,"cansimTableNumber") <- cansimTableNumber
+
 
   if (nrow(d)>0){
     d <- d %>%

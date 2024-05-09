@@ -106,3 +106,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 * improve metadata handling when Member ID order is mixed up in metadata
 * fix problem with refreshing data in get_cansim_vectors
 
+# Changes from version 0.3.16
+## Minor changes
+* fix problem with reading french tables released by the census division
+

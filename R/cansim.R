@@ -55,14 +55,17 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
                                     default_month="01", default_day="01",
                                     factors=FALSE,strip_classification_code=FALSE,
                                     cansimTableNumber=NULL){
-  language <- ifelse("VALEUR" %in% names(data),"fr","en")
-  value_string <- ifelse(language=="fr","VALEUR","VALUE")
-  scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
-  scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
-  uom_string=ifelse(language=="fr",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
-  percentage_string=ifelse(language=="fr","^Pourcent","^Percent")
-  classification_prefix <- ifelse(language=="fr","Code de classification pour ","Classification Code for ")
-  hierarchy_prefix <- ifelse(language=="fr",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
+  language <- attr(data,"language")
+  if (is.null(language)) {
+    language <- ifelse("VALEUR" %in% names(data),"fra","eng")
+  }
+  value_string <- ifelse(language=="fra","VALEUR","VALUE")
+  scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
+  uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  percentage_string=ifelse(language=="fra","^Pourcent","^Percent")
+  classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
+  hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
 
   trad_cansim <- scale_string %in% names(data)
@@ -90,7 +93,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   }
 
 
-  date_field=ifelse(language=="fr",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
+  date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
   sample_date <- data[[date_field]] %>%
     na.omit %>%
     first()
@@ -117,7 +120,9 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
     cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
     cleaned_language <- cleaned_ndm_language(language)
-    geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+    geography_columns <- ifelse(cleaned_language=="eng",c("Geography","Geographic name"),
+                               c(paste0("G",intToUtf8(0x00E9),"ographie"),
+                                 paste0("Nom g",intToUtf8(0x00E9),"ographique")))
     base_table <- naked_ndm_table_number(cansimTableNumber)
     path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
     data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
@@ -126,7 +131,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     fields <- pull(meta2,  dimension_name_column)
     #fields <- setdiff(fields,geography_column)
     data <- fold_in_metadata_for_columns(data,data_path,fields)
-    fields <- setdiff(fields,geography_column)
+    fields <- setdiff(fields,geography_columns)
   } else {
     fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
   }
@@ -166,7 +171,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
         if (!(field %in% names(data))) {
-          geography_column <- ifelse(language=="en","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+          geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
           data_geography_column <- ifelse(language=="en","GEO",paste0("G",intToUtf8(0x00C9),"O"))
           if (grepl(geography_column,field) && data_geography_column %in% names(data)) {
             field=data_geography_column
@@ -395,7 +400,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
   dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
   classification_code_column <- ifelse(cleaned_language=="eng","Classification Code","Code sur la classification")
   member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
-  geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+  geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
   data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
   symbol_legend_grepl_field <- ifelse(cleaned_language=="eng","Symbol Legend",paste0("L",intToUtf8(0x00E9),"gende Symbole"))
   survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
@@ -527,23 +532,25 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     if(cleaned_language=="eng") {
       message("Parsing data")
       csv_reader <- readr::read_csv
-      value_column="VALUE"
+      value_column <- "VALUE"
     } else {
       message(paste0("Analyser les donn",intToUtf8(0x00E9),"es"))
       csv_reader <- readr::read_csv2
-      value_column="VALEUR"
+      value_column <- "VALEUR"
     }
 
     header <- csv_reader(file.path(exdir, paste0(base_table, ".csv")), n_max=1,
                                  na=na_strings,
-                                 locale=readr::locale(encoding="UTF-8"),
+                                 locale=readr::locale(encoding="UTF-8",
+                                                      decimal_mark = ",",
+                                                      grouping_mark = "."),
                                  col_types = list(.default = "c"),
                                  col_names = FALSE) %>%
       as.character()
 
     symbols <- which(header=="Symbol")
     if (length(symbols)==0) {
-      symbols <- which(header=="Symbols")
+      symbols <- which(header=="Symbols"|header=="Symboles")
     }
 
     if (length(symbols)>1) {
@@ -553,6 +560,10 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
     if (!(coordinate_column %in% header)) {
       ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
+      if (length(ci)==0 && (paste0("Coordonn",intToUtf8(0x00E9),"es") %in% header | paste0("Coordonn",intToUtf8(0x00E9),"e") %in% header)) {
+        ci <- which(header==paste0("Coordonn",intToUtf8(0x00E9),"es") | header==paste0("Coordonn",intToUtf8(0x00E9),"e"))
+      }
+
       if (length(ci)==1) {
         header[ci] <- coordinate_column
       }
@@ -561,18 +572,25 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 
     data <- csv_reader(file.path(exdir, paste0(base_table, ".csv")),
                        na=na_strings,
-                       locale=readr::locale(encoding="UTF-8"),
+                       locale=readr::locale(encoding="UTF-8",
+                                            decimal_mark = ",",
+                                            grouping_mark = "."),
                        col_types = list(.default = "c"),
                        skip=1,
                        col_names = header)
+
+    attr(data,"language") <- cleaned_language
+    attr(data,"cansimTableNumber") <- cleaned_number
 
     data <- data %>% transform_value_column(value_column)
 
     meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                              na=na_strings,
                                              #col_names=FALSE,
-                                             locale=readr::locale(encoding="UTF-8"),
-                                             col_types = list(.default = "c")))
+                                        locale=readr::locale(encoding="UTF-8",
+                                                             decimal_mark = ",",
+                                                             grouping_mark = "."),
+                                        col_types = list(.default = "c")))
     tryCatch({
       #data <- parse_and_fold_in_metadata(data,meta,data_path)
       parse_metadata(meta,data_path)
@@ -597,9 +615,11 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
   }
 
   if (!is.null(getOption("cansim.debug"))) message('Initiating normalization')
-  data  %>%
+  data <- data  %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                             default_month = default_month, default_day = default_day)
+
+  data
 }
 
 #' Retrieve Statistics Canada data table information
@@ -970,6 +990,10 @@ get_cansim_cube_metadata <- function(cansimTableNumber){
   fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
               "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
               "surveyCode",  "dimension","releaseTime")
+  # fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate",
+  #             "frequencyCode", "nbSeriesCube", "nbDatapointsCube",
+  #             "releaseTime", "archiveStatusCode", "archiveStatusEn", "archiveStatusFr",   "subjectCode",
+  #             "surveyCode",  "dimension", "footnote","correctionFootnote", "correction")
   l <- lapply(fields, function(field){
     purrr::map(data1,function(d){
       dd<-d$object[[field]]

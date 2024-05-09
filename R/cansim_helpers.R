@@ -282,6 +282,8 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
 # transforms the value column to nomeric. If table is in semi-wide form it converts the wide for dimension
 # to long form and creates and modifies the COORDINATE column as needed.
 transform_value_column <- function(data,value_column){
+  language <- attr(data,"language")
+
   symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
   if (!(value_column %in% names(data)) & length(symbols)>1) {
     #message("\nTransforming to long form.")
@@ -300,8 +302,9 @@ transform_value_column <- function(data,value_column){
       if (length(dimension_name)>1) {
         warning("Unable to identify dimension name")
       } else {
+        symbol_string <- "Symbol"
         renames <- c(setNames(names(data)[dimensions],paste0(member_ids," --- ",value_column)),
-                     setNames(names(data)[symbols],paste0(member_ids," --- Symbol")))
+                     setNames(names(data)[symbols],paste0(member_ids," --- ",symbol_string)))
 
         member_names <- dplyr::tibble(!!as.name(paste0("Member ID: ",dimension_name)):=member_ids,
                                       !!as.name(dimension_name):=dimension_members)
@@ -311,9 +314,13 @@ transform_value_column <- function(data,value_column){
           tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
                               names_to=c(paste0("Member ID: ",dimension_name),".value")) %>%
           dplyr::left_join(member_names,by=paste0("Member ID: ",dimension_name))
-        if ("COORDINATE" %in% names(data)) {
+
+        coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+        if (coordinate_column %in% names(data)) {
           data <- data %>%
-            dplyr::mutate(COORDINATE = paste0(.data$COORDINATE,".",!!as.name(paste0("Member ID: ",dimension_name))))
+            dplyr::mutate(!!coordinate_column := paste0(!!as.name(coordinate_column),".",
+                                                     !!as.name(paste0("Member ID: ",dimension_name))))
         }
 
         data <- data %>%
