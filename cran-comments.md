@@ -109,4 +109,6 @@ There were no ERRORs or WARNINGs or NOTEs.
 # Changes from version 0.3.16
 ## Minor changes
 * fix problem with reading french tables released by the census division
+* restore original column order after converting to factors
+* convery geography column to factor if available
 

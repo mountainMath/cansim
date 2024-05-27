@@ -56,6 +56,10 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
                                     factors=FALSE,strip_classification_code=FALSE,
                                     cansimTableNumber=NULL){
   language <- attr(data,"language")
+  if (is.null(cansimTableNumber)) {
+    cansimTableNumber <- attr(data,"cansimTableNumber")
+  }
+
   if (is.null(language)) {
     language <- ifelse("VALEUR" %in% names(data),"fra","eng")
   }
@@ -116,13 +120,16 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       mutate(Date=as.Date(!!as.name(date_field)))
   }
 
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
+  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+  cleaned_language <- cleaned_ndm_language(language)
+  geography_columns <- case_when(cleaned_language=="eng" ~
+                              c("Geography","Geographic name","Geography of origin"),
+                              TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
+                                paste0("Nom g",intToUtf8(0x00E9),"ographique"),
+                                paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+
   if (!is.null(cansimTableNumber)) {
-    cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-    cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
-    cleaned_language <- cleaned_ndm_language(language)
-    geography_columns <- ifelse(cleaned_language=="eng",c("Geography","Geographic name"),
-                               c(paste0("G",intToUtf8(0x00E9),"ographie"),
-                                 paste0("Nom g",intToUtf8(0x00E9),"ographique")))
     base_table <- naked_ndm_table_number(cansimTableNumber)
     path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
     data_path <- paste0(base_path_for_table_language(cansimTableNumber,language),".Rda")
@@ -131,7 +138,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     fields <- pull(meta2,  dimension_name_column)
     #fields <- setdiff(fields,geography_column)
     data <- fold_in_metadata_for_columns(data,data_path,fields)
-    fields <- setdiff(fields,geography_columns)
+    #fields <- setdiff(fields,geography_columns)
   } else {
     fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
   }
@@ -172,8 +179,9 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
       tryCatch({
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
-          data_geography_column <- ifelse(language=="en","GEO",paste0("G",intToUtf8(0x00C9),"O"))
-          if (grepl(geography_column,field) && data_geography_column %in% names(data)) {
+          data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+          if ((grepl(geography_column,field) | field %in% geography_columns) &&
+              data_geography_column %in% names(data)) {
             field=data_geography_column
           }
         }
@@ -225,11 +233,15 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
             arrange(.data$...h)
 
 
+          field_pos <- which(names(data) == field)
           data <- data %>%
             select(-all_of(field)) %>%
             left_join(levels_data %>%
                         select(all_of(c(hierarchy_field,"...name"))) %>%
                         rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
+          after_field <- names(data)[field_pos]
+          data <- data %>%
+            relocate(!!as.name(field),.before=!!as.name(after_field))
 
           if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' values to factor.'))
           data <- data %>%

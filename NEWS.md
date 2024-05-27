@@ -1,6 +1,8 @@
 # cansim 0.3.17
 ## Minor changes
 * fix problem with reading french tables released by the census division
+* restore original column order after converting to factors
+* convery geography column to factor if available
 
 # cansim 0.3.16
 ## Minor changes
