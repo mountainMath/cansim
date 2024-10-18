@@ -19,3 +19,4 @@ fix_meta.sh
 ^\.github
 ^\.github/*
 ^CRAN-SUBMISSION$
+^\.github$
