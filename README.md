@@ -1,8 +1,10 @@
 # cansim
 
-[![R build status](https://github.com/mountainMath/cansim/workflows/R-CMD-check/badge.svg)](https://github.com/mountainMath/cansim/actions)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cansim)](https://cran.r-project.org/package=cansim)
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/cansim)](https://cranlogs.r-pkg.org/badges/cansim)
+<!-- badges: end -->
 
 <a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
 
