@@ -7,6 +7,7 @@
 get_cansim_vector_for_latest_periods(
   vectors,
   periods = 1,
+  language = "english",
   refresh = FALSE,
   timeout = 200,
   factors = TRUE,
@@ -18,6 +19,8 @@ get_cansim_vector_for_latest_periods(
 \item{vectors}{The list of vectors to retrieve}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
+
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 

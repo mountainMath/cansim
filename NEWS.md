@@ -4,6 +4,8 @@
 * restore original column order after converting to factors
 * convery geography column to factor if available
 * fix problem with `add_provincial_abbreviations` that could lead to mislabelling of provinces in some cases
+* improve handling of metadata, enable downloading only metadata instead of only via full table download
+* fold metadata into data when accessing via vector or coordinates
 
 # cansim 0.3.16
 ## Minor changes
