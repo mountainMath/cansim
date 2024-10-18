@@ -171,13 +171,12 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 
 
   if (!file.exists(meta1_path)) {
-    m1 <- d[(lapply(d,class) %>% unlist())!="list"] %>%
-      dplyr::as_tibble() %>%
-      dplyr::select(-dplyr::any_of("responseStatusCode")) %>%
-      #dplyr::rename(!!!m1_renames[m1_renames %in% c(names(.))]) %>%
-      dplyr::mutate(surveyCode=paste0(d$surveyCode, collapse=", ")) %>%
-      dplyr::mutate(subjectCode=paste0(d$subjectCode, collapse=", ")) %>%
-      dplyr::relocate(intersect(names(d),names(.)))
+    m1 <- d %>% tibble::enframe() %>%
+      mutate(l=lapply(.data$value,class) %>% unlist()) %>%
+      filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
+      select(-.data$l) %>%
+      tidyr::pivot_wider() %>%
+      mutate_all(\(x)paste0(unlist(x), collapse=", "))
     saveRDS(m1, meta1_path)
   } else {
     m1 <- readRDS(meta1_path)

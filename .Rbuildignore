@@ -20,3 +20,4 @@ fix_meta.sh
 ^\.github/*
 ^CRAN-SUBMISSION$
 ^\.github$
+R-CMD-check-old.yaml
