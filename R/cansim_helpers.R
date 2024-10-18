@@ -35,6 +35,10 @@ cleaned_ndm_language <- function(language){
   ifelse(tolower(language) %in% c("english","eng","en"),"eng",ifelse(tolower(language) %in% c("fra","french","fr"),"fra",NA))
 }
 
+table_base_path <- function(cansimTableNumber) {
+  file.path(tempdir(),paste0("cansim_",naked_ndm_table_number(cansimTableNumber)))
+}
+
 file_path_for_table_language <- function(cansimTableNumber, language){
   language <- cleaned_ndm_language(language)
   if (is.na(language)) stop(paste0("Unkown Lanaguage ",language))
@@ -42,7 +46,13 @@ file_path_for_table_language <- function(cansimTableNumber, language){
   file.path(paste0(base_table,"-",language))
 }
 
-base_path_for_table_language <- function(cansimTableNumber, language,base_dir = tempdir()){
+base_path_for_table_language <- function(cansimTableNumber, language,base_dir = NULL){
+  if (is.null(base_dir)) {
+    base_dir <- table_base_path(cansimTableNumber)
+  }
+  if (!dir.exists(base_dir)) {
+    dir.create(base_dir)
+  }
   file.path(base_dir,file_path_for_table_language(cansimTableNumber,language))
 }
 
@@ -233,9 +243,16 @@ add_provincial_abbreviations <- function(data){
     data_geography_column <- paste0("G",intToUtf8(0x00C9),"O")
     short_prov <- short_prov.fr
   }
+
+  short_prov_t <- short_prov %>%
+    tibble::enframe() %>%
+    setNames(c(data_geography_column,"GEO.abb")) |>
+    mutate(GEO.abb=factor(.data$GEO.abb,levels = c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+
   data <- data %>%
-    mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]),
-                          levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+    left_join(short_prov_t,by=data_geography_column)
+    # mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]),
+    #                       levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
 }
 
 

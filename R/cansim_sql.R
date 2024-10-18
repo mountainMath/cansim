@@ -275,7 +275,26 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
     meta_grep_string <- basename(meta_base_path)
     meta_dir_name <- dirname(meta_base_path)
     meta_files <- dir(meta_dir_name,pattern=meta_grep_string)
-    for (f in meta_files) file.copy(file.path(meta_dir_name,f),file.path(tempdir(),f))
+
+    column_files <- meta_files[grepl("_column_",meta_files) & !grepl("_\\d+$",meta_files)]
+
+    # legacy support for old column files
+    if (length(column_files)>0) {
+      meta2 <- readRDS(file.path(meta_dir_name,meta_files[grepl("\\.Rda2$",meta_files)]))
+      for (f in column_files) {
+        nn <- gsub(".+_column_","",f)
+        id <- meta2[meta2[,2]==nn,1] |> as.character()
+        if (length(id)==1) {
+          new_name <- f |> gsub("_column_.+$",paste0("_column_",id),x=_)
+          file.rename(file.path(meta_dir_name,f),file.path(meta_dir_name,new_name))
+        }
+      }
+      meta_files <- dir(meta_dir_name,pattern=meta_grep_string)
+    }
+
+
+    meta_base_path <- table_base_path(cansimTableNumber)
+    for (f in meta_files) file.copy(file.path(meta_dir_name,f),file.path(meta_base_path,f))
   }
 
   con <- DBI::dbConnect(RSQLite::SQLite(), dbname=sqlite_path) %>%
