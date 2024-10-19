@@ -2,19 +2,19 @@
 % Please edit documentation in R/cansim.R
 \name{view_cansim_webpage}
 \alias{view_cansim_webpage}
-\title{View CANSIM table information in browser}
+\title{View CANSIM table or vector information in browser}
 \usage{
 view_cansim_webpage(cansimTableNumber = NULL)
 }
 \arguments{
-\item{cansimTableNumber}{CANSIM or NDM table number. If no number is provided, the vector search
+\item{cansimTableNumber}{CANSIM or NDM table number or cansim vectors with "v" prefix. If no number is provided, the vector search
 page on the Statistic Canada website will be opened.}
 }
 \value{
 none
 }
 \description{
-Opens CANSIM table on Statistics Canada's website using default browser. This may be useful for getting further info on CANSIM table and survey methods.
+Opens CANSIM table or vector on Statistics Canada's website using default browser. This may be useful for getting further info on CANSIM table and survey methods.
 }
 \examples{
 \dontrun{

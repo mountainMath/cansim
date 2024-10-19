@@ -35,6 +35,10 @@ cleaned_ndm_language <- function(language){
   ifelse(tolower(language) %in% c("english","eng","en"),"eng",ifelse(tolower(language) %in% c("fra","french","fr"),"fra",NA))
 }
 
+table_base_path <- function(cansimTableNumber) {
+  file.path(tempdir(),paste0("cansim_",naked_ndm_table_number(cansimTableNumber)))
+}
+
 file_path_for_table_language <- function(cansimTableNumber, language){
   language <- cleaned_ndm_language(language)
   if (is.na(language)) stop(paste0("Unkown Lanaguage ",language))
@@ -42,7 +46,13 @@ file_path_for_table_language <- function(cansimTableNumber, language){
   file.path(paste0(base_table,"-",language))
 }
 
-base_path_for_table_language <- function(cansimTableNumber, language,base_dir = tempdir()){
+base_path_for_table_language <- function(cansimTableNumber, language,base_dir = NULL){
+  if (is.null(base_dir)) {
+    base_dir <- table_base_path(cansimTableNumber)
+  }
+  if (!dir.exists(base_dir)) {
+    dir.create(base_dir)
+  }
   file.path(base_dir,file_path_for_table_language(cansimTableNumber,language))
 }
 
@@ -233,9 +243,16 @@ add_provincial_abbreviations <- function(data){
     data_geography_column <- paste0("G",intToUtf8(0x00C9),"O")
     short_prov <- short_prov.fr
   }
+
+  short_prov_t <- short_prov %>%
+    tibble::enframe() %>%
+    setNames(c(data_geography_column,"GEO.abb")) |>
+    mutate(GEO.abb=factor(.data$GEO.abb,levels = c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+
   data <- data %>%
-    mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]),
-                          levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
+    left_join(short_prov_t,by=data_geography_column)
+    # mutate(GEO.abb=factor(as.character(short_prov[!!as.name(data_geography_column)]),
+    #                       levels=c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
 }
 
 
@@ -282,6 +299,8 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
 # transforms the value column to nomeric. If table is in semi-wide form it converts the wide for dimension
 # to long form and creates and modifies the COORDINATE column as needed.
 transform_value_column <- function(data,value_column){
+  language <- attr(data,"language")
+
   symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
   if (!(value_column %in% names(data)) & length(symbols)>1) {
     #message("\nTransforming to long form.")
@@ -300,8 +319,9 @@ transform_value_column <- function(data,value_column){
       if (length(dimension_name)>1) {
         warning("Unable to identify dimension name")
       } else {
+        symbol_string <- "Symbol"
         renames <- c(setNames(names(data)[dimensions],paste0(member_ids," --- ",value_column)),
-                     setNames(names(data)[symbols],paste0(member_ids," --- Symbol")))
+                     setNames(names(data)[symbols],paste0(member_ids," --- ",symbol_string)))
 
         member_names <- dplyr::tibble(!!as.name(paste0("Member ID: ",dimension_name)):=member_ids,
                                       !!as.name(dimension_name):=dimension_members)
@@ -311,9 +331,13 @@ transform_value_column <- function(data,value_column){
           tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
                               names_to=c(paste0("Member ID: ",dimension_name),".value")) %>%
           dplyr::left_join(member_names,by=paste0("Member ID: ",dimension_name))
-        if ("COORDINATE" %in% names(data)) {
+
+        coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+        if (coordinate_column %in% names(data)) {
           data <- data %>%
-            dplyr::mutate(COORDINATE = paste0(.data$COORDINATE,".",!!as.name(paste0("Member ID: ",dimension_name))))
+            dplyr::mutate(!!coordinate_column := paste0(!!as.name(coordinate_column),".",
+                                                     !!as.name(paste0("Member ID: ",dimension_name))))
         }
 
         data <- data %>%

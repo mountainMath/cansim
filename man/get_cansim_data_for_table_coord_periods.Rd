@@ -8,6 +8,7 @@ get_cansim_data_for_table_coord_periods(
   cansimTableNumber,
   coordinate,
   periods = 1,
+  language = "english",
   refresh = FALSE,
   timeout = 200,
   factors = TRUE,
@@ -21,6 +22,8 @@ get_cansim_data_for_table_coord_periods(
 \item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
+
+\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
