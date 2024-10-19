@@ -6,6 +6,7 @@
 * fix problem with `add_provincial_abbreviations` that could lead to mislabelling of provinces in some cases
 * improve handling of metadata, enable downloading only metadata instead of only via full table download
 * fold metadata into data when accessing via vector or coordinates
+* allow for cansim vectors in `view_cansim_webpage` to view vector information from statcan in the browser
 
 # cansim 0.3.16
 ## Minor changes
