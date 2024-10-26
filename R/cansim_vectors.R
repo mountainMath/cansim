@@ -12,18 +12,21 @@ extract_vector_data <- function(data1){
           "SYMBOL"="symbolCode",
           "frequencyCode"="frequencyCode",
           "SCALAR_ID"="scalarFactorCode")
-  ctn <- cleaned_ndm_table_number(as.character(data1[[1]]$object$productId))
+  # ctn <- cleaned_ndm_table_number(as.character(data1[[1]]$object$productId))
   result <- purrr::map(data1,function(d){
+    ctn <- cleaned_ndm_table_number(as.character(d$object$productId))
     vdp <- d$object$vectorDataPoint
     if (length(vdp)==0) {return(NULL)}
-    value_data = lapply(vf,function(f){
+    value_data <- lapply(vf,function(f){
       x=purrr::map(vdp,function(cc)cc[[f]])
       x[sapply(x, is.null)] <- NA
       unlist(x)
     }) %>%
       tibble::as_tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
-             VECTOR=paste0("v",d$object$vectorId))
+             VECTOR=paste0("v",d$object$vectorId)) %>%
+      mutate(cansimTableNumber=ctn)
+
     value_data
   }) %>%
     dplyr::bind_rows()
@@ -32,8 +35,7 @@ extract_vector_data <- function(data1){
     if (length(ref_date_2)==1 && ref_date_2=="")
       result <- result %>% dplyr::select(-.data$REF_DATE_2)
   }
-  result %>%
-    mutate(cansimTableNumber=ctn)
+  result
 }
 
 
@@ -75,6 +77,10 @@ metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
     m<-dm %>%
       filter(.data$memberId==member_pos)
 
+    if (nrow(m)==0) {
+      warning("Could not find metadata for dimension ",unique(dm$dimensionName)," member ",member_pos," in table ",cansimTableNumber)
+      next
+    }
     if (dimension==1 && (m$dimensionName %in% geography_columns)) {
       m$dimensionName <- data_geography_column
     }
