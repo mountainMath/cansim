@@ -12,17 +12,21 @@ extract_vector_data <- function(data1){
           "SYMBOL"="symbolCode",
           "frequencyCode"="frequencyCode",
           "SCALAR_ID"="scalarFactorCode")
+  # ctn <- cleaned_ndm_table_number(as.character(data1[[1]]$object$productId))
   result <- purrr::map(data1,function(d){
+    ctn <- cleaned_ndm_table_number(as.character(d$object$productId))
     vdp <- d$object$vectorDataPoint
     if (length(vdp)==0) {return(NULL)}
-    value_data = lapply(vf,function(f){
+    value_data <- lapply(vf,function(f){
       x=purrr::map(vdp,function(cc)cc[[f]])
       x[sapply(x, is.null)] <- NA
       unlist(x)
     }) %>%
       tibble::as_tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
-             VECTOR=paste0("v",d$object$vectorId))
+             VECTOR=paste0("v",d$object$vectorId)) %>%
+      mutate(cansimTableNumber=ctn)
+
     value_data
   }) %>%
     dplyr::bind_rows()
@@ -30,6 +34,66 @@ extract_vector_data <- function(data1){
     ref_date_2 <- unique(result$REF_DATE_2) %>% unique
     if (length(ref_date_2)==1 && ref_date_2=="")
       result <- result %>% dplyr::select(-.data$REF_DATE_2)
+  }
+  result
+}
+
+
+metadata_for_coordinates <- function(cansimTableNumber,coordinates,language) {
+  unique(coordinates) %>%
+    purrr::map_dfr(\(coord)metadata_for_coordinate(cansimTableNumber,coord,language))
+}
+
+metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
+  cleaned_language <- cleaned_ndm_language(language)
+  members <- get_cansim_cube_metadata(cansimTableNumber,type="members")
+  coordinates <- coordinate %>% strsplit("\\.") %>% unlist()
+  dimensions <- members %>% pull(.data$dimensionPositionId) %>% unique()
+  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, COORDINATE=coordinate)
+
+  if (cleaned_language=="fra") {
+    members <- members %>%
+      select(.data$dimensionPositionId,.data$memberId,dimensionName=.data$dimensionNameFr,memberName=.data$memberNameFr)
+  } else {
+    members <- members %>%
+      select(.data$dimensionPositionId,.data$memberId,dimensionName=.data$dimensionNameEn,memberName=.data$memberNameEn)
+  }
+
+  for (dimension in dimensions) {
+    member_pos <- coordinates[dimension] %>% as.integer()
+    dm<-members %>%
+      filter(.data$dimensionPositionId==dimension) %>%
+      mutate(n=n(),.by = .data$memberName) %>%
+      mutate(nn=row_number(),.by=.data$memberName) %>%
+      mutate(memberLevel=if_else(.data$n==1,.data$memberName,paste0(.data$memberName," (",.data$nn,")")))
+
+    data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+    geography_columns <- case_when(cleaned_language=="eng" ~
+                                     c("Geography","Geographic name","Geography of origin"),
+                                   TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
+                                            paste0("Nom g",intToUtf8(0x00E9),"ographique"),
+                                            paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+
+    m<-dm %>%
+      filter(.data$memberId==member_pos)
+
+    if (nrow(m)==0) {
+      warning("Could not find metadata for dimension ",unique(dm$dimensionName)," member ",member_pos," in table ",cansimTableNumber)
+      next
+    }
+    if (dimension==1 && (m$dimensionName %in% geography_columns)) {
+      m$dimensionName <- data_geography_column
+    }
+
+    dn <- m$dimensionName
+
+    result_new <- m %>%
+      select(.data$dimensionName,.data$memberLevel) %>%
+      tidyr::pivot_wider(names_from="dimensionName",values_from="memberLevel") %>%
+      mutate(!!dn:=factor(!!as.name(dn),levels=dm$memberLevel))
+
+    result <- result %>%
+      bind_cols(result_new)
   }
   result
 }
@@ -76,6 +140,7 @@ rename_vectors <- function(data,vectors){
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
 #' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
 #' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses StatisticsCanada's \code{releaseDate} value for filtering the specified vectors.
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
@@ -90,8 +155,10 @@ rename_vectors <- function(data,vectors){
 #' }
 #' @export
 get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_time = Sys.time(), use_ref_date = TRUE,
+                            language="english",
                             refresh = FALSE, timeout = 200,
                             factors = TRUE, default_month = "07", default_day = "01"){
+  cleaned_language <- cleaned_ndm_language(language)
   start_time=as.Date(start_time)
   original_end_time=as.Date(end_time)
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
@@ -151,6 +218,18 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   #     filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
   # }
 
+  attr(result,"language") <- cleaned_language
+
+
+  metadata <- result %>%
+    select(.data$cansimTableNumber,.data$COORDINATE) %>%
+    unique() %>%
+    group_by(.data$cansimTableNumber) %>%
+    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+    bind_rows()
+
+    #metadata_for_coordinates(attr(result,"cansimTableNumber"),coordinates=unique(result$COORDINATE),language=language)
+
   if (nrow(result)>0) {
     result <-  result %>%
       rename_vectors(vectors)  %>%
@@ -158,7 +237,9 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
                               default_month = default_month, default_day = default_day)
   }
 
-  result
+
+
+  result %>% left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
 }
 
 #' Retrieve data for specified Statistics Canada data vector(s) for last N periods
@@ -167,6 +248,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #'
 #' @param vectors The list of vectors to retrieve
 #' @param periods Numeric value for number of latest periods to retrieve data for
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
@@ -181,8 +263,10 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #' }
 #' @export
 get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
+                                               language="english",
                                                refresh = FALSE, timeout = 200,
                                                factors = TRUE, default_month = "07", default_day = "01"){
+  cleaned_language <- cleaned_ndm_language(language)
   if (periods*length(vectors)>MAX_PERIODS) {
     periods=pmin(periods,floor(as.numeric(MAX_PERIODS)/length(vectors)))
     warning(paste0("Can access at most ",MAX_PERIODS," data points, capping value to ",periods," periods per vector."))
@@ -217,9 +301,18 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
     message(paste0("Reading CANSIM NDM vectors from temporary cache"))
     result <- readRDS(cache_path)
   }
+
+  metadata <- result %>%
+    select(.data$cansimTableNumber,.data$COORDINATE) %>%
+    unique() %>%
+    group_by(.data$cansimTableNumber) %>%
+    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+    bind_rows()
+
   result %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day)
+                            default_month = default_month, default_day = default_day) %>%
+    left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
 }
 
 
@@ -230,6 +323,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' @param cansimTableNumber Statistics Canada data table number
 #' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}
 #' @param periods Numeric value for number of latest periods to retrieve data for
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
@@ -244,8 +338,10 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' }
 #' @export
 get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1,
+                                                  language="english",
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
+  cleaned_language <- cleaned_ndm_language(language)
   table=naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
@@ -270,9 +366,20 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
     message(paste0("Reading CANSIM NDM vectors from temporary cache"))
     data1 <- readRDS(cache_path)
   }
-  extract_vector_data(data1) %>%
+
+  result <- extract_vector_data(data1)
+
+  metadata <- result %>%
+    select(.data$cansimTableNumber,.data$COORDINATE) %>%
+    unique() %>%
+    group_by(.data$cansimTableNumber) %>%
+    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+    bind_rows()
+
+  result %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day)
+                            default_month = default_month, default_day = default_day) %>%
+    left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
 }
 
 

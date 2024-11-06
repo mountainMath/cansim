@@ -106,3 +106,12 @@ There were no ERRORs or WARNINGs or NOTEs.
 * improve metadata handling when Member ID order is mixed up in metadata
 * fix problem with refreshing data in get_cansim_vectors
 
+# Changes from version 0.3.16
+## Minor changes
+* fix problem with reading French tables released by the census division
+* restore original column order after converting to factors
+* convery geography column to factor if available
+* fix problem with `add_provincial_abbreviations` that could lead to mislabelling of provinces in some cases
+* improve handling of metadata, enable downloading only metadata instead of only via full table download
+* fold metadata into data when accessing via vector or coordinates
+* allow for cansim vectors in `view_cansim_webpage` to view vector information from statcan in the browser
