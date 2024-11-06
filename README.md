@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/cansim)](https://cran.r-project.org/package=cansim)
+[![CRAN status](https://www.r-pkg.org/badges/version/cansim)](https://CRAN.R-project.org/package=cansim)
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/cansim)](https://cranlogs.r-pkg.org/badges/cansim)
 <!-- badges: end -->
 

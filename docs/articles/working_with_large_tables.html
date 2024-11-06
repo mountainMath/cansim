@@ -212,7 +212,7 @@ general idea of what the data looks like.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [6 x 19]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpSzr2Rx/cansim_20100001_eng/20100001-eng.sqlite]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpbmRvh7/cansim_20100001_eng/20100001-eng.sqlite]</span></span></span>
 <span><span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type`     Origin of manufactur…¹ Sales</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 2016A000011124 Total, new motor … Total, country of man… Units</span></span>
@@ -319,7 +319,7 @@ overview over the cached data we have.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 8</span></span></span>
 <span><span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title          path </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2024-11-06 <span style="color: #949494;">07:30:53</span> 46.9 Mb    New motor veh… cans…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2024-11-06 <span style="color: #949494;">07:53:19</span> 46.9 Mb    New motor veh… cans…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
 <p>Cached data won’t update automatically, we will have to pass the
 <code>refresh=TRUE</code> option to refresh it manually when we want a
