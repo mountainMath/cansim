@@ -12,17 +12,14 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Retrieve and work with public Statistics Canada data tables in R">
-<meta property="og:description" content="Searches for, accesses, and retrieves new-format and old-format Statistics Canada data 
-    tables, as well as individual vectors, as tidy data frames. This package deals with encoding issues, allows for 
-    bilingual English or French language data retrieval, and bundles convenience functions 
-    to make it easier to work with retrieved table data. Optional caching features are provided.">
+<meta property="og:description" content="Searches for, accesses, and retrieves new-format and old-format Statistics Canada data tables, as well as individual vectors, as tidy data frames. This package deals with encoding issues, allows for bilingual English or French language data retrieval, and bundles convenience functions to make it easier to work with retrieved table data. Optional caching features are provided.">
 <meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png">
 <meta property="og:image:alt" content="cansim">
 <meta name="twitter:card" content="summary_large_image">
@@ -54,7 +51,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.17</span>
       </span>
     </div>
 
@@ -152,7 +149,8 @@
 <div class="section level1">
 <div class="page-header"><h1 id="cansim">cansim<a class="anchor" aria-label="anchor" href="#cansim"></a>
 </h1></div>
-<p><a href="https://github.com/mountainMath/cansim/actions" class="external-link"><img src="https://github.com/mountainMath/cansim/workflows/R-CMD-check/badge.svg" alt="R build status"></a> <a href="https://cran.r-project.org/package=cansim" class="external-link"><img src="http://www.r-pkg.org/badges/version/cansim" alt="CRAN_Status_Badge"></a> <a href="https://cranlogs.r-pkg.org/badges/cansim" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/cansim" alt="CRAN_Downloads_Badge"></a></p>
+<!-- badges: start -->
+
 <p><a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width="25%" height="25%"></a></p>
 <p>An R package to retrieve and work with public Statistics Canada data tables.</p>
 <p>This package:</p>
@@ -218,19 +216,25 @@
 <div class="section level3">
 <h3 id="vectors">Vectors<a class="anchor" aria-label="anchor" href="#vectors"></a>
 </h3>
-<p>Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: <em>v41690973</em>. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the <code><a href="reference/get_cansim_vector.html">get_cansim_vector()</a></code> function with the vector code and the date onwards from which we want to get vector results for. <code>{r} get_cansim_vector("v41690973","2015-01-01")</code></p>
+<p>Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: <em>v41690973</em>. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the <code><a href="reference/get_cansim_vector.html">get_cansim_vector()</a></code> function with the vector code and the date onwards from which we want to get vector results for.</p>
+<p><code>{r} get_cansim_vector("v41690973","2015-01-01")</code></p>
 <p>To access metadata for the vectors, use <code>{r} get_cansim_vector_info("v41690973")</code></p>
 <p>More detailed usage examples are available in the <em>Retrieving individual Statistics Canada vectors</em> vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="table-overview-metadata">Table overview metadata<a class="anchor" aria-label="anchor" href="#table-overview-metadata"></a>
 </h3>
-<p>The <code>get_cansim_table_overview</code> function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let’s take a look what’s in the table we are interested in. <code>{r} get_cansim_table_overview("36-10-040")</code></p>
+<p>The <code>get_cansim_table_overview</code> function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let’s take a look what’s in the table we are interested in.</p>
+<p><code>{r} get_cansim_table_overview("36-10-040")</code></p>
 </div>
 <div class="section level3">
 <h3 id="listing-available-tables">Listing available tables<a class="anchor" aria-label="anchor" href="#listing-available-tables"></a>
 </h3>
-<p>Calling <code>list_cansim_cubes</code> returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. <code>{r} list_cansim_cubes()</code> The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard <code>dplyr</code> verbs.<br><code>{r} list_cansim_cubes() %&gt;%    filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %&gt;%    select("cansim_table_number","cubeTitleEn")</code> As table search functions require a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cansim.cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
+<p>Calling <code>list_cansim_cubes</code> returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers.</p>
+<p><code>{r} list_cansim_cubes()</code></p>
+<p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard <code>dplyr</code> verbs.</p>
+<p><code>{r} list_cansim_cubes() %&gt;%    filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %&gt;%    select("cansim_table_number","cubeTitleEn")</code></p>
+<p>As table search functions require a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cansim.cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
 <p>The <em>Listing Statistics Canada data tables</em> vignette has additional detail and examples.</p>
 </div>
 <div class="section level3">
@@ -288,22 +292,24 @@ In doing any of the above, you shall:
 <h3 id="related-packages">Related packages<a class="anchor" aria-label="anchor" href="#related-packages"></a>
 </h3>
 <ul>
-<li><p>There exists a <a href="https://CRAN.R-project.org/package=CANSIM2R" class="external-link">CANSIM2R package</a> on CRAN that shares some functionality.</p></li>
+<li><p>The <a href="https://CRAN.R-project.org/package=CANSIM2R" class="external-link">CANSIM2R package</a> provides functionality to download entire StatCan tables.</p></li>
+<li><p>The <a href="https://CRAN.R-project.org/package=statcanR" class="external-link">statcanR package</a> provides functionality to download entire StatCan tables and basic data discovery functionality.</p></li>
 <li><p><a href="https://github.com/bcgov/CANSIM-dataviewer" class="external-link">CANSIM-dataviewer</a> is another tool that depends on the existing <em>CANSIM2R</em> package with a focus on uses for the Province of British Columbia.</p></li>
-<li><p><a href="https://github.com/mountainMath/cancensus" class="external-link">cancensus</a> is a package designed to access, retrieve, and work with Canadian Census data and geography. A stable version is available on CRAN and a development version is on Github.</p></li>
+<li><p><a href="https://github.com/mountainMath/cancensus" class="external-link">cancensus</a> is a package designed to access, retrieve, and work with Canadian Census data and geography. The <em>cansim</em> package is designed to work in conjunction with <em>cancensus</em> and data can easily be joined on standard geographic identifiers exposed and harmonized by both packages.</p></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="cite-cansim">Cite cansim<a class="anchor" aria-label="anchor" href="#cite-cansim"></a>
 </h3>
 <p>If you wish to cite the <code>cansim</code> package in your work:</p>
-<p>von Bergmann, J., Dmitry Shkolnik (2023). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.16.</p>
+<p>von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.17. DOI: 10.32614/CRAN.package.cansim</p>
 <p>A BibTeX entry for LaTeX users is</p>
 <pre><code>  @Manual{cansim,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
-    year = {2023},
-    note = {R package version 0.3.16},
+    year = {2024},
+    doi = {10.32614/CRAN.package.cansim},
+    note = {R package version 0.3.17},
     url = {https://mountainmath.github.io/cansim/}
   }</code></pre>
 </div>
@@ -346,7 +352,14 @@ In doing any of the above, you shall:
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://cran.r-project.org/package=cansim" class="external-link"><img src="http://www.r-pkg.org/badges/version/cansim" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cranlogs.r-pkg.org/badges/cansim" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/cansim" alt="CRAN_Downloads_Badge"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
@@ -359,7 +372,7 @@ In doing any of the above, you shall:
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

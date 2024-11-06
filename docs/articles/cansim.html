@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -51,7 +51,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.16</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.17</span>
       </span>
     </div>
 
@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Getting started with the cansim package</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-03-12</h4>
+            <h4 data-toc-skip class="date">2024-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/cansim.Rmd" class="external-link"><code>vignettes/cansim.Rmd</code></a></small>
       <div class="hidden name"><code>cansim.Rmd</code></div>
@@ -196,21 +196,21 @@ use <code>get_cansim</code> to download the entire table.</p>
 <span><span class="co">#&gt; Parsing data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 24</span></span></span>
-<span><span class="co">#&gt;   REF_DATE GEO    DGUID   UOM   UOM_ID SCALAR_FACTOR SCALAR_ID VECTOR COORDINATE</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.1.1     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.2.1     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.2.2     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.2.3     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2001-03  Canada 2016A0… Pers… 249    thousands     3         v9141… 1.3.1     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2001-03  Canada 2016A0… Pers… 249    thousands     3         v1018… 1.3.2     </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more variables: VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt;   REF_DATE GEO    DGUID          Labour force characte…¹ Statistics UOM   UOM_ID</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2001-03  Canada 2016A000011124 Population              Estimate   Pers… 249   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2001-03  Canada 2016A000011124 Labour force            Estimate   Pers… 249   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2001-03  Canada 2016A000011124 Labour force            Standard … Pers… 249   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2001-03  Canada 2016A000011124 Labour force            Standard … Pers… 249   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2001-03  Canada 2016A000011124 Employment              Estimate   Pers… 249   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2001-03  Canada 2016A000011124 Employment              Standard … Pers… 249   </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Labour force characteristics`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 17 more variables: SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, GeoUID &lt;chr&gt;, `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Labour force characteristics` &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Labour force characteristics` &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Statistics` &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Statistics` &lt;chr&gt;, val_norm &lt;dbl&gt;, Date &lt;date&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Labour force characteristics` &lt;fct&gt;, Statistics &lt;fct&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Statistics` &lt;chr&gt;, …</span></span></span></code></pre></div>
 <p>By default, the data tables retrieved by the package comes in the
 original format provided by Statistics Canada and is enriched by several
 added columns and transformations.</p>
@@ -236,6 +236,7 @@ first step. This is implemented in the package with the
 <code>get_cansim_table_overview(table_number)</code> function.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"14-10-0293"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Reading CANSIM NDM product 14-10-0293 information from cache.</span></span>
 <span><span class="co">#&gt; Labour force characteristics by economic region, three-month moving average, unadjusted for seasonality, last 5 months, inactive</span></span>
 <span><span class="co">#&gt; CANSIM Table 14-10-0293</span></span>
 <span><span class="co">#&gt; Start Reference Period: 2001-03-01, End Reference Period: 2020-12-01, Frequency: Monthly</span></span>
@@ -274,7 +275,7 @@ containing the specified name for each vector.</p>
 <span>                  start_time <span class="op">=</span> <span class="st">"2015-05-01"</span>,</span>
 <span>                  end_time<span class="op">=</span><span class="st">"2015-08-01"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 12</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 17</span></span></span>
 <span><span class="co">#&gt;   DECIMALS VALUE REF_DATE  releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span></span>
 <span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>        1  122. 2015-05-… 2021-07-28…      0             6         0 27.2.0.0.…</span></span>
@@ -282,7 +283,10 @@ containing the specified name for each vector.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>        1  122. 2015-07-… 2021-07-28…      0             6         0 27.2.0.0.…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>        1  123. 2015-08-… 2021-07-28…      0             6         0 27.2.0.0.…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>        1  153  2015-07-… 2015-11-10…      0             9         0 8.7.1.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: VECTOR &lt;chr&gt;, label &lt;chr&gt;, val_norm &lt;dbl&gt;, Date &lt;date&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 9 more variables: VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;, label &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, Date &lt;date&gt;, GEO &lt;fct&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Products and product groups` &lt;fct&gt;, `Type of building` &lt;fct&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Major sub-trade group` &lt;fct&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -340,7 +344,7 @@ acknowledgement of source:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

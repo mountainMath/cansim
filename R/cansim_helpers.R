@@ -246,7 +246,7 @@ add_provincial_abbreviations <- function(data){
 
   short_prov_t <- short_prov %>%
     tibble::enframe() %>%
-    setNames(c(data_geography_column,"GEO.abb")) |>
+    setNames(c(data_geography_column,"GEO.abb")) %>%
     mutate(GEO.abb=factor(.data$GEO.abb,levels = c("CAN","BC","AB","SK","MB","ON","QC","NB","PE","NS","NL","YT","NT","NU","NTNU")))
 
   data <- data %>%
