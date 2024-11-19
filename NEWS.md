@@ -1,3 +1,7 @@
+# cansim 0.3.18
+## Minor changes
+* fix problem with inconsistent type parsing of notes
+
 # cansim 0.3.17
 ## Minor changes
 * fix problem with reading French tables released by the census division

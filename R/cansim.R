@@ -1080,8 +1080,9 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
       filter(!is.na(!!as.name(note_id_column))) %>%
       mutate(!!note_id_column:=strsplit(!!as.name(note_id_column),";")) %>%
       tidyr::unnest_longer(!!note_id_column) %>%
-      full_join(notes,by=note_id_column) %>%
-      arrange(!!as.name(note_id_column))
+      mutate(!!note_id_column:=as.character(!!as.name(note_id_column))) %>%
+      full_join(notes %>% mutate(!!note_id_column:=as.character(!!as.name(note_id_column))),by=note_id_column) %>%
+      arrange(!!as.integer(as.name(note_id_column)))
   } else {
     full_notes <- get_cansim_cube_metadata(cansimTableNumber,type="notes",refresh=refresh)
     members <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh = refresh)

@@ -115,3 +115,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 * improve handling of metadata, enable downloading only metadata instead of only via full table download
 * fold metadata into data when accessing via vector or coordinates
 * allow for cansim vectors in `view_cansim_webpage` to view vector information from statcan in the browser
+
+# cansim 0.3.18
+## Minor changes
+* fix problem with inconsistent type parsing of notes
