@@ -315,13 +315,18 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
       pull(!!as.name(dimension_id_column)) %>%
       as.integer()
 
+    is_geo_column <- grepl(geography_column,column_name) &  !(column_name %in% names(data))
+    if (length(column_index)==0) { # failsafe
+      column_index <- which(grepl(geography_column,pull(meta2,dimension_name_column))) %>% first()
+    }
+
     if (length(column_index)!=1) { # failsafe
       warning("Problem with column index, trying to find column index by order in metadata. This may be a problem with the cansim package, please flag this on the {cansim} repository at https://github.com/mountainMath/cansim/issues.")
       column_index <- which(pull(meta2,dimension_name_column)==column_name)
     }
 
     column <- meta2 %>% filter(!!as.name(dimension_id_column)==column_index)
-    is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
+    # is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column_index))
 
     if (is_geo_column) {

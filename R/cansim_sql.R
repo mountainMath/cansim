@@ -217,7 +217,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
     date_field=ifelse(cleaned_language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
 
     fields <- pull(meta2,dimension_name_column) %>%
-      gsub(geography_column,data_geography_column,.) %>%
+      #gsub(geography_column,data_geography_column,.) %>%
       c(.,date_field,"DGUID")
 
     if (length(geo_column_pos)==1) fields <- c(fields,"GeoUID")
@@ -236,7 +236,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
         message(paste0("Indexing ",field))
         create_index(con,table_name,field)
       } else {
-        warning("did not know how to index field ",field)
+        warning("Do not know how to index field ",field)
       }
     }
     DBI::dbDisconnect(con)
@@ -541,7 +541,7 @@ csv2sqlite <- function(csv_file, sqlite_file, table_name, transform=NULL,chunk_s
 
   chunk_handler <- function(df, pos) {
     if (nrow(readr::problems(df)) > 0) print(readr::problems(df))
-    if (!is.null(transform)) df <- df %>% transform
+    if (!is.null(transform)) df <- df %>% transform()
     DBI::dbWriteTable(con, table_name, as.data.frame(df), append=TRUE)
   }
 
