@@ -25,7 +25,8 @@ extract_vector_data <- function(data1){
       tibble::as_tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
              VECTOR=paste0("v",d$object$vectorId)) %>%
-      mutate(cansimTableNumber=ctn)
+      mutate(cansimTableNumber=ctn) %>%
+      mutate(VECTOR=na_if(VECTOR,"v0"))
 
     value_data
   }) %>%
@@ -342,9 +343,11 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   cleaned_language <- cleaned_ndm_language(language)
-  table=naked_ndm_table_number(cansimTableNumber)
+  table <- naked_ndm_table_number(cansimTableNumber)
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
-  body_string=paste0('[{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}]')
+  body_string=paste0('{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}') %>%
+    paste0(.,collapse = ", ") %>%
+    paste0("[",.,"]")
   cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))
   if (refresh || !file.exists(cache_path)) {
     message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
@@ -356,9 +359,9 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
     data1 <- Filter(function(x)x$status=="SUCCESS",data)
     data2 <- Filter(function(x)x$status!="SUCCESS",data)
     if (length(data2)>0) {
-      message(paste0("Failed to load metadata for ",length(data2)," tables "))
+      message(paste0("Failed to load for ",length(data2)," coordinates "))
       data2 %>% purrr::map(function(x){
-        message(x$object)
+        message(x$object$coordinate)
       })
     }
     saveRDS(data1,cache_path)
