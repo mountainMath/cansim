@@ -1107,7 +1107,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
                .data$memberId,!!member_name_column:=.data$memberNameEn) %>%
         unique()
       full_notes <- full_notes %>%
-        select(!!note_id_column:=.data$footnoteId,Note=.data$footnotesFr,.data$dimensionPositionId, .data$memberId) %>%
+        select(!!note_id_column:=.data$footnoteId,Note=.data$footnotesEn,.data$dimensionPositionId, .data$memberId) %>%
         left_join(members,by=c("dimensionPositionId","memberId")) %>%
         select(-.data$dimensionPositionId,-.data$memberId)
     }

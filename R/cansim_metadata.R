@@ -187,7 +187,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
     m2 <- d$dimension %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
-          tidyr::unnest_wider(.data$member)
+          tidyr::unnest_wider(.data$member)  %>%
+          mutate(across(is.integer,as.character))
       })
     saveRDS(m2, meta2_path)
   } else {
@@ -199,7 +200,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           left_join(as_tibble(.$link),by="footnoteId") %>%
-          dplyr::select(-.data$link)
+          dplyr::select(-.data$link)  %>%
+          mutate(across(is.integer,as.character))
       }) %>%
       unique()
     saveRDS(m3, meta3_path)
@@ -210,7 +212,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   if (!file.exists(meta4_path)) {
     m4 <- d$correctionFootnote %>%
       purrr::map_df(\(x){
-        tibble::as_tibble(x)
+        tibble::as_tibble(x)   %>%
+          mutate(across(is.integer,as.character))
       })
     saveRDS(m4, meta4_path)
   } else {

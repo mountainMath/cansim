@@ -61,7 +61,7 @@ metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
   }
 
   for (dimension in dimensions) {
-    member_pos <- coordinates[dimension] %>% as.integer()
+    member_pos <- coordinates[as.integer(dimension)]
     dm<-members %>%
       filter(.data$dimensionPositionId==dimension) %>%
       mutate(n=n(),.by = .data$memberName) %>%
@@ -342,8 +342,11 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
                                                   language="english",
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
+  CENSUS_TABLE_STARTING_STRING <- "9810"
+
   cleaned_language <- cleaned_ndm_language(language)
   table <- naked_ndm_table_number(cansimTableNumber)
+  is_census_table <- substr(table,1,4)==CENSUS_TABLE_STARTING_STRING
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   body_string=paste0('{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}') %>%
     paste0(.,collapse = ", ") %>%
@@ -363,6 +366,9 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
       data2 %>% purrr::map(function(x){
         message(x$object$coordinate)
       })
+      if (is_census_table) {
+        warning(paste0("Table ",cansimTableNumber," is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
+      }
     }
     saveRDS(data1,cache_path)
   } else {
@@ -372,17 +378,22 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
 
   result <- extract_vector_data(data1)
 
-  metadata <- result %>%
-    select(.data$cansimTableNumber,.data$COORDINATE) %>%
-    unique() %>%
-    group_by(.data$cansimTableNumber) %>%
-    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
-    bind_rows()
+  if (nrow(result)==0) {
+    result <- NULL
+  } else {
+    metadata <- result %>%
+      select(.data$cansimTableNumber,.data$COORDINATE) %>%
+      unique() %>%
+      group_by(.data$cansimTableNumber) %>%
+      group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+      bind_rows()
 
-  result %>%
-    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day) %>%
-    left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
+    result <- result %>%
+      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                              default_month = default_month, default_day = default_day) %>%
+      left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
+  }
+  result
 }
 
 
