@@ -300,6 +300,7 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
 # to long form and creates and modifies the COORDINATE column as needed.
 transform_value_column <- function(data,value_column){
   language <- attr(data,"language")
+  cansimTableNumber <- attr(data,"cansimTableNumber")
 
   symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
   if (!(value_column %in% names(data)) & length(symbols)>1) {
@@ -326,6 +327,13 @@ transform_value_column <- function(data,value_column){
         member_names <- dplyr::tibble(!!as.name(paste0("Member ID: ",dimension_name)):=member_ids,
                                       !!as.name(dimension_name):=dimension_members)
 
+
+        if ("arrow_dplyr_query" %in% class(data)) {
+          data <- as.data.frame(data)
+          attr(data,"language") <- language
+          attr(data,"cansimTableNumber") <- cansimTableNumber
+        }
+
         data <- data %>%
           dplyr::rename(!!!renames) %>%
           tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
@@ -347,8 +355,10 @@ transform_value_column <- function(data,value_column){
   }
 
   if (value_column %in% names(data)) {
-    data <- data %>%
-      dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+    if (!is.numeric(data[[value_column]])) {
+      data <- data %>%
+        dplyr::mutate(!!value_column:=as.numeric(!!as.name(value_column)))
+    }
   } else {
     warning("Unkown table type")
   }

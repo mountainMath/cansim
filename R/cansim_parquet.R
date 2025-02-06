@@ -27,7 +27,7 @@
 #' }
 #' @export
 get_cansim_arrow <- function(cansimTableNumber, language="english",
-                             format="pqrquet",
+                             format="parquet",
                              refresh=FALSE, auto_refresh = FALSE,
                               timeout=1000,
                               cache_path=getOption("cansim.cache_path")){
@@ -275,13 +275,13 @@ get_cansim_arrow <- function(cansimTableNumber, language="english",
     con <- arrow::read_feather(arrow_path,as_data_frame = FALSE)
   }
 
-  if ("DGUID" %in% names(con)) {
     con <- con |>
       mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1),.before=.data$DGUID)
-  }
+
   attr(con,"language") <- cleaned_language
   attr(con,"cansimTableNumber") <- cansimTableNumber
-con
+
+  con
 }
 
 
@@ -304,7 +304,7 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
                        text_encoding="UTF-8",delim = ",") {
 
   if (file.exists(arrow_file)) file.remove(arrow_file)
-  value_columns <- col_names[col_names==value_column| grepl(" \\(\\d+[A-Z]*\\)\\: .+ \\[\\d+\\]$",col_names)]
+  value_columns <- col_names[col_names==value_column| grepl(" \\(\\d+[A-Z]*\\)\\:.+\\[\\d+\\]$",col_names)]
 
   col_types <- setNames(rep("c",length(col_names)),col_names)
   col_types[value_columns] <- "n"
@@ -318,13 +318,14 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
   input <- arrow::read_delim_arrow(csv_file,
                                    skip=1,
                                    delim=delim,
-                                   #col_names=col_names,
                                    #col_types=paste0(as.character(col_types),collapse=""),
+                                   #col_names=col_names,
                                    as_data_frame = FALSE,
-                                   schema=arrow_schema,
+                                   col_types=arrow_schema,
                                    na=na,
-                                   read_options = arrow::csv_read_options(encoding=text_encoding)) |>
-    setNames(col_names)
+                                   read_options = arrow::csv_read_options(encoding=text_encoding,
+                                                                          skip_rows=1,
+                                                                          column_names=col_names))
 
   if (format=="feather")
     arrow::write_feather(input, arrow_file)
@@ -334,6 +335,55 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
 }
 
 
+#' Collect data from a parquet or feather query and normalize cansim table output
+#'
+#' @param connection A connection to a local arrow connection as returned by \code{get_cansim_arrow},
+#' possibly with filters or other \code{dplyr} verbs applied
+#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.
+#' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
+#' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{FALSE}).
+#' @param strip_classification_code (Optional) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
+#' @return A tibble with the collected and normalized data
+#'
+#' @examples
+#' \dontrun{
+#' library(dplyr)
+#'
+#' con <- get_cansim_arrow("34-10-0013")
+#' data <- con %>%
+#'   filter(GEO=="Ontario") %>%
+#'   normalize_cansim_arrow()
+#'
+#' }
+#' @export
+
+normalize_cansim_arrow <- function(connection,
+                                   replacement_value="val_norm", normalize_percent=TRUE,
+                                   default_month="07", default_day="01",
+                                   factors=TRUE,strip_classification_code=FALSE) {
+
+  data <- connection |> dplyr::as_tibble()
+  attr(data,"language") <- attr(connection,"language")
+  cansimTableNumber <- attr(connection,"cansimTableNumber")
+  attr(data,"cansimTableNumber") <- cansimTableNumber
+
+  if (nrow(data)>0){
+    data <- data %>%
+      transform_value_column(replacement_value) %>%
+      normalize_cansim_values(replacement_value=replacement_value,
+                              normalize_percent=normalize_percent,
+                              default_month=default_month,
+                              default_day=default_day,
+                              factors=factors,
+                              cansimTableNumber = cansimTableNumber)
+  } else {
+    message("No data selected, try adjusting your filters.")
+  }
+
+  data
+}
 
 
 #' List cached cansim arrow and SQlite databases

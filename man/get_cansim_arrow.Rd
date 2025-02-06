@@ -7,7 +7,7 @@
 get_cansim_arrow(
   cansimTableNumber,
   language = "english",
-  format = "pqrquet",
+  format = "parquet",
   refresh = FALSE,
   auto_refresh = FALSE,
   timeout = 1000,

@@ -346,7 +346,7 @@ disconnect_cansim_sqlite <- function(connection){
 collect_and_normalize <- function(connection,
                                   replacement_value="val_norm", normalize_percent=TRUE,
                                   default_month="07", default_day="01",
-                                  factors=FALSE,strip_classification_code=FALSE,
+                                  factors=TRUE,strip_classification_code=FALSE,
                                   disconnect=FALSE){
 
   if (!is.null(connection$src) && !is.null(connection$src$con)) {
@@ -378,7 +378,7 @@ collect_and_normalize <- function(connection,
                               normalize_percent=normalize_percent,
                               default_month=default_month,
                               default_day=default_day,
-                              factors=TRUE,
+                              factors=factors,
                               cansimTableNumber = cansimTableNumber)
   } else {
     message("No data selected, try adjusting your filters.")
