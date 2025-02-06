@@ -26,7 +26,7 @@ extract_vector_data <- function(data1){
       mutate(COORDINATE=d$object$coordinate,
              VECTOR=paste0("v",d$object$vectorId)) %>%
       mutate(cansimTableNumber=ctn) %>%
-      mutate(VECTOR=na_if(VECTOR,"v0"))
+      mutate(VECTOR=na_if(.data$VECTOR,"v0"))
 
     value_data
   }) %>%

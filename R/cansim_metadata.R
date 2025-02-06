@@ -251,6 +251,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 
   if (type=="overview") {
 
+    if (FALSE) { # experimental code
     fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
                 "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
                 "surveyCode",  "dimension","releaseTime")
@@ -267,12 +268,13 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
       dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
                                                       format=STATCAN_TIME_FORMAT,
                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))
-
+    } else {
     result <- m1 %>%
       dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
       dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
                                                       format=STATCAN_TIME_FORMAT,
                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))
+    }
   } else if (type=="notes") {
     result <- m3
   } else if (type=="members") {

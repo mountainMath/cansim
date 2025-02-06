@@ -3,11 +3,11 @@
 #' Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
 #' @param data A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
-#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to replacing the current value field
-#' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
+#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"
+#' @param normalize_percent (Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
 #' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
 #'
@@ -19,10 +19,11 @@
 #' normalize_cansim_values(cansim_table)
 #' }
 #' @export
-normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE,
+normalize_cansim_values <- function(data, replacement_value="val_norm", normalize_percent=TRUE,
                                     default_month="01", default_day="01",
-                                    factors=FALSE,strip_classification_code=FALSE,
+                                    factors=TRUE,strip_classification_code=FALSE,
                                     cansimTableNumber=NULL){
+
   language <- attr(data,"language")
   if (is.null(cansimTableNumber)) {
     cansimTableNumber <- attr(data,"cansimTableNumber")
@@ -49,6 +50,12 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     return (data)
   }
 
+  data <- data |> as_tibble()
+
+  attr(data,"cansimTableNumber") <- cansimTableNumber
+  attr(data,"language") <- language
+
+
   if (trad_cansim) {
     data <- data %>%
       mutate(!!as.name(replacement_value_string):=!!as.name(value_string)*(`^`(10,as.integer(!!as.name(scale_string)))))
@@ -66,9 +73,17 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 
 
   date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
-  sample_date <- data[[date_field]] %>%
-    na.omit %>%
-    first()
+
+  sample_date <- data[1:10,date_field] |> pull(date_field) |> na.omit() |> first()
+  if (is.na(sample_date)) {
+    sample_date <- pull(date_field) |> na.omit() |> first()
+
+  }
+  # sample_date <- data[[date_field]] %>%
+  #   na.omit %>%
+  #   first()
+
+
   if (!trad_cansim) {
     # do nothing
   } else if (grepl("^\\d{4}$",sample_date)) {

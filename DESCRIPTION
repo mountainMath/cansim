@@ -3,7 +3,7 @@ Type: Package
 Title: Accessing Statistics Canada Data Table and Vectors
 Version: 0.3.18
 Authors@R: c(
-    person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
+    person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("aut","cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
 Maintainer: Jens von Bergmann <jens@mountainmath.ca>
 Description: Searches for, accesses, and retrieves new-format and old-format Statistics Canada data 
@@ -15,11 +15,12 @@ Encoding: UTF-8
 ByteCompile: yes
 NeedsCompilation: no
 LazyData: true
-Depends: R (>= 2.10)
+Depends: R (>= 4.1)
 Imports: digest (>= 0.1),
-    dplyr (>= 0.7),
+    dplyr (>= 1.1),
     httr (>= 1.0.0),
     jsonlite (>= 1.0),
+    arrow (>= 18.1),
     readr,
     rlang,
     xml2,
