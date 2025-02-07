@@ -428,22 +428,25 @@ normalize_cansim_db <- function(connection,
                                 disconnect=FALSE) {
 
   cansimTableNumber <- attr(connection,"cansimTableNumber")
+  language <- attr(connection,"language")
+  value_string <- ifelse(language=="fr","VALEUR","VALUE")
+
   data <- NULL
   if ("tbl_sql" %in% class(connection)) {
     data <- connection |> dplyr::collect()
-    attr(data,"language") <- attr(connection,"language")
+    attr(data,"language") <- language
     attr(data,"cansimTableNumber") <- cansimTableNumber
 
     if (disconnect) disconnect_cansim_sqlite(connection)
   } else if ("arrow_dplyr_query" %in% class(connection)){
     data <- connection |>
       dplyr::as_tibble()
-    attr(data,"language") <- attr(connection,"language")
+    attr(data,"language") <- language
     attr(data,"cansimTableNumber") <- cansimTableNumber
 
     if (nrow(data)>0){
       data <- data |>
-        transform_value_column(replacement_value)
+        transform_value_column(value_string)
     }
   } else {
     stop("Don't know how to handle connections of class ",paste0(class(connection),collapse=", "))
