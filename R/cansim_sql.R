@@ -113,16 +113,16 @@ collect_and_normalize <- function(connection,
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
-#' list_cansim_sqlite_dbs()
+#' list_cansim_cached_dbs()
 #' }
 #' @keywords internal
 #' @export
 list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
-  .Deprecated("list_cansim_dbs",
+  .Deprecated("list_cansim_cached_dbs",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_dbs(...) instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cached_dbs(...) instead.")
 
-  list_cansim_dbs(cache_path=cache_path, refresh=refresh)
+  list_cansim_cached_dbs(cache_path=cache_path, refresh=refresh)
 }
 
 #' Remove cached cansim SQLite database
@@ -135,18 +135,18 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_db("34-10-0013", format="sqlite)
+#' con <- get_cansim_db("34-10-0013", format="sqlite")
 #' disconnect_cansim_sqlite(con)
-#' remove_cansim_dbs("34-10-0013", format="sqlite")
+#' remove_cansim_cached_dbs("34-10-0013", format="sqlite")
 #' }
 #' @keywords internal
 #' @export
 remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=getOption("cansim.cache_path")){
-  .Deprecated("remove_cansim_dbs",
+  .Deprecated("remove_cansim_cached_dbs",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_dbs(..., format='sqlite'') instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use remove_cansim_cached_dbs(..., format='sqlite'') instead.")
 
-  remove_cansim_dbs(cansimTableNumber=cansimTableNumber,language=language,format="sqlite",cache_path=cache_path)
+  remove_cansim_cached_dbs(cansimTableNumber=cansimTableNumber,language=language,format="sqlite",cache_path=cache_path)
 }
 
 

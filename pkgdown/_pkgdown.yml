@@ -19,8 +19,8 @@ reference:
   - contents:
     - get_cansim_db
     - normalize_cansim_db
-    - list_cansim_dbs
-    - remove_cansim_dbs
+    - list_cansim_cached_dbs
+    - remove_cansim_cached_dbs
     - disconnect_cansim_sqlite
   - title: Locating data
   - contents:
@@ -48,12 +48,6 @@ reference:
     - add_provincial_abbreviations
     - cansim_old_to_new
     - get_cansim_code_set
-  - title: Deprecated methods
-  - contents:
-    - get_cansim_sqlite
-    - list_cansim_sqlite_cached_tables
-    - remove_cansim_sqlite_cached_table
-    - collect_and_normalize
 
 news:
   releases:

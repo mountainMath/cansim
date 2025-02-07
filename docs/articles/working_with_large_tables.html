@@ -232,7 +232,7 @@ differences in database formats are mostly abstracted away.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">connection.parquet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_db.html">get_cansim_db</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span> <span class="co"># format='parquet' is the default</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span></span>
-<span><span class="co">#&gt; Parsing data</span></span>
+<span><span class="co">#&gt; Parsing data to parquet.</span></span>
 <span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.parquet</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Table (query)</span></span>
@@ -264,7 +264,7 @@ differences in database formats are mostly abstracted away.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">connection.feather</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_db.html">get_cansim_db</a></span><span class="op">(</span><span class="st">"20-10-0001"</span>, format<span class="op">=</span><span class="st">'feather'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span></span>
-<span><span class="co">#&gt; Parsing data</span></span>
+<span><span class="co">#&gt; Parsing data to feather.</span></span>
 <span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.feather</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Table (query)</span></span>
@@ -296,7 +296,7 @@ differences in database formats are mostly abstracted away.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">connection.sqlite</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_db.html">get_cansim_db</a></span><span class="op">(</span><span class="st">"20-10-0001"</span>, format<span class="op">=</span><span class="st">'sqlite'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span></span>
-<span><span class="co">#&gt; Parsing data</span></span>
+<span><span class="co">#&gt; Parsing data to sqlite.</span></span>
 <span><span class="co">#&gt; Indexing GEO</span></span>
 <span><span class="co">#&gt; Indexing Vehicle type</span></span>
 <span><span class="co">#&gt; Indexing Origin of manufacture</span></span>
@@ -309,7 +309,7 @@ differences in database formats are mostly abstracted away.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.sqlite</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 19</span></span>
-<span><span class="co">#&gt; Database: sqlite 3.47.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpfBQULw/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
+<span><span class="co">#&gt; Database: sqlite 3.47.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/Rtmp4YYiNT/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
 <span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1946-01", "1946-01", "1946-01", "1946-01", "1…</span></span>
 <span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Canada", "Canada", "Canada", "Canada", "Canad…</span></span>
 <span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "11124", "11124", "11124", "11124", "11124", "…</span></span>
@@ -394,7 +394,6 @@ used in the same way across database formats.</p>
 <span>         <span class="va">`Origin of manufacture`</span><span class="op">==</span><span class="st">"Total, country of manufacture"</span>,</span>
 <span>         <span class="va">`Vehicle type`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Passenger cars"</span>,<span class="st">"Trucks"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/normalize_cansim_db.html">normalize_cansim_db</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in transform_value_column(data, replacement_value): Unkown table type</span></span>
 <span></span>
 <span><span class="va">data.parquet</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
@@ -425,7 +424,6 @@ used in the same way across database formats.</p>
 <span>         <span class="va">`Origin of manufacture`</span><span class="op">==</span><span class="st">"Total, country of manufacture"</span>,</span>
 <span>         <span class="va">`Vehicle type`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Passenger cars"</span>,<span class="st">"Trucks"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/normalize_cansim_db.html">normalize_cansim_db</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in transform_value_column(data, replacement_value): Unkown table type</span></span>
 <span></span>
 <span><span class="va">data.feather</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
@@ -507,13 +505,13 @@ care to manage that space properly. The
 <code>list_cansim_sqlite_cached_tables</code> function gives us an
 overview over the cached data we have.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/list_cansim_dbs.html">list_cansim_dbs</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/list_cansim_cached_dbs.html">list_cansim_cached_dbs</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
 <span><span class="co">#&gt;   cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-02-06 <span style="color: #949494;">19:57:14</span> 9.9 Mb   10<span style="text-decoration: underline;">415</span>546</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-02-06 <span style="color: #949494;">19:57:12</span> 679.1 Kb   <span style="text-decoration: underline;">695</span>439</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-02-06 <span style="color: #949494;">19:57:16</span> 47.1 Mb  49<span style="text-decoration: underline;">434</span>624</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-02-06 <span style="color: #949494;">21:53:18</span> 9.9 Mb   10<span style="text-decoration: underline;">415</span>546</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-02-06 <span style="color: #949494;">21:53:17</span> 679.1 Kb   <span style="text-decoration: underline;">695</span>439</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-02-06 <span style="color: #949494;">21:53:19</span> 47.1 Mb  49<span style="text-decoration: underline;">434</span>624</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: title &lt;chr&gt;, path &lt;chr&gt;, timeReleased &lt;dttm&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
 </div>
@@ -524,7 +522,7 @@ overview over the cached data we have.</p>
 several tables. The following call will remove all cached “20-10-0001”
 tables in all formats and languages.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_cansim_dbs.html">remove_cansim_dbs</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_cansim_cached_dbs.html">remove_cansim_cached_dbs</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Removing feather cached data for 20-10-0001 (eng)</span></span>
 <span><span class="co">#&gt; Removing parquet cached data for 20-10-0001 (eng)</span></span>
 <span><span class="co">#&gt; Removing sqlite cached data for 20-10-0001 (eng)</span></span></code></pre></div>

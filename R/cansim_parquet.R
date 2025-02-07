@@ -43,8 +43,9 @@ get_cansim_db <- function(cansimTableNumber,
   cleaned_number <- cansimTableNumber
   cleaned_language <- cleaned_ndm_language(language)
   base_table <- naked_ndm_table_number(cansimTableNumber)
-  table_name<-paste0("cansim_",base_table,"_",format,"_",cleaned_language)
-  cache_path <- file.path(cache_path,table_name)
+  path_name<-paste0("cansim_",base_table,"_",format,"_",cleaned_language)
+  table_name<-paste0("cansim_",base_table,"_",cleaned_language)
+  cache_path <- file.path(cache_path,path_name)
   if (!dir.exists(cache_path)) dir.create(cache_path)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
   file_extension <- ifelse(format=="feather","arrow",format)
@@ -55,7 +56,7 @@ get_cansim_db <- function(cansimTableNumber,
   if (is.na(last_updated)) {
     warning("Could not determine if existing table is out of date.")
   } else {
-    last_downloaded <- list_cansim_dbs() %>%
+    last_downloaded <- list_cansim_cached_dbs() %>%
       filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format) %>%
       pull(.data$timeCached)
 
@@ -87,11 +88,11 @@ get_cansim_db <- function(cansimTableNumber,
     unlink(path)
 
     if(cleaned_language=="eng") {
-      message("Parsing data")
+      message("Parsing data to ",format,".")
       delim <- ","
       value_column="VALUE"
     } else {
-      message(paste0("Analyser les donn",intToUtf8(0x00E9),"es"))
+      message(paste0("Analyser les donn",intToUtf8(0x00E9),"es du ",format,"."))
       delim <- ";"
       value_column="VALEUR"
     }
@@ -100,7 +101,6 @@ get_cansim_db <- function(cansimTableNumber,
     meta <- suppressWarnings(readr::read_delim(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                                delim=delim,
                                                na=na_strings,
-                                               #col_names=FALSE,
                                                locale=readr::locale(encoding="UTF-8"),
                                                col_types = list(.default = "c")))
 
@@ -112,7 +112,6 @@ get_cansim_db <- function(cansimTableNumber,
 
     scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
     value_string <- ifelse(language=="fr","VALEUR","VALUE")
-    # scale_string2 <- ifelse(language=="fr","FACTEUR SCALAIRE","SCALAR_FACTOR")
 
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
@@ -126,11 +125,7 @@ get_cansim_db <- function(cansimTableNumber,
 
     meta2 <- readRDS(paste0(meta_base_path,"2"))
     geo_column_pos <- which(pull(meta2,dimension_name_column) %in% geography_columns)
-    # if (length(geo_column_pos)==0) {
-    #   geography_column <- ifelse(cleaned_language=="eng","Geography of origin",
-    #                              paste0("G",intToUtf8(0x00E9),"ographie d'origine"))
-    #   geo_column_pos <- which(pull(meta2,dimension_name_column)==geography_column)
-    # }
+
 
     if (length(geo_column_pos)>1) geo_column_pos <- geo_column_pos[1]
 
@@ -154,10 +149,6 @@ get_cansim_db <- function(cansimTableNumber,
       symbols <- which(header=="Symbols"|header=="Symboles")
     }
 
-    # symbols <- which(grepl("^Symbol( .+)*$",header,ignore.case = TRUE))
-    # if (length(symbols)==0) {
-    #   symbols <-  which(grepl("^Symbols( .+)*$",header,ignore.case = TRUE))
-    # }
 
     sl <- length(symbols)
 
@@ -165,12 +156,6 @@ get_cansim_db <- function(cansimTableNumber,
       header[symbols] <- paste0("Symbol ",seq(1,sl))
     }
 
-    # if (!(coordinate_column %in% header)) {
-    #   ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
-    #     if (length(ci)==1) {
-    #       header[ci] <- coordinate_column
-    #     }
-    # }
 
     if (!(coordinate_column %in% header)) {
       ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))
@@ -209,45 +194,32 @@ get_cansim_db <- function(cansimTableNumber,
                    attr(data,"language") <- cleaned_language
                    attr(data,"cansimTableNumber") <- cleaned_number
                    data <- data %>% transform_value_column(value_string)
-                   if (length(geo_column_pos)==1)
+                   if (length(geo_column_pos)==1) {
                      data <- data %>%
-                     fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
-                     select(-!!as.name(hierarchy_name))
+                       fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
+                       select(-!!as.name(hierarchy_name))
+                   }
                    if ("DGUID" %in% names(data) && "GeoUID" %in% names(data)) {
                      data <- data %>% relocate(.data$GeoUID,.before="DGUID")
                    }
                    data
                  })
     } else {
-
-    csv2arrow(file.path(exdir, paste0(base_table, ".csv")),
-              arrow_file = db_path,
-              format = format,
-              col_names = header,
-              na = na_strings,
-              value_column = value_string,
-               # transform=function(data){
-               #   attr(data,"language") <- cleaned_language
-               #   attr(data,"cansimTableNumber") <- cleaned_number
-               #   data <- data %>% transform_value_column(value_string)
-               #   if (length(geo_column_pos)==1)
-               #     data <- data %>%
-               #     fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
-               #     select(-!!as.name(hierarchy_name))
-               #   data
-               # },
-              delim = delim)
-
+      csv2arrow(file.path(exdir, paste0(base_table, ".csv")),
+                arrow_file = db_path,
+                format = format,
+                col_names = header,
+                na = na_strings,
+                value_column = value_string,
+                delim = delim)
     }
 
     unlink(exdir,recursive = TRUE)
 
     date_field=ifelse(cleaned_language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
 
-
     if (format=="sqlite") { # add indices
       fields <- pull(meta2,dimension_name_column) %>%
-        #gsub(geography_column,data_geography_column,.) %>%
         c(.,date_field,"DGUID")
 
       if (length(geo_column_pos)==1) fields <- c(fields,"GeoUID")
@@ -379,8 +351,6 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
   input <- arrow::read_delim_arrow(csv_file,
                                    skip=1,
                                    delim=delim,
-                                   #col_types=paste0(as.character(col_types),collapse=""),
-                                   #col_names=col_names,
                                    as_data_frame = FALSE,
                                    col_types=arrow_schema,
                                    na=na,
@@ -475,10 +445,10 @@ normalize_cansim_db <- function(connection,
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
-#' list_cansim_dbs()
+#' list_cansim_cached_dbs()
 #' }
 #' @export
-list_cansim_dbs <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
+list_cansim_cached_dbs <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
 
@@ -590,10 +560,10 @@ list_cansim_dbs <- function(cache_path=getOption("cansim.cache_path"),refresh=FA
 #' @examples
 #' \dontrun{
 #' con <- get_cansim_arrow("34-10-0013", format="parquet")
-#' remove_cansim_dbs("34-10-0013", format="parquet")
+#' remove_cansim_cached_dbs("34-10-0013", format="parquet")
 #' }
 #' @export
-remove_cansim_dbs <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
+remove_cansim_cached_dbs <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
                                               cache_path=getOption("cansim.cache_path")){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   format=tolower(format)
@@ -605,7 +575,7 @@ remove_cansim_dbs <- function(cansimTableNumber, format=c("parquet","feather","s
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- ifelse(is.null(language),c("eng","fra"),cleaned_ndm_language(language))
 
-  tables <- list_cansim_dbs(cache_path) %>%
+  tables <- list_cansim_cached_dbs(cache_path) %>%
     dplyr::filter(.data$cansimTableNumber %in% !!cansimTableNumber,
                   .data$language %in% cleaned_language,
                   .data$dataFormat %in% format)

@@ -158,7 +158,7 @@ data.parquet %>%
 Since we now have the option of a more permanent cache we should take care to manage that space properly. The `list_cansim_sqlite_cached_tables` function gives us an overview over the cached data we have.
 
 ```{r}
-list_cansim_dbs()
+list_cansim_cached_dbs()
 ```
 
 ## Removing cached data
@@ -167,7 +167,7 @@ list_cansim_dbs()
 If we want to free up disk space we can remove a cached table or several tables. The following call will remove all cached "20-10-0001" tables in all formats and languages.
 
 ```{r}
-remove_cansim_dbs("20-10-0001")
+remove_cansim_cached_dbs("20-10-0001")
 ```
 
 

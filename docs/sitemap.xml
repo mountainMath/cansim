@@ -139,10 +139,10 @@
     <loc>https://mountainmath.github.io/cansim/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_cubes.html</loc>
+    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_cached_dbs.html</loc>
   </url>
   <url>
-    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_dbs.html</loc>
+    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_cubes.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/list_cansim_sqlite_cached_tables.html</loc>
@@ -160,7 +160,7 @@
     <loc>https://mountainmath.github.io/cansim/reference/parse_metadata.html</loc>
   </url>
   <url>
-    <loc>https://mountainmath.github.io/cansim/reference/remove_cansim_dbs.html</loc>
+    <loc>https://mountainmath.github.io/cansim/reference/remove_cansim_cached_dbs.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/remove_cansim_sqlite_cached_table.html</loc>
