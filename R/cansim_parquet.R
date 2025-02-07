@@ -98,16 +98,17 @@ get_cansim_db <- function(cansimTableNumber,
     }
 
 
-    meta <- suppressWarnings(readr::read_delim(file.path(exdir, paste0(base_table, "_MetaData.csv")),
-                                               delim=delim,
-                                               na=na_strings,
-                                               locale=readr::locale(encoding="UTF-8"),
-                                               col_types = list(.default = "c")))
+    # meta <- suppressWarnings(readr::read_delim(file.path(exdir, paste0(base_table, "_MetaData.csv")),
+    #                                            delim=delim,
+    #                                            na=na_strings,
+    #                                            locale=readr::locale(encoding="UTF-8"),
+    #                                            col_types = list(.default = "c")))
 
-
+    meta_lines <- readr::read_lines(file.path(exdir, paste0(base_table, "_MetaData.csv")),
+                                    locale=readr::locale(encoding="UTF-8"))
 
     meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
-    parse_metadata(meta,data_path = meta_base_path)
+    parse_metadata2(meta_lines,data_path = meta_base_path)
 
 
     scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
