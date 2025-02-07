@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.17</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-11-06</h4>
+            <h4 data-toc-skip class="date">2025-02-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_large_tables.Rmd" class="external-link"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -164,14 +164,15 @@
 memory. However, some tables are so large that this is not a feasible
 strategy. Table <code>43-10-0024</code> is one such example and comes
 with a CSV file that is several gigabytes in size. In cases like this it
-is more useful to store and access the data as an SQLite database using
-the <code>get_cansim_sqlite</code> function instead of the usual
-<code>get_cansim</code>. In these circumstances it is also useful to
-cache the data for longer than just the current R session, and the
-<code>data_cache</code> option allows to specify a permanent location.
-It defaults to <code>getOption("cansim.cache_path")</code>, and if this
-option is not set it will only cache the data for the duration of the
-current session.</p>
+is more useful to store and access the data as a parquet, feather, or
+SQLite database format using the <code>get_cansim_db</code> function
+instead of the usual <code>get_cansim</code>. In these circumstances it
+is also useful to cache the data for longer than just the current R
+session, and the <code>data_cache</code> option allows to specify a
+permanent location. It defaults to
+<code>getOption("cansim.cache_path")</code>, and if this option is not
+set it will only cache the data for the duration of the current
+session.</p>
 <p>For this vignette we use the (rather small) motor vehicle sales data
 as an example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -188,15 +189,112 @@ as an example.</p>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mountainMath/cansim" class="external-link">cansim</a></span><span class="op">)</span></span></code></pre></div>
 <p>One main difference to the <code>get_cansim</code> method is that
-<code>get_cansim_sqlite</code> does not return data but only a
-connection to the database. This allows us to filter the data before
-fetching the data into memory. When this is called the first time it
-will fetch the data, parse it into an SQLite database, index the main
-columns. This can take a significant amount of time, depending on the
-size of the table. In any subsequent call it will simply open a database
-connection to the cached database.</p>
+<code>get_cansim_db</code> does not return data but only a connection to
+the database. This allows us to filter the data before fetching the data
+into memory. The package supports three formats with different
+advantages and disadvantages:</p>
+<ul>
+<li>
+<code>parquet</code>: This is the most efficient format for
+importing and storing data, but a bit slower when filtering and reading
+data.</li>
+<li>
+<code>feather</code>: This is a somewhat less efficient format for
+importing and storing data, but slightly faster than <em>parquet</em>
+when filtering and reading data.</li>
+<li>
+<code>sqlite</code>: This is fairly inefficient format for importing
+and storing data, taking a lot more disk space, time and a little more
+memory when importing and indexing, but after importing it allows for
+very efficient queries and filtering, and additionally allows for
+database level summary statistics.</li>
+</ul>
+<p>By default <code>get_cansim_db</code> uses the <em>parquet</em> data
+format as the best all-around solution, but in use cases of infrequently
+updating tables with lots of database queries in the meantime that need
+to be fast, and possibly the need for database level statistics, the
+<em>sqlite</em> format is likely preferable.</p>
+<p>When accessing cached data the package automatically checks if newer
+versions are available and issues a warning if the cached version is out
+of date. The <code>auto_update</code> argument can be set to
+<code>TRUE</code> to automatically refresh the table if needed, or this
+can be done manually by setting the <code>refresh</code> argument to
+<code>TRUE</code> when calling the function to force a refresh.</p>
+<div class="section level2 tabset tabset-pills">
+<h2 class="tabset tabset-pills" id="working-with-cached-tables">Working with cached tables<a class="anchor" aria-label="anchor" href="#working-with-cached-tables"></a>
+</h2>
+<p>If data is not cached the function will download the data first and
+convert it to the speficied format. The package is designed so that the
+differences in database formats are mostly abstracted away.</p>
+<div class="section level3 active">
+<h3 class="active" id="parquet">parquet<a class="anchor" aria-label="anchor" href="#parquet"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">connection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_sqlite.html">get_cansim_sqlite</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">connection.parquet</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_db.html">get_cansim_db</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span> <span class="co"># format='parquet' is the default</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span></span>
+<span><span class="co">#&gt; Parsing data</span></span>
+<span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.parquet</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Table (query)</span></span>
+<span><span class="co">#&gt; 163,168 rows x 19 columns</span></span>
+<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1946-01", "1946-01", "1946-01", "1946-01", "…</span></span>
+<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Canada", "Canada", "Canada", "Canada", "Cana…</span></span>
+<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "11124", "11124", "11124", "11124", "11124", …</span></span>
+<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "2016A000011124", "2016A000011124", "2016A000…</span></span>
+<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Total, new motor vehicles", "Total, new moto…</span></span>
+<span><span class="co">#&gt; $ `Origin of manufacture` <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Total, country of manufacture", "Total, coun…</span></span>
+<span><span class="co">#&gt; $ Sales                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Units", "Dollar…</span></span>
+<span><span class="co">#&gt; $ `Seasonal adjustment`   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Unadjusted", "Unadjusted", "Unadjusted", "Se…</span></span>
+<span><span class="co">#&gt; $ UOM                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Units", "Dollar…</span></span>
+<span><span class="co">#&gt; $ UOM_ID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "300", "81", "300", "300", "81", "300", "300"…</span></span>
+<span><span class="co">#&gt; $ SCALAR_FACTOR           <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "units ", "thousands", "units ", "units ", "t…</span></span>
+<span><span class="co">#&gt; $ SCALAR_ID               <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "3", "0", "0", "3", "0", "0", "3", "0", …</span></span>
+<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "v42169911", "v42169913", "v42169920", "v4216…</span></span>
+<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1.1.1.1.1", "1.1.1.2.1", "1.2.1.1.1", "1.2.1…</span></span>
+<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;double&gt;</span> 2756, 4507, 1102, 1468, 1604, 1654, 2037, 290…</span></span>
+<span><span class="co">#&gt; $ STATUS                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
+<span><span class="co">#&gt; $ SYMBOL                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
+<span><span class="co">#&gt; $ TERMINATED              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "t", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "t", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>,…</span></span>
+<span><span class="co">#&gt; $ DECIMALS                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "0", "0", "0", "0", "0", "0", "0", "0", …</span></span>
+<span><span class="co">#&gt; Call `print()` for query details</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="feather">feather<a class="anchor" aria-label="anchor" href="#feather"></a>
+</h3>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">connection.feather</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_db.html">get_cansim_db</a></span><span class="op">(</span><span class="st">"20-10-0001"</span>, format<span class="op">=</span><span class="st">'feather'</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span></span>
+<span><span class="co">#&gt; Parsing data</span></span>
+<span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.feather</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Table (query)</span></span>
+<span><span class="co">#&gt; 163,168 rows x 19 columns</span></span>
+<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1946-01", "1946-01", "1946-01", "1946-01", "…</span></span>
+<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Canada", "Canada", "Canada", "Canada", "Cana…</span></span>
+<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "11124", "11124", "11124", "11124", "11124", …</span></span>
+<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "2016A000011124", "2016A000011124", "2016A000…</span></span>
+<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Total, new motor vehicles", "Total, new moto…</span></span>
+<span><span class="co">#&gt; $ `Origin of manufacture` <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Total, country of manufacture", "Total, coun…</span></span>
+<span><span class="co">#&gt; $ Sales                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Units", "Dollar…</span></span>
+<span><span class="co">#&gt; $ `Seasonal adjustment`   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Unadjusted", "Unadjusted", "Unadjusted", "Se…</span></span>
+<span><span class="co">#&gt; $ UOM                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Units", "Dollar…</span></span>
+<span><span class="co">#&gt; $ UOM_ID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "300", "81", "300", "300", "81", "300", "300"…</span></span>
+<span><span class="co">#&gt; $ SCALAR_FACTOR           <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "units ", "thousands", "units ", "units ", "t…</span></span>
+<span><span class="co">#&gt; $ SCALAR_ID               <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "3", "0", "0", "3", "0", "0", "3", "0", …</span></span>
+<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "v42169911", "v42169913", "v42169920", "v4216…</span></span>
+<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1.1.1.1.1", "1.1.1.2.1", "1.2.1.1.1", "1.2.1…</span></span>
+<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;double&gt;</span> 2756, 4507, 1102, 1468, 1604, 1654, 2037, 290…</span></span>
+<span><span class="co">#&gt; $ STATUS                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
+<span><span class="co">#&gt; $ SYMBOL                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
+<span><span class="co">#&gt; $ TERMINATED              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "t", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "t", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>,…</span></span>
+<span><span class="co">#&gt; $ DECIMALS                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "0", "0", "0", "0", "0", "0", "0", "0", …</span></span>
+<span><span class="co">#&gt; Call `print()` for query details</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="sqlite">sqlite<a class="anchor" aria-label="anchor" href="#sqlite"></a>
+</h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">connection.sqlite</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_db.html">get_cansim_db</a></span><span class="op">(</span><span class="st">"20-10-0001"</span>, format<span class="op">=</span><span class="st">'sqlite'</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM product 20-10-0001 from Statistics Canada</span></span>
 <span><span class="co">#&gt; Parsing data</span></span>
 <span><span class="co">#&gt; Indexing GEO</span></span>
@@ -206,39 +304,43 @@ connection to the cached database.</p>
 <span><span class="co">#&gt; Indexing Seasonal adjustment</span></span>
 <span><span class="co">#&gt; Indexing REF_DATE</span></span>
 <span><span class="co">#&gt; Indexing DGUID</span></span>
-<span><span class="co">#&gt; Indexing GeoUID</span></span></code></pre></div>
-<p>We can inspect the data by looking at the first few columns to get a
-general idea of what the data looks like.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Source:   SQL [6 x 19]</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.45.2 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpbmRvh7/cansim_20100001_eng/20100001-eng.sqlite]</span></span></span>
-<span><span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type`     Origin of manufactur…¹ Sales</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 2016A000011124 Total, new motor … Total, country of man… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1946-01  Canada 2016A000011124 Total, new motor … Total, country of man… Doll…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1946-01  Canada 2016A000011124 Passenger cars     Total, country of man… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1946-01  Canada 2016A000011124 Passenger cars     Total, country of man… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1946-01  Canada 2016A000011124 Passenger cars     Total, country of man… Doll…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1946-01  Canada 2016A000011124 Trucks             Total, country of man… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 13 more variables: `Seasonal adjustment` &lt;chr&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   GeoUID &lt;chr&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Indexing GeoUID</span></span>
+<span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.sqlite</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: ??</span></span>
+<span><span class="co">#&gt; Columns: 19</span></span>
+<span><span class="co">#&gt; Database: sqlite 3.47.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/Rtmptuvn5J/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
+<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1946-01", "1946-01", "1946-01", "1946-01", "1…</span></span>
+<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Canada", "Canada", "Canada", "Canada", "Canad…</span></span>
+<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "11124", "11124", "11124", "11124", "11124", "…</span></span>
+<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "2016A000011124", "2016A000011124", "2016A0000…</span></span>
+<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Total, new motor vehicles", "Total, new motor…</span></span>
+<span><span class="co">#&gt; $ `Origin of manufacture` <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Total, country of manufacture", "Total, count…</span></span>
+<span><span class="co">#&gt; $ Sales                   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Units", "Dollars", "Units", "Units", "Dollars…</span></span>
+<span><span class="co">#&gt; $ `Seasonal adjustment`   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Unadjusted", "Unadjusted", "Unadjusted", "Sea…</span></span>
+<span><span class="co">#&gt; $ UOM                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Units", "Dollars", "Units", "Units", "Dollars…</span></span>
+<span><span class="co">#&gt; $ UOM_ID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "300", "81", "300", "300", "81", "300", "300",…</span></span>
+<span><span class="co">#&gt; $ SCALAR_FACTOR           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "units ", "thousands", "units ", "units ", "th…</span></span>
+<span><span class="co">#&gt; $ SCALAR_ID               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0", "3", "0", "0", "3", "0", "0", "3", "0", "…</span></span>
+<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "v42169911", "v42169913", "v42169920", "v42169…</span></span>
+<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1.1.1.1.1", "1.1.1.2.1", "1.2.1.1.1", "1.2.1.…</span></span>
+<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2756, 4507, 1102, 1468, 1604, 1654, 2037, 2903…</span></span>
+<span><span class="co">#&gt; $ STATUS                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>…</span></span>
+<span><span class="co">#&gt; $ SYMBOL                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>…</span></span>
+<span><span class="co">#&gt; $ TERMINATED              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "t", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "t", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, …</span></span>
+<span><span class="co">#&gt; $ DECIMALS                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0", "0", "0", "0", "0", "0", "0", "0", "0", "…</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="section"></h2>
 <p>To make good use of the data we will have to look at the metadata and
-inspect the member columns and variables available. The metadata will be
-available in the R session after the database connection has been
-opened. Trying to access the metadata before the connection has been
-opened will result in the package to attempt to download the data via
-the <code>get_cansim</code> call, which the
-<code>get_cansim_sqlite</code> function is trying to avoid.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+inspect the member columns and variables available.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading CANSIM NDM product 20-10-0001 information from cache.</span></span>
 <span><span class="co">#&gt; New motor vehicle sales</span></span>
 <span><span class="co">#&gt; CANSIM Table 20-10-0001</span></span>
-<span><span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2024-08-01, Frequency: Monthly</span></span>
+<span><span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2024-11-01, Frequency: Monthly</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Column Geography (11)</span></span>
 <span><span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia and the Territories, ...</span></span>
@@ -258,42 +360,136 @@ the <code>get_cansim</code> call, which the
 purpose of this vignette we are interested in the breakdown of sales
 units by Vehicle type in Canada overall. The data is stored in its raw
 form in the database, the only processing done is that it is augmented
-by the GeoUID. In order to work with it we need to <code>collect</code>
-the data. If the only operation done is filtering, and no selection or
-renaming of columns was done before accessing the data, we can utilize
-the custom <code>collect_and_normalize</code> function to collect and at
-the same time normalize the data so it will appear the same way as if we
-had used the <code>get_cansim</code> function. This will add the
-category and hierarchy metadata and the normalized value column.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">connection</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+by the GeoUID.</p>
+</div>
+<div class="section level2 tabset tabset-pills">
+<h2 class="tabset tabset-pills" id="filtering-and-loading-into-memory">Filtering and loading into memory<a class="anchor" aria-label="anchor" href="#filtering-and-loading-into-memory"></a>
+</h2>
+<p>In order to work with it we need to load it into memory, which is
+done by casting to a data frame via e.g. <code><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble()</a></code> for
+<em>parquet</em> and <em>feather</em> data formats for
+<code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> in case of <em>sqlite</em>. If the only operation
+done is filtering, and no selection or renaming of columns was done
+before accessing the data, we can utilize the custom
+<code>normalize_cansim_db</code> function to do this and at the same
+time normalize the data so it will appear the same way as if we had used
+the <code>get_cansim</code> function. This will add the category and
+hierarchy metadata and the normalized value column. In the case of
+<em>sqlite</em> connections we might want to pass the
+<code>disconnect = TRUE</code> argument in the
+<code>normalize_cansim_db</code> function to close the connection after
+normalizing the data, or do that manually at a later time via
+<code>disconnect_cansim_sqlite(connection)</code>. This is not required
+for <em>parquet</em> or <em>feather</em> connections.</p>
+<p>The <code><a href="../reference/normalize_cansim_db.html">normalize_cansim_db()</a></code> interface is designed to be
+used in the same way across database formats.</p>
+<div class="section level3 active">
+<h3 class="active" id="parquet-1">parquet<a class="anchor" aria-label="anchor" href="#parquet-1"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data.parquet</span> <span class="op">&lt;-</span> <span class="va">connection.parquet</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">GEO</span><span class="op">==</span><span class="st">"Canada"</span>,</span>
 <span>         <span class="va">`Seasonal adjustment`</span><span class="op">==</span><span class="st">"Unadjusted"</span>,</span>
 <span>         <span class="va">Sales</span><span class="op">==</span><span class="st">"Units"</span>,</span>
 <span>         <span class="va">`Origin of manufacture`</span><span class="op">==</span><span class="st">"Total, country of manufacture"</span>,</span>
 <span>         <span class="va">`Vehicle type`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Passenger cars"</span>,<span class="st">"Trucks"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/collect_and_normalize.html">collect_and_normalize</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="../reference/normalize_cansim_db.html">normalize_cansim_db</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in transform_value_column(data, replacement_value): Unkown table type</span></span>
 <span></span>
-<span><span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">data.parquet</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
-<span><span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type` `Origin of manufacture`    Sales</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1946-01  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1946-02  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1946-02  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1946-03  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1946-03  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: `Seasonal adjustment` &lt;fct&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt;   REF_DATE GEO    GeoUID DGUID       `Vehicle type` Origin of manufactur…¹ Sales</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1946-01  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1946-02  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1946-02  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1946-03  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1946-03  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: `Seasonal adjustment` &lt;fct&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   GeoUID &lt;chr&gt;, val_norm &lt;dbl&gt;, Date &lt;date&gt;, `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, Date &lt;date&gt;, `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Vehicle type` &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Vehicle type` &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Origin of manufacture` &lt;chr&gt;, …</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Vehicle type` &lt;chr&gt;, …</span></span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="feather-1">feather<a class="anchor" aria-label="anchor" href="#feather-1"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data.feather</span> <span class="op">&lt;-</span> <span class="va">connection.feather</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">GEO</span><span class="op">==</span><span class="st">"Canada"</span>,</span>
+<span>         <span class="va">`Seasonal adjustment`</span><span class="op">==</span><span class="st">"Unadjusted"</span>,</span>
+<span>         <span class="va">Sales</span><span class="op">==</span><span class="st">"Units"</span>,</span>
+<span>         <span class="va">`Origin of manufacture`</span><span class="op">==</span><span class="st">"Total, country of manufacture"</span>,</span>
+<span>         <span class="va">`Vehicle type`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Passenger cars"</span>,<span class="st">"Trucks"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/normalize_cansim_db.html">normalize_cansim_db</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in transform_value_column(data, replacement_value): Unkown table type</span></span>
+<span></span>
+<span><span class="va">data.feather</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
+<span><span class="co">#&gt;   REF_DATE GEO    GeoUID DGUID       `Vehicle type` Origin of manufactur…¹ Sales</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1946-01  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1946-02  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1946-02  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1946-03  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1946-03  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: `Seasonal adjustment` &lt;fct&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, Date &lt;date&gt;, `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Vehicle type` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Vehicle type` &lt;chr&gt;, …</span></span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="sqlite-1">sqlite<a class="anchor" aria-label="anchor" href="#sqlite-1"></a>
+</h3>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data.sqlite</span> <span class="op">&lt;-</span> <span class="va">connection.sqlite</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">GEO</span><span class="op">==</span><span class="st">"Canada"</span>,</span>
+<span>         <span class="va">`Seasonal adjustment`</span><span class="op">==</span><span class="st">"Unadjusted"</span>,</span>
+<span>         <span class="va">Sales</span><span class="op">==</span><span class="st">"Units"</span>,</span>
+<span>         <span class="va">`Origin of manufacture`</span><span class="op">==</span><span class="st">"Total, country of manufacture"</span>,</span>
+<span>         <span class="va">`Vehicle type`</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Passenger cars"</span>,<span class="st">"Trucks"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="../reference/normalize_cansim_db.html">normalize_cansim_db</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data.sqlite</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
+<span><span class="co">#&gt;   REF_DATE GEO    GeoUID DGUID       `Vehicle type` Origin of manufactur…¹ Sales</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1946-01  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1946-02  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1946-02  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1946-03  Canada 11124  2016A00001… Passenger cars Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1946-03  Canada 11124  2016A00001… Trucks         Total, country of man… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: `Seasonal adjustment` &lt;fct&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, Date &lt;date&gt;, `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Vehicle type` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Vehicle type` &lt;chr&gt;, …</span></span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="section-1"></h2>
+<p>We note that the syntax, and the resulting data frames, are
+identical.</p>
+</div>
+<div class="section level2">
+<h2 id="working-with-the-data">Working with the data<a class="anchor" aria-label="anchor" href="#working-with-the-data"></a>
+</h2>
+<p>With all three data formats producing the same output we can now work
+with the data as if it was fetched and subsequently filtered via
+<code>get_cansim</code>.</p>
 <p>Given the data we can further filter the date range and plot it.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data.parquet</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Date</span><span class="op">&gt;=</span><span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"1990-01-01"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Date</span>,y<span class="op">=</span><span class="va">val_norm</span>,color<span class="op">=</span><span class="va">`Vehicle type`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html" class="external-link">geom_smooth</a></span><span class="op">(</span>span<span class="op">=</span><span class="fl">0.2</span>,method <span class="op">=</span> <span class="st">'loess'</span>, formula <span class="op">=</span> <span class="va">y</span> <span class="op">~</span> <span class="va">x</span><span class="op">)</span> <span class="op">+</span></span>
@@ -301,12 +497,8 @@ category and hierarchy metadata and the normalized value column.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">d</span>,scale<span class="op">=</span><span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">3</span>,suffix<span class="op">=</span><span class="st">"k"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Canada new motor vehicle sales"</span>,caption<span class="op">=</span><span class="st">"StatCan Table 20-10-0001"</span>,</span>
 <span>       x<span class="op">=</span><span class="cn">NULL</span>,y<span class="op">=</span><span class="st">"Number of units"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="working_with_large_tables_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<p>When we don’t need the database connection any more we should
-remember to close it. This frees up resources and keeps the database
-handlers happy.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/disconnect_cansim_sqlite.html">disconnect_cansim_sqlite</a></span><span class="op">(</span><span class="va">connection</span><span class="op">)</span></span></code></pre></div>
+<p><img src="working_with_large_tables_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+</div>
 <div class="section level2">
 <h2 id="keeping-track-of-cached-data">Keeping track of cached data<a class="anchor" aria-label="anchor" href="#keeping-track-of-cached-data"></a>
 </h2>
@@ -314,21 +506,28 @@ handlers happy.</p>
 care to manage that space properly. The
 <code>list_cansim_sqlite_cached_tables</code> function gives us an
 overview over the cached data we have.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/list_cansim_sqlite_cached_tables.html">list_cansim_sqlite_cached_tables</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 8</span></span></span>
-<span><span class="co">#&gt;   cansimTableNumber language timeCached          sqliteSize title          path </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      2024-11-06 <span style="color: #949494;">07:53:19</span> 46.9 Mb    New motor veh… cans…</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
-<p>Cached data won’t update automatically, we will have to pass the
-<code>refresh=TRUE</code> option to refresh it manually when we want a
-fresh data pull from StatCan. If we want to free up disk space we can
-remove a cached table.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_cansim_sqlite_cached_table.html">remove_cansim_sqlite_cached_table</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Removing cached data for 20-10-0001 (eng)</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/list_cansim_dbs.html">list_cansim_dbs</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
+<span><span class="co">#&gt;   cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-02-06 <span style="color: #949494;">19:33:57</span> 9.9 Mb   10<span style="text-decoration: underline;">415</span>546</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-02-06 <span style="color: #949494;">19:33:52</span> 679.1 Kb   <span style="text-decoration: underline;">695</span>439</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-02-06 <span style="color: #949494;">19:34:00</span> 47.1 Mb  49<span style="text-decoration: underline;">434</span>624</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: title &lt;chr&gt;, path &lt;chr&gt;, timeReleased &lt;dttm&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="removing-cached-data">Removing cached data<a class="anchor" aria-label="anchor" href="#removing-cached-data"></a>
+</h2>
+<p>If we want to free up disk space we can remove a cached table or
+several tables. The following call will remove all cached “20-10-0001”
+tables in all formats and languages.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/remove_cansim_dbs.html">remove_cansim_dbs</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Removing feather cached data for 20-10-0001 (eng)</span></span>
+<span><span class="co">#&gt; Removing parquet cached data for 20-10-0001 (eng)</span></span>
+<span><span class="co">#&gt; Removing sqlite cached data for 20-10-0001 (eng)</span></span></code></pre></div>
 </div>
   </div>
 

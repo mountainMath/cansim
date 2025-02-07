@@ -46,3 +46,4 @@ head(con)
 disconnect_cansim_sqlite(con)
 }
 }
+\keyword{internal}

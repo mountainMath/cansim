@@ -17,10 +17,11 @@ reference:
   - title: SQLite database
     desc: Managing data in local SQLite database
   - contents:
-    - get_cansim_sqlite
+    - get_cansim_db
+    - normalize_cansim_db
+    - list_cansim_dbs
+    - remove_cansim_dbs
     - disconnect_cansim_sqlite
-    - list_cansim_sqlite_cached_tables
-    - remove_cansim_sqlite_cached_table
   - title: Locating data
   - contents:
     - list_cansim_cubes
@@ -42,20 +43,17 @@ reference:
   - title: Data transformation
   - contents:
     - normalize_cansim_values
-    - collect_and_normalize
   - title: Miscellaneous
   - contents:
     - add_provincial_abbreviations
     - cansim_old_to_new
     - get_cansim_code_set
-articles:
-  - title: "Working with the cansim package"
-    navbar: ~
-    contents:
-      - listing_cansim_tables
-      - retrieving_cansim_vectors
-      - working_with_hierarchies
-      - working_with_large_tables
+  - title: Deprecated methods
+  - contents:
+    - get_cansim_sqlite
+    - list_cansim_sqlite_cached_tables
+    - remove_cansim_sqlite_cached_table
+    - collect_and_normalize
 
 news:
   releases:

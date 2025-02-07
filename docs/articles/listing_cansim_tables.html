@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.17</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@
       <h1 data-toc-skip>Listing Statistics Canada data tables</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-11-06</h4>
+            <h4 data-toc-skip class="date">2025-02-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/listing_cansim_tables.Rmd" class="external-link"><code>vignettes/listing_cansim_tables.Rmd</code></a></small>
       <div class="hidden name"><code>listing_cansim_tables.Rmd</code></div>
@@ -181,9 +181,9 @@ notes, and table numbers.</p>
 <span><span class="co">#&gt;  [4] "productId"           "cansimId"            "cubeStartDate"      </span></span>
 <span><span class="co">#&gt;  [7] "cubeEndDate"         "releaseTime"         "archived"           </span></span>
 <span><span class="co">#&gt; [10] "subjectCode"         "surveyCode"          "frequencyCode"      </span></span>
-<span><span class="co">#&gt; [13] "corrections"         "dimensionNameEn"     "dimensionNameFr"    </span></span>
-<span><span class="co">#&gt; [16] "surveyEn"            "surveyFr"            "subjectEn"          </span></span>
-<span><span class="co">#&gt; [19] "subjectFr"</span></span></code></pre></div>
+<span><span class="co">#&gt; [13] "corrections"         "issueDate"           "dimensionNameEn"    </span></span>
+<span><span class="co">#&gt; [16] "dimensionNameFr"     "surveyEn"            "surveyFr"           </span></span>
+<span><span class="co">#&gt; [19] "subjectEn"           "subjectFr"</span></span></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the
 properties we want to use to find the appropriate tables.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -202,11 +202,13 @@ properties we want to use to find the appropriate tables.</p>
 <span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">cansim_table_number</span>,<span class="va">cubeTitleEn</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Retrieving cube information from temporary cache.</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 2</span></span></span>
 <span><span class="co">#&gt;   cansim_table_number cubeTitleEn                                               </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 14-10-0090          Labour force characteristics by province, territory and e…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 14-10-0293          Labour force characteristics by economic region, three-mo…</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 14-10-0293          Labour force characteristics by economic region, three-mo…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 14-10-0462          Labour force characteristics by economic region, three-mo…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 14-10-0464          Labour force characteristics by province, territory and e…</span></span></code></pre></div>
 <p>The search came up with two tables. In this example we are interested
 in the unemployment rate for 2015 onwards for the Lower Mainland,
 Vancouver Island, and Okanagan economic regions from the Labour Force

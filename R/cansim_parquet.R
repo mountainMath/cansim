@@ -213,6 +213,9 @@ get_cansim_db <- function(cansimTableNumber,
                      data <- data %>%
                      fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
                      select(-!!as.name(hierarchy_name))
+                   if ("DGUID" %in% names(data) && "GeoUID" %in% names(data)) {
+                     data <- data %>% relocate(GeoUID,.before="DGUID")
+                   }
                    data
                  })
     } else {

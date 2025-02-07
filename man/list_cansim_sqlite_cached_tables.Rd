@@ -25,3 +25,4 @@ List cached cansim SQLite database
 list_cansim_sqlite_cached_tables()
 }
 }
+\keyword{internal}

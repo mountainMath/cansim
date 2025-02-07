@@ -29,6 +29,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #'
 #' disconnect_cansim_sqlite(con)
 #' }
+#' @keywords internal
 #' @export
 get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, auto_refresh = FALSE,
                               timeout=1000,
@@ -84,6 +85,7 @@ disconnect_cansim_sqlite <- function(connection){
 #'
 #' disconnect_cansim_sqlite(con)
 #' }
+#' @keywords internal
 #' @export
 collect_and_normalize <- function(connection,
                                   replacement_value="val_norm", normalize_percent=TRUE,
@@ -114,6 +116,7 @@ collect_and_normalize <- function(connection,
 #' \dontrun{
 #' list_cansim_sqlite_cached_tables()
 #' }
+#' @keywords internal
 #' @export
 list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
   .Deprecated("list_cansim_dbs",
@@ -137,6 +140,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' disconnect_cansim_sqlite(con)
 #' remove_cansim_sqlite_cached_table("34-10-0013")
 #' }
+#' @keywords internal
 #' @export
 remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=getOption("cansim.cache_path")){
   .Deprecated("remove_cansim_dbs",

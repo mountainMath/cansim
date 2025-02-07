@@ -1,4 +1,7 @@
-# cansim 0.3.18
+# cansim 0.4
+## Major changes
+* add support for local caching in parquet and feather formats
+* uniform interface for sqlite, parquet, and feather caching
 ## Minor changes
 * fix problem with inconsistent type parsing of notes
 

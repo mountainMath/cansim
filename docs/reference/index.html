@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.17</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4</span>
       </span>
     </div>
 
@@ -135,21 +135,25 @@
           <p class="section-desc"></p><p>Managing data in local SQLite database</p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="get_cansim_sqlite.html">get_cansim_sqlite()</a></code> </p>
+          <p><code><a href="get_cansim_db.html">get_cansim_db()</a></code> </p>
         </td>
-        <td><p>Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection</p></td>
+        <td><p>Retrieve a Statistics Canada data table using NDM catalogue number as parquet, feather, or sqlite database connection</p></td>
+      </tr><tr><td>
+          <p><code><a href="normalize_cansim_db.html">normalize_cansim_db()</a></code> </p>
+        </td>
+        <td><p>Collect data from a parquet or feather query and normalize cansim table output</p></td>
+      </tr><tr><td>
+          <p><code><a href="list_cansim_dbs.html">list_cansim_dbs()</a></code> </p>
+        </td>
+        <td><p>List cached cansim arrow and SQlite databases</p></td>
+      </tr><tr><td>
+          <p><code><a href="remove_cansim_dbs.html">remove_cansim_dbs()</a></code> </p>
+        </td>
+        <td><p>Remove cached cansim SQLite and parquet database</p></td>
       </tr><tr><td>
           <p><code><a href="disconnect_cansim_sqlite.html">disconnect_cansim_sqlite()</a></code> </p>
         </td>
         <td><p>Disconnect from a cansim database connection</p></td>
-      </tr><tr><td>
-          <p><code><a href="list_cansim_sqlite_cached_tables.html">list_cansim_sqlite_cached_tables()</a></code> </p>
-        </td>
-        <td><p>List cached cansim SQLite database</p></td>
-      </tr><tr><td>
-          <p><code><a href="remove_cansim_sqlite_cached_table.html">remove_cansim_sqlite_cached_table()</a></code> </p>
-        </td>
-        <td><p>Remove cached cansim SQLite database</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="locating-data">Locating data <a href="#locating-data" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
@@ -242,10 +246,6 @@
           <p><code><a href="normalize_cansim_values.html">normalize_cansim_values()</a></code> </p>
         </td>
         <td><p>Normalize retrieved data table values to appropriate scales</p></td>
-      </tr><tr><td>
-          <p><code><a href="collect_and_normalize.html">collect_and_normalize()</a></code> </p>
-        </td>
-        <td><p>Collect data from connection and normalize cansim table output</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="miscellaneous">Miscellaneous <a href="#miscellaneous" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
@@ -262,6 +262,26 @@
           <p><code><a href="get_cansim_code_set.html">get_cansim_code_set()</a></code> </p>
         </td>
         <td><p>Get NDM code sets</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="deprecated-methods">Deprecated methods <a href="#deprecated-methods" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="get_cansim_sqlite.html">get_cansim_sqlite()</a></code> </p>
+        </td>
+        <td><p>Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection</p></td>
+      </tr><tr><td>
+          <p><code><a href="list_cansim_sqlite_cached_tables.html">list_cansim_sqlite_cached_tables()</a></code> </p>
+        </td>
+        <td><p>List cached cansim SQLite database</p></td>
+      </tr><tr><td>
+          <p><code><a href="remove_cansim_sqlite_cached_table.html">remove_cansim_sqlite_cached_table()</a></code> </p>
+        </td>
+        <td><p>Remove cached cansim SQLite database</p></td>
+      </tr><tr><td>
+          <p><code><a href="collect_and_normalize.html">collect_and_normalize()</a></code> </p>
+        </td>
+        <td><p>Collect data from connection and normalize cansim table output</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
