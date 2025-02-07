@@ -1,4 +1,4 @@
-#' Retrieve a Statistics Canada data table using NDM catalogue number as parquet or feather database connection
+#' Retrieve a Statistics Canada data table using NDM catalogue number as parquet, feather, or sqlite database connection
 #'
 #' Retrieves a data table using an NDM catalogue number as an parquet dataset Retrieved table data is
 #' cached permanently if a cache path is supplied or for duration of the current R session.
@@ -7,7 +7,7 @@
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
-#' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"} or \code{"feather"} (default is \code{"parquet"}).
+#' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param auto_refresh (Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
@@ -15,25 +15,28 @@
 #' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
 #  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
 #'
-#' @return A database connection to a local parquet database with the StatCan Table data.
+#' @return A database connection to a local parquet, feather, or sqlite database with the StatCan Table data.
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_arrow("34-10-0013")
+#' con <- get_cansim_db("34-10-0013")
 #'
 #' # Work with the data connection
 #' head(con) |> as.data.frame()
 #'
 #' }
 #' @export
-get_cansim_arrow <- function(cansimTableNumber, language="english",
-                             format="parquet",
-                             refresh=FALSE, auto_refresh = FALSE,
-                              timeout=1000,
-                              cache_path=getOption("cansim.cache_path")){
-  if (!c(format %in% c("parquet","feather")) || length(format)!=1) {
-    stop("format must be either 'parquet' or 'feather'")
+get_cansim_db <- function(cansimTableNumber,
+                          language="english",
+                          format="parquet",
+                          refresh=FALSE, auto_refresh = FALSE,
+                          timeout=1000,
+                          cache_path=getOption("cansim.cache_path")){
+
+  if (!c(format %in% c("parquet","feather","sqlite")) || length(format)!=1) {
+    stop("format must be either 'parquet', 'feather', or 'sqlite'.")
   }
+
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
@@ -44,28 +47,28 @@ get_cansim_arrow <- function(cansimTableNumber, language="english",
   cache_path <- file.path(cache_path,table_name)
   if (!dir.exists(cache_path)) dir.create(cache_path)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
-  file_extension <- ifelse(format=="parquet","parquet","arrow")
-  arrow_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".",file_extension)
+  file_extension <- ifelse(format=="feather","arrow",format)
+  db_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".",file_extension)
 
   last_updated <- tryCatch(get_cansim_table_last_release_date(cleaned_number), error=function(cond)return(NA))
 
   if (is.na(last_updated)) {
     warning("Could not determine if existing table is out of date.")
   } else {
-    last_downloaded <- list_cansim_cached_tables() %>%
+    last_downloaded <- list_cansim_dbs() %>%
       filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format) %>%
       pull(.data$timeCached)
 
-    if (file.exists(arrow_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
+    if (file.exists(db_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
         as.numeric(last_downloaded)<as.numeric(last_updated)) {
       message(paste0("A newer version of ",cansimTableNumber," is available, auto-refreshing the table..."))
       refresh=TRUE
-    } else if (file.exists(arrow_path) && auto_refresh && (is.na(last_updated)||is.na(last_downloaded))){
+    } else if (file.exists(db_path) && auto_refresh && (is.na(last_updated)||is.na(last_downloaded))){
       message(paste0("Could not determine if ",cansimTableNumber," is up to date..."))
     }
   }
 
-  if (refresh || !file.exists(arrow_path)){
+  if (refresh || !file.exists(db_path)){
     if (cleaned_language=="eng")
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
@@ -190,9 +193,32 @@ get_cansim_arrow <- function(cansimTableNumber, language="english",
                   ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."))
     }
 
+    if (format=="sqlite") {
+      chunk_size=ceiling(5000000/pmax(sl,1))
+
+      csv2sqlite(file.path(exdir, paste0(base_table, ".csv")),
+                 sqlite_file = db_path,
+                 table_name=table_name,
+                 col_types = list(.default = "c"),
+                 col_names = header,
+                 skip=1,
+                 na = na_strings,
+                 delim = delim,
+                 chunk_size=chunk_size,
+                 transform=function(data){
+                   attr(data,"language") <- cleaned_language
+                   attr(data,"cansimTableNumber") <- cleaned_number
+                   data <- data %>% transform_value_column(value_string)
+                   if (length(geo_column_pos)==1)
+                     data <- data %>%
+                     fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
+                     select(-!!as.name(hierarchy_name))
+                   data
+                 })
+    } else {
 
     csv2arrow(file.path(exdir, paste0(base_table, ".csv")),
-              arrow_file = arrow_path,
+              arrow_file = db_path,
               format = format,
               col_names = header,
               na = na_strings,
@@ -209,9 +235,39 @@ get_cansim_arrow <- function(cansimTableNumber, language="english",
                # },
               delim = delim)
 
+    }
+
     unlink(exdir,recursive = TRUE)
 
     date_field=ifelse(cleaned_language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
+
+
+    if (format=="sqlite") { # add indices
+      fields <- pull(meta2,dimension_name_column) %>%
+        #gsub(geography_column,data_geography_column,.) %>%
+        c(.,date_field,"DGUID")
+
+      if (length(geo_column_pos)==1) fields <- c(fields,"GeoUID")
+
+      con <- DBI::dbConnect(RSQLite::SQLite(), dbname=db_path)
+      db_fields <- con %>% tbl(table_name) %>% head(1) %>% collect() %>% names
+      for (field in fields) {
+        if (!(field %in% db_fields)) {
+          geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
+          data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+          if ((grepl(geography_column,field) || field %in% geography_columns )&& data_geography_column %in% db_fields) {
+            field=data_geography_column
+          }
+        }
+        if (field %in% db_fields) {
+          message(paste0("Indexing ",field))
+          create_index(con,table_name,field)
+        } else {
+          warning("Do not know how to index field ",field)
+        }
+      }
+      DBI::dbDisconnect(con)
+    }
 
     # saving timestamp
     saveRDS(strftime(time_check,format=TIME_FORMAT),paste0(meta_base_path,"_time"))
@@ -270,13 +326,15 @@ get_cansim_arrow <- function(cansimTableNumber, language="english",
   }
 
   if (format=="parquet") {
-    con <- arrow::read_parquet(arrow_path,as_data_frame = FALSE)
-  } else {
-    con <- arrow::read_feather(arrow_path,as_data_frame = FALSE)
-  }
-
-    con <- con |>
+    con <- arrow::read_parquet(db_path,as_data_frame = FALSE) |>
       mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1),.before=.data$DGUID)
+  } else if (format=="feather") {
+    con <- arrow::read_feather(db_path,as_data_frame = FALSE) |>
+      mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1),.before=.data$DGUID)
+  } else if (format=="sqlite") {
+    con <- DBI::dbConnect(RSQLite::SQLite(), dbname=db_path) %>%
+      dplyr::tbl(table_name)
+  }
 
   attr(con,"language") <- cleaned_language
   attr(con,"cansimTableNumber") <- cansimTableNumber
@@ -345,33 +403,51 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{FALSE}).
 #' @param strip_classification_code (Optional) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
+#' @param disconnect (Optional) Only used when format is sqlite. Logical value to indicate if the SQLite database connection should be disconnected. (Default is \code{FALSE})
 #' @return A tibble with the collected and normalized data
 #'
 #' @examples
 #' \dontrun{
 #' library(dplyr)
 #'
-#' con <- get_cansim_arrow("34-10-0013")
+#' con <- get_cansim_db("34-10-0013")
 #' data <- con %>%
 #'   filter(GEO=="Ontario") %>%
-#'   normalize_cansim_arrow()
+#'   normalize_cansim_db()
 #'
 #' }
 #' @export
 
-normalize_cansim_arrow <- function(connection,
+normalize_cansim_db <- function(connection,
                                    replacement_value="val_norm", normalize_percent=TRUE,
                                    default_month="07", default_day="01",
-                                   factors=TRUE,strip_classification_code=FALSE) {
+                                   factors=TRUE,strip_classification_code=FALSE,
+                                disconnect=FALSE) {
 
-  data <- connection |> dplyr::as_tibble()
-  attr(data,"language") <- attr(connection,"language")
   cansimTableNumber <- attr(connection,"cansimTableNumber")
-  attr(data,"cansimTableNumber") <- cansimTableNumber
+  data <- NULL
+  if ("tbl_sql" %in% class(connection)) {
+    data <- connection |> dplyr::collect()
+    attr(data,"language") <- attr(connection,"language")
+    attr(data,"cansimTableNumber") <- cansimTableNumber
+
+    if (disconnect) disconnect_cansim_sqlite(connection)
+  } else if ("arrow_dplyr_query" %in% class(connection)){
+    data <- connection |>
+      dplyr::as_tibble()
+    attr(data,"language") <- attr(connection,"language")
+    attr(data,"cansimTableNumber") <- cansimTableNumber
+
+    if (nrow(data)>0){
+      data <- data |>
+        transform_value_column(replacement_value)
+    }
+  } else {
+    stop("Don't know how to handle connections of class ",paste0(class(connection),collapse=", "))
+  }
 
   if (nrow(data)>0){
     data <- data %>%
-      transform_value_column(replacement_value) %>%
       normalize_cansim_values(replacement_value=replacement_value,
                               normalize_percent=normalize_percent,
                               default_month=default_month,
@@ -393,18 +469,50 @@ normalize_cansim_arrow <- function(connection,
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
-#' list_cansim_cached_tables()
+#' list_cansim_dbs()
 #' }
 #' @export
-list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
+list_cansim_dbs <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
-  result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_eng|cansim_\\d+_fra|cansim_\\d+_parquet_eng|cansim_\\d+_parquet_fra|cansim_\\d+_feather_eng|cansim_\\d+_feather_fra")) %>%
-    dplyr::mutate(cansimTableNumber=gsub("^cansim_|_eng$|_fra$|_parquet_eng$|_parquet_fra$","",.data$path) %>% cleaned_ndm_table_number()) %>%
+
+  # check for legacy tables
+  result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_eng|cansim_\\d+_fra"))
+  if (nrow(result)>0) {
+    message("Transitioning legacy sqlite tables...")
+    for (i in 1:nrow(result)){
+      path <- result$path[i]
+      full_path <- file.path(cache_path,path)
+      files <- dir(full_path)
+      if (length(files)==0||length(files[grepl("\\.sqlite$",files)])==0) {
+        message("No sqlite files found for ",path, " cleaning up....")
+        unlink(full_path, recursive=TRUE)
+      } else {
+        message("Transitioning ",path," to new format")
+        new_path <- path |>
+          gsub("_eng$","_sqlite_eng",x=_) |>
+          gsub("_fra$","_sqlite_fra",x=_)
+        full_new_path <- file.path(cache_path,new_path)
+        if (dir.exists(full_new_path)) {
+          message("Already have new sqlite table, removing legacy table ",path)
+          unlink(full_path,recursive=TRUE)
+        } else {
+          rr <- file.rename(full_path,full_new_path)
+          if (!rr) {
+            message("Problem transitioning ",path," please try to manually remove the leagacy table at ",full_path)
+          }
+        }
+      }
+    }
+  }
+
+  result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_parquet_eng|cansim_\\d+_parquet_fra|cansim_\\d+_feather_eng|cansim_\\d+_feather_fra|cansim_\\d+_sqlite_eng|cansim_\\d+_sqlite_fra")) %>%
+    dplyr::mutate(cansimTableNumber=gsub("^cansim_|_eng$|_fra$|_parquet_eng$|_parquet_fra|_feather_eng$|_feather_fra|_sqlite_eng$|_sqlte_fra$","",.data$path) %>% cleaned_ndm_table_number()) %>%
     dplyr::mutate(dataFormat=case_when(grepl("_parquet",.data$path)~"parquet",
                                      grepl("_feather",.data$path)~"feather",
-                                     TRUE ~ "sqlite")) %>%
-    dplyr::mutate(language=gsub("^cansim_\\d+_|^cansim_\\d+_parquet_|^cansim_\\d+_feather_","",.data$path)) %>%
+                                     grepl("_sqlite",.data$path)~"sqlite",
+                                     TRUE ~ "UNKNOWN")) %>%
+    dplyr::mutate(language=gsub("^cansim_\\d+_sqlite_|^cansim_\\d+_parquet_|^cansim_\\d+_feather_","",.data$path)) %>%
     dplyr::mutate(title=NA_character_,
                   timeCached=NA_character_,
                   rawSize=NA_real_,
@@ -476,10 +584,10 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 #' @examples
 #' \dontrun{
 #' con <- get_cansim_arrow("34-10-0013", format="parquet")
-#' remove_cansim_cached_table("34-10-0013", format="parquet")
+#' remove_cansim_dbs("34-10-0013", format="parquet")
 #' }
 #' @export
-remove_cansim_cached_table <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
+remove_cansim_dbs <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
                                               cache_path=getOption("cansim.cache_path")){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   format=tolower(format)
@@ -491,7 +599,7 @@ remove_cansim_cached_table <- function(cansimTableNumber, format=c("parquet","fe
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- ifelse(is.null(language),c("eng","fra"),cleaned_ndm_language(language))
 
-  tables <- list_cansim_cached_tables(cache_path) %>%
+  tables <- list_cansim_dbs(cache_path) %>%
     dplyr::filter(.data$cansimTableNumber %in% !!cansimTableNumber,
                   .data$language %in% cleaned_language,
                   .data$dataFormat %in% format)
