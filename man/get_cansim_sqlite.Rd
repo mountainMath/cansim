@@ -38,10 +38,10 @@ if the cached table is out of date.
 }
 \examples{
 \dontrun{
-con <- get_cansim_sqlite("34-10-0013")
+con <- get_cansim_db("34-10-0013", format="sqlite")
 
 # Work with the data connection
-head(con)
+gplimpse(con)
 
 disconnect_cansim_sqlite(con)
 }

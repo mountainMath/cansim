@@ -44,7 +44,7 @@ if the cached table is out of date.
 con <- get_cansim_db("34-10-0013")
 
 # Work with the data connection
-head(con) |> as.data.frame()
+glimpse(con)
 
 }
 }

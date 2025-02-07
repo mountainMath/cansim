@@ -43,12 +43,11 @@ Collect data from connection and normalize cansim table output
 \dontrun{
 library(dplyr)
 
-con <- get_cansim_sqlite("34-10-0013")
+con <- get_cansim_db("34-10-0013", format="sqlite")
 data <- con \%>\%
   filter(GEO=="Ontario") \%>\%
-  collect_and_normalize()
+  normalize_cansim_sb(disconnect=TRUE)
 
-disconnect_cansim_sqlite(con)
 }
 }
 \keyword{internal}

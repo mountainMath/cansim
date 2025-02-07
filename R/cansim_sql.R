@@ -22,10 +22,10 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_sqlite("34-10-0013")
+#' con <- get_cansim_db("34-10-0013", format="sqlite")
 #'
 #' # Work with the data connection
-#' head(con)
+#' gplimpse(con)
 #'
 #' disconnect_cansim_sqlite(con)
 #' }
@@ -39,7 +39,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
               msg="This function has been deprecated, it will be removed in future versions. Please use get_cansim_db(..., format='sqlite'') instead.")
 
   get_cansim_db(cansimTableNumber=cansimTableNumber,
-                language=langauge,
+                language=language,
                 refresh=refresh,
                 auto_refresh = auto_refresh,
                 timeout=timeout,
@@ -78,12 +78,11 @@ disconnect_cansim_sqlite <- function(connection){
 #' \dontrun{
 #' library(dplyr)
 #'
-#' con <- get_cansim_sqlite("34-10-0013")
+#' con <- get_cansim_db("34-10-0013", format="sqlite")
 #' data <- con %>%
 #'   filter(GEO=="Ontario") %>%
-#'   collect_and_normalize()
+#'   normalize_cansim_sb(disconnect=TRUE)
 #'
-#' disconnect_cansim_sqlite(con)
 #' }
 #' @keywords internal
 #' @export
@@ -114,7 +113,7 @@ collect_and_normalize <- function(connection,
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
-#' list_cansim_sqlite_cached_tables()
+#' list_cansim_sqlite_dbs()
 #' }
 #' @keywords internal
 #' @export
@@ -136,9 +135,9 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_sqlite("34-10-0013")
+#' con <- get_cansim_db("34-10-0013", format="sqlite)
 #' disconnect_cansim_sqlite(con)
-#' remove_cansim_sqlite_cached_table("34-10-0013")
+#' remove_cansim_dbs("34-10-0013", format="sqlite")
 #' }
 #' @keywords internal
 #' @export

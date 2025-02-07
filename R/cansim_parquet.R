@@ -22,7 +22,7 @@
 #' con <- get_cansim_db("34-10-0013")
 #'
 #' # Work with the data connection
-#' head(con) |> as.data.frame()
+#' glimpse(con)
 #'
 #' }
 #' @export
@@ -214,7 +214,7 @@ get_cansim_db <- function(cansimTableNumber,
                      fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
                      select(-!!as.name(hierarchy_name))
                    if ("DGUID" %in% names(data) && "GeoUID" %in% names(data)) {
-                     data <- data %>% relocate(GeoUID,.before="DGUID")
+                     data <- data %>% relocate(.data$GeoUID,.before="DGUID")
                    }
                    data
                  })
