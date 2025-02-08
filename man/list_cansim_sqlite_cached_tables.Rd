@@ -22,7 +22,7 @@ List cached cansim SQLite database
 }
 \examples{
 \dontrun{
-list_cansim_cached_dbs()
+list_cansim_cached_tables()
 }
 }
 \keyword{internal}

@@ -18,9 +18,9 @@ reference:
     desc: Managing data in local SQLite database
   - contents:
     - get_cansim_db
-    - normalize_cansim_db
-    - list_cansim_cached_dbs
-    - remove_cansim_cached_dbs
+    - collect_and_normalize
+    - list_cansim_cached_tables
+    - remove_cansim_cached_tables
     - disconnect_cansim_sqlite
   - title: Locating data
   - contents:

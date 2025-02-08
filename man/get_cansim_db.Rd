@@ -8,6 +8,7 @@ get_cansim_db(
   cansimTableNumber,
   language = "english",
   format = "parquet",
+  partitioning = c(),
   refresh = FALSE,
   auto_refresh = FALSE,
   timeout = 1000,
@@ -20,6 +21,8 @@ get_cansim_db(
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
 \item{format}{(Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).}
+
+\item{partitioning}{(Optional) Partition columns to use for parquet or feather formats.}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 

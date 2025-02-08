@@ -123,6 +123,7 @@
 <span>  format <span class="op">=</span> <span class="st">"parquet"</span>,</span>
 <span>  <span class="va">col_names</span>,</span>
 <span>  value_column <span class="op">=</span> <span class="st">"VALUE"</span>,</span>
+<span>  partitioning <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  na <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">".."</span>, <span class="st">""</span>, <span class="st">"..."</span>, <span class="st">"F"</span><span class="op">)</span>,</span>
 <span>  text_encoding <span class="op">=</span> <span class="st">"UTF-8"</span>,</span>
 <span>  delim <span class="op">=</span> <span class="st">","</span></span>
@@ -149,6 +150,10 @@
 
 <dt>value_column</dt>
 <dd><p>name of the value column with numeric data</p></dd>
+
+
+<dt>partitioning</dt>
+<dd><p>optional partition columns</p></dd>
 
 
 <dt>na</dt>

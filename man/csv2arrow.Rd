@@ -10,6 +10,7 @@ csv2arrow(
   format = "parquet",
   col_names,
   value_column = "VALUE",
+  partitioning = c(),
   na = c(NA, "..", "", "...", "F"),
   text_encoding = "UTF-8",
   delim = ","
@@ -25,6 +26,8 @@ csv2arrow(
 \item{col_names}{column names of the csv file}
 
 \item{value_column}{name of the value column with numeric data}
+
+\item{partitioning}{optional partition columns}
 
 \item{na}{na character strings}
 

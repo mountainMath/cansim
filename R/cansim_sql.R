@@ -61,49 +61,7 @@ disconnect_cansim_sqlite <- function(connection){
   DBI::dbDisconnect(connection$src$con)
 }
 
-#' Collect data from connection and normalize cansim table output
-#'
-#' @param connection A connection to a local StatCan table SQLite database as returned by \code{get_cansim_sqlite},
-#' possibly with filters or other \code{dbplyr} verbs applied
-#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.
-#' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
-#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
-#' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{FALSE}).
-#' @param strip_classification_code (Optional) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
-#' @param disconnect (Optional) Logical value to indicate if the database connection should be disconnected. (Default is \code{FALSE})
-#' @return A tibble with the collected and normalized data
-#'
-#' @examples
-#' \dontrun{
-#' library(dplyr)
-#'
-#' con <- get_cansim_db("34-10-0013", format="sqlite")
-#' data <- con %>%
-#'   filter(GEO=="Ontario") %>%
-#'   normalize_cansim_sb(disconnect=TRUE)
-#'
-#' }
-#' @keywords internal
-#' @export
-collect_and_normalize <- function(connection,
-                                  replacement_value="val_norm", normalize_percent=TRUE,
-                                  default_month="07", default_day="01",
-                                  factors=TRUE,strip_classification_code=FALSE,
-                                  disconnect=FALSE){
-  .Deprecated("normalize_cansim_db",
-              package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use normalize_cansim_db(...) instead.")
 
-  normalize_cansim_db(connection,
-                      replacement_value=replacement_value,
-                      normalize_percent=normalize_percent,
-                      default_month=default_month,
-                      default_day=default_day,
-                      factors=factors,
-                      strip_classification_code=strip_classification_code,
-                      disconnect=disconnect)
-}
 
 
 #' List cached cansim SQLite database
@@ -113,16 +71,16 @@ collect_and_normalize <- function(connection,
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
-#' list_cansim_cached_dbs()
+#' list_cansim_cached_tables()
 #' }
 #' @keywords internal
 #' @export
 list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
-  .Deprecated("list_cansim_cached_dbs",
+  .Deprecated("list_cansim_cached_tables",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cached_dbs(...) instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cached_tables(...) instead.")
 
-  list_cansim_cached_dbs(cache_path=cache_path, refresh=refresh)
+  list_cansim_cached_tables(cache_path=cache_path, refresh=refresh)
 }
 
 #' Remove cached cansim SQLite database
@@ -137,16 +95,16 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' \dontrun{
 #' con <- get_cansim_db("34-10-0013", format="sqlite")
 #' disconnect_cansim_sqlite(con)
-#' remove_cansim_cached_dbs("34-10-0013", format="sqlite")
+#' remove_cansim_cached_tables("34-10-0013", format="sqlite")
 #' }
 #' @keywords internal
 #' @export
 remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=getOption("cansim.cache_path")){
-  .Deprecated("remove_cansim_cached_dbs",
+  .Deprecated("remove_cansim_cached_tables",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use remove_cansim_cached_dbs(..., format='sqlite'') instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use remove_cansim_cached_tables(..., format='sqlite'') instead.")
 
-  remove_cansim_cached_dbs(cansimTableNumber=cansimTableNumber,language=language,format="sqlite",cache_path=cache_path)
+  remove_cansim_cached_tables(cansimTableNumber=cansimTableNumber,language=language,format="sqlite",cache_path=cache_path)
 }
 
 

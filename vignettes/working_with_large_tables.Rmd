@@ -84,9 +84,9 @@ This gives us an understanding of the available variables. For the purpose of th
 
 ## Filtering and loading into memory {.tabset .tabset-pills}
 
-In order to work with it we need to load it into memory, which is done by casting to a data frame via e.g. `as_tibble()` for *parquet* and *feather* data formats for `collect()` in case of *sqlite*. If the only operation done is filtering, and no selection or renaming of columns was done before accessing the data, we can utilize the custom `normalize_cansim_db` function to do this and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column. In the case of *sqlite* connections we might want to pass the `disconnect = TRUE` argument in the `normalize_cansim_db` function to close the connection after normalizing the data, or do that manually at a later time via `disconnect_cansim_sqlite(connection)`. This is not required for *parquet* or *feather* connections.
+In order to work with the data we need to load it into memory, which is done calling `collect()` on the connection object. If we want to make use of the additional metadata and processing the *cansim* package usually does and the main operations done on the connection were filtering (and not renaming or de-selecing columns needed for enriching with metadata) then we can utilize the custom `collect_and_normalize` function to do this and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column. In the case of *sqlite* connections we might want to pass the `disconnect = TRUE` argument in the `collect_and_normalize` function to close the connection after normalizing the data, or do that manually at a later time via `disconnect_cansim_sqlite(connection)`. This is not required for *parquet* or *feather* connections.
 
-The `normalize_cansim_db()` interface is designed to be used in the same way across database formats.
+The `collect_and_normalize()` interface is designed to be used in the same way across database formats.
 
 ### parquet {.active}
 
@@ -97,7 +97,7 @@ data.parquet <- connection.parquet %>%
          Sales=="Units",
          `Origin of manufacture`=="Total, country of manufacture",
          `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
-  normalize_cansim_db()
+  collect_and_normalize()
 
 data.parquet %>% head()
 ```
@@ -111,7 +111,7 @@ data.feather <- connection.feather %>%
          Sales=="Units",
          `Origin of manufacture`=="Total, country of manufacture",
          `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
-  normalize_cansim_db()
+  collect_and_normalize()
 
 data.feather %>% head()
 ```
@@ -125,7 +125,7 @@ data.sqlite <- connection.sqlite %>%
          Sales=="Units",
          `Origin of manufacture`=="Total, country of manufacture",
          `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
-  normalize_cansim_db()
+  collect_and_normalize()
 
 data.sqlite %>% head()
 ```
@@ -152,23 +152,29 @@ data.parquet %>%
 ```
 
 
+## Partitioning
+
+To improve read performance of *parquet* and *feather* data one can specify a `partioning` argument when calling `get_cansim_db`. This will partition the data by the specified columns. This can be useful when filtering by these columns as it will only read the relevant partitions and greatly increase read performance with a sight cost to size on disk. If for example a dataset is mostly accessed by filtering on geographic regions, it migh be useful to partition by `GeoUID`, or the `GEO` column if querying data by name. More than one partitioning column can be specified, but this is only helpful for very large datasets with a high number of dimensions. A *parquet* dataset that is partitioned with the subsequent queries in mind is often faster in data retrieval than an index SQLite database. The [*arrow* package](https://arrow.apache.org/docs/r/) has more guidance on partitioning and the tradeoffs.
+
+Partitioning happens on initial data import and stays fixed afterward, regardless of how partitioning is specified in subsequent calls. If data should be repartitioned it needs to be re-downloaded.
+
 
 ## Keeping track of cached data
 
 Since we now have the option of a more permanent cache we should take care to manage that space properly. The `list_cansim_sqlite_cached_tables` function gives us an overview over the cached data we have.
 
 ```{r}
-list_cansim_cached_dbs()
+list_cansim_cached_tables()
 ```
 
 ## Removing cached data
 
 
-If we want to free up disk space we can remove a cached table or several tables. The following call will remove all cached "20-10-0001" tables in all formats and languages.
+If we want to free up disk space we can remove a cached table or several tables. The following call will remove all cached "20-10-0001" tables in all formats and languages. Before that we disconnect the connection to the *sqlite* database.
 
 ```{r}
-remove_cansim_cached_dbs("20-10-0001")
+disconnect_cansim_sqlite(connection.sqlite)
+remove_cansim_cached_tables("20-10-0001")
 ```
-
 
 

@@ -8,6 +8,7 @@
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
+#' @param partitioning (Optional) Partition columns to use for parquet or feather formats.
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param auto_refresh (Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
@@ -29,6 +30,7 @@
 get_cansim_db <- function(cansimTableNumber,
                           language="english",
                           format="parquet",
+                          partitioning=c(),
                           refresh=FALSE, auto_refresh = FALSE,
                           timeout=1000,
                           cache_path=getOption("cansim.cache_path")){
@@ -56,7 +58,7 @@ get_cansim_db <- function(cansimTableNumber,
   if (is.na(last_updated)) {
     warning("Could not determine if existing table is out of date.")
   } else {
-    last_downloaded <- list_cansim_cached_dbs() %>%
+    last_downloaded <- list_cansim_cached_tables() %>%
       filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format) %>%
       pull(.data$timeCached)
 
@@ -210,6 +212,7 @@ get_cansim_db <- function(cansimTableNumber,
                 arrow_file = db_path,
                 format = format,
                 col_names = header,
+                partitioning = partitioning,
                 na = na_strings,
                 value_column = value_string,
                 delim = delim)
@@ -301,13 +304,18 @@ get_cansim_db <- function(cansimTableNumber,
     for (f in meta_files) file.copy(file.path(meta_dir_name,f),file.path(meta_base_path,f))
   }
 
-  if (format=="parquet") {
-    con <- arrow::read_parquet(db_path,as_data_frame = FALSE) |>
-      mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1),.before=.data$DGUID)
-  } else if (format=="feather") {
-    con <- arrow::read_feather(db_path,as_data_frame = FALSE) |>
-      mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1),.before=.data$DGUID)
-  } else if (format=="sqlite") {
+  if (format %in% c("parquet","feather")) {
+
+    schema_path <- file.path(dirname(db_path),paste0(basename(db_path),".schema"))
+    if (file.exists(schema_path)) { # workaround when arrow drops schema info for partitioning variables
+      arrow_schema <- arrow::open_dataset(schema_path,format=format) |> arrow::schema()
+      # workaround for arrow dropping attributes
+      arrow_schema <- arrow_schema$WithMetadata(list("cansimTableNumber"=cansimTableNumber,"language"=cleaned_language))
+      con <- arrow::open_dataset(db_path,format=format, schema=arrow_schema)
+    } else {
+      con <- arrow::open_dataset(db_path,format=format)
+    }
+  } else {
     con <- DBI::dbConnect(RSQLite::SQLite(), dbname=db_path) %>%
       dplyr::tbl(table_name)
   }
@@ -326,6 +334,7 @@ get_cansim_db <- function(cansimTableNumber,
 #' @param format format of arrow file, "parquet" or "feather" (default parquet)
 #' @param col_names column names of the csv file
 #' @param value_column name of the value column with numeric data
+#' @param partitioning optional partition columns
 #' @param na na character strings
 #' @param text_encoding encoding of csv file (default UTF-8)
 #' @param delim (Optional) csv deliminator, default is ","
@@ -334,10 +343,12 @@ get_cansim_db <- function(cansimTableNumber,
 #' @keywords internal
 csv2arrow <- function(csv_file, arrow_file, format="parquet",
                       col_names, value_column = "VALUE",
+                      partitioning = c(),
                        na=c(NA,"..","","...","F"),
                        text_encoding="UTF-8",delim = ",") {
 
-  if (file.exists(arrow_file)) file.remove(arrow_file)
+  if (file.exists(arrow_file)) unlink(arrow_file,recursive=TRUE)
+
   value_columns <- col_names[col_names==value_column| grepl(" \\(\\d+[A-Z]*\\)\\:.+\\[\\d+\\]$",col_names)]
 
   col_types <- setNames(rep("c",length(col_names)),col_names)
@@ -359,15 +370,29 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
                                                                           skip_rows=1,
                                                                           column_names=col_names))
 
-  if (format=="feather")
-    arrow::write_feather(input, arrow_file)
-  else if (format=="parquet") {
-    arrow::write_parquet(input, arrow_file)
+  if ("DGUID" %in% names(input)) {
+    input <- input |>
+      mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1) |> as.character()) # ,.before=.data$DGUID)
   }
+
+  if (!is.null(partitioning) && length(partitioning)>0) {
+    if (setdiff(partitioning,names(input)) |> length() > 0) {
+      stop("Partition columns must be present in the input data")
+    }
+  }
+
+  if (format=="feather" && arrow::codec_is_available("LZ4_FRAME")) {
+    arrow::write_dataset(input, format=format, arrow_file,partition=partitioning,codec=arrow::Codec$create("LZ4_FRAME"))
+  } else {
+    arrow::write_dataset(input, format=format, arrow_file,partition=partitioning)
+  }
+  # workaround when arrow drops schema info for partitioning variables
+  schema_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".schema"))
+  arrow::write_dataset(input |> dplyr::slice_head(n=1), format=format, schema_path)
 }
 
 
-#' Collect data from a parquet or feather query and normalize cansim table output
+#' Collect data from a parquet, feather or sqlite query and normalize cansim table output
 #'
 #' @param connection A connection to a local arrow connection as returned by \code{get_cansim_arrow},
 #' possibly with filters or other \code{dplyr} verbs applied
@@ -387,19 +412,29 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
 #' con <- get_cansim_db("34-10-0013")
 #' data <- con %>%
 #'   filter(GEO=="Ontario") %>%
-#'   normalize_cansim_db()
+#'   collect_and_normalize()
 #'
 #' }
 #' @export
 
-normalize_cansim_db <- function(connection,
-                                   replacement_value="val_norm", normalize_percent=TRUE,
-                                   default_month="07", default_day="01",
-                                   factors=TRUE,strip_classification_code=FALSE,
+collect_and_normalize <- function(connection,
+                                replacement_value="val_norm", normalize_percent=TRUE,
+                                default_month="07", default_day="01",
+                                factors=TRUE,strip_classification_code=FALSE,
                                 disconnect=FALSE) {
 
   cansimTableNumber <- attr(connection,"cansimTableNumber")
   language <- attr(connection,"language")
+
+  if ((is.null(language)||is.null(cansimTableNumber))&& ("arrow_dplyr_query" %in% class(connection))) {
+    md <- arrow::schema(connection)$metadata
+    cansimTableNumber <- md$cansimTableNumber
+    language <- md$language
+    if ((is.null(language)||is.null(cansimTableNumber))) {
+      stop("Connection does not have the necessary attributes to normalize the data")
+    }
+  }
+
   value_string <- ifelse(language=="fr","VALEUR","VALUE")
 
   data <- NULL
@@ -446,10 +481,10 @@ normalize_cansim_db <- function(connection,
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
 #' \dontrun{
-#' list_cansim_cached_dbs()
+#' list_cansim_cached_tables()
 #' }
 #' @export
-list_cansim_cached_dbs <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
+list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
 
@@ -493,9 +528,13 @@ list_cansim_cached_dbs <- function(cache_path=getOption("cansim.cache_path"),ref
     dplyr::mutate(title=NA_character_,
                   timeCached=NA_character_,
                   rawSize=NA_real_,
-                  niceSize=NA_character_) %>%
-    dplyr::select(.data$cansimTableNumber,.data$language,.data$dataFormat,.data$timeCached,.data$niceSize,.data$rawSize,
-                  .data$title,.data$path)
+                  niceSize=NA_character_)
+
+    if (nrow(result)>0) {
+      result <- result |>
+        dplyr::select(.data$cansimTableNumber,.data$language,.data$dataFormat,.data$timeCached,.data$niceSize,.data$rawSize,
+                      .data$title,.data$path)
+    }
 
   if (nrow(result)>0) {
     result$timeCached <- do.call("c",
@@ -510,9 +549,17 @@ list_cansim_cached_dbs <- function(cache_path=getOption("cansim.cache_path"),ref
                                        }))
     result$rawSize <- do.call("c",
                            lapply(result$path,function(p){
-                             pp <- dir(file.path(cache_path,p),"\\.sqlite|\\.arrow|\\.parquet")
+                             pp <- dir(file.path(cache_path,p),"\\.sqlite$|\\.arrow$|\\.parquet$")
                              if (length(pp)==1) {
-                               d<-file.size(file.path(cache_path,p,pp))
+                               file_path <- file.path(cache_path,p,pp)
+                               if (dir.exists(file_path)) {
+                                 d<-list.files(file.path(cache_path,p,pp),full.names = TRUE,recursive = TRUE) |>
+                                   lapply(file.size) |>
+                                   unlist() |>
+                                   sum()
+                               } else {
+                                d<-file.size(file.path(cache_path,p,pp))
+                               }
                              } else {
                                d <- NA_real_
                              }
@@ -560,11 +607,11 @@ list_cansim_cached_dbs <- function(cache_path=getOption("cansim.cache_path"),ref
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_arrow("34-10-0013", format="parquet")
-#' remove_cansim_cached_dbs("34-10-0013", format="parquet")
+#' con <- get_cansim_db("34-10-0013", format="parquet")
+#' remove_cansim_cached_tables("34-10-0013", format="parquet")
 #' }
 #' @export
-remove_cansim_cached_dbs <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
+remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
                                               cache_path=getOption("cansim.cache_path")){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   format=tolower(format)
@@ -576,7 +623,7 @@ remove_cansim_cached_dbs <- function(cansimTableNumber, format=c("parquet","feat
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- ifelse(is.null(language),c("eng","fra"),cleaned_ndm_language(language))
 
-  tables <- list_cansim_cached_dbs(cache_path) %>%
+  tables <- list_cansim_cached_tables(cache_path) %>%
     dplyr::filter(.data$cansimTableNumber %in% !!cansimTableNumber,
                   .data$language %in% cleaned_language,
                   .data$dataFormat %in% format)
