@@ -22,6 +22,7 @@ reference:
     - list_cansim_cached_tables
     - remove_cansim_cached_tables
     - disconnect_cansim_sqlite
+    - cansim_repartition_cached_table
   - title: Locating data
   - contents:
     - list_cansim_cubes

@@ -151,7 +151,7 @@
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-02-07</h4>
+            <h4 data-toc-skip class="date">2025-02-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_large_tables.Rmd" class="external-link"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -309,7 +309,7 @@ differences in database formats are mostly abstracted away.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.sqlite</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 19</span></span>
-<span><span class="co">#&gt; Database: sqlite 3.47.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmptYUWX0/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
+<span><span class="co">#&gt; Database: sqlite 3.47.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/Rtmp64bj4x/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
 <span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1946-01", "1946-01", "1946-01", "1946-01", "1…</span></span>
 <span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Canada", "Canada", "Canada", "Canada", "Canad…</span></span>
 <span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "11124", "11124", "11124", "11124", "11124", "…</span></span>
@@ -399,12 +399,12 @@ used in the same way across database formats.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
 <span><span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type` `Origin of manufacture`    Sales</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1970-03  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1970-03  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1970-04  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1970-04  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1970-05  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1970-05  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1965-07  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1965-07  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1965-08  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1965-08  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1965-09  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1965-09  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: `Seasonal adjustment` &lt;fct&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
@@ -429,12 +429,12 @@ used in the same way across database formats.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
 <span><span class="co">#&gt;   REF_DATE GEO    DGUID          `Vehicle type` `Origin of manufacture`    Sales</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1970-03  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1970-03  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1970-04  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1970-04  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1970-05  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1970-05  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1946-01  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1946-01  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1946-02  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1946-02  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1946-03  Canada 2016A000011124 Passenger cars Total, country of manufac… Units</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1946-03  Canada 2016A000011124 Trucks         Total, country of manufac… Units</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: `Seasonal adjustment` &lt;fct&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   VALUE &lt;dbl&gt;, STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
@@ -514,9 +514,22 @@ number of dimensions. A <em>parquet</em> dataset that is partitioned
 with the subsequent queries in mind is often faster in data retrieval
 than an index SQLite database. The <a href="https://arrow.apache.org/docs/r/" class="external-link"><em>arrow</em> package</a> has
 more guidance on partitioning and the tradeoffs.</p>
-<p>Partitioning happens on initial data import and stays fixed
-afterward, regardless of how partitioning is specified in subsequent
-calls. If data should be repartitioned it needs to be re-downloaded.</p>
+<div class="section level3">
+<h3 id="repartitioning">Repartitioning<a class="anchor" aria-label="anchor" href="#repartitioning"></a>
+</h3>
+<p>Partitioning happens on initial data import and changing the
+<code>partitioning</code> parameter in subsequent calls to
+<code><a href="../reference/get_cansim_db.html">get_cansim_db()</a></code> won’t have any effect, althoug a warning
+will get issued if the specified partitioning is not empty and differs
+from the initial paritioning. In some cases, for example when doing lots
+of data queries on the dataset, it might make sense to occasionally
+change the partitioning of the data in order to optimize read
+performance. This can be done with the
+<code><a href="../reference/cansim_repartition_cached_table.html">cansim_repartition_cached_table()</a></code> that takes a
+<code>new_partitioning</code> argument. Repartitioning happnes fairly
+fast, taking up to several seconds on fairly large tables where the
+original CSV is several gigabytes in size.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="keeping-track-of-cached-data">Keeping track of cached data<a class="anchor" aria-label="anchor" href="#keeping-track-of-cached-data"></a>
@@ -530,9 +543,9 @@ overview over the cached data we have.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
 <span><span class="co">#&gt;   cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-02-07 <span style="color: #949494;">19:09:48</span> 10.5 Mb  11<span style="text-decoration: underline;">031</span>002</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-02-07 <span style="color: #949494;">19:09:46</span> 1.1 Mb    1<span style="text-decoration: underline;">132</span>470</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-02-07 <span style="color: #949494;">19:09:51</span> 47.1 Mb  49<span style="text-decoration: underline;">434</span>624</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-02-08 <span style="color: #949494;">15:32:08</span> 10.5 Mb  11<span style="text-decoration: underline;">031</span>002</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-02-08 <span style="color: #949494;">15:32:04</span> 1.1 Mb    1<span style="text-decoration: underline;">132</span>470</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-02-08 <span style="color: #949494;">15:32:11</span> 47.1 Mb  49<span style="text-decoration: underline;">434</span>624</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: title &lt;chr&gt;, path &lt;chr&gt;, timeReleased &lt;dttm&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
 </div>

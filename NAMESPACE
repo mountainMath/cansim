@@ -2,6 +2,7 @@
 
 export(add_provincial_abbreviations)
 export(cansim_old_to_new)
+export(cansim_repartition_cached_table)
 export(categories_for_level)
 export(collect_and_normalize)
 export(disconnect_cansim_sqlite)

@@ -100,17 +100,11 @@ get_cansim_db <- function(cansimTableNumber,
     }
 
 
-    # meta <- suppressWarnings(readr::read_delim(file.path(exdir, paste0(base_table, "_MetaData.csv")),
-    #                                            delim=delim,
-    #                                            na=na_strings,
-    #                                            locale=readr::locale(encoding="UTF-8"),
-    #                                            col_types = list(.default = "c")))
-
     meta_lines <- readr::read_lines(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                     locale=readr::locale(encoding="UTF-8"))
 
     meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
-    parse_metadata2(meta_lines,data_path = meta_base_path)
+    parse_metadata(meta_lines,data_path = meta_base_path)
 
 
     scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
@@ -305,12 +299,26 @@ get_cansim_db <- function(cansimTableNumber,
   }
 
   if (format %in% c("parquet","feather")) {
+    partitioning_path <- file.path(dirname(db_path),paste0(basename(db_path),".partitioning"))
+    if (file.exists(partitioning_path)) {
+      used_partitioning <- readRDS(partitioning_path)
+    } else {
+      used_partitioning <- c()
+    }
+
+    if (!same_partitioning(used_partitioning,partitioning)) {
+      pm <- ifelse(length(used_partitioning)==0,"no partitioning",
+                   paste0("[",paste0(used_partitioning,collapse=","),"]"))
+      message("Partitioning has changed, using ",pm,". To change the partitioning the arrow file needs to get rebuilt.")
+    }
 
     schema_path <- file.path(dirname(db_path),paste0(basename(db_path),".schema"))
     if (file.exists(schema_path)) { # workaround when arrow drops schema info for partitioning variables
       arrow_schema <- arrow::open_dataset(schema_path,format=format) |> arrow::schema()
       # workaround for arrow dropping attributes
-      arrow_schema <- arrow_schema$WithMetadata(list("cansimTableNumber"=cansimTableNumber,"language"=cleaned_language))
+      arrow_schema <- arrow_schema$WithMetadata(list("cansimTableNumber"=cansimTableNumber,
+                                                     "language"=cleaned_language,
+                                                     "partitioning"=list(partitioning)))
       con <- arrow::open_dataset(db_path,format=format, schema=arrow_schema)
     } else {
       con <- arrow::open_dataset(db_path,format=format)
@@ -360,6 +368,8 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
     arrow::arrow_table() |>
     arrow::schema()
 
+
+
   input <- arrow::read_delim_arrow(csv_file,
                                    skip=1,
                                    delim=delim,
@@ -388,13 +398,86 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
   }
   # workaround when arrow drops schema info for partitioning variables
   schema_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".schema"))
+  partitioning_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".partitioning"))
   arrow::write_dataset(input |> dplyr::slice_head(n=1), format=format, schema_path)
+  saveRDS(partitioning,partitioning_path)
 }
 
 
+#' Repartitions a cached cansim table to a new partitioning scheme
+#'
+#' Repartitions and already downloaded and cached parquet or feather dataset
+#'
+#' @param cansimTableNumber the NDM table number to load
+#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
+#' @param new_partitioning (Optional) Partition columns to use for parquet or feather formats.
+#' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
+#' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
+#  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
+#'
+#' @return NULL
+#'
+#' @examples
+#' \dontrun{
+#' cansim_repartition_cached_table("34-10-0013",new_partitioning=c("GeoUID"))
+#'
+#' }
+#' @export
+cansim_repartition_cached_table <- function(cansimTableNumber,
+                                            new_partitioning=c(),
+                                            language="english",
+                                            format="parquet",
+                                            cache_path=getOption("cansim.cache_path")){
+  if (!(format %in% c("parquet","feather"))) {
+    stop("Format must be one of 'parquet' or 'feather'.")
+  }
+
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
+  cleaned_language <- cleaned_ndm_language(language)
+  base_table <- naked_ndm_table_number(cansimTableNumber)
+  path_name<-paste0("cansim_",base_table,"_",format,"_",cleaned_language)
+  table_name<-paste0("cansim_",base_table,"_",cleaned_language)
+
+  cache_path <- file.path(cache_path,path_name)
+  if (!dir.exists(cache_path)) {
+    stop("Table ",cansimTableNumber, " for ",language," and ",format," not found in cache, download it with the desired partitioning using `get_cansim_db`")
+  }
+  file_extension <- ifelse(format=="feather","arrow",format)
+  db_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".",file_extension)
+  if (!dir.exists(db_path)) {
+    stop("Table not found in cache, download it with the desired partitioning using `get_cansim_db`")
+  }
+
+  schema_path <- file.path(dirname(db_path),paste0(basename(db_path),".schema"))
+  partitioning_path <- file.path(dirname(db_path),paste0(basename(db_path),".partitioning"))
+  if (file.exists(partitioning_path)) {
+    old_partitioning <- readRDS(partitioning_path)
+
+    if (same_partitioning(old_partitioning,new_partitioning)) {
+      stop("Partitioning is the same as the existing table, no need to repartition")
+    }
+  }
+
+  if (!file.exists(schema_path)) {
+    stop("Could not access existing database schema, please redownload the table.")
+  }
+  arrow_schema <- arrow::open_dataset(schema_path, format=format) |> arrow::schema()
+  old_path <- paste0(db_path,".old")
+  file.rename(db_path,old_path)
+
+  old_db <- arrow::open_dataset(old_path, format=format, schema=arrow_schema)
+  new_db <- arrow::write_dataset(old_db, format=format, db_path, partition=new_partitioning)
+
+  unlink(old_path,recursive=TRUE)
+
+  saveRDS(new_partitioning,partitioning_path)
+  invisible()
+}
+
 #' Collect data from a parquet, feather or sqlite query and normalize cansim table output
 #'
-#' @param connection A connection to a local arrow connection as returned by \code{get_cansim_arrow},
+#' @param connection A connection to a local arrow connection as returned by \code{get_cansim_db},
 #' possibly with filters or other \code{dplyr} verbs applied
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates

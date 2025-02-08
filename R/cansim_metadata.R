@@ -1,3 +1,5 @@
+
+
 #' Parse metadata
 #' @param meta the raw metadata table
 #' @param data_path base path to save parsed metadata
@@ -5,87 +7,6 @@
 #' @return NULL
 #' @keywords internal
 parse_metadata <- function(meta,data_path){
-  cleaned_language <- basename(data_path) %>% gsub("^.+-|\\..+$","",.)
-  cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
-  dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
-  dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
-  classification_code_column <- ifelse(cleaned_language=="eng","Classification Code","Code sur la classification")
-  member_name_column <- ifelse(cleaned_language=="eng","Member Name","Nom du membre")
-  geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
-  data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
-  symbol_legend_grepl_field <- ifelse(cleaned_language=="eng","Symbol Legend",paste0("L",intToUtf8(0x00E9),"gende Symbole"))
-  survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
-  subject_code_grepl_field <- ifelse(cleaned_language=="eng","Subject Code","Code du sujet")
-  note_id_grepl_field <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
-  correction_id_grepl_field <- ifelse(cleaned_language=="eng","Correction ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la correction"))
-  member_id_column <- ifelse(cleaned_language=="eng","Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre"))
-  parent_member_id_column <- ifelse(cleaned_language=="eng","Parent Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre parent"))
-  hierarchy_column <- ifelse(cleaned_language=="eng","Hierarchy",paste0("Hi",intToUtf8(0x00E9),"rarchie"))
-  classification_code_prefix <- ifelse(cleaned_language=="eng","Classification Code for","Code de classification pour")
-  exceeded_hierarchy_warning_message <- ifelse(cleaned_language=="eng","Exceeded max depth for hierarchy, hierarchy information may be faulty.",
-                                               paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
-  hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
-
-  m<-suppressWarnings(setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta)))
-  m<-NULL
-
-  cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
-  cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]])) %>% sort()
-  meta1 <- meta[seq(1,cut_indices[1]-1),]
-  saveRDS(meta1,file=paste0(data_path,"1"))
-  names2 <- meta[cut_indices[1],]  %>%
-    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
-    as.character()
-  meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
-    rlang::set_names(names2)
-  saveRDS(meta2,file=paste0(data_path,"2"))
-  names3 <- meta[cut_indices[2],]  %>%
-    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
-    as.character()
-  meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
-    rlang::set_names(names3)
-  saveRDS(meta3,file=paste0(data_path,"2m"))
-  correction_index <- grep(correction_id_grepl_field,meta[[cube_title_column]])
-  if (length(correction_index)==0) correction_index=nrow(meta)
-  additional_indices=c(grep(survey_code_grepl_field,meta[[cube_title_column]]),
-                       grep(subject_code_grepl_field,meta[[cube_title_column]]),
-                       grep(note_id_grepl_field,meta[[cube_title_column]]),
-                       correction_index)
-  saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
-  saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
-  if (length(additional_indices)>3)
-    saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
-              rlang::set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
-
-  column_ids <- dplyr::pull(meta2,dimension_id_column)
-  column_names <- dplyr::pull(meta2,dimension_name_column)
-  for (column_index in column_ids) { # iterate through columns for which we have meta data
-    column <- meta2 %>% dplyr::filter(.data[[dimension_id_column]]==column_index)
-    is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) & !(column[[dimension_name_column]] %in% column_names)
-    meta_x <- meta3 %>%
-      dplyr::filter(.data[[dimension_id_column]]==column_index) %>%
-      add_hierarchy(parent_member_id_column=parent_member_id_column,
-                    member_id_column=member_id_column,
-                    hierarchy_column=hierarchy_column,
-                    exceeded_hierarchy_warning_message=exceeded_hierarchy_warning_message) %>%
-      mutate(name=ifelse(is.na(!!as.name(classification_code_column)) | is_geo_column,
-                         !!as.name(member_name_column),
-                         paste0(!!as.name(member_name_column)," ",!!as.name(classification_code_column))))
-    saveRDS(meta_x,file=paste0(data_path,"_column_",column_index))
-  }
-  NULL
-}
-
-
-#' Parse metadata
-#' @param meta the raw metadata table
-#' @param data_path base path to save parsed metadata
-#'
-#' @return NULL
-#' @keywords internal
-parse_metadata2 <- function(meta,data_path){
   cleaned_language <- basename(data_path) %>% gsub("^.+-|\\..+$","",.)
   cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
   dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))

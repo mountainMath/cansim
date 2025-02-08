@@ -365,6 +365,10 @@ transform_value_column <- function(data,value_column){
   data
 }
 
+same_partitioning <- function(p1,p2) {
+  length(p1)==length(p2) && sum(sort(p1)!=sort(p2))==0
+}
+
 # copied from unexported utils:::format.object_size
 format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ...)
 {

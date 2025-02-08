@@ -16,7 +16,7 @@ collect_and_normalize(
 )
 }
 \arguments{
-\item{connection}{A connection to a local arrow connection as returned by \code{get_cansim_arrow},
+\item{connection}{A connection to a local arrow connection as returned by \code{get_cansim_db},
 possibly with filters or other \code{dplyr} verbs applied}
 
 \item{replacement_value}{(Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.}

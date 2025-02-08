@@ -43,6 +43,9 @@
     <loc>https://mountainmath.github.io/cansim/reference/cansim_old_to_new.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/reference/cansim_repartition_cached_table.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/reference/categories_for_level.html</loc>
   </url>
   <url>
@@ -155,9 +158,6 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/parse_metadata.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/parse_metadata2.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/remove_cansim_cached_tables.html</loc>

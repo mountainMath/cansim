@@ -156,8 +156,11 @@ data.parquet %>%
 
 To improve read performance of *parquet* and *feather* data one can specify a `partioning` argument when calling `get_cansim_db`. This will partition the data by the specified columns. This can be useful when filtering by these columns as it will only read the relevant partitions and greatly increase read performance with a sight cost to size on disk. If for example a dataset is mostly accessed by filtering on geographic regions, it migh be useful to partition by `GeoUID`, or the `GEO` column if querying data by name. More than one partitioning column can be specified, but this is only helpful for very large datasets with a high number of dimensions. A *parquet* dataset that is partitioned with the subsequent queries in mind is often faster in data retrieval than an index SQLite database. The [*arrow* package](https://arrow.apache.org/docs/r/) has more guidance on partitioning and the tradeoffs.
 
-Partitioning happens on initial data import and stays fixed afterward, regardless of how partitioning is specified in subsequent calls. If data should be repartitioned it needs to be re-downloaded.
 
+
+### Repartitioning
+
+Partitioning happens on initial data import and changing the `partitioning` parameter in subsequent calls to `get_cansim_db()` won't have any effect, althoug a warning will get issued if the specified partitioning is not empty and differs from the initial paritioning. In some cases, for example when doing lots of data queries on the dataset, it might make sense to occasionally change the partitioning of the data in order to optimize read performance. This can be done with the `cansim_repartition_cached_table()` that takes a `new_partitioning` argument. Repartitioning happnes fairly fast, taking up to several seconds on fairly large tables where the original CSV is several gigabytes in size.
 
 ## Keeping track of cached data
 

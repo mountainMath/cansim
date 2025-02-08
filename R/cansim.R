@@ -486,20 +486,12 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 
     data <- data %>% transform_value_column(value_column)
 
-    # meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
-    #                                          na=na_strings,
-    #                                          #col_names=FALSE,
-    #                                     locale=readr::locale(encoding="UTF-8",
-    #                                                          decimal_mark = ",",
-    #                                                          grouping_mark = "."),
-    #                                     col_types = list(.default = "c")))
 
     meta_lines <- readr::read_lines(file.path(exdir, paste0(base_table, "_MetaData.csv")),
                                     locale=readr::locale(encoding="UTF-8"))
 
     tryCatch({
-      #data <- parse_and_fold_in_metadata(data,meta,data_path)
-      parse_metadata2(meta_lines,data_path)
+      parse_metadata(meta_lines,data_path)
       meta2 <- readRDS(paste0(data_path,"2"))
       dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
       data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
