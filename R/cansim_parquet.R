@@ -455,7 +455,8 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
     old_partitioning <- readRDS(partitioning_path)
 
     if (same_partitioning(old_partitioning,new_partitioning)) {
-      stop("Partitioning is the same as the existing table, no need to repartition")
+      message("Partitioning is the same as the existing table, no need to repartition")
+      return(invisible())
     }
   }
 
