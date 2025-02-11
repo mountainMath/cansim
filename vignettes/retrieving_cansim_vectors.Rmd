@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
   eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 library(cansim)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
 ```
 
