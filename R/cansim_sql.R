@@ -40,6 +40,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 
   get_cansim_db(cansimTableNumber=cansimTableNumber,
                 language=language,
+                format="sqlite",
                 refresh=refresh,
                 auto_refresh = auto_refresh,
                 timeout=timeout,
