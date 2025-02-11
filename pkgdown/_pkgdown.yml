@@ -15,7 +15,7 @@ reference:
     - get_cansim_vector
     - get_cansim_vector_for_latest_periods
   - title: SQLite database
-    desc: Managing data in local SQLite database
+    desc: Managing data in local database
   - contents:
     - get_cansim_db
     - collect_and_normalize
