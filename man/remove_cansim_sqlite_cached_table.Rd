@@ -26,7 +26,7 @@ Remove cached cansim SQLite database
 }
 \examples{
 \dontrun{
-con <- get_cansim_db("34-10-0013", format="sqlite")
+con <- get_cansim_connection("34-10-0013", format="sqlite")
 disconnect_cansim_sqlite(con)
 remove_cansim_cached_tables("34-10-0013", format="sqlite")
 }

@@ -31,11 +31,22 @@ parse_metadata <- function(meta,data_path){
   table_delim <- ifelse(cleaned_language=="fra",";",",")
 
   read_meta <- function(meta_part) {
-    suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
-                                       delim=table_delim, col_types = readr::cols(.default="c")))
+    while (meta_part[length(meta_part)]=="") {
+      meta_part <- meta_part[-length(meta_part)]
+    }
+    if (TRUE) {
+      utils::read.delim(text=meta_part,sep=table_delim,header=TRUE,stringsAsFactors=FALSE,
+                 colClasses="character",check.names=FALSE) |>
+        as_tibble() |>
+        mutate(across(everything(),\(x)na_if(x,"")))
+    } else {
+      suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
+                                         delim=table_delim, col_types = readr::cols(.default="c")))
+    }
   }
 
   cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
+
   meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)])
   saveRDS(meta1,file=paste0(data_path,"1"))
   meta2 <- read_meta(meta[seq(cut_indices[1],cut_indices[2]-1)])

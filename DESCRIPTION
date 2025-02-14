@@ -20,25 +20,26 @@ Imports: digest (>= 0.1),
     dplyr (>= 1.1),
     httr (>= 1.0.0),
     jsonlite (>= 1.0),
-    arrow (>= 18.1),
+    tidyr,
     readr,
     rlang,
-    xml2,
-    rvest,
     stringr,
     purrr,
     tibble,
-    utils,
-    DBI,
-    RSQLite
+    utils
 RoxygenNote: 7.3.1
-Suggests: knitr,
+Suggests: 
+    knitr,
     rmarkdown,
-    scales, 
-    tidyr,
     ggplot2,
-    dbplyr
+    scales,
+    dbplyr,
+    arrow (>= 18.1),
+    DBI,
+    RSQLite,
+    testthat (>= 3.0.0)
 URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
 BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr
 Language: en-CA
+Config/testthat/edition: 3

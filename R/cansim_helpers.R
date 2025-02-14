@@ -5,7 +5,7 @@ cleaned_ndm_table_number <- function(cansimTableNumber){
     cansimTableNumber <- as.character(cansimTableNumber)
   }
   n<-gsub("-","",cansimTableNumber) %>%
-    purrr::map(function(t){
+    lapply(function(t){
       if (nchar(t)<=7) {
         tt<-cansim_old_to_new(t)
         message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
@@ -187,7 +187,7 @@ short_prov.en <- c(
 #   "Canada"="CAN"
 # )
 
-short_prov.fr <- purrr::set_names(c(
+short_prov.fr <- setNames(c(
   "BC",
   "AB",
   "SK",
@@ -419,4 +419,56 @@ format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ..
 }
 
 
+#' Get column names de-duplicated and in the correct order
+#' @param cansimTableNumber The table number
+#' @param language The language of the column names
+#' @param column The column name
+#' @keywords internal
+#' @return A tibble with the column names
+get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
+  dimension_id_column <- ifelse(language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
+  member_id_column <- ifelse(language=="eng","Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre"))
+  member_name_column <- ifelse(language=="eng","Member Name","Nom du membre")
+  parent_member_id_column <- ifelse(language=="eng","Parent Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre parent"))
+
+  columns <- get_cansim_column_categories(cansimTableNumber = cansimTableNumber,
+                                          column = column,
+                                          language = language)
+
+  # full level values from metadata
+  level_table <- columns |>
+    select(...dim=!!as.name(dimension_id_column),
+           ...id=!!as.name(member_id_column),
+           ...name=!!as.name(member_name_column),
+           ...parent_id=!!as.name(parent_member_id_column)) |>
+    mutate(...n=as.integer(.data$...id)) |>
+    arrange(.data$...n) |>
+    select(-.data$...n) |>
+    mutate(...count=n(),.by=.data$...name) |>
+    mutate(...duplicated=.data$...count>1) |>
+    mutate(...original=!.data$...duplicated) |>
+    mutate(...original_name=.data$...name) |>
+    mutate(...name=ifelse(.data$...duplicated & is.na(.data$...parent_id),
+                          paste0(.data$...name," [",.data$...id,"]"), # deals with 36-10-0108
+                          .data$...name)) |>
+  mutate(...count=n(),.by=.data$...name) |>
+    mutate(...duplicated=.data$...count>1)
+
+  max_run <- 30
+  while (sum(level_table$...duplicated)>0 && max_run>0) { # deals with 36-10-0580
+    max_run <- max_run - 1
+    level_table <- level_table %>%
+      left_join(level_table |> select(,.data$...id,...parent_name=.data$...name),
+                by=c("...parent_id"="...id")) |>
+      mutate(...name=ifelse(.data$...duplicated,
+                            paste0(.data$...name," ==> ",.data$...parent_name),
+                            .data$...name)) |>
+      select(-.data$...parent_name) |>
+      mutate(...count=n(),.by=.data$...name) |>
+      mutate(...duplicated=.data$...count>1)
+  }
+
+  level_table |>
+    select(.data$...dim,.data$...id,.data$...name,.data$...original,.data$...original_name)
+}
 

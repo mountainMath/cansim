@@ -3,7 +3,7 @@
 get_cansim_members <- function(cansimTableNumber, language="english",
                                latestN=NULL,
                                members=list(),
-                               refresh=FALSE, auto_refresh = FALSE,
+                               refresh=FALSE,
                                timeout=1000,
                         cache_path=getOption("cansim.cache_path")){
 

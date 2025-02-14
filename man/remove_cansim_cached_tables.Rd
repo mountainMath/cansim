@@ -28,7 +28,7 @@ Remove cached cansim SQLite and parquet database
 }
 \examples{
 \dontrun{
-con <- get_cansim_db("34-10-0013", format="parquet")
+con <- get_cansim_connection("34-10-0013", format="parquet")
 remove_cansim_cached_tables("34-10-0013", format="parquet")
 }
 }

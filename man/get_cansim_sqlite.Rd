@@ -38,7 +38,7 @@ if the cached table is out of date.
 }
 \examples{
 \dontrun{
-con <- get_cansim_db("34-10-0013", format="sqlite")
+con <- get_cansim_connection("34-10-0013", format="sqlite")
 
 # Work with the data connection
 gplimpse(con)

@@ -22,7 +22,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_db("34-10-0013", format="sqlite")
+#' con <- get_cansim_connection("34-10-0013", format="sqlite")
 #'
 #' # Work with the data connection
 #' gplimpse(con)
@@ -34,15 +34,18 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, auto_refresh = FALSE,
                               timeout=1000,
                        cache_path=getOption("cansim.cache_path")){
-  .Deprecated("get_cansim_db",
+  .Deprecated("get_cansim_connection",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use get_cansim_db(..., format='sqlite'') instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use get_cansim_connection(..., format='sqlite'') instead.")
 
-  get_cansim_db(cansimTableNumber=cansimTableNumber,
+  if (auto_refresh){
+    refresh <- "auto"
+  }
+
+  get_cansim_connection(cansimTableNumber=cansimTableNumber,
                 language=language,
                 format="sqlite",
                 refresh=refresh,
-                auto_refresh = auto_refresh,
                 timeout=timeout,
                 cache_path=cache_path)
 }
@@ -94,7 +97,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_db("34-10-0013", format="sqlite")
+#' con <- get_cansim_connection("34-10-0013", format="sqlite")
 #' disconnect_cansim_sqlite(con)
 #' remove_cansim_cached_tables("34-10-0013", format="sqlite")
 #' }

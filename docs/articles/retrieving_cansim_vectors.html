@@ -152,7 +152,7 @@
 vectors</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-02-08</h4>
+            <h4 data-toc-skip class="date">2025-02-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/retrieving_cansim_vectors.Rmd" class="external-link"><code>vignettes/retrieving_cansim_vectors.Rmd</code></a></small>
       <div class="hidden name"><code>retrieving_cansim_vectors.Rmd</code></div>
@@ -190,21 +190,21 @@ and the date onwards from which we want to get vector results for.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 120 × 14</span></span></span>
-<span><span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span></span>
-<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  124. 2015-01… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  125. 2015-02… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  126. 2015-03… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  126. 2015-04… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  127. 2015-05… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  127. 2015-06… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  127. 2015-07… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  127. 2015-08… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  127. 2015-09… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  127. 2015-10… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
+<span><span class="co">#&gt;    DECIMALS VALUE val_norm REF_DATE  Date       releaseTime SYMBOL frequencyCode</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  124.     124. 2015-01-… 2015-01-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  125.     125. 2015-02-… 2015-02-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  126.     126. 2015-03-… 2015-03-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  126.     126. 2015-04-… 2015-04-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  127.     127. 2015-05-… 2015-05-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  127.     127. 2015-06-… 2015-06-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  127.     127. 2015-07-… 2015-07-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  127.     127. 2015-08-… 2015-08-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  127.     127. 2015-09-… 2015-09-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  127.     127. 2015-10-… 2015-10-01 2021-07-28…      0             6</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 110 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;, val_norm &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   Date &lt;date&gt;, GEO &lt;fct&gt;, `Products and product groups` &lt;fct&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: SCALAR_ID &lt;int&gt;, COORDINATE &lt;chr&gt;, VECTOR &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   cansimTableNumber &lt;chr&gt;, GEO &lt;fct&gt;, `Products and product groups` &lt;fct&gt;</span></span></span></code></pre></div>
 <p>The call to <code>get_cansim_vector</code> takes three inputs: a
 string code (or codes) for <code>vectors</code>, a
 <code>start_time</code> in YYYY-MM-DD format, and an optional value for
@@ -230,21 +230,21 @@ always dated to the first day of the month.</p>
 <span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="va">vectors</span>, <span class="st">"2017-01-01"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 192 × 14</span></span></span>
-<span><span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span></span>
-<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  130. 2017-01… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  130. 2017-02… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  130. 2017-03… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  130. 2017-04… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  130. 2017-05… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  130. 2017-06… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  130. 2017-07… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  130. 2017-08… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  131. 2017-09… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  131. 2017-10… 2021-07-28…      0             6         0 2.2.0.0.0…</span></span>
+<span><span class="co">#&gt;    DECIMALS VALUE val_norm REF_DATE  Date       releaseTime SYMBOL frequencyCode</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  130.     130. 2017-01-… 2017-01-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  130.     130. 2017-02-… 2017-02-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  130.     130. 2017-03-… 2017-03-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  130.     130. 2017-04-… 2017-04-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  130.     130. 2017-05-… 2017-05-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  130.     130. 2017-06-… 2017-06-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  130.     130. 2017-07-… 2017-07-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  130.     130. 2017-08-… 2017-08-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  131.     131. 2017-09-… 2017-09-01 2021-07-28…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  131.     131. 2017-10-… 2017-10-01 2021-07-28…      0             6</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 182 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;, val_norm &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   Date &lt;date&gt;, GEO &lt;fct&gt;, `Products and product groups` &lt;fct&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: SCALAR_ID &lt;int&gt;, COORDINATE &lt;chr&gt;, VECTOR &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   cansimTableNumber &lt;chr&gt;, GEO &lt;fct&gt;, `Products and product groups` &lt;fct&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="get_cansim_vectors_for_latest_periods">get_cansim_vectors_for_latest_periods()<a class="anchor" aria-label="anchor" href="#get_cansim_vectors_for_latest_periods"></a>
@@ -261,21 +261,21 @@ irrespective of dates.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector_for_latest_periods.html">get_cansim_vector_for_latest_periods</a></span><span class="op">(</span><span class="st">"v41690973"</span>, periods <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 14</span></span></span>
-<span><span class="co">#&gt;    DECIMALS VALUE REF_DATE releaseTime SYMBOL frequencyCode SCALAR_ID COORDINATE</span></span>
-<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  137. 2020-01… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  137. 2020-02… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  137. 2020-03… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  136. 2020-04… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  136. 2020-05… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  137. 2020-06… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  137. 2020-07… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  137  2020-08… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  137. 2020-09… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  138. 2020-10… 2021-09-15…      0             6         0 2.2.0.0.0…</span></span>
+<span><span class="co">#&gt;    DECIMALS VALUE val_norm REF_DATE  Date       releaseTime SYMBOL frequencyCode</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        1  137.     137. 2020-01-… 2020-01-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>        1  137.     137. 2020-02-… 2020-02-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>        1  137.     137. 2020-03-… 2020-03-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>        1  136.     136. 2020-04-… 2020-04-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>        1  136.     136. 2020-05-… 2020-05-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>        1  137.     137. 2020-06-… 2020-06-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>        1  137.     137. 2020-07-… 2020-07-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>        1  137      137  2020-08-… 2020-08-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>        1  137.     137. 2020-09-… 2020-09-01 2021-09-15…      0             6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        1  138.     138. 2020-10-… 2020-10-01 2021-09-15…      0             6</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;, val_norm &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   Date &lt;date&gt;, GEO &lt;fct&gt;, `Products and product groups` &lt;fct&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: SCALAR_ID &lt;int&gt;, COORDINATE &lt;chr&gt;, VECTOR &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   cansimTableNumber &lt;chr&gt;, GEO &lt;fct&gt;, `Products and product groups` &lt;fct&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="naming-vector-series">Naming vector series<a class="anchor" aria-label="anchor" href="#naming-vector-series"></a>

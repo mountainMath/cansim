@@ -16,7 +16,7 @@ collect_and_normalize(
 )
 }
 \arguments{
-\item{connection}{A connection to a local arrow connection as returned by \code{get_cansim_db},
+\item{connection}{A connection to a local arrow connection as returned by \code{get_cansim_connection},
 possibly with filters or other \code{dplyr} verbs applied}
 
 \item{replacement_value}{(Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.}
@@ -43,7 +43,7 @@ Collect data from a parquet, feather or sqlite query and normalize cansim table 
 \dontrun{
 library(dplyr)
 
-con <- get_cansim_db("34-10-0013")
+con <- get_cansim_connection("34-10-0013")
 data <- con \%>\%
   filter(GEO=="Ontario") \%>\%
   collect_and_normalize()

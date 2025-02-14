@@ -85,13 +85,13 @@
     <loc>https://mountainmath.github.io/cansim/reference/get_cansim_column_list.html</loc>
   </url>
   <url>
+    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_connection.html</loc>
+  </url>
+  <url>
     <loc>https://mountainmath.github.io/cansim/reference/get_cansim_cube_metadata.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/get_cansim_data_for_table_coord_periods.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_db.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/get_cansim_key_release_schedule.html</loc>
@@ -137,6 +137,9 @@
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector_info.html</loc>
+  </url>
+  <url>
+    <loc>https://mountainmath.github.io/cansim/reference/get_deduped_column_level_data.html</loc>
   </url>
   <url>
     <loc>https://mountainmath.github.io/cansim/reference/index.html</loc>

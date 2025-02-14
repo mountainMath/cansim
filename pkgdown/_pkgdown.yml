@@ -17,7 +17,7 @@ reference:
   - title: SQLite database
     desc: Managing data in local database
   - contents:
-    - get_cansim_db
+    - get_cansim_connection
     - collect_and_normalize
     - list_cansim_cached_tables
     - remove_cansim_cached_tables

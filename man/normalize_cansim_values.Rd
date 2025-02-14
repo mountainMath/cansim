@@ -33,7 +33,7 @@ normalize_cansim_values(
 \item{cansimTableNumber}{(Optional) Only needed when operating on results of SQLite connections.}
 }
 \value{
-Returns the input tibble with with adjusted values
+Returns a tibble with with adjusted values.
 }
 \description{
 Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.

@@ -1,43 +1,51 @@
 #' Retrieve a Statistics Canada data table using NDM catalogue number as parquet, feather, or sqlite database connection
 #'
-#' Retrieves a data table using an NDM catalogue number as an parquet dataset Retrieved table data is
+#' Retrieves a data table using an NDM catalogue number as parquet, feather, or SQLite database connection. Retrieved table data is
 #' cached permanently if a cache path is supplied or for duration of the current R session.
-#' The function will check against the lastest release data for the table and emit a warning message
-#' if the cached table is out of date.
+#' If the table is cached the function will check if a newer version is available
+#' and emit a warning message if the cached table is out of date.
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
 #' @param partitioning (Optional) Partition columns to use for parquet or feather formats.
-#' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param auto_refresh (Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})
+#' @param refresh (Optional) Valid options are \code{FALSE} (the default), \code{TRUE}, and \code{"auto"}. When set
+#' to \code{TRUE}, forces a reload of data table, when set to \code{"auto"} it will refresh the table by downloading
+#' the newest version from StatCan if the table is out of date. If set to \code{FALSE} and the table is out of date
+#' a warning will be emitted to alert the user that the data is outdated.
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
 #' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
 #  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
 #'
-#' @return A database connection to a local parquet, feather, or sqlite database with the StatCan Table data.
+#' @return A database connection to a local parquet, feather, or sqlite database with the StatCan Table data. The data
+#' frames after calling `collect()` or `collect_and_normalize()` are identical up to possibly different row order.
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_db("34-10-0013")
+#' con <- get_cansim_connection("34-10-0013")
 #'
 #' # Work with the data connection
 #' glimpse(con)
 #'
 #' }
 #' @export
-get_cansim_db <- function(cansimTableNumber,
+get_cansim_connection <- function(cansimTableNumber,
                           language="english",
                           format="parquet",
                           partitioning=c(),
-                          refresh=FALSE, auto_refresh = FALSE,
+                          refresh=FALSE,
                           timeout=1000,
                           cache_path=getOption("cansim.cache_path")){
 
   if (!c(format %in% c("parquet","feather","sqlite")) || length(format)!=1) {
     stop("format must be either 'parquet', 'feather', or 'sqlite'.")
   }
+
+  auto_refresh <- is.character(refresh) && refresh=="auto"
+  refresh <- case_when(is.logical(refresh) ~ refresh,
+                       is.character(refresh) && refresh=="TRUE" ~ TRUE,
+                       TRUE ~ FALSE)
 
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
@@ -441,12 +449,12 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
 
   cache_path <- file.path(cache_path,path_name)
   if (!dir.exists(cache_path)) {
-    stop("Table ",cansimTableNumber, " for ",language," and ",format," not found in cache, download it with the desired partitioning using `get_cansim_db`")
+    stop("Table ",cansimTableNumber, " for ",language," and ",format," not found in cache, download it with the desired partitioning using `get_cansim_connection`")
   }
   file_extension <- ifelse(format=="feather","arrow",format)
   db_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".",file_extension)
   if (!dir.exists(db_path)) {
-    stop("Table not found in cache, download it with the desired partitioning using `get_cansim_db`")
+    stop("Table not found in cache, download it with the desired partitioning using `get_cansim_connection`")
   }
 
   schema_path <- file.path(dirname(db_path),paste0(basename(db_path),".schema"))
@@ -478,7 +486,7 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
 
 #' Collect data from a parquet, feather or sqlite query and normalize cansim table output
 #'
-#' @param connection A connection to a local arrow connection as returned by \code{get_cansim_db},
+#' @param connection A connection to a local arrow connection as returned by \code{get_cansim_connection},
 #' possibly with filters or other \code{dplyr} verbs applied
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to adding the `val_norm` value field.
 #' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
@@ -493,7 +501,7 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
 #' \dontrun{
 #' library(dplyr)
 #'
-#' con <- get_cansim_db("34-10-0013")
+#' con <- get_cansim_connection("34-10-0013")
 #' data <- con %>%
 #'   filter(GEO=="Ontario") %>%
 #'   collect_and_normalize()
@@ -691,7 +699,7 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_db("34-10-0013", format="parquet")
+#' con <- get_cansim_connection("34-10-0013", format="parquet")
 #' remove_cansim_cached_tables("34-10-0013", format="parquet")
 #' }
 #' @export
