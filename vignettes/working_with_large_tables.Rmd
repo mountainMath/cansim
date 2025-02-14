@@ -86,7 +86,7 @@ This gives us an understanding of the available variables. For the purpose of th
 
 In order to work with the data we need to load it into memory, which is done calling `collect()` on the connection object. If we want to make use of the additional metadata and processing the *cansim* package usually does and the main operations done on the connection were filtering (and not renaming or de-selecing columns needed for enriching with metadata) then we can utilize the custom `collect_and_normalize` function to do this and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column. In the case of *sqlite* connections we might want to pass the `disconnect = TRUE` argument in the `collect_and_normalize` function to close the connection after normalizing the data, or do that manually at a later time via `disconnect_cansim_sqlite(connection)`. This is not required for *parquet* or *feather* connections.
 
-The `collect_and_normalize()` interface is designed to be used in the same way across database formats.
+The `collect_and_normalize()` interface is designed to be used in the same way across database formats. In this comparison we also add the "traditional" `get_cansim()` approach that reads the entire table into memory and normalizes the data.
 
 ### parquet {.active}
 
@@ -131,7 +131,7 @@ data.sqlite %>% head()
 ```
 
 
-### memory
+### traditional
 
 ```{r}
 data.memory <- get_cansim("20-10-0001") |>
