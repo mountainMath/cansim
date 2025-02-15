@@ -13,7 +13,7 @@ test_that("consistent data output", {
 
 
   tables <- formats |>
-    lapply(\(f) get_cansim_connection("20-10-0001", format=f) |>
+    lapply(\(f) get_cansim_connection("20-10-0001", format=f, refres="auto") |>
     filter_function() |>
     collect_and_normalize(disconnect=TRUE)) |>
     setNames(formats)

@@ -43,7 +43,7 @@ get_cansim_connection <- function(cansimTableNumber,
   }
 
   auto_refresh <- is.character(refresh) && refresh=="auto"
-  refresh <- case_when(is.logical(refresh) ~ refresh,
+  refresh <- case_when(is.logical(refresh) && refresh==TRUE ~ TRUE,
                        is.character(refresh) && refresh=="TRUE" ~ TRUE,
                        TRUE ~ FALSE)
 
@@ -624,8 +624,8 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 
     if (nrow(result)>0) {
       result <- result |>
-        dplyr::select(.data$cansimTableNumber,.data$language,.data$dataFormat,.data$timeCached,.data$niceSize,.data$rawSize,
-                      .data$title,.data$path)
+        dplyr::select("cansimTableNumber","language","dataFormat","timeCached","niceSize","rawSize",
+                      "title","path")
     }
 
   if (nrow(result)>0) {
@@ -675,7 +675,7 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 
   if (!is.null(cube_info)) {
     cube_info <- cube_info %>%
-      select(cansimTableNumber=.data$cansim_table_number,timeReleased=.data$releaseTime)
+      select(cansimTableNumber="cansim_table_number",timeReleased="releaseTime")
     result <- result %>%
       dplyr::left_join(cube_info,by="cansimTableNumber")  %>%
       dplyr::mutate(upToDate=as.numeric(.data$timeReleased)<as.numeric(.data$timeCached))

@@ -442,33 +442,32 @@ get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
            ...name=!!as.name(member_name_column),
            ...parent_id=!!as.name(parent_member_id_column)) |>
     mutate(...n=as.integer(.data$...id)) |>
-    arrange(.data$...n) |>
-    select(-.data$...n) |>
-    mutate(...count=n(),.by=.data$...name) |>
+    arrange("...n") |>
+    select(-"...n") |>
+    mutate(...count=n(),.by="...name") |>
     mutate(...duplicated=.data$...count>1) |>
     mutate(...original=!.data$...duplicated) |>
     mutate(...original_name=.data$...name) |>
     mutate(...name=ifelse(.data$...duplicated & is.na(.data$...parent_id),
                           paste0(.data$...name," [",.data$...id,"]"), # deals with 36-10-0108
                           .data$...name)) |>
-  mutate(...count=n(),.by=.data$...name) |>
+  mutate(...count=n(),.by="...name") |>
     mutate(...duplicated=.data$...count>1)
 
   max_run <- 30
   while (sum(level_table$...duplicated)>0 && max_run>0) { # deals with 36-10-0580
     max_run <- max_run - 1
     level_table <- level_table %>%
-      left_join(level_table |> select(,.data$...id,...parent_name=.data$...name),
+      left_join(level_table |> select("...id",...parent_name="...name"),
                 by=c("...parent_id"="...id")) |>
       mutate(...name=ifelse(.data$...duplicated,
                             paste0(.data$...name," ==> ",.data$...parent_name),
                             .data$...name)) |>
-      select(-.data$...parent_name) |>
-      mutate(...count=n(),.by=.data$...name) |>
+      select(-"...parent_name") |>
+      mutate(...count=n(),.by="...name") |>
       mutate(...duplicated=.data$...count>1)
   }
 
   level_table |>
-    select(.data$...dim,.data$...id,.data$...name,.data$...original,.data$...original_name)
+    select("...dim","...id","...name","...original","...original_name")
 }
-

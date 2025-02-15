@@ -106,7 +106,7 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
     meta_x <- meta_x %>%
       dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
       dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
-      dplyr::select(-.data$p)
+      dplyr::select(-"p")
     added <- sum(old != meta_x[[hierarchy_column]])>0
     count=count+1
   }

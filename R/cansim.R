@@ -165,9 +165,9 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 
           data <- data |>
             select(-all_of(field)) |>
-            left_join(level_table |> select(.data$...id,.data$...name) |> rename(!!field:=.data$...name),by="...id") |>
+            left_join(level_table |> select("...id","...name") |> rename(!!field:="...name"),by="...id") |>
             relocate(!!as.name(field),.after=!!as.name(column_before)) |>
-            select(-.data$...id)
+            select(-"...id")
         }
 
         h <- level_table$...name
@@ -200,11 +200,11 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
   if ("GeoUID" %in% names(data) && "DGUID" %in% names(data)) {
     data <- data %>%
-      relocate(.data$GeoUID,.after=.data$DGUID)
+      relocate("GeoUID",.after="DGUID")
   }
   if ("Date" %in% names(data) && "REF_DATE" %in% names(data)) {
     data <- data %>%
-      relocate(.data$Date,.after=.data$REF_DATE)
+      relocate("Date",.after="REF_DATE")
   }
 
 
@@ -342,7 +342,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     }
   }
   if (!is.null(getOption("cansim.debug"))) message('Folding in hierarchy')
-  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-.data$...pos), by=coordinate_column)
+  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-"...pos"), by=coordinate_column)
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package
