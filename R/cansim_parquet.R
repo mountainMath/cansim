@@ -270,7 +270,7 @@ get_cansim_connection <- function(cansimTableNumber,
                        "There is a newer version of the table available, it was last updated ",
                        lu_date,".\n",
                        "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
-                       "or set it to automatically update to the newest version by setting the `auto_refresh=TRUE` option."))
+                       "or set it to automatically update to the newest version by setting the `refresh='auto'` option."))
       }
     }
     if (cleaned_language=="eng")
