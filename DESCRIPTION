@@ -19,7 +19,6 @@ Depends: R (>= 4.1)
 Imports: digest (>= 0.1),
     dplyr (>= 1.1),
     httr (>= 1.0.0),
-    jsonlite (>= 1.0),
     tidyr,
     readr,
     rlang,
