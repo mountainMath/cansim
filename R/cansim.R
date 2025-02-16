@@ -1090,6 +1090,11 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
 #' @importFrom stats setNames
 #' @importFrom utils head
 
+# silence warning that dbplyer is not used (explicitly)
+ignore_unused_imports <- function(){
+  dbplyr::sql(NULL)
+}
+
 NULL
 
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
