@@ -150,7 +150,7 @@
       <h1 data-toc-skip>Getting started with the cansim package</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-02-13</h4>
+            <h4 data-toc-skip class="date">2025-02-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/cansim.Rmd" class="external-link"><code>vignettes/cansim.Rmd</code></a></small>
       <div class="hidden name"><code>cansim.Rmd</code></div>
@@ -196,21 +196,21 @@ use <code>get_cansim</code> to download the entire table.</p>
 <span><span class="co">#&gt; Parsing data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 24</span></span></span>
-<span><span class="co">#&gt;   REF_DATE Date       GEO   DGUID GeoUID Labour force charact…¹ Statistics UOM  </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2001-03  2001-03-01 Cana… 2016… 11124  Population             Estimate   Pers…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2001-03  2001-03-01 Cana… 2016… 11124  Labour force           Estimate   Pers…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2001-03  2001-03-01 Cana… 2016… 11124  Labour force           Standard … Pers…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2001-03  2001-03-01 Cana… 2016… 11124  Labour force           Standard … Pers…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2001-03  2001-03-01 Cana… 2016… 11124  Employment             Estimate   Pers…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2001-03  2001-03-01 Cana… 2016… 11124  Employment             Standard … Pers…</span></span>
+<span><span class="co">#&gt;   REF_DATE Date       GEO    DGUID      GeoUID Labour force charact…¹ Statistics</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Population             Estimate  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Labour force           Estimate  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Labour force           Standard …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Labour force           Standard …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Employment             Estimate  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Employment             Standard …</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Labour force characteristics`</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 16 more variables: UOM_ID &lt;chr&gt;, SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;, VALUE &lt;dbl&gt;, val_norm &lt;dbl&gt;, STATUS &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;, `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 17 more variables: VALUE &lt;dbl&gt;, val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Labour force characteristics` &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Labour force characteristics` &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Statistics` &lt;chr&gt;, …</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Labour force characteristics` &lt;chr&gt;, …</span></span></span></code></pre></div>
 <p>By default, the data tables retrieved by the package comes in the
 original format provided by Statistics Canada and is enriched by several
 added columns and transformations.</p>
@@ -277,17 +277,18 @@ containing the specified name for each vector.</p>
 <span>                  end_time<span class="op">=</span><span class="st">"2015-08-01"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 17</span></span></span>
-<span><span class="co">#&gt;   DECIMALS VALUE val_norm REF_DATE   Date       releaseTime SYMBOL frequencyCode</span></span>
-<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>        1  122.     122. 2015-05-01 2015-05-01 2021-07-28…      0             6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>        1  122.     122. 2015-06-01 2015-06-01 2021-07-28…      0             6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>        1  122.     122. 2015-07-01 2015-07-01 2021-07-28…      0             6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>        1  123.     123. 2015-08-01 2015-08-01 2021-07-28…      0             6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>        1  153      153  2015-07-01 2015-07-01 2015-11-10…      0             9</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 9 more variables: SCALAR_ID &lt;int&gt;, COORDINATE &lt;chr&gt;, VECTOR &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   cansimTableNumber &lt;chr&gt;, label &lt;chr&gt;, GEO &lt;fct&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Products and product groups` &lt;fct&gt;, `Type of building` &lt;fct&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   `Major sub-trade group` &lt;fct&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt;   REF_DATE   Date       GEO      label Products and product…¹ `Type of building`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2015-05-01 2015-05-01 Vancouv… Metr… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2015-06-01 2015-06-01 Vancouv… Metr… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2015-07-01 2015-07-01 Vancouv… Metr… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2015-08-01 2015-08-01 Vancouv… Metr… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2015-07-01 2015-07-01 Vancouv… Metr… <span style="color: #BB0000;">NA</span>                     Apartment         </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Products and product groups`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more variables: `Major sub-trade group` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;, frequencyCode &lt;int&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   DECIMALS &lt;int&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
