@@ -19,7 +19,7 @@ get_cansim_data_for_table_coord_periods(
 \arguments{
 \item{cansimTableNumber}{Statistics Canada data table number}
 
-\item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}}
+\item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
 

@@ -208,7 +208,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
 
-  data
+  data |>
+    standardize_cansim_column_order()
 }
 
 #' Translate deprecated CANSIM table number into new NDM-format table catalogue number

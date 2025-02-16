@@ -120,5 +120,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Major changes
 * add support for local caching in parquet and feather formats
 * uniform interface for sqlite, parquet, and feather caching
+* principled approach to column order
 ## Minor changes
 * fix problem with inconsistent type parsing of notes
+* better support for french language when accessing data by vector or coordinate
+* tests

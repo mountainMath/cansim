@@ -471,3 +471,62 @@ get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
   level_table |>
     select("...dim","...id","...name","...original","...original_name")
 }
+
+
+standardize_cansim_column_order <- function(data) {
+  language <- attr(data,"language")
+  if (is.null(language)|!(language %in% c("eng","fra"))) {
+    warning("Don't know how to standardize column order.")
+    return(data)
+  }
+
+  classification_code_column <- ifelse(language=="eng","Classification Code","Code sur la classification")
+  value_string <- ifelse(language=="fra","VALEUR","VALUE")
+  scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
+  uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
+  hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
+  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
+
+  standard_order1 <- intersect(c("REF_DATE",date_field,"Date","REF_DATE2",data_geography_column,"DGUID","GeoUID") |>
+                                 unique(),names(data))
+  standard_order2 <- intersect(c(value_string,"val_norm","UOM","UOM_ID",scale_string2,scale_string,"VECTOR","cansimTableNumber",coordinate_column,
+                                 "STATUS","SYMBOL","releaseTime","frequencyCode",
+                                 "TERMINATED","DECIMALS"), names(data))
+  standard_order3 <- names(data)[grepl(paste0("^",hierarchy_prefix,"|^",classification_prefix),names(data))]
+
+  rest_order <- setdiff(names(data),c(standard_order1,standard_order2,standard_order3))
+
+  data |>
+    select(all_of(c(standard_order1,rest_order,standard_order2,standard_order3)))
+}
+
+
+column_names_for_language <- function(language) {
+  date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
+  classification_code_column <- ifelse(language=="eng","Classification Code","Code sur la classification")
+  value_string <- ifelse(language=="fra","VALEUR","VALUE")
+  scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
+  uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  column_names <- c(date_field,classification_code_column,value_string,scale_string,scale_string2,
+                    uom_string,coordinate_column,data_geography_column)
+  column_names
+}
+
+rename_columns_for_language <- function(data,from_language,to_language) {
+  renames <- setNames(column_names_for_language(to_language),column_names_for_language(from_language))
+
+  renames <- renames[intersect(names(data),names(renames))]
+
+  renames <- setNames(names(renames),as.character(renames))
+
+  data |>
+    rename(!!!renames)
+
+}

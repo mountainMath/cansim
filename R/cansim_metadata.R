@@ -180,7 +180,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
     m1 <- d %>% tibble::enframe() %>%
       mutate(l=lapply(.data$value,class) %>% unlist()) %>%
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
-      select(-.data$l) %>%
+      select(-"l") %>%
       tidyr::pivot_wider() %>%
       mutate_all(\(x)paste0(unlist(x), collapse=", "))
     saveRDS(m1, meta1_path)
@@ -193,8 +193,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
     m2 <- d$dimension %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
-          tidyr::unnest_wider(.data$member)  %>%
-          mutate(across(is.integer,as.character))
+          tidyr::unnest_wider("member")  %>%
+          mutate(across(where(is.integer),as.character))
       })
     saveRDS(m2, meta2_path)
   } else {
@@ -206,8 +206,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           left_join(as_tibble(.$link),by="footnoteId") %>%
-          dplyr::select(-.data$link)  %>%
-          mutate(across(is.integer,as.character))
+          dplyr::select(-"link")  %>%
+          mutate(across(where(is.integer),as.character))
       }) %>%
       unique()
     saveRDS(m3, meta3_path)

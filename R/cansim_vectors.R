@@ -34,7 +34,7 @@ extract_vector_data <- function(data1){
   if ("REF_DATE_2" %in% names(result)) {
     ref_date_2 <- unique(result$REF_DATE_2) %>% unique
     if (length(ref_date_2)==1 && ref_date_2=="")
-      result <- result %>% dplyr::select(-.data$REF_DATE_2)
+      result <- result %>% dplyr::select(-"REF_DATE_2")
   }
   result
 }
@@ -47,25 +47,26 @@ metadata_for_coordinates <- function(cansimTableNumber,coordinates,language) {
 
 metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
   cleaned_language <- cleaned_ndm_language(language)
+  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
   members <- get_cansim_cube_metadata(cansimTableNumber,type="members")
   coordinates <- coordinate %>% strsplit("\\.") %>% unlist()
   dimensions <- members %>% pull(.data$dimensionPositionId) %>% unique()
-  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, COORDINATE=coordinate)
+  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, !!coordinate_column:=coordinate)
 
   if (cleaned_language=="fra") {
     members <- members %>%
-      select(.data$dimensionPositionId,.data$memberId,dimensionName=.data$dimensionNameFr,memberName=.data$memberNameFr)
+      select("dimensionPositionId","memberId",dimensionName="dimensionNameFr",memberName="memberNameFr")
   } else {
     members <- members %>%
-      select(.data$dimensionPositionId,.data$memberId,dimensionName=.data$dimensionNameEn,memberName=.data$memberNameEn)
+      select("dimensionPositionId","memberId",dimensionName="dimensionNameEn",memberName="memberNameEn")
   }
 
   for (dimension in dimensions) {
     member_pos <- coordinates[as.integer(dimension)]
     dm<-members %>%
       filter(.data$dimensionPositionId==dimension) %>%
-      mutate(n=n(),.by = .data$memberName) %>%
-      mutate(nn=row_number(),.by=.data$memberName) %>%
+      mutate(n=n(),.by = "memberName") %>%
+      mutate(nn=row_number(),.by="memberName") %>%
       mutate(memberLevel=if_else(.data$n==1,.data$memberName,paste0(.data$memberName," (",.data$nn,")")))
 
     data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
@@ -89,7 +90,7 @@ metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
     dn <- m$dimensionName
 
     result_new <- m %>%
-      select(.data$dimensionName,.data$memberLevel) %>%
+      select("dimensionName","memberLevel") %>%
       tidyr::pivot_wider(names_from="dimensionName",values_from="memberLevel") %>%
       mutate(!!dn:=factor(!!as.name(dn),levels=dm$memberLevel))
 
@@ -121,7 +122,8 @@ extract_vector_metadata <- function(data1){
     dplyr::bind_rows() %>%
     dplyr::mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
     dplyr::mutate(title=.data$title_en) %>%
-    dplyr::mutate(table=cleaned_ndm_table_number(as.character(table)))
+    dplyr::mutate(table=cleaned_ndm_table_number(as.character(table))) |>
+    dplyr::mutate(COORDINATE=gsub("(\\.0)+$","",COORDINATE)) # strip trailing zeros
 
   result
 }
@@ -220,16 +222,24 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   # }
 
   attr(result,"language") <- cleaned_language
+  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
 
+  if (cleaned_language=="fra") { # need to rename columns
+    result <- result %>%
+      rename_columns_for_language("eng",cleaned_language)
+  }
 
   metadata <- result %>%
-    select(.data$cansimTableNumber,.data$COORDINATE) %>%
+    select("cansimTableNumber",all_of(coordinate_column)) %>%
     unique() %>%
     group_by(.data$cansimTableNumber) %>%
-    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
+                                         coordinates=.x[[coordinate_column]],
+                                         language=cleaned_language)) %>%
     bind_rows()
 
     #metadata_for_coordinates(attr(result,"cansimTableNumber"),coordinates=unique(result$COORDINATE),language=language)
+
 
   if (nrow(result)>0) {
     result <-  result %>%
@@ -238,9 +248,10 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
                               default_month = default_month, default_day = default_day)
   }
 
-
-
-  result %>% left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
+  result |>
+    left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
+    standardize_cansim_column_order() |>
+    mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
 }
 
 #' Retrieve data for specified Statistics Canada data vector(s) for last N periods
@@ -268,6 +279,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
                                                refresh = FALSE, timeout = 200,
                                                factors = TRUE, default_month = "07", default_day = "01"){
   cleaned_language <- cleaned_ndm_language(language)
+
   if (periods*length(vectors)>MAX_PERIODS) {
     periods=pmin(periods,floor(as.numeric(MAX_PERIODS)/length(vectors)))
     warning(paste0("Can access at most ",MAX_PERIODS," data points, capping value to ",periods," periods per vector."))
@@ -303,17 +315,33 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
     result <- readRDS(cache_path)
   }
 
+  attr(result,"language") <- cleaned_language
+  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+  if (cleaned_language=="fra") { # need to rename columns
+    result <- result %>%
+      rename_columns_for_language("eng",cleaned_language)
+  }
+
   metadata <- result %>%
-    select(.data$cansimTableNumber,.data$COORDINATE) %>%
+    select("cansimTableNumber",all_of(coordinate_column)) %>%
     unique() %>%
     group_by(.data$cansimTableNumber) %>%
-    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
+                                         coordinates=.x[[coordinate_column]],
+                                         language=cleaned_language)) %>%
     bind_rows()
 
-  result %>%
+  result <- result %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                             default_month = default_month, default_day = default_day) %>%
-    left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
+    left_join(metadata,by=c("cansimTableNumber",coordinate_column))
+
+  attr(result,"language") <- cleaned_language
+
+  result |>
+    standardize_cansim_column_order() |>
+    mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
 }
 
 
@@ -322,7 +350,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 #'
 #' @param cansimTableNumber Statistics Canada data table number
-#' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}
+#' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.
 #' @param periods Numeric value for number of latest periods to retrieve data for
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
@@ -343,6 +371,13 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   CENSUS_TABLE_STARTING_STRING <- "9810"
+
+  # pad coordinate if needed
+  coordinate <- coordinate |>
+    strsplit("\\.") |>
+    unlist() %>%
+    c(., rep(0, pmax(0,10-length(.)))) |>
+    paste(collapse = ".")
 
   cleaned_language <- cleaned_ndm_language(language)
   table <- naked_ndm_table_number(cansimTableNumber)
@@ -381,18 +416,32 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
   if (nrow(result)==0) {
     result <- NULL
   } else {
+    attr(result,"language") <- cleaned_language
+    coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+    if (cleaned_language=="fra") { # need to rename columns
+      result <- result %>%
+        rename_columns_for_language("eng",cleaned_language)
+    }
+
     metadata <- result %>%
-      select(.data$cansimTableNumber,.data$COORDINATE) %>%
+      select("cansimTableNumber",all_of(coordinate_column)) %>%
       unique() %>%
       group_by(.data$cansimTableNumber) %>%
-      group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,coordinates=.x$COORDINATE,language=cleaned_language)) %>%
+      group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
+                                           coordinates=.x[[coordinate_column]],
+                                           language=cleaned_language)) %>%
       bind_rows()
 
     result <- result %>%
       normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                               default_month = default_month, default_day = default_day) %>%
-      left_join(metadata,by=c("cansimTableNumber","COORDINATE"))
+      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
+      standardize_cansim_column_order() |>
+      mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
   }
+
+  attr(result,"language") <- cleaned_language
   result
 }
 
