@@ -12,7 +12,8 @@ normalize_cansim_values(
   default_day = "01",
   factors = TRUE,
   strip_classification_code = FALSE,
-  cansimTableNumber = NULL
+  cansimTableNumber = NULL,
+  internal = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ normalize_cansim_values(
 \item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
 
 \item{cansimTableNumber}{(Optional) Only needed when operating on results of SQLite connections.}
+
+\item{internal}{(Optional) Flag to indicate that this function is called internally.}
 }
 \value{
 Returns a tibble with with adjusted values.
@@ -44,3 +47,4 @@ cansim_table <- get_cansim("34-10-0013")
 normalize_cansim_values(cansim_table)
 }
 }
+\keyword{internal}

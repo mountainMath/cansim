@@ -43,6 +43,6 @@ Allows for the retrieval of data for a Statistics Canada data table with specifi
 }
 \examples{
 \dontrun{
-get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12.0.0.0.0.0.0.0.0",periods=3)
+get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12",periods=3)
 }
 }
