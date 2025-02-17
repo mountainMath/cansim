@@ -35,10 +35,14 @@ parse_metadata <- function(meta,data_path){
       meta_part <- meta_part[-length(meta_part)]
     }
     if (TRUE) {
+      # This is a workaround for problems with StatCan Metadata found in Table 17-10-0016
+      if (length(grep("\u201C|\u201D",meta_part))>0){
+        meta_part <- meta_part |> gsub("\u201C|\u201D",'"',x=_)
+      }
       utils::read.delim(text=meta_part,sep=table_delim,header=TRUE,stringsAsFactors=FALSE,
+                        quote="\"",na.strings="",
                  colClasses="character",check.names=FALSE) |>
-        as_tibble() |>
-        mutate(across(everything(),\(x)na_if(x,"")))
+        as_tibble()
     } else {
       suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
                                          delim=table_delim, col_types = readr::cols(.default="c")))

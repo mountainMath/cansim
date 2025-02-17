@@ -10,6 +10,7 @@
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
 #' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
+#' @param internal (Optional) Flag to indicate that this function is called internally.
 #'
 #' @return Returns a tibble with with adjusted values.
 #'
@@ -18,11 +19,19 @@
 #' cansim_table <- get_cansim("34-10-0013")
 #' normalize_cansim_values(cansim_table)
 #' }
+#' @keywords internal
 #' @export
 normalize_cansim_values <- function(data, replacement_value="val_norm", normalize_percent=TRUE,
                                     default_month="01", default_day="01",
                                     factors=TRUE,strip_classification_code=FALSE,
-                                    cansimTableNumber=NULL){
+                                    cansimTableNumber=NULL, internal=FALSE){
+
+  if (!internal) {
+    .Deprecated("<redundant>",
+                package="cansim",
+                msg="This function is redundant and don't needs to be called. It has been deprecated and will be removed in future versions.")
+
+  }
 
   language <- attr(data,"language")
   if (is.null(cansimTableNumber)) {
@@ -483,7 +492,7 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
   if (!is.null(getOption("cansim.debug"))) message('Initiating normalization')
   data <- data  %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day)
+                            default_month = default_month, default_day = default_day, internal=TRUE)
 
   data
 }

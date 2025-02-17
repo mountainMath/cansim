@@ -243,14 +243,13 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 
   if (nrow(result)>0) {
     result <-  result %>%
+      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
       rename_vectors(vectors)  %>%
       normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                              default_month = default_month, default_day = default_day)
+                              default_month = default_month, default_day = default_day, internal=TRUE)
   }
 
   result |>
-    left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
-    standardize_cansim_column_order() |>
     mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
 }
 
@@ -333,14 +332,13 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
     bind_rows()
 
   result <- result %>%
+    left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day) %>%
-    left_join(metadata,by=c("cansimTableNumber",coordinate_column))
+                            default_month = default_month, default_day = default_day, internal=TRUE)
 
   attr(result,"language") <- cleaned_language
 
   result |>
-    standardize_cansim_column_order() |>
     mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
 }
 
@@ -363,7 +361,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #'
 #' @examples
 #' \dontrun{
-#' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12.0.0.0.0.0.0.0.0",periods=3)
+#' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12",periods=3)
 #' }
 #' @export
 get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1,
@@ -434,10 +432,9 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
       bind_rows()
 
     result <- result %>%
-      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                              default_month = default_month, default_day = default_day) %>%
       left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
-      standardize_cansim_column_order() |>
+      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                              default_month = default_month, default_day = default_day, internal=TRUE) %>%
       mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
   }
 

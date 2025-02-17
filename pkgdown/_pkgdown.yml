@@ -41,9 +41,6 @@ reference:
     - get_cansim_column_list
     - view_cansim_webpage
     - categories_for_level
-  - title: Data transformation
-  - contents:
-    - normalize_cansim_values
   - title: Miscellaneous
   - contents:
     - add_provincial_abbreviations

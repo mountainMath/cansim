@@ -557,7 +557,8 @@ collect_and_normalize <- function(connection,
                               default_month=default_month,
                               default_day=default_day,
                               factors=factors,
-                              cansimTableNumber = cansimTableNumber)
+                              cansimTableNumber = cansimTableNumber,
+                              internal = TRUE)
   } else {
     message("No data selected, try adjusting your filters.")
   }
