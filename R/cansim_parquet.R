@@ -692,7 +692,8 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 
 #' Remove cached cansim SQLite and parquet database
 #'
-#' @param cansimTableNumber Number of the table to be removed
+#' @param cansimTableNumber Vector of the table(s) to be removed, or a (filtered) table as returned by `list_cansim_cached_tables`
+#' with the list of tables to be removed.
 #' @param format Format of cache to remove, possible values are `"parquet"`, `"feather"` or `"sqlite"` or a subset of these (the default is all of these)
 #' @param language Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages will be removed.
 #' @param cache_path Optional, default value is `getOption("cansim.cache_path")`
@@ -706,26 +707,41 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 #' @export
 remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
                                               cache_path=getOption("cansim.cache_path")){
-  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
+
   format=tolower(format)
   if (length(setdiff(format,c("parquet","sqlite","feather")))>0) {
     stop("Invalid format, must be a subset of 'parquet', 'sqlite', or 'sqlite'.")
   }
+  if (is.null(language)) language <- c("eng","fra")
+  cleaned_language <- cleaned_ndm_language(language)
+
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
-  cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
-  cleaned_language <- ifelse(is.null(language),c("eng","fra"),cleaned_ndm_language(language))
 
-  tables <- list_cansim_cached_tables(cache_path) %>%
-    dplyr::filter(.data$cansimTableNumber %in% !!cansimTableNumber,
-                  .data$language %in% cleaned_language,
-                  .data$dataFormat %in% format)
+  if (is.data.frame(cansimTableNumber)) {
+    if (!sum(c("cansimTableNumber","language","dataFormat") %in% colnames(cansimTableNumber))) {
+      stop("cansimTableNumber must be a character vector or a (filtered) data frame as returned by list_cansim_cached_tables.")
+    }
+    # ensure that tables actually exist
+    tables <- cansimTableNumber |>
+      select("cansimTableNumber","language","dataFormat") |>
+      inner_join(list_cansim_cached_tables(cache_path),by=c("cansimTableNumber","language","dataFormat"))
+  } else {
+    cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
+    tables <- list_cansim_cached_tables(cache_path) %>%
+      dplyr::filter(.data$cansimTableNumber %in% cleaned_number,
+                    .data$language %in% cleaned_language,
+                    .data$dataFormat %in% format)
+  }
 
-
-  for (index in seq(1,nrow(tables))) {
-    path <- tables[index,]$path
-    message("Removing ", tables[index,]$dataFormat," cached data for ",tables[index,]$cansimTableNumber," (",tables[index,]$language,")")
-    unlink(file.path(cache_path,path),recursive=TRUE)
+  if (nrow(tables)==0) {
+    message("No cached data found matching specified filter.")
+  } else {
+    for (index in seq(1,nrow(tables))) {
+      path <- tables[index,]$path
+      message("Removing ", tables[index,]$dataFormat," cached data for ",tables[index,]$cansimTableNumber," (",tables[index,]$language,")")
+      unlink(file.path(cache_path,path),recursive=TRUE)
+    }
   }
   invisible()
 }

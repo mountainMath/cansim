@@ -62,7 +62,10 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
 #' }
 #' @export
 disconnect_cansim_sqlite <- function(connection){
-  DBI::dbDisconnect(connection$src$con)
+  if ("tbl_sql" %in% class(connection)) {
+    DBI::dbDisconnect(connection$src$con)
+  }
+  invisible()
 }
 
 
@@ -84,7 +87,8 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cached_tables(...) instead.")
 
-  list_cansim_cached_tables(cache_path=cache_path, refresh=refresh)
+  list_cansim_cached_tables(cache_path=cache_path, refresh=refresh) |>
+    filter(.data$dataFormat=="sqlite")
 }
 
 #' Remove cached cansim SQLite database

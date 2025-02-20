@@ -12,7 +12,8 @@ remove_cansim_cached_tables(
 )
 }
 \arguments{
-\item{cansimTableNumber}{Number of the table to be removed}
+\item{cansimTableNumber}{Vector of the table(s) to be removed, or a (filtered) table as returned by `list_cansim_cached_tables`
+with the list of tables to be removed.}
 
 \item{format}{Format of cache to remove, possible values are `"parquet"`, `"feather"` or `"sqlite"` or a subset of these (the default is all of these)}
 
