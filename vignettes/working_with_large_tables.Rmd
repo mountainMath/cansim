@@ -42,9 +42,11 @@ By default `get_cansim_connection` uses the *parquet* data format as the best al
 When accessing cached data the package automatically checks if newer versions are available and issues a warning if the cached version is out of date. The `auto_update` argument can be set to `TRUE` to automatically refresh the table if needed, or this can be done manually by setting the `refresh` argument to `TRUE` when calling the function to force a refresh.
 
 
-## Working with cached tables {.tabset .tabset-pills}
+## Working with cached tables
 
 If data is not cached the function will download the data first and convert it to the speficied format. The package is designed so that the differences in database formats are mostly abstracted away.
+
+::: {.panel-tabset .nav-pills}
 
 ### parquet {.active}
 
@@ -70,7 +72,7 @@ connection.sqlite <- get_cansim_connection("20-10-0001", format='sqlite')
 glimpse(connection.sqlite)
 ```
 
-## {-}
+</div>
 
 
 To make good use of the data we will have to look at the metadata and inspect the member columns and variables available.
