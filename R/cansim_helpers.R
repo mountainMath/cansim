@@ -436,39 +436,39 @@ get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
                                           language = language)
 
   # full level values from metadata
-  level_table <- columns |>
+  level_table <- columns %>%
     select(...dim=!!as.name(dimension_id_column),
            ...id=!!as.name(member_id_column),
            ...name=!!as.name(member_name_column),
-           ...parent_id=!!as.name(parent_member_id_column)) |>
-    mutate(...n=as.integer(.data$...id)) |>
-    arrange("...n") |>
-    select(-"...n") |>
-    mutate(...count=n(),.by="...name") |>
-    mutate(...duplicated=.data$...count>1) |>
-    mutate(...original=!.data$...duplicated) |>
-    mutate(...original_name=.data$...name) |>
+           ...parent_id=!!as.name(parent_member_id_column)) %>%
+    mutate(...n=as.integer(.data$...id)) %>%
+    arrange("...n") %>%
+    select(-"...n") %>%
+    mutate(...count=n(),.by="...name") %>%
+    mutate(...duplicated=.data$...count>1) %>%
+    mutate(...original=!.data$...duplicated) %>%
+    mutate(...original_name=.data$...name) %>%
     mutate(...name=ifelse(.data$...duplicated & is.na(.data$...parent_id),
                           paste0(.data$...name," [",.data$...id,"]"), # deals with 36-10-0108
-                          .data$...name)) |>
-  mutate(...count=n(),.by="...name") |>
+                          .data$...name)) %>%
+  mutate(...count=n(),.by="...name") %>%
     mutate(...duplicated=.data$...count>1)
 
   max_run <- 30
   while (sum(level_table$...duplicated)>0 && max_run>0) { # deals with 36-10-0580
     max_run <- max_run - 1
     level_table <- level_table %>%
-      left_join(level_table |> select("...id",...parent_name="...name"),
-                by=c("...parent_id"="...id")) |>
+      left_join(level_table %>% select("...id",...parent_name="...name"),
+                by=c("...parent_id"="...id")) %>%
       mutate(...name=ifelse(.data$...duplicated,
                             paste0(.data$...name," ==> ",.data$...parent_name),
-                            .data$...name)) |>
-      select(-"...parent_name") |>
-      mutate(...count=n(),.by="...name") |>
+                            .data$...name)) %>%
+      select(-"...parent_name") %>%
+      mutate(...count=n(),.by="...name") %>%
       mutate(...duplicated=.data$...count>1)
   }
 
-  level_table |>
+  level_table %>%
     select("...dim","...id","...name","...original","...original_name")
 }
 
@@ -491,7 +491,7 @@ standardize_cansim_column_order <- function(data) {
   data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
   date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
 
-  standard_order1 <- intersect(c("REF_DATE",date_field,"Date","REF_DATE2",data_geography_column,"DGUID","GeoUID") |>
+  standard_order1 <- intersect(c("REF_DATE",date_field,"Date","REF_DATE2",data_geography_column,"DGUID","GeoUID") %>%
                                  unique(),names(data))
   standard_order2 <- intersect(c(value_string,"val_norm","UOM","UOM_ID",scale_string2,scale_string,"VECTOR","cansimTableNumber",coordinate_column,
                                  "STATUS","SYMBOL","releaseTime","frequencyCode",
@@ -500,7 +500,7 @@ standardize_cansim_column_order <- function(data) {
 
   rest_order <- setdiff(names(data),c(standard_order1,standard_order2,standard_order3))
 
-  data |>
+  data %>%
     select(all_of(c(standard_order1,rest_order,standard_order2,standard_order3)))
 }
 
@@ -526,7 +526,7 @@ rename_columns_for_language <- function(data,from_language,to_language) {
 
   renames <- setNames(names(renames),as.character(renames))
 
-  data |>
+  data %>%
     rename(!!!renames)
 
 }

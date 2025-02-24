@@ -136,7 +136,7 @@ data.sqlite %>% head()
 ### traditional
 
 ```{r}
-data.memory <- get_cansim("20-10-0001") |>
+data.memory <- get_cansim("20-10-0001") %>%
   filter(GEO=="Canada",
          `Seasonal adjustment`=="Unadjusted",
          Sales=="Units",

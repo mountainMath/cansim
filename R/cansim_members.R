@@ -20,15 +20,15 @@ get_cansim_members <- function(cansimTableNumber, language="english",
 
   cl <- get_cansim_column_list(cansimTableNumber, language=language, refresh=refresh, timeout=timeout)
 
-  selectedMembers <- cl |>
-    arrange(as.integer(1)) |>
-    pull(1) |>
+  selectedMembers <- cl %>%
+    arrange(as.integer(1)) %>%
+    pull(1) %>%
     lapply(\(did){
 
     })
 
-    members |>
-    seq_along() |>
+    members %>%
+    seq_along() %>%
     lapply(\(i,el,n){
 
     })

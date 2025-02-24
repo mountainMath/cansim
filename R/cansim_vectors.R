@@ -122,7 +122,7 @@ extract_vector_metadata <- function(data1){
     dplyr::bind_rows() %>%
     dplyr::mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
     dplyr::mutate(title=.data$title_en) %>%
-    dplyr::mutate(table=cleaned_ndm_table_number(as.character(table))) |>
+    dplyr::mutate(table=cleaned_ndm_table_number(as.character(table))) %>%
     dplyr::mutate(COORDINATE=gsub("(\\.0)+$","",.data$COORDINATE)) # strip trailing zeros
 
   result
@@ -243,13 +243,13 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 
   if (nrow(result)>0) {
     result <-  result %>%
-      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
+      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
       rename_vectors(vectors)  %>%
       normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                               default_month = default_month, default_day = default_day, internal=TRUE)
   }
 
-  result |>
+  result %>%
     mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
 }
 
@@ -338,7 +338,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 
   attr(result,"language") <- cleaned_language
 
-  result |>
+  result %>%
     mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
 }
 
@@ -371,10 +371,10 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
   CENSUS_TABLE_STARTING_STRING <- "9810"
 
   # pad coordinate if needed
-  coordinate <- coordinate |>
-    strsplit("\\.") |>
+  coordinate <- coordinate %>%
+    strsplit("\\.") %>%
     unlist() %>%
-    c(., rep(0, pmax(0,10-length(.)))) |>
+    c(., rep(0, pmax(0,10-length(.)))) %>%
     paste(collapse = ".")
 
   cleaned_language <- cleaned_ndm_language(language)
@@ -432,7 +432,7 @@ get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate,
       bind_rows()
 
     result <- result %>%
-      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) |>
+      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
       normalize_cansim_values(replacement_value = "val_norm", factors = factors,
                               default_month = default_month, default_day = default_day, internal=TRUE) %>%
       mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))

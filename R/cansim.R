@@ -60,7 +60,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     return (data)
   }
 
-  data <- data |> as_tibble()
+  data <- data %>% as_tibble()
 
   attr(data,"cansimTableNumber") <- cansimTableNumber
   attr(data,"language") <- language
@@ -84,9 +84,9 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 
   date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
 
-  sample_date <- data[1:10,date_field] |> pull(date_field) |> na.omit() |> first()
+  sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
   if (is.na(sample_date)) {
-    sample_date <- pull(date_field) |> na.omit() |> first()
+    sample_date <- pull(date_field) %>% na.omit() %>% first()
 
   }
   # sample_date <- data[[date_field]] %>%
@@ -162,7 +162,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           }
         }
 
-        dimension_id <- level_table$...dim |> unique() |> as.integer()
+        dimension_id <- level_table$...dim %>% unique() %>% as.integer()
 
         if (sum(!level_table$...original)>0) {
           # need to rename data
@@ -170,12 +170,12 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") |> lapply(\(x)x[dimension_id]) |> unlist()
+          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>% lapply(\(x)x[dimension_id]) %>% unlist()
 
-          data <- data |>
-            select(-all_of(field)) |>
-            left_join(level_table |> select("...id","...name") |> rename(!!field:="...name"),by="...id") |>
-            relocate(!!as.name(field),.after=!!as.name(column_before)) |>
+          data <- data %>%
+            select(-all_of(field)) %>%
+            left_join(level_table %>% select("...id","...name") %>% rename(!!field:="...name"),by="...id") %>%
+            relocate(!!as.name(field),.after=!!as.name(column_before)) %>%
             select(-"...id")
         }
 
@@ -187,7 +187,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
                          "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
                          "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
         } else {
-          data <- data |>
+          data <- data %>%
             mutate(!!field:=factor(!!as.name(field),levels=level_table$...name))
         }
 
@@ -217,7 +217,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
 
-  data |>
+  data %>%
     standardize_cansim_column_order()
 }
 

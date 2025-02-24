@@ -87,7 +87,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cached_tables(...) instead.")
 
-  list_cansim_cached_tables(cache_path=cache_path, refresh=refresh) |>
+  list_cansim_cached_tables(cache_path=cache_path, refresh=refresh) %>%
     filter(.data$dataFormat=="sqlite")
 }
 

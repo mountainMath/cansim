@@ -322,7 +322,7 @@ get_cansim_connection <- function(cansimTableNumber,
 
     schema_path <- file.path(dirname(db_path),paste0(basename(db_path),".schema"))
     if (file.exists(schema_path)) { # workaround when arrow drops schema info for partitioning variables
-      arrow_schema <- arrow::open_dataset(schema_path,format=format) |> arrow::schema()
+      arrow_schema <- arrow::open_dataset(schema_path,format=format) %>% arrow::schema()
       # workaround for arrow dropping attributes
       arrow_schema <- arrow_schema$WithMetadata(list("cansimTableNumber"=cansimTableNumber,
                                                      "language"=cleaned_language,
@@ -372,8 +372,8 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
 
   arrow_schema <- readr::read_csv(csv_file,col_names=col_names,
                                   col_types = col_types,
-                                  n_max = 10,skip=1) |>
-    arrow::arrow_table() |>
+                                  n_max = 10,skip=1) %>%
+    arrow::arrow_table() %>%
     arrow::schema()
 
 
@@ -389,12 +389,12 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
                                                                           column_names=col_names))
 
   if ("DGUID" %in% names(input)) {
-    input <- input |>
-      mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1) |> as.character()) # ,.before=.data$DGUID)
+    input <- input %>%
+      mutate(GeoUID=stringr::str_sub(.data$DGUID,10,-1) %>% as.character()) # ,.before=.data$DGUID)
   }
 
   if (!is.null(partitioning) && length(partitioning)>0) {
-    if (setdiff(partitioning,names(input)) |> length() > 0) {
+    if (setdiff(partitioning,names(input)) %>% length() > 0) {
       stop("Partition columns must be present in the input data")
     }
   }
@@ -407,7 +407,7 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
   # workaround when arrow drops schema info for partitioning variables
   schema_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".schema"))
   partitioning_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".partitioning"))
-  arrow::write_dataset(input |> dplyr::slice_head(n=1), format=format, schema_path)
+  arrow::write_dataset(input %>% dplyr::slice_head(n=1), format=format, schema_path)
   saveRDS(partitioning,partitioning_path)
 }
 
@@ -471,7 +471,7 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
   if (!file.exists(schema_path)) {
     stop("Could not access existing database schema, please redownload the table.")
   }
-  arrow_schema <- arrow::open_dataset(schema_path, format=format) |> arrow::schema()
+  arrow_schema <- arrow::open_dataset(schema_path, format=format) %>% arrow::schema()
   old_path <- paste0(db_path,".old")
   file.rename(db_path,old_path)
 
@@ -531,19 +531,19 @@ collect_and_normalize <- function(connection,
 
   data <- NULL
   if ("tbl_sql" %in% class(connection)) {
-    data <- connection |> dplyr::collect()
+    data <- connection %>% dplyr::collect()
     attr(data,"language") <- language
     attr(data,"cansimTableNumber") <- cansimTableNumber
 
     if (disconnect) disconnect_cansim_sqlite(connection)
   } else if ("arrow_dplyr_query" %in% class(connection)){
-    data <- connection |>
+    data <- connection %>%
       dplyr::as_tibble()
     attr(data,"language") <- language
     attr(data,"cansimTableNumber") <- cansimTableNumber
 
     if (nrow(data)>0){
-      data <- data |>
+      data <- data %>%
         transform_value_column(value_string)
     }
   } else {
@@ -594,9 +594,9 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
         unlink(full_path, recursive=TRUE)
       } else {
         message("Transitioning ",path," to new format")
-        new_path <- path |>
-          gsub("_eng$","_sqlite_eng",x=_) |>
-          gsub("_fra$","_sqlite_fra",x=_)
+        new_path <- path %>%
+          gsub("_eng$","_sqlite_eng",x=.) %>%
+          gsub("_fra$","_sqlite_fra",x=.)
         full_new_path <- file.path(cache_path,new_path)
         if (dir.exists(full_new_path)) {
           message("Already have new sqlite table, removing legacy table ",path)
@@ -624,7 +624,7 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
                   niceSize=NA_character_)
 
     if (nrow(result)>0) {
-      result <- result |>
+      result <- result %>%
         dplyr::select("cansimTableNumber","language","dataFormat","timeCached","niceSize","rawSize",
                       "title","path")
     }
@@ -646,9 +646,9 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
                              if (length(pp)==1) {
                                file_path <- file.path(cache_path,p,pp)
                                if (dir.exists(file_path)) {
-                                 d<-list.files(file.path(cache_path,p,pp),full.names = TRUE,recursive = TRUE) |>
-                                   lapply(file.size) |>
-                                   unlist() |>
+                                 d<-list.files(file.path(cache_path,p,pp),full.names = TRUE,recursive = TRUE) %>%
+                                   lapply(file.size) %>%
+                                   unlist() %>%
                                    sum()
                                } else {
                                 d<-file.size(file.path(cache_path,p,pp))
@@ -723,8 +723,8 @@ remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","f
       stop("cansimTableNumber must be a character vector or a (filtered) data frame as returned by list_cansim_cached_tables.")
     }
     # ensure that tables actually exist
-    tables <- cansimTableNumber |>
-      select("cansimTableNumber","language","dataFormat") |>
+    tables <- cansimTableNumber %>%
+      select("cansimTableNumber","language","dataFormat") %>%
       inner_join(list_cansim_cached_tables(cache_path),by=c("cansimTableNumber","language","dataFormat"))
   } else {
     cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
