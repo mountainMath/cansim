@@ -1,43 +1,47 @@
 Package: cansim
 Type: Package
 Title: Accessing Statistics Canada Data Table and Vectors
-Version: 0.3.17
+Version: 0.4
 Authors@R: c(
-    person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")),
+    person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("aut","cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
 Maintainer: Jens von Bergmann <jens@mountainmath.ca>
-Description: Searches for, accesses, and retrieves new-format and old-format Statistics Canada data 
-    tables, as well as individual vectors, as tidy data frames. This package deals with encoding issues, allows for 
-    bilingual English or French language data retrieval, and bundles convenience functions 
-    to make it easier to work with retrieved table data. Optional caching features are provided.
+Description: Searches for, accesses, and retrieves Statistics Canada data 
+    tables, as well as individual vectors, as tidy data frames.
+    This package enriches the tables with metadata, deals
+    with encoding issues, allows for bilingual English or French language data retrieval, and bundles
+    convenience functions to make it easier to work with retrieved table data. For more efficient data
+    access the package allows for caching data in a local database and database level filtering, data
+    manipulation and summarizing.
 License: MIT + file LICENSE
 Encoding: UTF-8
 ByteCompile: yes
 NeedsCompilation: no
 LazyData: true
-Depends: R (>= 2.10)
-Imports: digest (>= 0.1),
-    dplyr (>= 0.7),
+Depends: R (>= 4.1)
+Imports: digest (>= 0.6),
+    dplyr (>= 1.1),
     httr (>= 1.0.0),
-    jsonlite (>= 1.0),
-    readr,
-    rlang,
-    xml2,
-    rvest,
-    stringr,
-    purrr,
-    tibble,
-    utils,
-    DBI,
-    RSQLite
+    tidyr (>= 1.3),
+    readr (>= 2.1),
+    rlang (>= 1.1),
+    stringr (>= 1.5),
+    purrr (>= 1.0),
+    tibble (>= 3.2),
+    arrow (>= 18.1),
+    DBI  (>= 1.2),
+    RSQLite (>= 2.3),
+    utils (>= 4.3),
+    dbplyr (>= 2.5)
 RoxygenNote: 7.3.1
-Suggests: knitr,
+Suggests: 
+    knitr,
     rmarkdown,
-    scales, 
-    tidyr,
     ggplot2,
-    dbplyr
+    scales,
+    testthat (>= 3.0.0)
 URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
 BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr
 Language: en-CA
+Config/testthat/edition: 3

@@ -1,3 +1,13 @@
+# cansim 0.4
+## Major changes
+* add support for local caching in parquet and feather formats
+* uniform interface for sqlite, parquet, and feather caching
+* principled approach to column order
+## Minor changes
+* fix problem with inconsistent type parsing of notes
+* better support for french language when accessing data by vector or coordinate
+* tests
+
 # cansim 0.3.17
 ## Minor changes
 * fix problem with reading French tables released by the census division

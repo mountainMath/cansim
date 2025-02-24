@@ -32,7 +32,7 @@ names(list_cansim_cubes())
 ```
 The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. 
 ```{r}
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 list_cansim_cubes() %>% 
   filter(grepl("Labour force characteristics",cubeTitleEn), 

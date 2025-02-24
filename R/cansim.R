@@ -3,26 +3,36 @@
 #' Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
 #' @param data A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
-#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to replacing the current value field
-#' @param normalize_percent (Optional) When \code{true} (the default) normalizes percentages by changing them to rates
+#' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"
+#' @param normalize_percent (Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
-#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).
+#' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
 #' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
+#' @param internal (Optional) Flag to indicate that this function is called internally.
 #'
-#' @return Returns the input tibble with with adjusted values
+#' @return Returns a tibble with with adjusted values.
 #'
 #' @examples
 #' \dontrun{
 #' cansim_table <- get_cansim("34-10-0013")
 #' normalize_cansim_values(cansim_table)
 #' }
+#' @keywords internal
 #' @export
-normalize_cansim_values <- function(data, replacement_value=NA, normalize_percent=TRUE,
+normalize_cansim_values <- function(data, replacement_value="val_norm", normalize_percent=TRUE,
                                     default_month="01", default_day="01",
-                                    factors=FALSE,strip_classification_code=FALSE,
-                                    cansimTableNumber=NULL){
+                                    factors=TRUE,strip_classification_code=FALSE,
+                                    cansimTableNumber=NULL, internal=FALSE){
+
+  if (!internal) {
+    .Deprecated("<redundant>",
+                package="cansim",
+                msg="This function is redundant and don't needs to be called. It has been deprecated and will be removed in future versions.")
+
+  }
+
   language <- attr(data,"language")
   if (is.null(cansimTableNumber)) {
     cansimTableNumber <- attr(data,"cansimTableNumber")
@@ -39,6 +49,7 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
   hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
+  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
 
   trad_cansim <- scale_string %in% names(data)
 
@@ -48,6 +59,12 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     message("No data, try to adjust filters.")
     return (data)
   }
+
+  data <- data %>% as_tibble()
+
+  attr(data,"cansimTableNumber") <- cansimTableNumber
+  attr(data,"language") <- language
+
 
   if (trad_cansim) {
     data <- data %>%
@@ -66,9 +83,17 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
 
 
   date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
-  sample_date <- data[[date_field]] %>%
-    na.omit %>%
-    first()
+
+  sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
+  if (is.na(sample_date)) {
+    sample_date <- pull(date_field) %>% na.omit() %>% first()
+
+  }
+  # sample_date <- data[[date_field]] %>%
+  #   na.omit %>%
+  #   first()
+
+
   if (!trad_cansim) {
     # do nothing
   } else if (grepl("^\\d{4}$",sample_date)) {
@@ -124,27 +149,10 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
   if (factors){
     if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
 
-    parent_hierarchy <- function(hs){
-      hs %>%
-        strsplit("\\.") %>%
-        lapply(function(d)head(d,-1)) %>%
-        lapply(function(d)paste0(d,collapse = ".")) %>%
-        unlist
-    }
-    hierarchy_order <- function(hs){
-      hs %>%
-        strsplit("\\.") %>%
-        lapply(function(d)stringr::str_pad(d,20,side="left",pad="0")) %>%
-        lapply(function(d)paste0(d,collapse = ".")) %>%
-        unlist
-    }
-    # for (field in fields) {
-    #   data <- data %>%
-    #     mutate(!!field:=factor(!!as.name(field),levels=levels_for_field(field)))
-    # }
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
+        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,language=language,column=field)
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
           data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
@@ -153,68 +161,36 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
             field=data_geography_column
           }
         }
-        hierarchy_field <- paste0(hierarchy_prefix,field)
-        parent_field <- paste0("parent ",field)
-        levels_data <- data %>%
-          select(all_of(c(field,hierarchy_field))) %>%
-          unique %>%
-          rename(...name = !!as.name(field)) %>%
-          mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
-          mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
-          mutate(...original_name = .data$...name)
 
-        h <- levels_data[,hierarchy_field]
-        if (nrow(h) != nrow(unique(h))) {
-           warning(paste0("There is inconsitent naming of categories in column ",field,", cannot convert to factors.\n",
-                   "This is likely a problem with StatCan data, proceed with caution when filtering on this field\n",
-                   "to ensure data integrity. If this turns out to be a problem with the {cansim} package rather\n",
-                   "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
-                   "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
-        } else {
-          max_iterations <- 20 # failsafe
-          while (nrow(levels_data %>%filter(.data$...dupes,.data$...parent_hierarchy!=""))>0 & max_iterations > 0) {
-            if (!is.null(getOption("cansim.debug"))) message(paste0('Deduping ',field,' categories'))
-            levels_data <- levels_data %>%
-              mutate(...parent_hierarchy=parent_hierarchy(pull(.,hierarchy_field))) %>%
-              select(setdiff(names(.),parent_field)) %>%
-              left_join(select(.,all_of(c("...name",hierarchy_field)))%>%
-                          rename(!!!rlang::set_names("...name",parent_field)),
-                        by=c(...parent_hierarchy=hierarchy_field)) %>%
-              mutate(...name=ifelse(.data$...dupes & .data$...parent_hierarchy != "",
-                                    paste0(.data$...original_name," (",!!as.name(parent_field),")"),
-                                    .data$...name)) %>%
-              mutate(...dupes=.data$...name %in% filter(.,duplicated(.data$...name))$...name) %>%
-              mutate(...parent_hierarchy=parent_hierarchy(.data$...parent_hierarchy))
-            max_iterations <- max_iterations -1
-          }
-          if (max_iterations == 0) warning(paste0("Maximum iterations reached for field ",field,"."))
-          if (sum(levels_data$...dupes)>0) {
-            levels_data <- levels_data %>%
-              group_by(.data$...name) %>%
-              mutate(n=n(),nn=row_number()) %>%
-              mutate(...name=ifelse(n>1,paste0(.data$...name," - ",.data$nn),.data$...name))
-          }
+        dimension_id <- level_table$...dim %>% unique() %>% as.integer()
 
-          # make sure order of factors is right
-          levels_data <- levels_data %>%
-            mutate(...h=hierarchy_order(!!as.name(hierarchy_field))) %>%
-            arrange(.data$...h)
+        if (sum(!level_table$...original)>0) {
+          # need to rename data
 
+          column_position <- which(names(data)==field)
+          column_before <- names(data)[column_position-1]
 
-          field_pos <- which(names(data) == field)
+          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>% lapply(\(x)x[dimension_id]) %>% unlist()
+
           data <- data %>%
             select(-all_of(field)) %>%
-            left_join(levels_data %>%
-                        select(all_of(c(hierarchy_field,"...name"))) %>%
-                        rename(!!!rlang::set_names("...name",field)),by=hierarchy_field)
-          after_field <- names(data)[field_pos]
-          data <- data %>%
-            relocate(!!as.name(field),.before=!!as.name(after_field))
-
-          if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' values to factor.'))
-          data <- data %>%
-            mutate_at(field,function(d)factor(d,levels=levels_data$...name))
+            left_join(level_table %>% select("...id","...name") %>% rename(!!field:="...name"),by="...id") %>%
+            relocate(!!as.name(field),.after=!!as.name(column_before)) %>%
+            select(-"...id")
         }
+
+        h <- level_table$...name
+        if (length(h) != length(unique(h))) {
+          warning(paste0("There is inconsitent naming of categories in column ",field,", cannot convert to factors.\n",
+                         "This is likely a problem with StatCan data, proceed with caution when filtering on this field\n",
+                         "to ensure data integrity. If this turns out to be a problem with the {cansim} package rather\n",
+                         "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
+                         "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
+        } else {
+          data <- data %>%
+            mutate(!!field:=factor(!!as.name(field),levels=level_table$...name))
+        }
+
       },
       error=function(cond){
         warning(paste0("Could not convert field ",field, " to a factor, please flag this as an issue in the {cansim} repository at https://github.com/mountainMath/cansim/issues."))
@@ -226,7 +202,23 @@ normalize_cansim_values <- function(data, replacement_value=NA, normalize_percen
     }
   }
 
-  data
+  # column order
+  if (replacement_value_string != value_string) {
+    data <- data %>%
+      relocate(!!as.name(replacement_value_string),.after=!!as.name(value_string))
+  }
+  if ("GeoUID" %in% names(data) && "DGUID" %in% names(data)) {
+    data <- data %>%
+      relocate("GeoUID",.after="DGUID")
+  }
+  if ("Date" %in% names(data) && "REF_DATE" %in% names(data)) {
+    data <- data %>%
+      relocate("Date",.after="REF_DATE")
+  }
+
+
+  data %>%
+    standardize_cansim_column_order()
 }
 
 #' Translate deprecated CANSIM table number into new NDM-format table catalogue number
@@ -315,13 +307,18 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
       pull(!!as.name(dimension_id_column)) %>%
       as.integer()
 
+    is_geo_column <- grepl(geography_column,column_name) &  !(column_name %in% names(data))
+    if (length(column_index)==0) { # failsafe
+      column_index <- which(grepl(geography_column,pull(meta2,dimension_name_column))) %>% first()
+    }
+
     if (length(column_index)!=1) { # failsafe
       warning("Problem with column index, trying to find column index by order in metadata. This may be a problem with the cansim package, please flag this on the {cansim} repository at https://github.com/mountainMath/cansim/issues.")
       column_index <- which(pull(meta2,dimension_name_column)==column_name)
     }
 
     column <- meta2 %>% filter(!!as.name(dimension_id_column)==column_index)
-    is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
+    # is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column_index))
 
     if (is_geo_column) {
@@ -355,7 +352,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     }
   }
   if (!is.null(getOption("cansim.debug"))) message('Folding in hierarchy')
-  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-.data$...pos), by=coordinate_column)
+  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-"...pos"), by=coordinate_column)
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package
@@ -466,16 +463,12 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 
     data <- data %>% transform_value_column(value_column)
 
-    meta <- suppressWarnings(csv_reader(file.path(exdir, paste0(base_table, "_MetaData.csv")),
-                                             na=na_strings,
-                                             #col_names=FALSE,
-                                        locale=readr::locale(encoding="UTF-8",
-                                                             decimal_mark = ",",
-                                                             grouping_mark = "."),
-                                        col_types = list(.default = "c")))
+
+    meta_lines <- readr::read_lines(file.path(exdir, paste0(base_table, "_MetaData.csv")),
+                                    locale=readr::locale(encoding="UTF-8"))
+
     tryCatch({
-      #data <- parse_and_fold_in_metadata(data,meta,data_path)
-      parse_metadata(meta,data_path)
+      parse_metadata(meta_lines,data_path)
       meta2 <- readRDS(paste0(data_path,"2"))
       dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
       data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
@@ -499,7 +492,7 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
   if (!is.null(getOption("cansim.debug"))) message('Initiating normalization')
   data <- data  %>%
     normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day)
+                            default_month = default_month, default_day = default_day, internal=TRUE)
 
   data
 }
@@ -853,11 +846,11 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
   hierarchy_name=paste0("Hierarchy for ",column_name)
   h <- data %>% dplyr::select(column_name,hierarchy_name) %>%
     unique %>%
-    dplyr::mutate(hierarchy_level=(strsplit(!!as.name(hierarchy_name),"\\.") %>% purrr::map(length) %>% unlist)-1)
+    dplyr::mutate(hierarchy_level=(strsplit(!!as.name(hierarchy_name),"\\.") %>% lapply(length) %>% unlist)-1)
   max_level=max(h$hierarchy_level,na.rm = TRUE)
   if (is.na(level) | level>max_level) level=max_level
   h <- h %>%
-    dplyr::mutate(`Member ID`=strsplit(!!as.name(hierarchy_name),"\\.") %>% purrr::map(last) %>% as.integer) %>%
+    dplyr::mutate(`Member ID`=strsplit(!!as.name(hierarchy_name),"\\.") %>% lapply(last) %>% as.integer) %>%
     dplyr::filter(.data$hierarchy_level<=level)
   #strict_hierarchy=h %>% dplyr::filter(.data$hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
   if (strict) {
@@ -866,67 +859,15 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
     higher_ids <- h %>% pull(hierarchy_name) %>% #strict_hierarchy %>%
       as.character() %>%
       strsplit("\\.") %>%
-      purrr::map(function(x){utils::head(as.integer(x),-1)}) %>%
-      unlist %>% unique() %>% as.integer()
+      lapply(function(x){utils::head(as.integer(x),-1)}) %>%
+      unlist() %>% unique() %>% as.integer()
     h <- h %>% dplyr::filter(!(.data$`Member ID` %in% higher_ids))
   }
   h[[column_name]] %>% as.character()
 }
 
 
-generate_table_metadata <- function(){
-  url_for_page <-function(page){paste0("https://www150.statcan.gc.ca/n1/en/type/data?p=",page,"-data/tables#tables")}
-  parse_table_data <- function(item){
-    product <- item %>%
-      html_node(".ndm-result-productid") %>%
-      html_text() %>%
-      sub("^Table: ","", .data)
-    if (grepl("^\\d{2}-\\d{2}-\\d{4}",product)) {
-      result = tibble(
-        title=item %>%
-          html_node(".ndm-result-title") %>%
-          html_text() %>% sub("^(\\d|,)+\\. ","", .data),
-        table=product,
-        former = item %>%
-          html_node(".ndm-result-formerid") %>%
-          html_text() %>% trimws %>%
-          gsub("^\\(formerly: CANSIM |\\)$","", .data),
-        geo = item %>%
-          html_node(".ndm-result-geo") %>%
-          html_text() %>%
-          sub("Geography: ","", .data),
-        description = item %>%
-          html_node(".ndm-result-description") %>%
-          html_text() %>%
-          sub("Description: ","", .data),
-        release_date = item %>%
-          html_node(".ndm-result-date .ndm-result-date") %>%
-          html_text() %>%
-          as.Date()
-      )
-    } else {
-      result=tibble()
-    }
-    result
-  }
-  p <- (xml2::read_html(url_for_page(0)) %>%
-          html_nodes(".pagination"))[2]
-  l <- p %>% html_nodes("li")
-  max_page = (l[length(l)-1] %>%
-                html_node("a") %>%
-                html_text() %>%
-                stringr::str_extract(.data,"^(\\d+)") %>%
-                as.integer)-1
-  pb <- utils::txtProgressBar(0,max_page)
-  bind_rows(lapply(seq(0,max_page),function(page){
-    utils::setTxtProgressBar(pb, page)
-    p <- xml2::read_html(url_for_page(page))
-    l <- p %>%
-      html_nodes("#ndm-results #tables .ndm-item") %>%
-      purrr::map(parse_table_data) %>%
-      bind_rows
-  }))
-}
+
 
 
 #' View CANSIM table or vector information in browser
@@ -1080,8 +1021,9 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
       filter(!is.na(!!as.name(note_id_column))) %>%
       mutate(!!note_id_column:=strsplit(!!as.name(note_id_column),";")) %>%
       tidyr::unnest_longer(!!note_id_column) %>%
-      full_join(notes,by=note_id_column) %>%
-      arrange(!!as.name(note_id_column))
+      mutate(!!note_id_column:=as.character(!!as.name(note_id_column))) %>%
+      full_join(notes %>% mutate(!!note_id_column:=as.character(!!as.name(note_id_column))),by=note_id_column) %>%
+      arrange(!!as.integer(as.name(note_id_column)))
   } else {
     full_notes <- get_cansim_cube_metadata(cansimTableNumber,type="notes",refresh=refresh)
     members <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh = refresh)
@@ -1101,7 +1043,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
                .data$memberId,!!member_name_column:=.data$memberNameEn) %>%
         unique()
       full_notes <- full_notes %>%
-        select(!!note_id_column:=.data$footnoteId,Note=.data$footnotesFr,.data$dimensionPositionId, .data$memberId) %>%
+        select(!!note_id_column:=.data$footnoteId,Note=.data$footnotesEn,.data$dimensionPositionId, .data$memberId) %>%
         left_join(members,by=c("dimensionPositionId","memberId")) %>%
         select(-.data$dimensionPositionId,-.data$memberId)
     }
@@ -1149,10 +1091,6 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
 
 
 #' @import dplyr
-#' @importFrom tibble as.tibble
-#' @importFrom rvest html_node
-#' @importFrom rvest html_nodes
-#' @importFrom rvest html_text
 #' @importFrom rlang .data
 #' @importFrom stats na.omit
 #' @importFrom rlang set_names
@@ -1160,6 +1098,11 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
 #' @importFrom rlang :=
 #' @importFrom stats setNames
 #' @importFrom utils head
+
+# silence warning that dbplyer is not used (explicitly)
+ignore_unused_imports <- function(){
+  dbplyr::sql(NULL)
+}
 
 NULL
 

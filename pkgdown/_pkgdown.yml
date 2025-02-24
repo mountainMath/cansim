@@ -15,12 +15,14 @@ reference:
     - get_cansim_vector
     - get_cansim_vector_for_latest_periods
   - title: SQLite database
-    desc: Managing data in local SQLite database
+    desc: Managing data in local database
   - contents:
-    - get_cansim_sqlite
+    - get_cansim_connection
+    - collect_and_normalize
+    - list_cansim_cached_tables
+    - remove_cansim_cached_tables
     - disconnect_cansim_sqlite
-    - list_cansim_sqlite_cached_tables
-    - remove_cansim_sqlite_cached_table
+    - cansim_repartition_cached_table
   - title: Locating data
   - contents:
     - list_cansim_cubes
@@ -39,23 +41,11 @@ reference:
     - get_cansim_column_list
     - view_cansim_webpage
     - categories_for_level
-  - title: Data transformation
-  - contents:
-    - normalize_cansim_values
-    - collect_and_normalize
   - title: Miscellaneous
   - contents:
     - add_provincial_abbreviations
     - cansim_old_to_new
     - get_cansim_code_set
-articles:
-  - title: "Working with the cansim package"
-    navbar: ~
-    contents:
-      - listing_cansim_tables
-      - retrieving_cansim_vectors
-      - working_with_hierarchies
-      - working_with_large_tables
 
 news:
   releases:

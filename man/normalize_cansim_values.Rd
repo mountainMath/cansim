@@ -6,34 +6,37 @@
 \usage{
 normalize_cansim_values(
   data,
-  replacement_value = NA,
+  replacement_value = "val_norm",
   normalize_percent = TRUE,
   default_month = "01",
   default_day = "01",
-  factors = FALSE,
+  factors = TRUE,
   strip_classification_code = FALSE,
-  cansimTableNumber = NULL
+  cansimTableNumber = NULL,
+  internal = FALSE
 )
 }
 \arguments{
 \item{data}{A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}}
 
-\item{replacement_value}{(Optional) the name of the column the manipulated value should be returned in. Defaults to replacing the current value field}
+\item{replacement_value}{(Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"}
 
-\item{normalize_percent}{(Optional) When \code{true} (the default) normalizes percentages by changing them to rates}
+\item{normalize_percent}{(Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates}
 
 \item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "01")}
 
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 
-\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{false}).}
+\item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).}
 
 \item{strip_classification_code}{(strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).}
 
 \item{cansimTableNumber}{(Optional) Only needed when operating on results of SQLite connections.}
+
+\item{internal}{(Optional) Flag to indicate that this function is called internally.}
 }
 \value{
-Returns the input tibble with with adjusted values
+Returns a tibble with with adjusted values.
 }
 \description{
 Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
@@ -44,3 +47,4 @@ cansim_table <- get_cansim("34-10-0013")
 normalize_cansim_values(cansim_table)
 }
 }
+\keyword{internal}

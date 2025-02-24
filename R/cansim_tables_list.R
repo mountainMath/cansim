@@ -1,144 +1,3 @@
-#' Retrieve list of all Statistics Canada data tables
-#'
-#' Internal function to collect an up-to-date and complete list of Statistics Canada data tables
-#' @return cansim table list
-#' @keywords internal
-get_cansim_table_list <- function(){
-  start=0
-  rows=1000
-  stop=FALSE
-  result=tibble::tibble()
-  while(!stop) {
-    new_rows <- get_cansim_table_list_page(start,rows)
-    if (nrow(new_rows)>0) {
-      result=dplyr::bind_rows(result,new_rows)
-      start = start + rows
-    } else {
-      stop=TRUE
-    }
-  }
-  result
-}
-
-#' An internal method to get page of Statistics Canada data tables
-#' @param start_offset starting row
-#' @param max_rows number of rows, maximum is 1000
-#' @return cansim table list
-#' @keywords internal
-get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
-  if (max_rows>1000) {
-    warning("Clipping to 1000 rows")
-    max_rows=1000
-  }
-  url=paste0("https://open.canada.ca/data/api/3/action/package_search?q=owner_org:A0F0FCFC-BC3B-4696-8B6D-E7E411D55BAC",
-             "&start=",start_offset,"&rows=",max_rows)
-  raw_response <- suppressWarnings(get_with_timeout_retry(url))
-  response <- jsonlite::fromJSON(httr::content(raw_response,type="text",encoding = "UTF-8"))$result
-  results=response$results
-  if (length(results)==0) return (tibble::tibble())
-  string_list <- function(d){
-    purrr::map(d,function(l) paste(as.character(unlist(l)),collapse = ", ")) %>% unlist
-  }
-
-  url_rows <- dplyr::bind_rows(lapply(results$resources,function(d){
-    dd <- tibble::tibble(lang=string_list(d$language),format=d$format,url=d$url) %>%
-      dplyr::filter(.data$format=="CSV")
-    if (nrow(dd)==2) {
-      # have cansim dataset
-      url_1=filter(dd,.data$lang=="en")
-      url_2=filter(dd,.data$lang=="fr")
-      url_1=ifelse(nrow(url_1)==1,url_1$url,"")
-      url_2=ifelse(nrow(url_2)==1,url_2$url,"")
-      url_data=tibble::tibble(source="CANSIM",
-                              url_en=url_1,
-                              url_fr=url_2)
-    } else {
-      url_data=tibble::tibble(source="Other",url_en="",url_fr="")
-    }
-    table_number_from_url <- function(u){
-      cansim_table_number=gsub('^(https://.+/)(\\d+)(-eng.zip)$', '\\2', u)
-      if (grepl("^\\d{8}$",cansim_table_number)) cansim_table_number = cleaned_ndm_table_number(cansim_table_number)
-      cansim_table_number
-    }
-
-    url_data %>%
-      dplyr::mutate(cansim_table_number=table_number_from_url(.data$url_en))
-  }))
-
-
-
-  # rows <- tibble::as_tibble(results) %>%
-  #   dplyr::bind_cols(url_rows) %>%
-  #   dplyr::filter(.data$source=="CANSIM",
-  #                 grepl("^\\d{2}-\\d{2}-\\d{4}",.data$cansim_table_number))
-  #
-  # dfs <- rows %>% select_if(is.data.frame) %>% names
-  # lists <- rows %>% select_if(is.list) %>% names
-  #
-  # for (n in dfs) {
-  #   rows <- rows %>%
-  #     dplyr::mutate(!!paste0(n,"_en"):=!!(as.name(n)) %>% pull(.data$en),
-  #                   !!paste0(n,"_fr"):=!!(as.name(n)) %>% pull(.data$fr)) %>%
-  #     dplyr::select(-!!as.name(n))
-  # }
-  # for (n in lists) {
-  #   rows <- rows %>%
-  #     dplyr::mutate(!!paste0(n,"_en"):=!!(as.name(n))[["en"]],
-  #                   !!paste0(n,"_fr"):=!!(as.name(n))[["fr"]]) %>%
-  #     dplyr::select(-!!as.name(n))
-  # }
-  #
-  #   mutate(title_en=.data$title_translated$en,
-  #          title_fr=.data$title_translated$fr,
-  #          notes_en=.data$notes_translated$en,
-  #          notes_fr=.data$notes_translated$fr,
-  #          keywords_en=string_list(.data$keywords$en),
-  #          keywords_fr=string_list(.data$keywords$en),
-  #          subject=string_list(.data$subject),
-  #          organization_en=.data$organization$en,
-  #          organization_fr=.data$organization$fr,
-  #          program_page_url_en=.data$program_page_url$en,
-  #          program_page_url_fr=.data$program_page_url$fr,
-  #          data_series_name_en=.data$data_series_name$en,
-  #          data_series_name_fr=.data$data_series_name$fr,
-  #          org_title_at_publication_en=.data$org_title_at_publication$en,
-  #          org_title_at_publication_fr=.data$org_title_at_publication$fr) %>%
-  #   select(-.data$title_translated,
-  #          -.data$notes_translated,
-  #          -.data$keywords,
-  #          -.data$organization,
-  #          -.data$program_page_url,
-  #          -.data$data_series_name,
-  #          -.data$org_title_at_publication)
-
-  rows <- tibble::tibble(title=results$title,
-                         title_en=results$title_translated$en,
-                         title_fr=results$title_translated$fr,
-                         keywords_en=string_list(results$keywords$en),
-                         keywords=string_list(results$keywords$en),
-                         keywords_fr=string_list(results$keywords$en),
-                         notes=results$notes,
-                         notes_en=results$notes_translated$en,
-                         notes_fr=results$notes_translated$fr,
-                         state=results$state,
-                         subject=string_list(results$subject),
-                         date_published=results$date_published,
-                         frequency=results$frequency,
-                         revision_id=results$revision_id,
-                         time_period_coverage_start=results$time_period_coverage_start,
-                         time_period_coverage_end=results$time_period_coverage_end,
-                         metadata_created=results$metadata_created,
-                         metadata_modified=results$metadata_modified) %>%
-    dplyr::bind_cols(url_rows)
-
-  rows %>%
-    dplyr::filter(.data$source=="CANSIM",
-                  grepl("^\\d{2}-\\d{2}-\\d{4}",.data$cansim_table_number)) %>%
-    dplyr::select(-source)
-}
-
-
-
 #' Get overview list for all Statistics Canada data tables (deprecated)
 #'
 #' This method is deprecated, please use `list_cansim_cubes` instead.
@@ -156,41 +15,10 @@ get_cansim_table_list_page <- function(start_offset=0,max_rows=1000){
 #' @keywords internal
 #' @export
 list_cansim_tables <- function(refresh=FALSE){
-  warning("This method is deprecated, please use `list_cansim_cubes` instead.")
-  if (FALSE) {
-  # flow: if cansim.cache_path version exists, use that, otherwise fall back on package version
-  # if refresh is TRUE, refresh cache path
+  .Deprecated("list_cansim_cubes",
+              package="cansim",
+              msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cubes(...) instead.")
 
-  directory <- getOption("cansim.cache_path")
-  #if (is.null(directory)) directory <- getOption("cache_path") # legacy
-  path <- file.path(directory,"cansim_table_list.Rda")
-  if (is.null(directory) || (!refresh && !file.exists(path))) {
-    result=cansim_table_list
-    age=(Sys.Date()-attr(result,"date")) %>% as.integer
-    if (age>30) {
-      message_text <- paste0("Your CANSIM table overview data is ",age," days old.\n")
-      if (is.null(directory)) message_text <- paste0(message_text,"Consider setting options(cansim.cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
-      else message_text <- paste0(message_text,"Consider refreshing the table via list_cansim_tables(refresh=TRUE).\n\n")
-      message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider setting options(cansim.cache_path=\"your cache path\")\nin your .Rprofile and refreshing the table via list_cansim_tables(refresh=TRUE).\n\n"))
-      if (is.null(directory)) {
-        message("The table won't be able to be refreshed if options(cansim.cache_path=\"your cache path\") is not set.")
-      }
-    }
-  } else {
-    if (refresh) {
-      message("Generating the table overview data, this may take a minute.")
-      data <- get_cansim_table_list()
-      attr(data,"date") <- Sys.Date()
-      saveRDS(data,path)
-    }
-    result=readRDS(path)
-    age=(Sys.Date()-attr(result,"date")) %>% as.integer
-    if (age>30) {
-      message(paste0("Your CANSIM table overview data is ",age," days old.\nConsider refreshing the table via list_cansim_tables(refresh=TRUE)"))
-    }
-  }
-  result
-  }
   list_cansim_cubes(lite=FALSE,refresh=refresh) %>%
     mutate(title=.data$cubeTitleEn,
            subject=.data$subjectEn,
@@ -220,20 +48,10 @@ list_cansim_tables <- function(refresh=FALSE){
 #' @keywords internal
 #' @export
 search_cansim_tables <- function(search_term, search_fields = "both", refresh=FALSE){
-  warning("This method is deprecated, please use `search_cansim_cubes` instead.")
-  if (FALSE) {
-  tables <- list_cansim_tables(refresh = refresh)
-  if(search_fields=="title") {
-    tables %>%
-      filter(grepl(search_term, .data$title, ignore.case = TRUE))
-  } else if(search_fields=="keywords") {
-    tables %>%
-      filter(grepl(search_term, .data$keywords, ignore.case = TRUE))
-  } else {
-    tables %>%
-      filter(grepl(search_term, .data$subject, ignore.case = TRUE) | grepl(search_term, .data$keywords, ignore.case = TRUE) | grepl(search_term, .data$title, ignore.case = TRUE))
-  }
-  }
+  .Deprecated("search_cansim_cubes",
+              package="cansim",
+              msg="This function has been deprecated, it will be removed in future versions. Please use search_cansim_cubes(...) instead.")
+
   search_cansim_cubes(search_term = search_term, refresh=refresh) %>%
     mutate(title=.data$cubeTitleEn,
            subject=.data$subjectEn,
@@ -316,8 +134,8 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
       data <- r %>%
         mutate_at(vars(ends_with("Date")),as.Date) %>%
         mutate_at(vars(matches("releaseTime")),function(d)readr::parse_datetime(d,
-                                                                                format=STATCAN_TIME_FORMAT,
-                                                                                locale=readr::locale(tz="UTC"))) %>%
+                                                                                #format=STATCAN_TIME_FORMAT,
+                                                                                locale=readr::locale(tz=STATCAN_TIMEZONE))) %>%
         mutate(archived=.data$archived==1) %>%
         mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
         select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),

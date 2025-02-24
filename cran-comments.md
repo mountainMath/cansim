@@ -115,3 +115,13 @@ There were no ERRORs or WARNINGs or NOTEs.
 * improve handling of metadata, enable downloading only metadata instead of only via full table download
 * fold metadata into data when accessing via vector or coordinates
 * allow for cansim vectors in `view_cansim_webpage` to view vector information from statcan in the browser
+
+# cansim 0.4
+## Major changes
+* add support for local caching in parquet and feather formats
+* uniform interface for sqlite, parquet, and feather caching
+* principled approach to column order
+## Minor changes
+* fix problem with inconsistent type parsing of notes
+* better support for french language when accessing data by vector or coordinate
+* tests

@@ -5,7 +5,7 @@ cleaned_ndm_table_number <- function(cansimTableNumber){
     cansimTableNumber <- as.character(cansimTableNumber)
   }
   n<-gsub("-","",cansimTableNumber) %>%
-    purrr::map(function(t){
+    lapply(function(t){
       if (nchar(t)<=7) {
         tt<-cansim_old_to_new(t)
         message("Legacy table number ",cansimTableNumber,", converting to NDM ",tt)
@@ -187,7 +187,7 @@ short_prov.en <- c(
 #   "Canada"="CAN"
 # )
 
-short_prov.fr <- purrr::set_names(c(
+short_prov.fr <- setNames(c(
   "BC",
   "AB",
   "SK",
@@ -300,6 +300,7 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
 # to long form and creates and modifies the COORDINATE column as needed.
 transform_value_column <- function(data,value_column){
   language <- attr(data,"language")
+  cansimTableNumber <- attr(data,"cansimTableNumber")
 
   symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
   if (!(value_column %in% names(data)) & length(symbols)>1) {
@@ -326,6 +327,13 @@ transform_value_column <- function(data,value_column){
         member_names <- dplyr::tibble(!!as.name(paste0("Member ID: ",dimension_name)):=member_ids,
                                       !!as.name(dimension_name):=dimension_members)
 
+
+        if ("arrow_dplyr_query" %in% class(data)) {
+          data <- as.data.frame(data)
+          attr(data,"language") <- language
+          attr(data,"cansimTableNumber") <- cansimTableNumber
+        }
+
         data <- data %>%
           dplyr::rename(!!!renames) %>%
           tidyr::pivot_longer(matches(" --- "), names_pattern="^(.+) --- (.+)$",
@@ -347,12 +355,18 @@ transform_value_column <- function(data,value_column){
   }
 
   if (value_column %in% names(data)) {
-    data <- data %>%
-      dplyr::mutate(!!value_column:=as.numeric(.data[[value_column]]))
+    if (!is.numeric(data[[value_column]])) {
+      data <- data %>%
+        dplyr::mutate(!!value_column:=as.numeric(!!as.name(value_column)))
+    }
   } else {
     warning("Unkown table type")
   }
   data
+}
+
+same_partitioning <- function(p1,p2) {
+  length(p1)==length(p2) && sum(sort(p1)!=sort(p2))==0
 }
 
 # copied from unexported utils:::format.object_size
@@ -402,4 +416,117 @@ format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ..
   if (power == 0 && standard == "legacy")
     unit <- "bytes"
   paste(round(x/base^power, digits = digits), unit)
+}
+
+
+#' Get column names de-duplicated and in the correct order
+#' @param cansimTableNumber The table number
+#' @param language The language of the column names
+#' @param column The column name
+#' @keywords internal
+#' @return A tibble with the column names
+get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
+  dimension_id_column <- ifelse(language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
+  member_id_column <- ifelse(language=="eng","Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre"))
+  member_name_column <- ifelse(language=="eng","Member Name","Nom du membre")
+  parent_member_id_column <- ifelse(language=="eng","Parent Member ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification du membre parent"))
+
+  columns <- get_cansim_column_categories(cansimTableNumber = cansimTableNumber,
+                                          column = column,
+                                          language = language)
+
+  # full level values from metadata
+  level_table <- columns %>%
+    select(...dim=!!as.name(dimension_id_column),
+           ...id=!!as.name(member_id_column),
+           ...name=!!as.name(member_name_column),
+           ...parent_id=!!as.name(parent_member_id_column)) %>%
+    mutate(...n=as.integer(.data$...id)) %>%
+    arrange("...n") %>%
+    select(-"...n") %>%
+    mutate(...count=n(),.by="...name") %>%
+    mutate(...duplicated=.data$...count>1) %>%
+    mutate(...original=!.data$...duplicated) %>%
+    mutate(...original_name=.data$...name) %>%
+    mutate(...name=ifelse(.data$...duplicated & is.na(.data$...parent_id),
+                          paste0(.data$...name," [",.data$...id,"]"), # deals with 36-10-0108
+                          .data$...name)) %>%
+  mutate(...count=n(),.by="...name") %>%
+    mutate(...duplicated=.data$...count>1)
+
+  max_run <- 30
+  while (sum(level_table$...duplicated)>0 && max_run>0) { # deals with 36-10-0580
+    max_run <- max_run - 1
+    level_table <- level_table %>%
+      left_join(level_table %>% select("...id",...parent_name="...name"),
+                by=c("...parent_id"="...id")) %>%
+      mutate(...name=ifelse(.data$...duplicated,
+                            paste0(.data$...name," ==> ",.data$...parent_name),
+                            .data$...name)) %>%
+      select(-"...parent_name") %>%
+      mutate(...count=n(),.by="...name") %>%
+      mutate(...duplicated=.data$...count>1)
+  }
+
+  level_table %>%
+    select("...dim","...id","...name","...original","...original_name")
+}
+
+
+standardize_cansim_column_order <- function(data) {
+  language <- attr(data,"language")
+  if (is.null(language)|!(language %in% c("eng","fra"))) {
+    warning("Don't know how to standardize column order.")
+    return(data)
+  }
+
+  classification_code_column <- ifelse(language=="eng","Classification Code","Code sur la classification")
+  value_string <- ifelse(language=="fra","VALEUR","VALUE")
+  scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
+  uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
+  hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
+  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
+
+  standard_order1 <- intersect(c("REF_DATE",date_field,"Date","REF_DATE2",data_geography_column,"DGUID","GeoUID") %>%
+                                 unique(),names(data))
+  standard_order2 <- intersect(c(value_string,"val_norm","UOM","UOM_ID",scale_string2,scale_string,"VECTOR","cansimTableNumber",coordinate_column,
+                                 "STATUS","SYMBOL","releaseTime","frequencyCode",
+                                 "TERMINATED","DECIMALS"), names(data))
+  standard_order3 <- names(data)[grepl(paste0("^",hierarchy_prefix,"|^",classification_prefix),names(data))]
+
+  rest_order <- setdiff(names(data),c(standard_order1,standard_order2,standard_order3))
+
+  data %>%
+    select(all_of(c(standard_order1,rest_order,standard_order2,standard_order3)))
+}
+
+
+column_names_for_language <- function(language) {
+  date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
+  classification_code_column <- ifelse(language=="eng","Classification Code","Code sur la classification")
+  value_string <- ifelse(language=="fra","VALEUR","VALUE")
+  scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+  scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
+  uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  column_names <- c(date_field,classification_code_column,value_string,scale_string,scale_string2,
+                    uom_string,coordinate_column,data_geography_column)
+  column_names
+}
+
+rename_columns_for_language <- function(data,from_language,to_language) {
+  renames <- setNames(column_names_for_language(to_language),column_names_for_language(from_language))
+
+  renames <- renames[intersect(names(data),names(renames))]
+
+  renames <- setNames(names(renames),as.character(renames))
+
+  data %>%
+    rename(!!!renames)
+
 }

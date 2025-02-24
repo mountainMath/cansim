@@ -35,7 +35,7 @@ get_cansim_table_overview(table_id)
 ### Accessing table data
 We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Value))$Value)`". 
 ```{r}
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 
 data <- get_cansim(table_id) 
 

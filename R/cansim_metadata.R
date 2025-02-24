@@ -1,3 +1,5 @@
+
+
 #' Parse metadata
 #' @param meta the raw metadata table
 #' @param data_path base path to save parsed metadata
@@ -26,38 +28,46 @@ parse_metadata <- function(meta,data_path){
                                                paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
   hierarchy_prefix <- ifelse(cleaned_language=="eng","Hierarchy for",paste0("Hi",intToUtf8(0x00E9),"rarchie pour"))
 
-  m<-suppressWarnings(setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta)))
-  m<-NULL
+  table_delim <- ifelse(cleaned_language=="fra",";",",")
 
-  cut_indices <- setdiff(grep(dimension_id_column,meta[[cube_title_column]]),nrow(meta))
-  cut_indices <- c(cut_indices,grep(symbol_legend_grepl_field,meta[[cube_title_column]])) %>% sort()
-  meta1 <- meta[seq(1,cut_indices[1]-1),]
+  read_meta <- function(meta_part) {
+    while (meta_part[length(meta_part)]=="") {
+      meta_part <- meta_part[-length(meta_part)]
+    }
+    if (TRUE) {
+      # This is a workaround for problems with StatCan Metadata found in Table 17-10-0016
+      if (length(grep("\u201C|\u201D",meta_part))>0){
+        meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
+      }
+      utils::read.delim(text=meta_part,sep=table_delim,header=TRUE,stringsAsFactors=FALSE,
+                        quote="\"",na.strings="",
+                 colClasses="character",check.names=FALSE) %>%
+        as_tibble()
+    } else {
+      suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
+                                         delim=table_delim, col_types = readr::cols(.default="c")))
+    }
+  }
+
+  cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
+
+  meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)])
   saveRDS(meta1,file=paste0(data_path,"1"))
-  names2 <- meta[cut_indices[1],]  %>%
-    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
-    as.character()
-  meta2 <- meta[seq(cut_indices[1]+1,cut_indices[2]-1),seq(1,length(names2))] %>%
-    rlang::set_names(names2)
+  meta2 <- read_meta(meta[seq(cut_indices[1],cut_indices[2]-1)])
   saveRDS(meta2,file=paste0(data_path,"2"))
-  names3 <- meta[cut_indices[2],]  %>%
-    dplyr::select_if(function(d)sum(!is.na(d)) > 0) %>%
-    as.character()
-  meta3 <- meta[seq(cut_indices[2]+1,cut_indices[3]-1),seq(1,length(names3))] %>%
-    rlang::set_names(names3)
+  meta3 <- read_meta(meta[seq(cut_indices[2],cut_indices[3]-1)])
   saveRDS(meta3,file=paste0(data_path,"2m"))
-  correction_index <- grep(correction_id_grepl_field,meta[[cube_title_column]])
-  if (length(correction_index)==0) correction_index=nrow(meta)
-  additional_indices=c(grep(survey_code_grepl_field,meta[[cube_title_column]]),
-                       grep(subject_code_grepl_field,meta[[cube_title_column]]),
-                       grep(note_id_grepl_field,meta[[cube_title_column]]),
+  correction_index <- grep(paste0('^"',correction_id_grepl_field,'"'),meta)
+  if (length(correction_index)==0) correction_index=length(meta)
+  additional_indices=c(grep(paste0('^"',survey_code_grepl_field,'"'),meta),
+                       grep(paste0('^"',subject_code_grepl_field,'"'),meta),
+                       grep(paste0('^"',note_id_grepl_field,'"'),meta),
                        correction_index)
-  saveRDS(meta[seq(additional_indices[1]+1,additional_indices[2]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[1],c(1,2)]) ,file=paste0(data_path,"3"))
-  saveRDS(meta[seq(additional_indices[2]+1,additional_indices[3]-1),c(1,2)] %>%
-            rlang::set_names(meta[additional_indices[2],c(1,2)]) ,file=paste0(data_path,"4"))
-  if (length(additional_indices)>3)
-    saveRDS(meta[seq(additional_indices[3]+1,additional_indices[4]-1),c(1,2)] %>%
-              rlang::set_names(meta[additional_indices[3],c(1,2)]) ,file=paste0(data_path,"5"))
+  saveRDS(read_meta(meta[seq(additional_indices[1],additional_indices[2]-1)]), file=paste0(data_path,"3"))
+  saveRDS(read_meta(meta[seq(additional_indices[2],additional_indices[3]-1)]), file=paste0(data_path,"4"))
+  if (length(additional_indices)>3) {
+    saveRDS(read_meta(meta[seq(additional_indices[3],additional_indices[4]-1)]),file=paste0(data_path,"5"))
+  }
 
   column_ids <- dplyr::pull(meta2,dimension_id_column)
   column_names <- dplyr::pull(meta2,dimension_name_column)
@@ -100,7 +110,7 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
     meta_x <- meta_x %>%
       dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
       dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
-      dplyr::select(-.data$p)
+      dplyr::select(-"p")
     added <- sum(old != meta_x[[hierarchy_column]])>0
     count=count+1
   }
@@ -174,7 +184,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
     m1 <- d %>% tibble::enframe() %>%
       mutate(l=lapply(.data$value,class) %>% unlist()) %>%
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
-      select(-.data$l) %>%
+      select(-"l") %>%
       tidyr::pivot_wider() %>%
       mutate_all(\(x)paste0(unlist(x), collapse=", "))
     saveRDS(m1, meta1_path)
@@ -187,7 +197,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
     m2 <- d$dimension %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
-          tidyr::unnest_wider(.data$member)
+          tidyr::unnest_wider("member")  %>%
+          mutate(across(where(is.integer),as.character))
       })
     saveRDS(m2, meta2_path)
   } else {
@@ -199,7 +210,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           left_join(as_tibble(.$link),by="footnoteId") %>%
-          dplyr::select(-.data$link)
+          dplyr::select(-"link")  %>%
+          mutate(across(where(is.integer),as.character))
       }) %>%
       unique()
     saveRDS(m3, meta3_path)
@@ -210,7 +222,8 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   if (!file.exists(meta4_path)) {
     m4 <- d$correctionFootnote %>%
       purrr::map_df(\(x){
-        tibble::as_tibble(x)
+        tibble::as_tibble(x)   %>%
+          mutate(across(is.integer,as.character))
       })
     saveRDS(m4, meta4_path)
   } else {
@@ -248,6 +261,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 
   if (type=="overview") {
 
+    if (FALSE) { # experimental code
     fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
                 "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
                 "surveyCode",  "dimension","releaseTime")
@@ -264,12 +278,13 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
       dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
                                                       format=STATCAN_TIME_FORMAT,
                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))
-
+    } else {
     result <- m1 %>%
       dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
       dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
                                                       format=STATCAN_TIME_FORMAT,
                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))
+    }
   } else if (type=="notes") {
     result <- m3
   } else if (type=="members") {

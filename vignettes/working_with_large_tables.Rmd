@@ -20,40 +20,80 @@ knitr::opts_chunk$set(
 ```
 
 
-Most StatCan tables are small in size and can easily processed in memory. However, some tables are so large that this is not a feasible strategy. Table `43-10-0024` is one such example and comes with a CSV file that is several gigabytes in size. In cases like this it is more useful to store and access the data as an SQLite database using the `get_cansim_sqlite` function instead of the usual `get_cansim`. In these circumstances it is also useful to cache the data for longer than just the current R session, and the `data_cache` option allows to specify a permanent location. It defaults to `getOption("cansim.cache_path")`, and if this option is not set it will only cache the data for the duration of the current session.
+Most StatCan tables are small in size and can easily processed in memory. However, some tables are so large that this is not a feasible strategy. Table `43-10-0024` is one such example and comes with a CSV file that is several gigabytes in size. In cases like this it is more useful to store and access the data as a parquet, feather, or SQLite database format using the `get_cansim_connection` function instead of the usual `get_cansim`. In these circumstances it is also useful to cache the data for longer than just the current R session, and the `data_cache` option allows to specify a permanent location. It defaults to `getOption("cansim.cache_path")`, and if this option is not set it will only cache the data for the duration of the current session.
 
 For this vignette we use the (rather small) motor vehicle sales data as an example.
 
 ```{r setup}
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
 
 library(cansim)
 ```
 
-One main difference to the `get_cansim` method is that `get_cansim_sqlite` does not return data but only a connection to the database. This allows us to filter the data before fetching the data into memory. When this is called the first time it will fetch the data, parse it into an SQLite database, index the main columns. This can take a significant amount of time, depending on the size of the table. In any subsequent call it will simply open a database connection to the cached database.
+One main difference to the `get_cansim` method is that `get_cansim_connection` does not return data but only a connection to the database. This allows us to filter the data before fetching the data into memory. The package supports three formats with different advantages and disadvantages:
+
+* `parquet`: This is the most efficient format for importing and storing data, but a bit slower when filtering and reading data.
+* `feather`: This is a somewhat less efficient format for importing and storing data, but slightly faster than *parquet* when filtering and reading data.
+* `sqlite`: This is fairly inefficient format for importing and storing data, taking a lot more disk space, time and a little more memory when importing and indexing, but after importing it allows for very efficient queries and filtering, and additionally allows for database level summary statistics.
+
+By default `get_cansim_connection` uses the *parquet* data format as the best all-around solution, but in use cases of infrequently updating tables with lots of database queries in the meantime that need to be fast, and possibly the need for database level statistics, the *sqlite* format is likely preferable.
+
+When accessing cached data the package automatically checks if newer versions are available and issues a warning if the cached version is out of date. The `auto_update` argument can be set to `TRUE` to automatically refresh the table if needed, or this can be done manually by setting the `refresh` argument to `TRUE` when calling the function to force a refresh.
+
+
+## Working with cached tables
+
+If data is not cached the function will download the data first and convert it to the speficied format. The package is designed so that the differences in database formats are mostly abstracted away.
+
+::: {.panel-tabset .nav-pills}
+
+### parquet {.active}
 
 ```{r}
-connection <- get_cansim_sqlite("20-10-0001")
+connection.parquet <- get_cansim_connection("20-10-0001") # format='parquet' is the default
+
+glimpse(connection.parquet)
 ```
 
-We can inspect the data by looking at the first few columns to get a general idea of what the data looks like.
+### feather 
 
 ```{r}
-head(connection)
+connection.feather <- get_cansim_connection("20-10-0001", format='feather')
+
+glimpse(connection.feather)
 ```
 
-To make good use of the data we will have to look at the metadata and inspect the member columns and variables available. The metadata will be available in the R session after the database connection has been opened. Trying to access the metadata before the connection has been opened will result in the package to attempt to download the data via the `get_cansim` call, which the `get_cansim_sqlite` function is trying to avoid.
+### sqlite
+
+```{r}
+connection.sqlite <- get_cansim_connection("20-10-0001", format='sqlite')
+
+glimpse(connection.sqlite)
+```
+
+</div>
+
+
+To make good use of the data we will have to look at the metadata and inspect the member columns and variables available.
 
 ```{r}
 get_cansim_table_overview("20-10-0001")
 ```
 
 
-This gives us an understanding of the available variables. For the purpose of this vignette we are interested in the breakdown of sales units by Vehicle type in Canada overall. The data is stored in its raw form in the database, the only processing done is that it is augmented by the GeoUID. In order to work with it we need to `collect` the data. If the only operation done is filtering, and no selection or renaming of columns was done before accessing the data, we can utilize the custom `collect_and_normalize` function to collect and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column.
+This gives us an understanding of the available variables. For the purpose of this vignette we are interested in the breakdown of sales units by Vehicle type in Canada overall. The data is stored in its raw form in the database, the only processing done is that it is augmented by the GeoUID. 
+
+## Filtering and loading into memory {.tabset .tabset-pills}
+
+In order to work with the data we need to load it into memory, which is done calling `collect()` on the connection object. If we want to make use of the additional metadata and processing the *cansim* package usually does and the main operations done on the connection were filtering (and not renaming or de-selecing columns needed for enriching with metadata) then we can utilize the custom `collect_and_normalize` function to do this and at the same time normalize the data so it will appear the same way as if we had used the `get_cansim` function. This will add the category and hierarchy metadata and the normalized value column. In the case of *sqlite* connections we might want to pass the `disconnect = TRUE` argument in the `collect_and_normalize` function to close the connection after normalizing the data, or do that manually at a later time via `disconnect_cansim_sqlite(connection)`. This is not required for *parquet* or *feather* connections.
+
+The `collect_and_normalize()` interface is designed to be used in the same way across database formats. In this comparison we also add the "traditional" `get_cansim()` approach that reads the entire table into memory and normalizes the data.
+
+### parquet {.active}
 
 ```{r}
-data <- connection %>%
+data.parquet <- connection.parquet %>%
   filter(GEO=="Canada",
          `Seasonal adjustment`=="Unadjusted",
          Sales=="Units",
@@ -61,14 +101,63 @@ data <- connection %>%
          `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
   collect_and_normalize()
 
-data %>% head()
+data.parquet %>% head()
 ```
 
+### feather
+
+```{r}
+data.feather <- connection.feather %>%
+  filter(GEO=="Canada",
+         `Seasonal adjustment`=="Unadjusted",
+         Sales=="Units",
+         `Origin of manufacture`=="Total, country of manufacture",
+         `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
+  collect_and_normalize()
+
+data.feather %>% head()
+```
+
+### sqlite
+
+```{r}
+data.sqlite <- connection.sqlite %>%
+  filter(GEO=="Canada",
+         `Seasonal adjustment`=="Unadjusted",
+         Sales=="Units",
+         `Origin of manufacture`=="Total, country of manufacture",
+         `Vehicle type` %in% c("Passenger cars","Trucks")) %>%
+  collect_and_normalize()
+
+data.sqlite %>% head()
+```
+
+
+### traditional
+
+```{r}
+data.memory <- get_cansim("20-10-0001") %>%
+  filter(GEO=="Canada",
+         `Seasonal adjustment`=="Unadjusted",
+         Sales=="Units",
+         `Origin of manufacture`=="Total, country of manufacture",
+         `Vehicle type` %in% c("Passenger cars","Trucks")) 
+
+data.memory %>% head()
+```
+
+## {-}
+
+We note that the syntax, and the resulting data frames, are identical. 
+
+## Working with the data
+
+With all three data formats producing the same output we can now work with the data as if it was fetched and subsequently filtered via `get_cansim`. 
 
 Given the data we can further filter the date range and plot it.
 
 ```{r}
-data %>%
+data.parquet %>%
   filter(Date>=as.Date("1990-01-01")) %>%
   ggplot(aes(x=Date,y=val_norm,color=`Vehicle type`)) +
   geom_smooth(span=0.2,method = 'loess', formula = y ~ x) +
@@ -78,24 +167,33 @@ data %>%
        x=NULL,y="Number of units")
 ```
 
-When we don't need the database connection any more we should remember to close it. This frees up resources and keeps the database handlers happy.
 
-```{r}
-disconnect_cansim_sqlite(connection)
-```
+## Partitioning
+
+To improve read performance of *parquet* and *feather* data one can specify a `partioning` argument when calling `get_cansim_connection`. This will partition the data by the specified columns. This can be useful when filtering by these columns as it will only read the relevant partitions and greatly increase read performance with a sight cost to size on disk. If for example a dataset is mostly accessed by filtering on geographic regions, it migh be useful to partition by `GeoUID`, or the `GEO` column if querying data by name. More than one partitioning column can be specified, but this is only helpful for very large datasets with a high number of dimensions. A *parquet* dataset that is partitioned with the subsequent queries in mind is often faster in data retrieval than an index SQLite database. The [*arrow* package](https://arrow.apache.org/docs/r/) has more guidance on partitioning and the tradeoffs.
+
+
+
+### Repartitioning
+
+Partitioning happens on initial data import and changing the `partitioning` parameter in subsequent calls to `get_cansim_connection()` won't have any effect, althoug a warning will get issued if the specified partitioning is not empty and differs from the initial paritioning. In some cases, for example when doing lots of data queries on the dataset, it might make sense to occasionally change the partitioning of the data in order to optimize read performance. This can be done with the `cansim_repartition_cached_table()` that takes a `new_partitioning` argument. Repartitioning happnes fairly fast, taking up to several seconds on fairly large tables where the original CSV is several gigabytes in size.
 
 ## Keeping track of cached data
+
 Since we now have the option of a more permanent cache we should take care to manage that space properly. The `list_cansim_sqlite_cached_tables` function gives us an overview over the cached data we have.
 
 ```{r}
-list_cansim_sqlite_cached_tables()
+list_cansim_cached_tables()
 ```
 
-Cached data won't update automatically, we will have to pass the `refresh=TRUE` option to refresh it manually when we want a fresh data pull from StatCan. If we want to free up disk space we can remove a cached table.
+## Removing cached data
+
+
+If we want to free up disk space we can remove a cached table or several tables. The following call will remove all cached "20-10-0001" tables in all formats and languages. Before that we disconnect the connection to the *sqlite* database.
 
 ```{r}
-remove_cansim_sqlite_cached_table("20-10-0001")
+disconnect_cansim_sqlite(connection.sqlite)
+remove_cansim_cached_tables("20-10-0001")
 ```
-
 
 

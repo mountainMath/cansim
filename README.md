@@ -43,21 +43,57 @@ remotes::install_github("mountainmath/cansim")
 
 The package accepts use of both old-format ("051-0013") or new-format ("17-10-0016-01") table catalogue numbers to download entire data tables as tidy data frames. Calling either the legacy CANSIM table number or the new NDM number will load the same data. Since the transition to the new data repository, existing tables will have retained their old-format numbers, but any newly created tables will have only new-format names. 
 
-```r
+```{r}
 # Retrieve data for births table: 17-10-0016-01 (formerly: CANSIM 051-0013)
 births <- get_cansim("051-0013")
-births <- get_cansim("17-10-0016-01")
+births <- get_cansim("17-10-0016")
 
 # Retrieve data for balance of payment table 36-10-0042-01 (formerly CANSIM  376-8105)
 bop <- get_cansim("3768105")
 bop <- get_cansim("36-10-0042")
 ```
 
-See more example usage and worfklow in the _Getting started with the cansim package_ vignette. 
+See more example usage and workflow in the _Getting started with the cansim package_ vignette. 
 
 ### Caching
 
 Many of the data tables available in Statistics Canada's data repository are quite large in size. After downloading tables, the `cansim` package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. To force a refresh of the data, pass the `refresh=TRUE` option in the function call. 
+
+To cache data between sessions the `get_cansim_connection()` function retrieves and caches data in a local database and
+returns a database connection. This allows for database level filtering, data manipulation, and summarizing before
+calling `collect_and_normalize()` to retrieve the data as a data frame. Data retrieved this way is identical to data
+retrieved via `get_cansim()`, possibly up to row order.
+
+The call
+
+```{r}
+births <- get_cansim_connection("17-10-0016") |>
+  collect_and_normalize()
+```
+
+will give identical output to `get_cansim("17-10-0016")`, more commonly we would filter or otherwise manipulate the data before
+calling `collect_and_normalize()` to load the data into memory. For example, to filter the data to only include births
+in Canada overall irrespective of gender we could use the following code:
+
+
+```{r}
+births <- get_cansim_connection("17-10-0016") |>
+  dplyr::filter(GEO == "Canada",
+                Gender == "Total - gender") |>
+  collect_and_normalize()
+```
+
+One further difference to just calling `get_cansim()` is that the data is cached before sessions if the
+"cansim.cache_path" option variable is set. Typically this will be set in the `.Rprofile` file in the home directory
+to share the cache between sessions and between projects.
+
+The function will emit a warning if the package we query is cached and a newer version is available from StatCan.
+Setting the `refresh = "auto"` argument will automatically refresh the data if a newer version is available, setting
+`refresh = TRUE` forces a refresh irrespective if the cached data is out of date or not.
+
+This approach is especially useful when working with large tables, see more example usage and workflow in
+the _Working with large tables_ vignette. 
+
 
 ### Bilingual
 
@@ -71,15 +107,22 @@ naissances <- get_cansim("051-0013",language="fr")
 
 ### Normalizing values
 
-The package also contains a convenience function that will re-scale and re-label variables that are reported in thousands or millions. Statistics Canada data table values may be scaled by powers of 10. 
+The package also scales variables that are reported in thousands
+or millions. Statistics Canada data table values may be scaled by powers of 10. 
 
-For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. By default the {cansim} package adds a `val_norm` column with scaled values, so to get the value of the `val_norm` the `VALUE` column will be converted from 10 to 10,000,000 in the example given. Similarly, percentages will be converted to rates, so instead of being 0-100 it will be normalized to 0-1 in the `val_norm` column.
-
-Prior to version 0.3.7 this was achieved by calling the `normalize_cansim_values` functions, the use of which is now redundant and is deprecated.
+For example, values in the `VALUE` field may be reported in "millions", so a `VALUE` of 10 means 10,000,000. By default
+the **cansim** package adds a `val_norm` column with scaled values, so to get the value of the `val_norm` the `VALUE` column
+will be converted from 10 to 10,000,000 in the example given. Similarly, percentages will be converted to rates, so instead
+of being 0-100 it will be normalized to 0-1 in the `val_norm` column.
 
 ### Vectors
 
-Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian
+statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will
+typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI)
+over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*.
+To retrieve just this data series on its own without all of the additional data available in related tables, we can use
+the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
 
 ```{r}
 get_cansim_vector("v41690973","2015-01-01")
@@ -188,7 +231,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.3.17. DOI: 10.32614/CRAN.package.cansim
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4. DOI: 10.32614/CRAN.package.cansim
 
 A BibTeX entry for LaTeX users is
 
@@ -196,9 +239,9 @@ A BibTeX entry for LaTeX users is
   @Manual{cansim,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
-    year = {2024},
+    year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.3.17},
+    note = {R package version 0.4},
     url = {https://mountainmath.github.io/cansim/}
   }
 ```
