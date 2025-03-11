@@ -203,7 +203,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
   # column order
-  if (replacement_value_string != value_string) {
+  if (replacement_value_string != value_string && replacement_value_string %in% names(data) && value_string %in% names(data)) {
     data <- data %>%
       relocate(!!as.name(replacement_value_string),.after=!!as.name(value_string))
   }

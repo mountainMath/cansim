@@ -125,3 +125,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 * fix problem with inconsistent type parsing of notes
 * better support for french language when accessing data by vector or coordinate
 * tests
+
+# cansim 0.4.1
+## Minor changes
+* fix problem with parsing census data tables
