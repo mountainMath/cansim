@@ -518,7 +518,7 @@ collect_and_normalize <- function(connection,
   cansimTableNumber <- attr(connection,"cansimTableNumber")
   language <- attr(connection,"language")
 
-  if ((is.null(language)||is.null(cansimTableNumber))&& ("arrow_dplyr_query" %in% class(connection))) {
+  if ((is.null(language)||is.null(cansimTableNumber))&& ("arrow_dplyr_query" %in% class(connection) || "ArrowObject" %in% class(connection))) {
     md <- arrow::schema(connection)$metadata
     cansimTableNumber <- md$cansimTableNumber
     language <- md$language
@@ -536,7 +536,7 @@ collect_and_normalize <- function(connection,
     attr(data,"cansimTableNumber") <- cansimTableNumber
 
     if (disconnect) disconnect_cansim_sqlite(connection)
-  } else if ("arrow_dplyr_query" %in% class(connection)){
+  } else if ("arrow_dplyr_query" %in% class(connection) || "ArrowObject" %in% class(connection)){
     data <- connection %>%
       dplyr::as_tibble()
     attr(data,"language") <- language
