@@ -28,7 +28,7 @@ get_cansim_members <- function(cansimTableNumber, language="english",
     })
 
     members %>%
-    seq_along() %>%
+    #seq_along() %>%
     lapply(\(i,el,n){
 
     })

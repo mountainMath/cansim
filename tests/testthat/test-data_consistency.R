@@ -125,7 +125,7 @@ test_that("consistent census tables", {
   skip_on_cran()
   formats <- c("parquet","feather","sqlite")
 
-  table <- "98-10-0036-01"
+  table <- "98-10-0036"
 
   tables <- formats |>
     lapply(\(f) get_cansim_connection(table, format=f, refres="auto") |>
@@ -145,14 +145,16 @@ test_that("consistent census tables", {
   expect_equal(count_differences(tables$parquet,tables$memory),0)
   expect_equal(count_differences(tables$feather,tables$memory),0)
   expect_equal(count_differences(tables$sqlite,tables$memory),0)
+
+  remove_cansim_cached_tables(table)
 })
 
 test_that("consistent cache", {
   skip_on_cran()
 
-  table <- "98-10-0036-01"
+  table <- "98-10-0036"
 
-  tables.statcan <- get_cansim(table)
+  tables.statcan <- get_cansim(table, refresh=TRUE)
   tables.cache <- get_cansim(table)
 
   count_differences <- function(d1,d2) {
