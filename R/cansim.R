@@ -8,7 +8,8 @@
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
-#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped from names. (Default set to \code{false}).
+#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped
+#' from names. (Default set to \code{FALSE}, if \code{factors=TRUE} this is overridden and set to \code{TRUE}).
 #' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
 #' @param internal (Optional) Flag to indicate that this function is called internally.
 #'
@@ -136,6 +137,9 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     fields= gsub(classification_prefix,"",names(data)[grepl(classification_prefix,names(data))])
   }
 
+  if (factors) { #override for consistency
+    strip_classification_code=TRUE
+  }
 
   if (strip_classification_code){
     for (field in fields) {
@@ -203,7 +207,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
   # column order
-  if (replacement_value_string != value_string) {
+  if (replacement_value_string != value_string && replacement_value_string %in% names(data) && value_string %in% names(data)) {
     data <- data %>%
       relocate(!!as.name(replacement_value_string),.after=!!as.name(value_string))
   }
@@ -488,6 +492,9 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       message(paste0("Lecture du produit ",cleaned_number)," de CANSIM NDM ",intToUtf8(0x00E0)," partir du cache.")
     data <- readRDS(file=data_path)
   }
+
+  attr(data,"language") <- cleaned_language
+  attr(data,"cansimTableNumber") <- cleaned_number
 
   if (!is.null(getOption("cansim.debug"))) message('Initiating normalization')
   data <- data  %>%

@@ -121,4 +121,50 @@ test_that("consistent coordinate languages", {
   expect_equal(count_differences(vectors_en,vectors_fr |> rename_columns_for_language("fra","eng")),0)
 })
 
+test_that("consistent census tables", {
+  skip_on_cran()
+  formats <- c("parquet","feather","sqlite")
 
+  table <- "98-10-0036"
+
+  tables <- formats |>
+    lapply(\(f) get_cansim_connection(table, format=f, refres="auto") |>
+             collect_and_normalize(disconnect=TRUE)) |>
+    setNames(formats)
+  tables$memory <- get_cansim(table)
+
+  count_differences <- function(d1,d2) {
+    d1 <- d1 |>
+      dplyr::arrange(REF_DATE,COORDINATE)
+    d2 <- d2 |>
+      dplyr::arrange(REF_DATE,COORDINATE)
+
+    (d1==d2) |> dplyr::as_tibble() |> dplyr::summarize_all(\(x) sum(!is.na(x) & x==FALSE)) |> rowSums()
+  }
+
+  expect_equal(count_differences(tables$parquet,tables$memory),0)
+  expect_equal(count_differences(tables$feather,tables$memory),0)
+  expect_equal(count_differences(tables$sqlite,tables$memory),0)
+
+  remove_cansim_cached_tables(table)
+})
+
+test_that("consistent cache", {
+  skip_on_cran()
+
+  table <- "98-10-0036"
+
+  tables.statcan <- get_cansim(table, refresh=TRUE)
+  tables.cache <- get_cansim(table)
+
+  count_differences <- function(d1,d2) {
+    d1 <- d1 |>
+      dplyr::arrange(REF_DATE,COORDINATE)
+    d2 <- d2 |>
+      dplyr::arrange(REF_DATE,COORDINATE)
+
+    (d1==d2) |> dplyr::as_tibble() |> dplyr::summarize_all(\(x) sum(!is.na(x) & x==FALSE)) |> rowSums()
+  }
+
+  expect_equal(count_differences(tables.statcan,tables.cache),0)
+})
