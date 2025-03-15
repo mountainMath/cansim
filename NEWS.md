@@ -1,6 +1,7 @@
 # cansim 0.4.1
 ## Minor changes
 * fix problem with parsing census data tables
+* fix problem with converting to factors when classification codes are attached.
 
 # cansim 0.4
 ## Major changes

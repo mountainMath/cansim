@@ -52,7 +52,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cansim</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.1</span>
       </span>
     </div>
 
@@ -152,7 +152,7 @@
 hierarchies</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-02-23</h4>
+            <h4 data-toc-skip class="date">2025-03-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_hierarchies.Rmd" class="external-link"><code>vignettes/working_with_hierarchies.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_hierarchies.Rmd</code></div>
@@ -240,12 +240,7 @@ wish to extract.</p>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">total_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Share <span class="op">=</span> <span class="va">val_norm</span><span class="op">/</span><span class="va">Total</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Joining with `by = join_by(Date, GEO)`</span></span>
-<span><span class="co">#&gt; Warning in left_join(., total_data): Detected an unexpected many-to-many relationship between `x` and `y`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Row 1 of `x` matches multiple rows in `y`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Row 1 of `y` matches multiple rows in `x`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> If a many-to-many relationship is expected, set `relationship =</span></span>
-<span><span class="co">#&gt;   "many-to-many"` to silence this warning.</span></span></code></pre></div>
+<span><span class="co">#&gt; Joining with `by = join_by(Date, GEO)`</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="hierarchies-in-more-detail">Hierarchies in more detail<a class="anchor" aria-label="anchor" href="#hierarchies-in-more-detail"></a>
@@ -265,7 +260,7 @@ prefixed with a “T” and which we want to remove as well.)</p>
 <span></span>
 <span><span class="co"># How many are NAICS categories left? </span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">cut_data</span><span class="op">$</span><span class="va">`North American Industry Classification System (NAICS)`</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">unique</span><span class="op">)</span></span></code></pre></div>
-<p>There are still 1 level 1 categories, too many to sensibly visualize
+<p>There are still 22 level 1 categories, too many to sensibly visualize
 at the same time. We can use <code>dplyr</code> functions to identify
 the top categories and group the rest so that we can have a plot that is
 easier to understand.</p>
@@ -304,9 +299,7 @@ further adjustments are required.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Gross domestic product (GDP) at basic prices"</span>,</span>
 <span>       subtitle<span class="op">=</span><span class="va">selected_value</span>,</span>
 <span>       x<span class="op">=</span><span class="st">""</span>, fill <span class="op">=</span> <span class="st">""</span>, </span>
-<span>       caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 27 rows containing non-finite outside the scale range</span></span>
-<span><span class="co">#&gt; (`stat_align()`).</span></span></code></pre></div>
+<span>       caption<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"CANSIM "</span>, <span class="va">table_id</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="working_with_hierarchies_files/figure-html/unnamed-chunk-6-1.png" width="864">
 Let’s have a closer look at the “Real estate and rental and leasing” and
 “Construction” categories. Once again we turn to the
