@@ -131,3 +131,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 * fix problem with parsing census data tables
 * fix problem with converting to factors when classification codes are attached.
 
+# cansim 0.4.2
+## Minor changes
+* ensure proper ordering of levels even if StatCan metadata is not ordered
+

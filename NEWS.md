@@ -1,3 +1,7 @@
+# cansim 0.4.2
+## Minor changes
+* ensure proper ordering of levels even if StatCan metadata is not ordered
+
 # cansim 0.4.1
 ## Minor changes
 * fix problem with parsing census data tables

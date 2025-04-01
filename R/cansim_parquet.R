@@ -205,7 +205,7 @@ get_cansim_connection <- function(cansimTableNumber,
                        select(-!!as.name(hierarchy_name))
                    }
                    if ("DGUID" %in% names(data) && "GeoUID" %in% names(data)) {
-                     data <- data %>% relocate(.data$GeoUID,.before="DGUID")
+                     data <- data %>% relocate("GeoUID",.before="DGUID")
                    }
                    data
                  })

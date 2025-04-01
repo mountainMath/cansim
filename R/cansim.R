@@ -156,7 +156,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
-        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,language=language,column=field)
+        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,language=language,column=field) %>%
+          arrange(as.integer(.data$`...dim`),as.integer(.data$`...id`))
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
           data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
