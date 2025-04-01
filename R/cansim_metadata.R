@@ -196,7 +196,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   meta5_path <- file.path(tmp_base, paste0(cansimTableNumber, "_cubemeta5.Rda"))
 
 
-  if (!file.exists(meta1_path)) {
+  if (!file.exists(meta1_path)||refresh) {
     m1 <- d %>% tibble::enframe() %>%
       mutate(l=lapply(.data$value,class) %>% unlist()) %>%
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
@@ -209,33 +209,36 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   }
 
 
-  if (!file.exists(meta2_path)) {
+  if (!file.exists(meta2_path)||refresh) {
     m2 <- d$dimension %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           tidyr::unnest_wider("member")  %>%
           mutate(across(where(is.integer),as.character))
-      })
+      }) %>%
+      arrange(as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
     saveRDS(m2, meta2_path)
   } else {
     m2 <- readRDS(meta2_path)
   }
 
-  if (!file.exists(meta3_path)) {
+  if (!file.exists(meta3_path)||refresh) {
     m3 <- d$footnote %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           left_join(as_tibble(.$link),by="footnoteId") %>%
           dplyr::select(-"link")  %>%
-          mutate(across(where(is.integer),as.character))
+          mutate(across(where(is.integer),as.character)) %>%
+          arrange(as.integer(.data$footnoteId))
       }) %>%
-      unique()
+      unique() |>
+      arrange(as.integer(.data$footnoteId),as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
     saveRDS(m3, meta3_path)
   } else {
     m3 <- readRDS(meta3_path)
   }
 
-  if (!file.exists(meta4_path)) {
+  if (!file.exists(meta4_path)||refresh) {
     m4 <- d$correctionFootnote %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x)   %>%
