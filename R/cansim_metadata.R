@@ -49,6 +49,22 @@ parse_metadata <- function(meta,data_path){
     }
   }
 
+  read_notes <- function(meta_part) {
+    while (meta_part[length(meta_part)]=="") {
+      meta_part <- meta_part[-length(meta_part)]
+    }
+    if (length(grep("\u201C|\u201D",meta_part))>0){
+      meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
+    }
+    h <- utils::read.delim(text=meta_part[1],sep=table_delim,header=TRUE,stringsAsFactors=FALSE,
+                           quote="\"",na.strings="",
+                           colClasses="character",check.names=FALSE) |>
+      names()
+    notes <- tibble(!!h[1]:=meta_part[-1] |> lapply(\(x)gsub(",.+","",x)) |> unlist(),
+                    !!h[2]:=meta_part[-1] |> lapply(\(x)gsub("^\\d+,","",x) %>% gsub("^\"|\"$","",.)) |> unlist())
+
+  }
+
   cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
 
   meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)])
@@ -66,7 +82,7 @@ parse_metadata <- function(meta,data_path){
   saveRDS(read_meta(meta[seq(additional_indices[1],additional_indices[2]-1)]), file=paste0(data_path,"3"))
   saveRDS(read_meta(meta[seq(additional_indices[2],additional_indices[3]-1)]), file=paste0(data_path,"4"))
   if (length(additional_indices)>3) {
-    saveRDS(read_meta(meta[seq(additional_indices[3],additional_indices[4]-1)]),file=paste0(data_path,"5"))
+    saveRDS(read_notes(meta[seq(additional_indices[3],additional_indices[4]-1)]),file=paste0(data_path,"5"))
   }
 
   column_ids <- dplyr::pull(meta2,dimension_id_column)
