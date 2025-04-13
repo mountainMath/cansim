@@ -117,11 +117,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
-  geography_columns <- case_when(cleaned_language=="eng" ~
-                              c("Geography","Geographic name","Geography of origin"),
-                              TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
-                                paste0("Nom g",intToUtf8(0x00E9),"ographique"),
-                                paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+  geography_columns <- geography_colum_names(cleaned_language)
 
   base_table <- naked_ndm_table_number(cansimTableNumber)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")

@@ -348,7 +348,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 #'
 #' @param cansimTableNumber Statistics Canada data table number
-#' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.
+#' @param coordinates A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.
 #' @param periods Numeric value for number of latest periods to retrieve data for
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
@@ -361,27 +361,23 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #'
 #' @examples
 #' \dontrun{
-#' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12",periods=3)
+#' get_cansim_data_for_table_coord_periods("35-10-0003",coordinates=c("1.1","1.12"),periods=3)
 #' }
 #' @export
-get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1,
+get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinates, periods=1,
                                                   language="english",
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   CENSUS_TABLE_STARTING_STRING <- "9810"
 
   # pad coordinate if needed
-  coordinate <- coordinate %>%
-    strsplit("\\.") %>%
-    unlist() %>%
-    c(., rep(0, pmax(0,10-length(.)))) %>%
-    paste(collapse = ".")
+  coordinates <- normalize_coordinates(coordinates)
 
   cleaned_language <- cleaned_ndm_language(language)
   table <- naked_ndm_table_number(cansimTableNumber)
   is_census_table <- substr(table,1,4)==CENSUS_TABLE_STARTING_STRING
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
-  body_string=paste0('{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}') %>%
+  body_string=paste0('{"productId":',table,',"coordinate":"',coordinates,'","latestN":',periods,'}') %>%
     paste0(.,collapse = ", ") %>%
     paste0("[",.,"]")
   cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))

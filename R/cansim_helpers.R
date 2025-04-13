@@ -530,3 +530,26 @@ rename_columns_for_language <- function(data,from_language,to_language) {
     rename(!!!renames)
 
 }
+
+geography_colum_names <- function(language) {
+  geography_columns <- case_when(language=="eng" ~
+                                   c("Geography","Geographic name","Geography of origin"),
+                                 TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
+                                          paste0("Nom g",intToUtf8(0x00E9),"ographique"),
+                                          paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+}
+
+
+normalize_coordinates <- function(coordinates){
+  coordinates <- lapply(coordinates,\(coordinate)
+                        coordinate %>%
+                          strsplit("\\.") %>%
+                          unlist() %>%
+                          c(., rep(0, pmax(0,10-length(.)))) %>%
+                          paste(collapse = ".")
+  ) %>% unlist()
+
+}
+
+
+

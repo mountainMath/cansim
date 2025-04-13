@@ -6,7 +6,7 @@
 \usage{
 get_cansim_data_for_table_coord_periods(
   cansimTableNumber,
-  coordinate,
+  coordinates,
   periods = 1,
   language = "english",
   refresh = FALSE,
@@ -19,7 +19,7 @@ get_cansim_data_for_table_coord_periods(
 \arguments{
 \item{cansimTableNumber}{Statistics Canada data table number}
 
-\item{coordinate}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.}
+\item{coordinates}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.}
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for}
 
@@ -43,6 +43,6 @@ Allows for the retrieval of data for a Statistics Canada data table with specifi
 }
 \examples{
 \dontrun{
-get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12",periods=3)
+get_cansim_data_for_table_coord_periods("35-10-0003",coordinates=c("1.1","1.12"),periods=3)
 }
 }
