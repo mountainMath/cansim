@@ -445,7 +445,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
   })
 
   info  %>%
-    filter(responseStatusCode==0) %>%
+    filter(.data$responseStatusCode!=2) %>% # filter out invalid combinations
     select(-"responseStatusCode")
 }
 
@@ -477,7 +477,7 @@ add_cansim_vectors_to_template <- function(template, refresh=FALSE) {
   }
 
   vector_info <- get_cansim_series_info_cube_coord(cansimTableNumber, template$COORDINATE, refresh=refresh) %>%
-    select(COORDINATE="coordinate", VECTOR=vectorId) %>%
+    select(COORDINATE="coordinate", VECTOR=.data$vectorId) %>%
     mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
     mutate(COORDINATE=gsub("(.0)+$","",.data$COORDINATE))
 

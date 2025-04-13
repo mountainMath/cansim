@@ -1,6 +1,9 @@
 # cansim 0.4.2
 ## Minor changes
 * ensure proper ordering of levels even if StatCan metadata is not ordered
+* enable series information by table and coordinate
+* generate table template and facitilate adding vector info to aid pinpointed data download
+* enable downloading of data by vector and multiple coordinates in get_cansim_data_for_table_coord_periods (breaking changes with change to parameter)
 
 # cansim 0.4.1
 ## Minor changes
