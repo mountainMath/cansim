@@ -4,6 +4,7 @@
 * enable series information by table and coordinate
 * generate table template and facitilate adding vector info to aid pinpointed data download
 * enable downloading of data by vector and multiple coordinates in get_cansim_data_for_table_coord_periods (breaking changes with change to parameter)
+* better error messages and information on how to diable peer checking when StatCan SSL certificates have problems
 
 # cansim 0.4.1
 ## Minor changes
