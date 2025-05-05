@@ -5,8 +5,7 @@
 \title{Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates}
 \usage{
 get_cansim_data_for_table_coord_periods(
-  cansimTableNumber,
-  coordinates,
+  tableCoordinates,
   periods = 1,
   language = "english",
   refresh = FALSE,
@@ -17,11 +16,11 @@ get_cansim_data_for_table_coord_periods(
 )
 }
 \arguments{
-\item{cansimTableNumber}{Statistics Canada data table number}
+\item{tableCoordinates}{Eitehr a list with vectors of coordinates by table number, or a
+(filtered) data frame as returned by \code{get_cansim_table_template}.}
 
-\item{coordinates}{A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.}
-
-\item{periods}{Numeric value for number of latest periods to retrieve data for}
+\item{periods}{Numeric value for number of latest periods to retrieve data for. Alternatively this can be specified by
+coordinate if tableCoordinates is a data frame, this argumet will be ignored if that data frame as a "periods" column.}
 
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
@@ -43,6 +42,6 @@ Allows for the retrieval of data for a Statistics Canada data table with specifi
 }
 \examples{
 \dontrun{
-get_cansim_data_for_table_coord_periods("35-10-0003",coordinates=c("1.1","1.12"),periods=3)
+get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 }
 }

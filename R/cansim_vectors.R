@@ -348,7 +348,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
 #'
 #' @param tableCoordinates Eitehr a list with vectors of coordinates by table number, or a
-#' (filtered) data frame as returned by code{get_cansim_table_template}.
+#' (filtered) data frame as returned by \code{get_cansim_table_template}.
 #' @param periods Numeric value for number of latest periods to retrieve data for. Alternatively this can be specified by
 #' coordinate if tableCoordinates is a data frame, this argumet will be ignored if that data frame as a "periods" column.
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
@@ -362,7 +362,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #'
 #' @examples
 #' \dontrun{
-#' get_cansim_data_for_table_coord_periods("35-10-0003",coordinates=c("1.1","1.12"),periods=3)
+#' get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 #' }
 #' @export
 get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
@@ -381,7 +381,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
     mutate(cansimTableNumber=naked_ndm_table_number(.data$cansimTableNumber)) %>%
     mutate(COORDINATE = normalize_coordinates(.data$COORDINATE)) %>%
     mutate(is_census_table=substr(.data$cansimTableNumber,1,4)==CENSUS_TABLE_STARTING_STRING) %>%
-    mutate(batch=paste0(is_census_table,"_",cansimTableNumber)) %>%
+    mutate(batch=paste0(.data$is_census_table,"_",.data$cansimTableNumber)) %>%
     mutate(n=n(),.by="batch") %>%
     mutate(b=(n-1) %% 300 == 0) %>%
     mutate(batch=paste0(.data$batch,"_",cumsum(.data$b)),.by="batch")
@@ -399,17 +399,23 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
   result <- NULL
   batches <- unique(tableCoordinates$batch)
+  batch_number=0
   for (batch in batches) {
+    batch_number <- batch_number + 1
     working_data <- tableCoordinates %>%
       filter(.data$batch==!!batch)  %>%
-      mutate(body_string=paste0('{"productId":',cansimTableNumber,
-                                ',"coordinate":"',COORDINATE,
-                                '","latestN":',periods,'}'))
+      mutate(body_string=paste0('{"productId":',.data$cansimTableNumber,
+                                ',"coordinate":"',.data$COORDINATE,
+                                '","latestN":',.data$periods,'}'))
     body_string=paste0(working_data$body_string, collapse = ", ") %>%
       paste0("[",.,"]")
     cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))
     if (refresh || !file.exists(cache_path)) {
-      message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+      addition=""
+      if (length(batches)>1) {
+        addition=paste0(" (batch ",batch_number," of ",length(batches),")")
+      }
+      message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
       if (response$status_code!=200) {
         stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
@@ -423,7 +429,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
           message(x$object$coordinate)
         })
         if (substr(1,4,batch)==CENSUS_TABLE_STARTING_STRING) {
-          warning(paste0("Table ",cansimTableNumber," is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
+          warning(paste0("Table ",.data$cansimTableNumber," is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
         }
       }
       saveRDS(data1,cache_path)

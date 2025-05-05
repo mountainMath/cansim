@@ -100,8 +100,8 @@ test_that("consistent vector languages", {
 test_that("consistent coordinate languages", {
   skip_on_cran()
 
-  vectors_en <- get_cansim_data_for_table_coord_periods("35-10-0003",coordinates="1.12",periods=3,language="eng")
-  vectors_fr <- get_cansim_data_for_table_coord_periods("35-10-0003",coordinates="1.12",periods=3,language="fra")
+  vectors_en <- get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3,language="eng")
+  vectors_fr <- get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3,language="fra")
 
   count_differences <- function(d1,d2) {
     common_names <- intersect(names(d1),names(d2)) |> setdiff("GEO")

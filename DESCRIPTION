@@ -33,7 +33,7 @@ Imports: digest (>= 0.6),
     RSQLite (>= 2.3),
     utils (>= 4.3),
     dbplyr (>= 2.5)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
