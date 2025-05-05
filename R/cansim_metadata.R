@@ -334,6 +334,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 #' }
 #' @export
 get_cansim_table_template <- function(cansimTableNumber, language="eng",refresh=FALSE){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
 
   language <- cleaned_ndm_language(language)
@@ -374,7 +375,8 @@ get_cansim_table_template <- function(cansimTableNumber, language="eng",refresh=
   }
 
   result <- result %>%
-    select(-any_of("...link"))
+    select(-any_of("...link")) %>%
+    mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
 
   attr(result, "cansimTableNumber") <- cansimTableNumber
   attr(result, "langauge") <- language
