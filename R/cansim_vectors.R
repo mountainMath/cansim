@@ -428,8 +428,9 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
         data2 %>% purrr::map(function(x){
           message(x$object$coordinate)
         })
-        if (substr(1,4,batch)==CENSUS_TABLE_STARTING_STRING) {
-          warning(paste0("Table ",.data$cansimTableNumber," is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
+        if (substr(batch,7,10) == CENSUS_TABLE_STARTING_STRING) {
+          warning(paste0("Table ",.data$cansimTableNumber,
+                         " is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
         }
       }
       saveRDS(data1,cache_path)

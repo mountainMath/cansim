@@ -1,0 +1,82 @@
+---
+title: "Partial table data download"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Partial table data download}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = nzchar(Sys.getenv("COMPILE_VIG"))
+)
+```
+
+Sometimes one is only interested in a relatively small subset of a large table, and instead of having to download the entire table, or just a handful of vectors, one might want to access a substantial number of coordinates without having to download the entire table. The package facilitates this by
+
+* allowing to create a template table using just the table metadata that informs on the available combination of dimensions and their coordinates, and
+* allowing to access a subset of the table using a filtered version of the template.
+
+We demonstrate this process by taking the large Table 34-10-0285 on building permits.
+
+```{r setup}
+library(cansim)
+library(dplyr)
+library(ggplot2)
+
+bp_template <- get_cansim_table_template("34-10-0285")
+
+head(bp_template)
+```
+
+The template gives information on the possible combinations of data (although some combinations might not be available in the table and have no data). We can use this to pinpoint data series we are interested in. For the purpose of this example we want to look at the number of housing units created and lost in the four largest metro areas in Canada.
+
+
+```{r}
+bp_template_filtered <- bp_template %>%
+  filter(Geography %in% c("Toronto, Ontario", "Montréal, Quebec", "Vancouver, British Columbia", "Calgary, Alberta"),
+         `Type of building` %in% c("Total residential","Total demolitions"),
+         `Type of work` == "Types of work, total",
+         Variables %in% c("Number of dwelling-units created", "Number of dwelling-units lost", "Number of dwelling-units demolished"),
+         `Seasonal adjustment, value type` == "Unadjusted, current"
+  )
+
+bp_template_filtered
+```
+
+To getting data for just this subset of the table we feed that into the `get_cansim_data_for_table_coord_periods` function.
+
+```{r}
+bp_data <- get_cansim_data_for_table_coord_periods(bp_template_filtered,periods = 10000)
+
+bp_data
+```
+
+
+We then aggregate it to annual data and plot it by year and area, separating out dwellings created from those lost or demolished. 
+
+```{r}
+bp_data |>
+  mutate(Value=case_when(
+    Variables == "Number of dwelling-units created" ~ val_norm,
+    TRUE ~ -val_norm
+  )) |>
+  mutate(Name=gsub(", .+","",GEO),
+         Year=strftime(Date,"%Y")) |>
+  summarize(Value=sum(Value),n=n(),.by=c(Name,Year,Variables)) |>
+  filter(n==12,!is.na(Value)) |> # only show years with complete 12 months of data
+  ggplot(aes(x=Year,y=Value,fill=Variables)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~Name,scales="free_y") +
+  scale_y_continuous(labels=scales::comma) +
+  theme(axis.text.x = element_text(angle=90, hjust=1)) +
+  labs(title="Building permits for residential structures in Canadian metro areas",
+       y="Number of dwelling units",
+       x=NULL,
+       fill="Metric",
+       caption="StatCan Table 34-10-0285") 
+```
+
