@@ -201,9 +201,15 @@
 <p>Many of the data tables available in Statistics Canada’s data repository are quite large in size. After downloading tables, the <code>cansim</code> package will cache data in a temporary directory for the duration of the current R session. This reduces unnecessary waiting when recompiling code. To force a refresh of the data, pass the <code>refresh=TRUE</code> option in the function call.</p>
 <p>To cache data between sessions the <code><a href="reference/get_cansim_connection.html">get_cansim_connection()</a></code> function retrieves and caches data in a local database and returns a database connection. This allows for database level filtering, data manipulation, and summarizing before calling <code><a href="reference/collect_and_normalize.html">collect_and_normalize()</a></code> to retrieve the data as a data frame. Data retrieved this way is identical to data retrieved via <code><a href="reference/get_cansim.html">get_cansim()</a></code>, possibly up to row order.</p>
 <p>The call</p>
-<p><code>{r} births &lt;- get_cansim_connection("17-10-0016") |&gt;   collect_and_normalize()</code></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim_connection.html">get_cansim_connection</a></span><span class="op">(</span><span class="st">"17-10-0016"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/collect_and_normalize.html">collect_and_normalize</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>will give identical output to <code>get_cansim("17-10-0016")</code>, more commonly we would filter or otherwise manipulate the data before calling <code><a href="reference/collect_and_normalize.html">collect_and_normalize()</a></code> to load the data into memory. For example, to filter the data to only include births in Canada overall irrespective of gender we could use the following code:</p>
-<p><code>{r} births &lt;- get_cansim_connection("17-10-0016") |&gt;   dplyr::filter(GEO == "Canada",                 Gender == "Total - gender") |&gt;   collect_and_normalize()</code></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">births</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim_connection.html">get_cansim_connection</a></span><span class="op">(</span><span class="st">"17-10-0016"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">==</span> <span class="st">"Canada"</span>,</span>
+<span>                <span class="va">Gender</span> <span class="op">==</span> <span class="st">"Total - gender"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/collect_and_normalize.html">collect_and_normalize</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>One further difference to just calling <code><a href="reference/get_cansim.html">get_cansim()</a></code> is that the data is cached before sessions if the “cansim.cache_path” option variable is set. Typically this will be set in the <code>.Rprofile</code> file in the home directory to share the cache between sessions and between projects.</p>
 <p>The function will emit a warning if the package we query is cached and a newer version is available from StatCan. Setting the <code>refresh = "auto"</code> argument will automatically refresh the data if a newer version is available, setting <code>refresh = TRUE</code> forces a refresh irrespective if the cached data is out of date or not.</p>
 <p>This approach is especially useful when working with large tables, see more example usage and workflow in the <em>Working with large tables</em> vignette.</p>
@@ -213,7 +219,7 @@
 </h3>
 <p>Statistics Canada data tables are provided in either English or French formats, including labels and formats. The <code>cansim</code> package allows for download of tables in either English or French. There is an optional language argument to retrieve tables in French:</p>
 <p>Le paquet <code>cansim</code> fonctionne en anglais ou en français. Il existe un argument de langue optionnel pour récupérer les tables en français:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">naissances</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_cansim.html">get_cansim</a></span><span class="op">(</span><span class="st">"051-0013"</span>,language<span class="op">=</span><span class="st">"fr"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -226,23 +232,31 @@
 <h3 id="vectors">Vectors<a class="anchor" aria-label="anchor" href="#vectors"></a>
 </h3>
 <p>Many of the time-series data available from Statistics Canada have individual vector codes and some users of Canadian statistical data, who are often concerned with specific time series such as the CPI or international arrivals, will typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI) over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: <em>v41690973</em>. To retrieve just this data series on its own without all of the additional data available in related tables, we can use the <code><a href="reference/get_cansim_vector.html">get_cansim_vector()</a></code> function with the vector code and the date onwards from which we want to get vector results for.</p>
-<p><code>{r} get_cansim_vector("v41690973","2015-01-01")</code></p>
-<p>To access metadata for the vectors, use <code>{r} get_cansim_vector_info("v41690973")</code></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span></code></pre></div>
+<p>To access metadata for the vectors, use</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/get_cansim_vector_info.html">get_cansim_vector_info</a></span><span class="op">(</span><span class="st">"v41690973"</span><span class="op">)</span></span></code></pre></div>
 <p>More detailed usage examples are available in the <em>Retrieving individual Statistics Canada vectors</em> vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="table-overview-metadata">Table overview metadata<a class="anchor" aria-label="anchor" href="#table-overview-metadata"></a>
 </h3>
 <p>The <code>get_cansim_table_overview</code> function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let’s take a look what’s in the table we are interested in.</p>
-<p><code>{r} get_cansim_table_overview("36-10-040")</code></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"36-10-040"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="listing-available-tables">Listing available tables<a class="anchor" aria-label="anchor" href="#listing-available-tables"></a>
 </h3>
 <p>Calling <code>list_cansim_cubes</code> returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers.</p>
-<p><code>{r} list_cansim_cubes()</code></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard <code>dplyr</code> verbs.</p>
-<p><code>{r} list_cansim_cubes() %&gt;%    filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %&gt;%    select("cansim_table_number","cubeTitleEn")</code></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></span></code></pre></div>
 <p>As table search functions require a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cansim.cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
 <p>The <em>Listing Statistics Canada data tables</em> vignette has additional detail and examples.</p>
 </div>
@@ -288,7 +302,7 @@ In doing any of the above, you shall:
 <h3 id="proxy-issues">Proxy issues<a class="anchor" aria-label="anchor" href="#proxy-issues"></a>
 </h3>
 <p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the <code>httr</code> package.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/set_config.html" class="external-link">set_config</a></span><span class="op">(</span><span class="fu">use_proxy</span><span class="op">(</span>url<span class="op">=</span><span class="va">http_proxy</span>, port<span class="op">=</span><span class="va">selected_port</span>, username<span class="op">=</span><span class="va">your_username</span>,password<span class="op">=</span><span class="va">your_pass</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">

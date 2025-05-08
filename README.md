@@ -66,7 +66,7 @@ retrieved via `get_cansim()`, possibly up to row order.
 
 The call
 
-```{r}
+```r
 births <- get_cansim_connection("17-10-0016") |>
   collect_and_normalize()
 ```
@@ -76,7 +76,7 @@ calling `collect_and_normalize()` to load the data into memory. For example, to 
 in Canada overall irrespective of gender we could use the following code:
 
 
-```{r}
+```r
 births <- get_cansim_connection("17-10-0016") |>
   dplyr::filter(GEO == "Canada",
                 Gender == "Total - gender") |>
@@ -124,12 +124,12 @@ over time, you might already know the Statistics Canada vector code the seasonal
 To retrieve just this data series on its own without all of the additional data available in related tables, we can use
 the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
 
-```{r}
+```r
 get_cansim_vector("v41690973","2015-01-01")
 ```
 
 To access metadata for the vectors, use
-```{r}
+```r
 get_cansim_vector_info("v41690973")
 ```
 
@@ -139,7 +139,7 @@ More detailed usage examples are available in the _Retrieving individual Statist
 
 The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
 
-```{r}
+```r
 get_cansim_table_overview("36-10-040")
 ```
 
@@ -147,13 +147,13 @@ get_cansim_table_overview("36-10-040")
 
 Calling `list_cansim_cubes` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
 
-```{r}
+```r
 list_cansim_cubes()
 ```
 
 The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard `dplyr` verbs.
 
-```{r}
+```r
 list_cansim_cubes() %>% 
   filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %>% 
   select("cansim_table_number","cubeTitleEn")
