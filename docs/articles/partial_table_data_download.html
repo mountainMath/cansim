@@ -223,8 +223,14 @@ units created and lost in the four largest metro areas in Canada.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 34-10-0285        24.4.24.2.1 Montréal, Qu… Total residential  Demolitions f…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 86 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: Variables &lt;chr&gt;, `Seasonal adjustment, value type` &lt;chr&gt;</span></span></span></code></pre></div>
-<p>To getting data for just this subset of the table we feed that into
-the <code>get_cansim_data_for_table_coord_periods</code> function.</p>
+<p>This leaves us with 96 coordinates from the table. To get data for
+just this subset of the table we feed that into the
+<code>get_cansim_data_for_table_coord_periods</code> function. By
+default this will get the data for all available times, we could narrow
+it down to the latest
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+periods using the <code>periods</code> argument, but here we want to get
+all available data.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bp_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_data_for_table_coord_periods.html">get_cansim_data_for_table_coord_periods</a></span><span class="op">(</span><span class="va">bp_template_filtered</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
@@ -334,7 +340,7 @@ separating out dwellings newly created, created through conversion,
 those lost to deconversions and those demolished.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bp_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span> <span class="co"># count demolitions and deconversions as negative</span></span>
 <span>    <span class="va">Variables</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Number of dwelling-units demolished"</span>,<span class="st">"Number of dwelling-units lost"</span><span class="op">)</span> <span class="op">~</span> <span class="op">-</span> <span class="va">val_norm</span>,</span>
 <span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">val_norm</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
