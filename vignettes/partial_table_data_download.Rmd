@@ -47,7 +47,7 @@ bp_template_filtered <- bp_template %>%
 bp_template_filtered
 ```
 
-To getting data for just this subset of the table we feed that into the `get_cansim_data_for_table_coord_periods` function.
+This leaves us with `r nrow(bp_template_filtered)` coordinates from the table. To get data for just this subset of the table we feed that into the `get_cansim_data_for_table_coord_periods` function. By default this will get the data for all available times, we could narrow it down to the latest $n$ periods using the `periods` argument, but here we want to get all available data. 
 
 ```{r}
 bp_data <- get_cansim_data_for_table_coord_periods(bp_template_filtered)
@@ -60,7 +60,7 @@ We then aggregate it to annual data and plot it by year and area, separating out
 
 ```{r}
 bp_data |>
-  mutate(Value=case_when(
+  mutate(Value=case_when( # count demolitions and deconversions as negative
     Variables %in% c("Number of dwelling-units demolished","Number of dwelling-units lost") ~ - val_norm,
     TRUE ~ val_norm
   )) |>
