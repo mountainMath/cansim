@@ -39,7 +39,7 @@ The template gives information on the possible combinations of data (although so
 bp_template_filtered <- bp_template %>%
   filter(Geography %in% c("Toronto, Ontario", "Montréal, Quebec", "Vancouver, British Columbia", "Calgary, Alberta"),
          `Type of building` %in% c("Total residential","Total demolitions"),
-         `Type of work` == "Types of work, total",
+         `Type of work` %in% c("Demolitions for residential dwellings","Deconversion total","Conversions total","New dwelling units total"),
          Variables %in% c("Number of dwelling-units created", "Number of dwelling-units lost", "Number of dwelling-units demolished"),
          `Seasonal adjustment, value type` == "Unadjusted, current"
   )
@@ -50,25 +50,25 @@ bp_template_filtered
 To getting data for just this subset of the table we feed that into the `get_cansim_data_for_table_coord_periods` function.
 
 ```{r}
-bp_data <- get_cansim_data_for_table_coord_periods(bp_template_filtered,periods = 10000)
+bp_data <- get_cansim_data_for_table_coord_periods(bp_template_filtered)
 
 bp_data
 ```
 
 
-We then aggregate it to annual data and plot it by year and area, separating out dwellings created from those lost or demolished. 
+We then aggregate it to annual data and plot it by year and area, separating out dwellings newly created, created through conversion, those lost to deconversions and those demolished. 
 
 ```{r}
 bp_data |>
   mutate(Value=case_when(
-    Variables == "Number of dwelling-units created" ~ val_norm,
-    TRUE ~ -val_norm
+    Variables %in% c("Number of dwelling-units demolished","Number of dwelling-units lost") ~ - val_norm,
+    TRUE ~ val_norm
   )) |>
   mutate(Name=gsub(", .+","",GEO),
          Year=strftime(Date,"%Y")) |>
-  summarize(Value=sum(Value),n=n(),.by=c(Name,Year,Variables)) |>
+  summarize(Value=sum(Value),n=n(),.by=c(Name,Year,`Type of work`)) |>
   filter(n==12,!is.na(Value)) |> # only show years with complete 12 months of data
-  ggplot(aes(x=Year,y=Value,fill=Variables)) +
+  ggplot(aes(x=Year,y=Value,fill=`Type of work`)) +
   geom_bar(stat="identity") +
   facet_wrap(~Name,scales="free_y") +
   scale_y_continuous(labels=scales::comma) +

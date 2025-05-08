@@ -349,7 +349,8 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #'
 #' @param tableCoordinates Eitehr a list with vectors of coordinates by table number, or a
 #' (filtered) data frame as returned by \code{get_cansim_table_template}.
-#' @param periods Numeric value for number of latest periods to retrieve data for. Alternatively this can be specified by
+#' @param periods Optional numeric value for number of latest periods to retrieve data for, default is \code{NULL} in which case data for all periods is downloaded.
+#' Alternatively this can be specified by
 #' coordinate if tableCoordinates is a data frame, this argumet will be ignored if that data frame as a "periods" column.
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
@@ -365,11 +366,13 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #' get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 #' }
 #' @export
-get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
+get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL,
                                                   language="english",
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   CENSUS_TABLE_STARTING_STRING <- "9810"
+  default_periods <- 1000000 # get data for all periods
+  if (is.null(periods) || is.na(periods)) {periods <- default_periods}
 
   # pad coordinate if needed
   if ("list" %in% class(tableCoordinates)) {
@@ -389,6 +392,9 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=1,
   if (!("periods") %in% names(tableCoordinates)) {
     tableCoordinates <- tableCoordinates %>%
       mutate(periods = !!periods)
+  } else {
+    tableCoordinates <- tableCoordinates %>%
+      mutate(periods = coalesce(.data$periods, default_periods))
   }
 
   tableCoordinates <- tableCoordinates %>%

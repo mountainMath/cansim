@@ -6,7 +6,7 @@
 \usage{
 get_cansim_data_for_table_coord_periods(
   tableCoordinates,
-  periods = 1,
+  periods = NULL,
   language = "english",
   refresh = FALSE,
   timeout = 200,
@@ -19,7 +19,8 @@ get_cansim_data_for_table_coord_periods(
 \item{tableCoordinates}{Eitehr a list with vectors of coordinates by table number, or a
 (filtered) data frame as returned by \code{get_cansim_table_template}.}
 
-\item{periods}{Numeric value for number of latest periods to retrieve data for. Alternatively this can be specified by
+\item{periods}{Optional numeric value for number of latest periods to retrieve data for, default is \code{NULL} in which case data for all periods is downloaded.
+Alternatively this can be specified by
 coordinate if tableCoordinates is a data frame, this argumet will be ignored if that data frame as a "periods" column.}
 
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}

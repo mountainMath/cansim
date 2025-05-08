@@ -33,15 +33,15 @@ get_cansim_table_overview(table_id)
 ```
 
 ### Accessing table data
-We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Value))$Value)`". 
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Prices))$Prices)`". 
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
 
 data <- get_cansim(table_id) 
 
-selected_value = data$Value[grepl("Chained",data$Value)] %>% unique()
+selected_value = data$Prices[grepl("Chained",data$Prices)] %>% unique()
 data <- data %>% 
-  filter(Value == selected_value)
+  filter(Prices == selected_value)
 ```
 
 
@@ -64,7 +64,7 @@ total_data <- data %>%
 
 # Merge total back in and calculate share for every NAICS code
 data <- data %>% 
-  left_join(total_data) %>% 
+  left_join(total_data,by = c("Date", "GEO")) %>% 
   mutate(Share = val_norm/Total)
 ```
 
