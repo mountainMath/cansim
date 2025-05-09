@@ -31,7 +31,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      COMPILE_VIG: true
+      COMPILE_VIG: ${{ secrets.COMPILE_VIG }}
 
     steps:
       - uses: actions/checkout@v4
