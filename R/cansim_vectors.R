@@ -404,7 +404,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   CENSUS_TABLE_STARTING_STRING <- "9810"
-  if (is.null(periods) || is.na(periods)) {periods <- MAX_PERIODS}}
+  if (is.null(periods) || is.na(periods)) {periods <- MAX_PERIODS}
   periods <- as.integer(periods)
 
   # pad coordinate if needed
