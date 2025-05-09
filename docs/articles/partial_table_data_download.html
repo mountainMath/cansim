@@ -280,6 +280,52 @@ those lost to deconversions and those demolished.</p>
 <span>       fill<span class="op">=</span><span class="st">"Metric"</span>,</span>
 <span>       caption<span class="op">=</span><span class="st">"StatCan Table 34-10-0285"</span><span class="op">)</span> </span></code></pre></div>
 <p><img src="partial_table_data_download_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<div class="section level2">
+<h2 id="using-vectors-instead-of-coordinates">Using vectors instead of coordinates<a class="anchor" aria-label="anchor" href="#using-vectors-instead-of-coordinates"></a>
+</h2>
+<p>The same can be achieved with downloading data by vectors. For this
+we need to add the vector information to the table template. Vector
+information is only available for coordinates, so it also gives an
+effective way to filter out invalid coordinate combinations from the
+template. Vector information is not available for census data
+tables.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bp_template_filtered_vecotrs</span> <span class="op">&lt;-</span> <span class="va">bp_template_filtered</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/add_cansim_vectors_to_template.html">add_cansim_vectors_to_template</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bp_data_vector</span> <span class="op">&lt;-</span> <span class="va">bp_template_filtered_vecotrs</span><span class="op">$</span><span class="va">VECTOR</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span></code></pre></div>
+<p>This gives us the same data as above, with possibly shorter time
+series for some coordinates as querying data by vector will not pull
+data for times when the specific vector was not available. When accessed
+by vector or by coordinate the data will only differ in this limited
+way, and the values on the difference will be <code>NA</code> and won’t
+affect the results. For completeness we plot the vector data and obtain
+an idential graph.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bp_data_vector</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span> <span class="co"># count demolitions and deconversions as negative</span></span>
+<span>    <span class="va">Variables</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Number of dwelling-units demolished"</span>,<span class="st">"Number of dwelling-units lost"</span><span class="op">)</span> <span class="op">~</span> <span class="op">-</span> <span class="va">val_norm</span>,</span>
+<span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">val_norm</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Name<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">", .+"</span>,<span class="st">""</span>,<span class="va">GEO</span><span class="op">)</span>,</span>
+<span>         Year<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/strptime.html" class="external-link">strftime</a></span><span class="op">(</span><span class="va">Date</span>,<span class="st">"%Y"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span>,n<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,.by<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Name</span>,<span class="va">Year</span>,<span class="va">`Type of work`</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n</span><span class="op">==</span><span class="fl">12</span>,<span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># only show years with complete 12 months of data</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Year</span>,y<span class="op">=</span><span class="va">Value</span>,fill<span class="op">=</span><span class="va">`Type of work`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat<span class="op">=</span><span class="st">"identity"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">Name</span>,scales<span class="op">=</span><span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels<span class="op">=</span><span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle<span class="op">=</span><span class="fl">90</span>, hjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Building permits for residential structures in Canadian metro areas"</span>,</span>
+<span>       y<span class="op">=</span><span class="st">"Number of dwelling units"</span>,</span>
+<span>       x<span class="op">=</span><span class="cn">NULL</span>,</span>
+<span>       fill<span class="op">=</span><span class="st">"Metric"</span>,</span>
+<span>       caption<span class="op">=</span><span class="st">"StatCan Table 34-10-0285"</span><span class="op">)</span> </span></code></pre></div>
+<p><img src="partial_table_data_download_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

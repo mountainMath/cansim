@@ -153,7 +153,7 @@
       <h1 data-toc-skip>Working with large tables</h1>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-05-08</h4>
+            <h4 data-toc-skip class="date">2025-05-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/mountainMath/cansim/blob/HEAD/vignettes/working_with_large_tables.Rmd" class="external-link"><code>vignettes/working_with_large_tables.Rmd</code></a></small>
       <div class="hidden name"><code>working_with_large_tables.Rmd</code></div>
@@ -304,7 +304,7 @@ differences in database formats are mostly abstracted away.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.sqlite</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 19</span></span>
-<span><span class="co">#&gt; Database: sqlite 3.49.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/Rtmp7wg5g2/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
+<span><span class="co">#&gt; Database: sqlite 3.49.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmptYRA4s/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
 <span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1…</span></span>
 <span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canad…</span></span>
 <span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"…</span></span>
@@ -568,9 +568,9 @@ overview over the cached data we have.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
 <span><span class="co">#&gt;   cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-05-08 <span style="color: #949494;">21:33:04</span> 10.5 Mb  11<span style="text-decoration: underline;">021</span>778</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-05-08 <span style="color: #949494;">21:32:59</span> 1.1 Mb    1<span style="text-decoration: underline;">133</span>941</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-05-08 <span style="color: #949494;">21:33:07</span> 47.1 Mb  49<span style="text-decoration: underline;">410</span>048</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-05-09 <span style="color: #949494;">10:52:08</span> 10.5 Mb  11<span style="text-decoration: underline;">021</span>778</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-05-09 <span style="color: #949494;">10:52:07</span> 1.1 Mb    1<span style="text-decoration: underline;">133</span>941</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-05-09 <span style="color: #949494;">10:52:09</span> 47.1 Mb  49<span style="text-decoration: underline;">410</span>048</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: title &lt;chr&gt;, path &lt;chr&gt;, timeReleased &lt;dttm&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
 </div>

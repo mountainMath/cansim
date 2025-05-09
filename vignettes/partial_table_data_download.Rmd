@@ -81,3 +81,40 @@ bp_data |>
        caption="StatCan Table 34-10-0285") 
 ```
 
+## Using vectors instead of coordinates
+
+The same can be achieved with downloading data by vectors. For this we need to add the vector information to the table template. Vector information is only available for coordinates, so it also gives an effective way to filter out invalid coordinate combinations from the template. Vector information is not available for census data tables.
+
+```{r}
+bp_template_filtered_vecotrs <- bp_template_filtered |>
+  add_cansim_vectors_to_template()
+
+bp_data_vector <- bp_template_filtered_vecotrs$VECTOR |>
+  na.omit() |>
+  get_cansim_vector()
+```
+
+This gives us the same data as above, with possibly shorter time series for some coordinates as querying data by vector will not pull data for times when the specific vector was not available. When accessed by vector or by coordinate the data will only differ in this limited way, and the values on the difference will be `NA` and won't affect the results. For completeness we plot the vector data and obtain an idential graph.
+
+
+```{r}
+bp_data_vector |>
+  mutate(Value=case_when( # count demolitions and deconversions as negative
+    Variables %in% c("Number of dwelling-units demolished","Number of dwelling-units lost") ~ - val_norm,
+    TRUE ~ val_norm
+  )) |>
+  mutate(Name=gsub(", .+","",GEO),
+         Year=strftime(Date,"%Y")) |>
+  summarize(Value=sum(Value),n=n(),.by=c(Name,Year,`Type of work`)) |>
+  filter(n==12,!is.na(Value)) |> # only show years with complete 12 months of data
+  ggplot(aes(x=Year,y=Value,fill=`Type of work`)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~Name,scales="free_y") +
+  scale_y_continuous(labels=scales::comma) +
+  theme(axis.text.x = element_text(angle=90, hjust=1)) +
+  labs(title="Building permits for residential structures in Canadian metro areas",
+       y="Number of dwelling units",
+       x=NULL,
+       fill="Metric",
+       caption="StatCan Table 34-10-0285") 
+```

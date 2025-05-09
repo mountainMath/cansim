@@ -453,12 +453,14 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 
 #' Retrieve series info for given table id and coordinates
 #'
-#' Retrieves series information by coordinates
+#' Retrieves vector information for given table and coordinates. This can be used to query data by vectors, it only
+#' returns vector information on coordinates which are present in the data table, so it gives an effective way to filter
+#' coordinates. Vector information is not available for census data tables.
 #'
 #' @param template A (possibly filtered) cansim table template as returned by `get_cansim_table_template`
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table template with added vector info
+#' @return a tibble containing the table template with added vector information
 #'
 #' @examples
 #' \dontrun{
@@ -469,23 +471,36 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 #' @export
 #'
 add_cansim_vectors_to_template <- function(template, refresh=FALSE) {
-  cansimTableNumber <- attr(template, "cansimTableNumber")
-  if (is.null(cansimTableNumber)) {
-    stop("The template does not have a cansimTableNumber attribute")
+
+  if (!("cansimTableNumber" %in% names(template))) {
+    stop("The template does not have a cansimTableNumber column.")
+  }
+  if (!("COORDINATE" %in% names(template))) {
+    stop("The template does not have a COORDINATE column.")
   }
 
-  if (!"COORDINATE" %in% names(template)) {
-    stop("The template does not have a COORDINATE column")
+  if (nrow(template)==0) {
+    stop("No rows in the template.")
   }
 
-  vector_info <- get_cansim_series_info_cube_coord(cansimTableNumber, template$COORDINATE, refresh=refresh) %>%
-    select(COORDINATE="coordinate", VECTOR=.data$vectorId) %>%
-    mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
-    mutate(COORDINATE=gsub("(.0)+$","",.data$COORDINATE))
+  tnr <- unique(template$cansimTableNumber)
 
-  template %>%
-    inner_join(vector_info,
+  vector_info <- NULL
+
+  for (tn in tnr) {
+    working_template <- template %>%
+      filter(.data$cansimTableNumber==tn)
+
+    new_vector_info <- get_cansim_series_info_cube_coord(tn, working_template$COORDINATE, refresh=refresh) %>%
+      select(COORDINATE="coordinate", VECTOR=.data$vectorId) %>%
+      mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
+      mutate(COORDINATE=gsub("(.0)+$","",.data$COORDINATE))
+
+    vector_info <- bind_rows(vector_info, new_vector_info)
+  }
+
+  template <- template %>%
+    left_join(vector_info,
                by="COORDINATE") %>%
     relocate("VECTOR", .after="COORDINATE")
-
 }

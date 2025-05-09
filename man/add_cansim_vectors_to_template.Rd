@@ -12,10 +12,12 @@ add_cansim_vectors_to_template(template, refresh = FALSE)
 \item{refresh}{Refresh the data from the Statistics Canada API}
 }
 \value{
-a tibble containing the table template with added vector info
+a tibble containing the table template with added vector information
 }
 \description{
-Retrieves series information by coordinates
+Retrieves vector information for given table and coordinates. This can be used to query data by vectors, it only
+returns vector information on coordinates which are present in the data table, so it gives an effective way to filter
+coordinates. Vector information is not available for census data tables.
 }
 \examples{
 \dontrun{
