@@ -39,7 +39,11 @@ coordinate if tableCoordinates is a data frame, this argumet will be ignored if 
 A tibble with data matching specified coordinate and period input arguments
 }
 \description{
-Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
+Allows for the retrieval of data for a Statistics Canada data table with specific table and coordinates.
+This allows partial targeted download of tables and can be effectively combined with the \code{get_cansim_table_template}
+function to help pinpoint data series of interest.
+The StatCan API can only process 300 coordinates at a time,
+if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
 \dontrun{

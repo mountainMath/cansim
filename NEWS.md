@@ -2,6 +2,7 @@
 ## Minor changes
 * ensure proper ordering of levels even if StatCan metadata is not ordered
 * better error messages and information on how to diable peer checking when StatCan SSL certificates have problems
+* automatically batch vetor or coordinate data retrieval in case users request more than 300 series at a time
 ## Major changes
 * enable series information by table and coordinate
 * generate table template and facitilate adding vector info to aid pinpointed data download
