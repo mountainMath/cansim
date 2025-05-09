@@ -23,7 +23,7 @@ Sometimes one is only interested in a relatively small subset of a large table, 
 
 We demonstrate this process by taking the large Table 34-10-0285 on building permits.
 
-```{r setup, cache=FALSE}
+```{r setup}
 library(cansim)
 library(dplyr)
 library(ggplot2)
@@ -36,7 +36,7 @@ head(bp_template)
 The template gives information on the possible combinations of data (although some combinations might not be available in the table and have no data). We can use this to pinpoint data series we are interested in. For the purpose of this example we want to look at the number of housing units created and lost in the four largest metro areas in Canada.
 
 
-```{r cache=FALSE}
+```{r}
 bp_template_filtered <- bp_template %>%
   filter(Geography %in% c("Toronto, Ontario", "Montréal, Quebec", "Vancouver, British Columbia", "Calgary, Alberta"),
          `Type of building` %in% c("Total residential","Total demolitions"),
