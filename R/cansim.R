@@ -117,11 +117,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
-  geography_columns <- case_when(cleaned_language=="eng" ~
-                              c("Geography","Geographic name","Geography of origin"),
-                              TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
-                                paste0("Nom g",intToUtf8(0x00E9),"ographique"),
-                                paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+  geography_columns <- geography_colum_names(cleaned_language)
 
   base_table <- naked_ndm_table_number(cansimTableNumber)
   path <- paste0(base_path_for_table_language(cansimTableNumber,language),".zip")
@@ -156,7 +152,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
-        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,language=language,column=field)
+        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,language=language,column=field) %>%
+          arrange(as.integer(.data$`...dim`),as.integer(.data$`...id`))
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
           data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
@@ -1030,7 +1027,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
       tidyr::unnest_longer(!!note_id_column) %>%
       mutate(!!note_id_column:=as.character(!!as.name(note_id_column))) %>%
       full_join(notes %>% mutate(!!note_id_column:=as.character(!!as.name(note_id_column))),by=note_id_column) %>%
-      arrange(!!as.integer(as.name(note_id_column)))
+      arrange(as.integer(!!as.name(note_id_column)))
   } else {
     full_notes <- get_cansim_cube_metadata(cansimTableNumber,type="notes",refresh=refresh)
     members <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh = refresh)
@@ -1064,7 +1061,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' This can be used to check when a table has last been updated.
 #'
 #' @param cansimTableNumber the NDM table number
-#' @return A datatime object if a release data is available, NULL otherwise.
+#' @return A datetime object if a release data is available, NULL otherwise.
 #'
 #' @examples
 #' \dontrun{

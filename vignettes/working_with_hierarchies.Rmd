@@ -1,9 +1,5 @@
 ---
 title: "Working with Statistics Canada data table object hierarchies"
-description: >
-  Data retrieved from Statistics Canada frequently has complicated hierarchical structures. The cansim provides convenience tools to make it easier to work with these structures. 
-author: ""
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with Statistics Canada data table object hierarchies}
@@ -33,15 +29,15 @@ get_cansim_table_overview(table_id)
 ```
 
 ### Accessing table data
-We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Value))$Value)`". 
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Prices))$Prices)`". 
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
 
 data <- get_cansim(table_id) 
 
-selected_value = data$Value[grepl("Chained",data$Value)] %>% unique()
+selected_value = data$Prices[grepl("Chained",data$Prices)] %>% unique()
 data <- data %>% 
-  filter(Value == selected_value)
+  filter(Prices == selected_value)
 ```
 
 
@@ -64,7 +60,7 @@ total_data <- data %>%
 
 # Merge total back in and calculate share for every NAICS code
 data <- data %>% 
-  left_join(total_data) %>% 
+  left_join(total_data,by = c("Date", "GEO")) %>% 
   mutate(Share = val_norm/Total)
 ```
 
@@ -102,7 +98,7 @@ plot_data <- cut_data %>%
             .groups = "drop") 
 ```
 With the data prepared, the last step is putting it all together into a visualization using `ggplot2`. We can then see if any further adjustments are required. 
-```{r fig.height=6, fig.width=9}
+```{r fig.height=6, fig.width=9, fig.alt="Vignette example plot, GDP by NAICS"}
 library(ggplot2)
 
 ggplot(plot_data %>%  filter(GEO %in% regions), 
@@ -119,7 +115,7 @@ ggplot(plot_data %>%  filter(GEO %in% regions),
 
 ```
 Let's have a closer look at the "Real estate and rental and leasing" and "Construction" categories. Once again we turn to the `categories_for_level` function to make grabbing the sub-categories an easier process. 
-```{r fig.height=10, fig.width=9, warning=FALSE}
+```{r fig.height=10, fig.width=9, warning=FALSE, fig.alt="Vignette example plot, GDP by NAICS"}
 real_construction <- c("Construction [23]","Real estate and rental and leasing [53]")
 
 # Get the NAICS hierarchy codes just for these categories

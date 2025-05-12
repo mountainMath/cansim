@@ -1,174 +1,64 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://mountainmath.github.io/cansim/404.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/articles/cansim.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/articles/listing_cansim_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/articles/retrieving_cansim_vectors.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/articles/working_with_hierarchies.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/articles/working_with_large_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/add_provincial_abbreviations.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/cansim_old_to_new.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/cansim_repartition_cached_table.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/categories_for_level.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/collect_and_normalize.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/correspondence.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/create_index.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/csv2arrow.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/csv2sqlite.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/disconnect_cansim_sqlite.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/fold_in_metadata_for_columns.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_code_set.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_column_categories.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_column_list.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_connection.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_cube_metadata.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_data_for_table_coord_periods.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_key_release_schedule.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_sqlite.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_info.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_last_release_date.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_notes.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_overview.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_short_notes.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_subject.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_survey.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_url.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector_for_latest_periods.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector_info.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/get_deduped_column_level_data.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_cached_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_cubes.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_sqlite_cached_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/list_cansim_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/normalize_cansim_values.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/parse_metadata.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/remove_cansim_cached_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/remove_cansim_sqlite_cached_table.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/search_cansim_cubes.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/search_cansim_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mountainmath.github.io/cansim/reference/view_cansim_webpage.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://mountainmath.github.io/cansim/404.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/LICENSE-text.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/LICENSE.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/cansim.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/index.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/listing_cansim_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/partial_table_data_download.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/retrieving_cansim_vectors.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/working_with_hierarchies.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/articles/working_with_large_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/authors.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/index.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/news/index.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/add_cansim_vectors_to_template.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/add_provincial_abbreviations.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/cansim_old_to_new.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/cansim_repartition_cached_table.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/categories_for_level.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/collect_and_normalize.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/correspondence.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/create_index.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/csv2arrow.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/csv2sqlite.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/disconnect_cansim_sqlite.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/fold_in_metadata_for_columns.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_code_set.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_column_categories.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_column_list.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_connection.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_cube_metadata.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_data_for_table_coord_periods.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_key_release_schedule.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_series_info_cube_coord.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_sqlite.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_info.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_last_release_date.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_notes.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_overview.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_short_notes.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_subject.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_survey.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_template.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_table_url.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector_for_latest_periods.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_cansim_vector_info.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/get_deduped_column_level_data.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/index.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/list_cansim_cached_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/list_cansim_cubes.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/list_cansim_sqlite_cached_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/list_cansim_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/normalize_cansim_values.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/parse_metadata.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/remove_cansim_cached_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/remove_cansim_sqlite_cached_table.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/search_cansim_cubes.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/search_cansim_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/view_cansim_webpage.html</loc></url>
 </urlset>
+

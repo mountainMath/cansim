@@ -13,7 +13,7 @@ get_cansim_vector_info(vectors)
 A tibble with metadata for selected vectors
 }
 \description{
-Allows for the retrieval of metadatadata for Statistics Canada data vectors
+Allows for the retrieval of metadata for Statistics Canada data vectors
 }
 \examples{
 \dontrun{

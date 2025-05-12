@@ -88,7 +88,10 @@ get_cansim_connection <- function(cansimTableNumber,
 
     time_check <- Sys.time()
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
-    if (is.null(response)) return(response)
+    if (is.null(response)|| (response$status_code!=200) && ("result" %in% names(response)) && is.null(response$result)) {
+      stop(paste0("Failed to download ",cansimTableNumber,"."))
+      return(NULL)
+    }
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
@@ -205,7 +208,7 @@ get_cansim_connection <- function(cansimTableNumber,
                        select(-!!as.name(hierarchy_name))
                    }
                    if ("DGUID" %in% names(data) && "GeoUID" %in% names(data)) {
-                     data <- data %>% relocate(.data$GeoUID,.before="DGUID")
+                     data <- data %>% relocate("GeoUID",.before="DGUID")
                    }
                    data
                  })

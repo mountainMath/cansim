@@ -66,7 +66,7 @@ retrieved via `get_cansim()`, possibly up to row order.
 
 The call
 
-```{r}
+```r
 births <- get_cansim_connection("17-10-0016") |>
   collect_and_normalize()
 ```
@@ -76,7 +76,7 @@ calling `collect_and_normalize()` to load the data into memory. For example, to 
 in Canada overall irrespective of gender we could use the following code:
 
 
-```{r}
+```r
 births <- get_cansim_connection("17-10-0016") |>
   dplyr::filter(GEO == "Canada",
                 Gender == "Total - gender") |>
@@ -122,14 +122,14 @@ statistical data, who are often concerned with specific time series such as the 
 typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI)
 over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*.
 To retrieve just this data series on its own without all of the additional data available in related tables, we can use
-the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+the `get_cansim_vector()` function with the vector code and the date onward from which we want to get vector results for.
 
-```{r}
+```r
 get_cansim_vector("v41690973","2015-01-01")
 ```
 
 To access metadata for the vectors, use
-```{r}
+```r
 get_cansim_vector_info("v41690973")
 ```
 
@@ -139,7 +139,7 @@ More detailed usage examples are available in the _Retrieving individual Statist
 
 The `get_cansim_table_overview` function displays an overview of table information. If the table is not yet downloaded and cached it will first download the table itself. Let's take a look what's in the table we are interested in.
 
-```{r}
+```r
 get_cansim_table_overview("36-10-040")
 ```
 
@@ -147,13 +147,13 @@ get_cansim_table_overview("36-10-040")
 
 Calling `list_cansim_cubes` returns a data frame with useful metadata for available tables. There are 21 fields of metadata for each table including title, in English and French, keyword sets, notes, and table numbers. 
 
-```{r}
+```r
 list_cansim_cubes()
 ```
 
 The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard `dplyr` verbs.
 
-```{r}
+```r
 list_cansim_cubes() %>% 
   filter(grepl("Labour force characteristics",cubeTitleEn), grepl("economic region",cubeTitleEn)) %>% 
   select("cansim_table_number","cubeTitleEn")
@@ -231,7 +231,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.1. DOI: 10.32614/CRAN.package.cansim
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.2. DOI: 10.32614/CRAN.package.cansim
 
 A BibTeX entry for LaTeX users is
 
@@ -241,7 +241,7 @@ A BibTeX entry for LaTeX users is
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.1},
+    note = {R package version 0.4.2},
     url = {https://mountainmath.github.io/cansim/}
   }
 ```

@@ -42,7 +42,13 @@ get_cansim_vector(
 A tibble with data for vectors released between start and end time
 }
 \description{
-Retrieve data for a Statistics Canada data vector released within a given time frame
+Allows for the retrieval of data for specified vector series for a given time window.
+Accessing data by vector allows for targeted extraction of time series. Discovering vectors of interest can be achieved
+using the StatCan table web interface or using \code{get_cansim_table_template}
+function to help pinpoint data series of interest, and then chaining the \code{add_cansim_vectors_to_template} function to add
+cansim vector information to the template data.
+The StatCan API can only process 300 coordinates at a time,
+if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
 \dontrun{

@@ -36,6 +36,8 @@ reference:
   - contents:
     - get_cansim_cube_metadata
     - starts_with("get_cansim_table_")
+    - add_cansim_vectors_to_template
+    - get_cansim_series_info_cube_coord
     - get_cansim_vector_info
     - get_cansim_column_categories
     - get_cansim_column_list
@@ -74,6 +76,7 @@ authors:
   Dmitry Shkolnik:
     href: https://dshkol.com
 template:
+  bootstrap: 5
   params:
     ganalytics: UA-107390160-2
   opengraph:

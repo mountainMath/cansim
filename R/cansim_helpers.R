@@ -85,6 +85,14 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FAL
                                          httr::timeout(timeout))
   }
   if (!is.null(response$error)){
+    if ("curl_error_peer_failed_verification" %in% class(response$error)) {
+      stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
+           "This means that the authenticity of the StatCan API server can't be verified.\n",
+           "Statistics Canada has a history of failty SSL certificats on their API,\n",
+           "if you are reasonably sure that your connection is not getting hijacked you\n",
+           "can disable peer checking for the duration of the R session by typing\n\n",
+           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.")
+    }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
       response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path)
@@ -127,6 +135,14 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE
                                         httr::add_headers("Content-Type"="application/json"),
                                         httr::timeout(timeout))
   if (!is.null(response$error)){
+    if ("curl_error_peer_failed_verification" %in% class(response$error)) {
+      stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
+           "This means that the authenticity of the StatCan API server can't be verified.\n",
+           "Statistics Canada has a history of failty SSL certificats on their API,\n",
+           "if you are reasonably sure that your connection is not getting hijacked you\n",
+           "can disable peer checking for the duration of the R session by typing\n\n",
+           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.")
+    }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
       response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1)
@@ -530,3 +546,26 @@ rename_columns_for_language <- function(data,from_language,to_language) {
     rename(!!!renames)
 
 }
+
+geography_colum_names <- function(language) {
+  geography_columns <- case_when(language=="eng" ~
+                                   c("Geography","Geographic name","Geography of origin"),
+                                 TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
+                                          paste0("Nom g",intToUtf8(0x00E9),"ographique"),
+                                          paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+}
+
+
+normalize_coordinates <- function(coordinates){
+  coordinates <- lapply(coordinates,\(coordinate)
+                        coordinate %>%
+                          strsplit("\\.") %>%
+                          unlist() %>%
+                          c(., rep(0, pmax(0,10-length(.)))) %>%
+                          paste(collapse = ".")
+  ) %>% unlist()
+
+}
+
+
+

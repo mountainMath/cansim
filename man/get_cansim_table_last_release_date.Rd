@@ -10,7 +10,7 @@ get_cansim_table_last_release_date(cansimTableNumber)
 \item{cansimTableNumber}{the NDM table number}
 }
 \value{
-A datatime object if a release data is available, NULL otherwise.
+A datetime object if a release data is available, NULL otherwise.
 }
 \description{
 This can be used to check when a table has last been updated.

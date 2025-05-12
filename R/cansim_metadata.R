@@ -49,6 +49,22 @@ parse_metadata <- function(meta,data_path){
     }
   }
 
+  read_notes <- function(meta_part) {
+    while (meta_part[length(meta_part)]=="") {
+      meta_part <- meta_part[-length(meta_part)]
+    }
+    if (length(grep("\u201C|\u201D",meta_part))>0){
+      meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
+    }
+    h <- utils::read.delim(text=meta_part[1],sep=table_delim,header=TRUE,stringsAsFactors=FALSE,
+                           quote="\"",na.strings="",
+                           colClasses="character",check.names=FALSE) %>%
+      names()
+    notes <- tibble(!!h[1]:=meta_part[-1] %>% lapply(\(x)gsub(",.+","",x)) %>% unlist(),
+                    !!h[2]:=meta_part[-1] %>% lapply(\(x)gsub("^\\d+,","",x) %>% gsub("^\"|\"$","",.)) %>% unlist())
+
+  }
+
   cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
 
   meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)])
@@ -66,7 +82,7 @@ parse_metadata <- function(meta,data_path){
   saveRDS(read_meta(meta[seq(additional_indices[1],additional_indices[2]-1)]), file=paste0(data_path,"3"))
   saveRDS(read_meta(meta[seq(additional_indices[2],additional_indices[3]-1)]), file=paste0(data_path,"4"))
   if (length(additional_indices)>3) {
-    saveRDS(read_meta(meta[seq(additional_indices[3],additional_indices[4]-1)]),file=paste0(data_path,"5"))
+    saveRDS(read_notes(meta[seq(additional_indices[3],additional_indices[4]-1)]),file=paste0(data_path,"5"))
   }
 
   column_ids <- dplyr::pull(meta2,dimension_id_column)
@@ -119,6 +135,8 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
   }
   meta_x
 }
+
+
 
 #' Retrieve table metadata from Statistics Canada API
 #'
@@ -180,7 +198,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   meta5_path <- file.path(tmp_base, paste0(cansimTableNumber, "_cubemeta5.Rda"))
 
 
-  if (!file.exists(meta1_path)) {
+  if (!file.exists(meta1_path)||refresh) {
     m1 <- d %>% tibble::enframe() %>%
       mutate(l=lapply(.data$value,class) %>% unlist()) %>%
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
@@ -193,33 +211,36 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   }
 
 
-  if (!file.exists(meta2_path)) {
+  if (!file.exists(meta2_path)||refresh) {
     m2 <- d$dimension %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           tidyr::unnest_wider("member")  %>%
           mutate(across(where(is.integer),as.character))
-      })
+      }) %>%
+      arrange(as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
     saveRDS(m2, meta2_path)
   } else {
     m2 <- readRDS(meta2_path)
   }
 
-  if (!file.exists(meta3_path)) {
+  if (!file.exists(meta3_path)||refresh) {
     m3 <- d$footnote %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x) %>%
           left_join(as_tibble(.$link),by="footnoteId") %>%
           dplyr::select(-"link")  %>%
-          mutate(across(where(is.integer),as.character))
+          mutate(across(where(is.integer),as.character)) %>%
+          arrange(as.integer(.data$footnoteId))
       }) %>%
-      unique()
+      unique() %>%
+      arrange(as.integer(.data$footnoteId),as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
     saveRDS(m3, meta3_path)
   } else {
     m3 <- readRDS(meta3_path)
   }
 
-  if (!file.exists(meta4_path)) {
+  if (!file.exists(meta4_path)||refresh) {
     m4 <- d$correctionFootnote %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x)   %>%
@@ -295,5 +316,191 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   result
 }
 
+#' Retrieve table template from Statistics Canada API
+#'
+#' A table template consists of the dimensions and members and coordinates of a table that can be used to explore
+#' and filter table data before downloading subsets of the table. To add vector Ids to (a possibly filtered) template
+#' the `add_cansim_vectors_to_template` function can be used.
+#'
+#' @param cansimTableNumber A new or old CANSIM/NDM table number or a vector of table numbers
+#' @param language Language for the dimension and member names, either "eng" or "fra"
+#' @param refresh Refresh the data from the Statistics Canada API
+#'
+#' @return a tibble containing the table template
+#'
+#' @examples
+#' \dontrun{
+#' get_cansim_table_template("34-10-0013")
+#' }
+#' @export
+get_cansim_table_template <- function(cansimTableNumber, language="eng",refresh=FALSE){
+  cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
+  member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
+
+  language <- cleaned_ndm_language(language)
+
+  if (language=="fra") {
+    member_info <- member_info %>%
+      select("dimensionPositionId",dimensionName="dimensionNameFr","memberId",memberName="memberNameFr",
+             "classificationCode","geoLevel")
+  } else {
+    member_info <- member_info %>%
+      select("dimensionPositionId",dimensionName="dimensionNameEn","memberId",memberName="memberNameEn",
+             "classificationCode","geoLevel")
+  }
+
+  dimensions <- member_info %>%
+    select("dimensionPositionId", "dimensionName") %>%
+    unique() %>%
+    arrange("dimensionPositionId")
+
+  result <- tibble(...link="link",COORDINATE="")
+
+  for (i in seq_len(nrow(dimensions))) {
+    dim <- dimensions[i,]
+    dim_name <- dim$dimensionName
+    member <- member_info %>%
+      filter(.data$dimensionPositionId==dim$dimensionPositionId) %>%
+      select("memberId", "memberName") %>%
+      unique() %>%
+      arrange("memberId") %>%
+      rename(!!dim_name:="memberName") %>%
+      mutate(...link="link")
+
+    result <- result %>%
+      full_join(member, by="...link",
+                relationship = "many-to-many") %>%
+      mutate(COORDINATE=ifelse(.data$COORDINATE=="", .data$memberId, paste0(.data$COORDINATE, ".", .data$memberId))) %>%
+      select(-any_of("memberId"))
+  }
+
+  result <- result %>%
+    select(-any_of("...link")) %>%
+    mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
+
+  attr(result, "cansimTableNumber") <- cansimTableNumber
+  attr(result, "langauge") <- language
+
+  result
+}
 
 
+#' Retrieve series info for given table id and coordinates
+#'
+#' Retrieves series information by coordinates
+#'
+#' @param cansimTableNumber A new or old CANSIM/NDM table number or a vector of table numbers
+#' @param coordinates A vector of coordinates
+#' @param timeout Timeout for the API call
+#' @param refresh Refresh the data from the Statistics Canada API
+#'
+#' @return a tibble containing the table template
+#'
+#' @examples
+#' \dontrun{
+#' get_cansim_table_template("34-10-0013")
+#' }
+#' @export
+get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, timeout=1000, refresh=FALSE){
+
+  productId <- naked_ndm_table_number(cansimTableNumber)
+
+  coordinates <- sort(normalize_coordinates(coordinates))
+
+  chuncksize <- 300
+  batches = split(coordinates, cumsum((1:length(coordinates)-1)%%chuncksize==0))
+
+  info <- purrr::map_dfr(batches, \(coordinates){
+    body <- paste0("{\"productId\": ",productId,", \"coordinate\": \"",coordinates,"\"}") %>%
+      paste0(.,collapse=", ") %>%
+      paste0("[",.,"]")
+
+    tmp_base <- tempdir()
+    tmp <- file.path(tmp_base, paste0("series_coord_info_",productId,"_",digest::digest(body), ".Rda"))
+
+    if (!file.exists(tmp) || refresh) {
+      url <- "https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromCubePidCoord"
+      response <- httr::POST(url,
+                             body=body,
+                             encode="json",
+                             httr::add_headers("Content-Type"="application/json"),
+                             httr::timeout(timeout)
+      )
+      if (response$status_code!=200) {
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+      }
+      data <- httr::content(response)
+      data1 <- Filter(function(x)x$status=="SUCCESS",data)
+      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+
+      info <- data1 %>%
+        purrr::map_df(\(x){
+          o <- x$object
+          as_tibble(Filter(Negate(is.null),o))
+          })
+
+      saveRDS(info, tmp)
+    } else {
+      info <- readRDS(tmp)
+    }
+    info
+  })
+
+  info  %>%
+    filter(.data$responseStatusCode!=2) %>% # filter out invalid combinations
+    select(-"responseStatusCode")
+}
+
+#' Retrieve series info for given table id and coordinates
+#'
+#' Retrieves vector information for given table and coordinates. This can be used to query data by vectors, it only
+#' returns vector information on coordinates which are present in the data table, so it gives an effective way to filter
+#' coordinates. Vector information is not available for census data tables.
+#'
+#' @param template A (possibly filtered) cansim table template as returned by `get_cansim_table_template`
+#' @param refresh Refresh the data from the Statistics Canada API
+#'
+#' @return a tibble containing the table template with added vector information
+#'
+#' @examples
+#' \dontrun{
+#' template <- get_cansim_table_template("34-10-0013")
+#' template |> filter(Geography=="Canada") |>
+#'   add_cansim_vectors_to_template()
+#' }
+#' @export
+#'
+add_cansim_vectors_to_template <- function(template, refresh=FALSE) {
+
+  if (!("cansimTableNumber" %in% names(template))) {
+    stop("The template does not have a cansimTableNumber column.")
+  }
+  if (!("COORDINATE" %in% names(template))) {
+    stop("The template does not have a COORDINATE column.")
+  }
+
+  if (nrow(template)==0) {
+    stop("No rows in the template.")
+  }
+
+  tnr <- unique(template$cansimTableNumber)
+
+  vector_info <- NULL
+
+  for (tn in tnr) {
+    working_template <- template %>%
+      filter(.data$cansimTableNumber==tn)
+
+    new_vector_info <- get_cansim_series_info_cube_coord(tn, working_template$COORDINATE, refresh=refresh) %>%
+      select(COORDINATE="coordinate", VECTOR=.data$vectorId) %>%
+      mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
+      mutate(COORDINATE=gsub("(.0)+$","",.data$COORDINATE))
+
+    vector_info <- bind_rows(vector_info, new_vector_info)
+  }
+
+  template <- template %>%
+    left_join(vector_info,
+               by="COORDINATE") %>%
+    relocate("VECTOR", .after="COORDINATE")
+}

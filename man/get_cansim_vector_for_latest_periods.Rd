@@ -6,7 +6,7 @@
 \usage{
 get_cansim_vector_for_latest_periods(
   vectors,
-  periods = 1,
+  periods = NULL,
   language = "english",
   refresh = FALSE,
   timeout = 200,
@@ -18,7 +18,7 @@ get_cansim_vector_for_latest_periods(
 \arguments{
 \item{vectors}{The list of vectors to retrieve}
 
-\item{periods}{Numeric value for number of latest periods to retrieve data for}
+\item{periods}{Numeric value for number of latest periods to retrieve data for, but default all data is retrieved.}
 
 \item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
 
@@ -37,6 +37,12 @@ A tibble with data for specified vector(s) for the last N periods
 }
 \description{
 Allows for the retrieval of data for specified vector series for the N most-recently released periods.
+Accessing data by vector allows for targeted extraction of time series. Discovering vectors of interest can be achieved
+using the StatCan table web interface or using \code{get_cansim_table_template}
+function to help pinpoint data series of interest, and then chaining the \code{add_cansim_vectors_to_template} function to add
+cansim vector information to the template data.
+The StatCan API can only process 300 coordinates at a time,
+if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
 \dontrun{

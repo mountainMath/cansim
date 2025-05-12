@@ -1,4 +1,4 @@
-MAX_PERIODS = 6000
+MAX_PERIODS = 1000000L
 STATCAN_TIMEZONE = "America/Toronto"
 STATCAN_TIME_FORMAT="%Y-%m-%dT%H:%M"
 STATCAN_TIME_FORMAT_S="%Y-%m-%dT%H:%M:%S"
@@ -139,6 +139,15 @@ rename_vectors <- function(data,vectors){
 
 #' Retrieve data for a Statistics Canada data vector released within a given time frame
 #'
+#' Allows for the retrieval of data for specified vector series for a given time window.
+#' Accessing data by vector allows for targeted extraction of time series. Discovering vectors of interest can be achieved
+#' using the StatCan table web interface or using \code{get_cansim_table_template}
+#' function to help pinpoint data series of interest, and then chaining the \code{add_cansim_vectors_to_template} function to add
+#' cansim vector information to the template data.
+#' The StatCan API can only process 300 coordinates at a time,
+#' if more than 300 coordinates are specified the function will batch the requests to the API.
+#'
+#'
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
 #' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
@@ -165,61 +174,64 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   start_time=as.Date(start_time)
   original_end_time=as.Date(end_time)
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
-  #if (use_ref_date) end_time=as.Date(pmax(Sys.time(),end_time))+1 else end_time=original_end_time
-  if (use_ref_date){
-    url = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorByReferencePeriodRange"
-    vectors_string=paste0('vectorIds=',paste(lapply(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ","),"")
-    time_string=paste0('startRefPeriod=',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
-                       '&endReferencePeriod=',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'')
-    body=paste0(vectors_string,"&",time_string)
-    # vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
-    # time_string=paste0('"startRefPeriod": "',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
-    #                    '","endReferencePeriod": "',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'"')
-    # body=paste0("{",vectors_string,",",time_string,"}")
-  } else {
-    url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
-    vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vectors),function(x)paste0('"',x,'"')),collapse = ", "),"]")
-    time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
-                       '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
-    body=paste0("{",vectors_string,",",time_string,"}")
-  }
-  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(list(vectors_string,time_string), algo = "md5"), ".rda"))
-  if (!file.exists(cache_path)||refresh) {
-    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
+
+  batches <- split(vectors, ceiling(seq_along(vectors)/300))
+  result <- NULL
+  for (batch_number in seq_along(batches)) {
+    addition=""
+    if (length(batches)>1) {
+      addition=paste0(" (batch ",batch_number," of ",length(batches),")")
+    }
+    vecs <- batches[[batch_number]]
     if (use_ref_date){
-      response <- get_with_timeout_retry(paste0(url,"?",body),
-                                         timeout = timeout)
+      url = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorByReferencePeriodRange"
+      vectors_string=paste0('vectorIds=',paste(lapply(as.character(vecs),function(x)paste0('"',x,'"')),collapse = ","),"")
+      time_string=paste0('startRefPeriod=',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
+                         '&endReferencePeriod=',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'')
+      body=paste0(vectors_string,"&",time_string)
     } else {
-      response <- post_with_timeout_retry(url, body=body,
-                                          timeout = timeout)
+      url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
+      vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vecs),function(x)paste0('"',x,'"')),collapse = ", "),"]")
+      time_string=paste0('"startDataPointReleaseDate": "',strftime(start_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),
+                         '","endDataPointReleaseDate": "',strftime(end_time,STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE),'"')
+      body=paste0("{",vectors_string,",",time_string,"}")
     }
-    if (is.null(response)) return(response)
-    if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-    }
-    data <- httr::content(response)
-    data1 <- Filter(function(x)x$status=="SUCCESS",data)
-    data2 <- Filter(function(x)x$status!="SUCCESS",data)
-    if (length(data2)>0) {
-      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-      data2 %>% purrr::map(function(x){
-        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-      })
+    cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(list(vectors_string,time_string), algo = "md5"), ".rda"))
+    if (!file.exists(cache_path)||refresh) {
+      message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
+      if (use_ref_date){
+        response <- get_with_timeout_retry(paste0(url,"?",body),
+                                           timeout = timeout)
+      } else {
+        response <- post_with_timeout_retry(url, body=body,
+                                            timeout = timeout)
+      }
+      if (is.null(response)) return(response)
+      if (response$status_code!=200) {
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+      }
+      data <- httr::content(response)
+      data1 <- Filter(function(x)x$status=="SUCCESS",data)
+      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+      if (length(data2)>0) {
+        message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+        data2 %>% purrr::map(function(x){
+          message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+        })
+      }
+
+      if (length(data1)>0)
+        result_new <- extract_vector_data(data1)
+      else
+        result_new <- tibble::tibble()
+      saveRDS(result_new,cache_path)
+    } else {
+      message(paste0("Reading CANSIM NDM vectors from temporary cache",addition))
+      result_new <- readRDS(cache_path)
     }
 
-    if (length(data1)>0)
-      result <- extract_vector_data(data1)
-    else
-      result <- tibble::tibble()
-    saveRDS(result,cache_path)
-  } else {
-    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
-    result <- readRDS(cache_path)
+    result <- bind_rows(result,result_new)
   }
-  # if (use_ref_date) {
-  #   result <- result %>%
-  #     filter(as.Date(.data$REF_DATE)>=start_time,as.Date(.data$REF_DATE)<=original_end_time)
-  # }
 
   attr(result,"language") <- cleaned_language
   coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -256,9 +268,15 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #' Retrieve data for specified Statistics Canada data vector(s) for last N periods
 #'
 #' Allows for the retrieval of data for specified vector series for the N most-recently released periods.
+#' Accessing data by vector allows for targeted extraction of time series. Discovering vectors of interest can be achieved
+#' using the StatCan table web interface or using \code{get_cansim_table_template}
+#' function to help pinpoint data series of interest, and then chaining the \code{add_cansim_vectors_to_template} function to add
+#' cansim vector information to the template data.
+#' The StatCan API can only process 300 coordinates at a time,
+#' if more than 300 coordinates are specified the function will batch the requests to the API.
 #'
 #' @param vectors The list of vectors to retrieve
-#' @param periods Numeric value for number of latest periods to retrieve data for
+#' @param periods Numeric value for number of latest periods to retrieve data for, but default all data is retrieved.
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
@@ -273,45 +291,55 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #' get_cansim_vector_for_latest_periods("v41690973",10)
 #' }
 #' @export
-get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
+get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
                                                language="english",
                                                refresh = FALSE, timeout = 200,
                                                factors = TRUE, default_month = "07", default_day = "01"){
+  if (is.null(periods) || is.na(periods)) {periods <- MAX_PERIODS}
+  periods <- as.integer(periods)
   cleaned_language <- cleaned_ndm_language(language)
 
-  if (periods*length(vectors)>MAX_PERIODS) {
-    periods=pmin(periods,floor(as.numeric(MAX_PERIODS)/length(vectors)))
-    warning(paste0("Can access at most ",MAX_PERIODS," data points, capping value to ",periods," periods per vector."))
-  }
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
-  vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
-  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(vectors_string, algo = "md5"), ".rda"))
-  if (refresh || !file.exists(cache_path)) {
-    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
-    response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
-    if (is.null(response)) return(response)
-    if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+
+  batches <- split(vectors, ceiling(seq_along(vectors)/300))
+  result <- NULL
+  for (batch_number in seq_along(batches)) {
+    addition=""
+    if (length(batches)>1) {
+      addition=paste0(" (batch ",batch_number," of ",length(batches),")")
     }
-    data <- httr::content(response)
-    data1 <- Filter(function(x)x$status=="SUCCESS",data)
-    data2 <- Filter(function(x)x$status!="SUCCESS",data)
-    if (length(data2)>0) {
-      message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-      data2 %>% purrr::map(function(x){
-        message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-      })
+    vecs <- batches[[batch_number]]
+
+    vectors_string=paste0("[",paste(purrr::map(as.character(vecs),function(x)paste0('{"vectorId":',x,',"latestN":',periods,'}')),collapse = ", "),"]")
+    cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(vectors_string, algo = "md5"), ".rda"))
+    if (refresh || !file.exists(cache_path)) {
+      message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
+      response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
+      if (is.null(response)) return(response)
+      if (response$status_code!=200) {
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+      }
+      data <- httr::content(response)
+      data1 <- Filter(function(x)x$status=="SUCCESS",data)
+      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+      if (length(data2)>0) {
+        message(paste0("Failed to load data for ",length(data2)," vector(s)."))
+        data2 %>% purrr::map(function(x){
+          message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
+        })
+      }
+      if (length(data1)>0)
+        result_new <- extract_vector_data(data1)
+      else
+        result_new <- tibble::tibble()
+      saveRDS(result_new,cache_path)
+    } else {
+      message(paste0("Reading CANSIM NDM vectors from temporary cache",addition))
+      result_new <- readRDS(cache_path)
     }
-    if (length(data1)>0)
-      result <- extract_vector_data(data1) %>%
-      rename_vectors(vectors)
-    else
-      result <- tibble::tibble()
-    saveRDS(result,cache_path)
-  } else {
-    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
-    result <- readRDS(cache_path)
+    result <- bind_rows(result,result_new)
+
   }
 
   attr(result,"language") <- cleaned_language
@@ -331,12 +359,13 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
                                          language=cleaned_language)) %>%
     bind_rows()
 
-  result <- result %>%
-    left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
-    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                            default_month = default_month, default_day = default_day, internal=TRUE)
-
-  attr(result,"language") <- cleaned_language
+  if (nrow(result)>0) {
+    result <-  result %>%
+      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
+      rename_vectors(vectors)  %>%
+      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                              default_month = default_month, default_day = default_day, internal=TRUE)
+  }
 
   result %>%
     mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
@@ -345,11 +374,17 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 
 #' Retrieve data for specified Statistics Canada data product for last N periods for specific coordinates
 #'
-#' Allows for the retrieval of data for a Statistics Canada data table with specific coordinates for the N most-recently released periods. Caution: coordinates are concatenations of table member ID values and require familiarity with the TableMetadata data structure. Coordinates have a maximum of ten dimensions.
+#' Allows for the retrieval of data for a Statistics Canada data table with specific table and coordinates.
+#' This allows partial targeted download of tables and can be effectively combined with the \code{get_cansim_table_template}
+#' function to help pinpoint data series of interest.
+#' The StatCan API can only process 300 coordinates at a time,
+#' if more than 300 coordinates are specified the function will batch the requests to the API.
 #'
-#' @param cansimTableNumber Statistics Canada data table number
-#' @param coordinate A string of table coordinates in the form \code{"1.1.1.36.1.0.0.0.0.0"}. Trailing zeros can be omitted.
-#' @param periods Numeric value for number of latest periods to retrieve data for
+#' @param tableCoordinates Either a list with vectors of coordinates by table number, or a
+#' (filtered) data frame as returned by \code{get_cansim_table_template}.
+#' @param periods Optional numeric value for number of latest periods to retrieve data for, default is \code{NULL} in which case data for all periods is downloaded.
+#' Alternatively this can be specified by
+#' coordinate if tableCoordinates is a data frame, this argument will be ignored if that data frame as a "periods" column.
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
@@ -361,91 +396,159 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=1,
 #'
 #' @examples
 #' \dontrun{
-#' get_cansim_data_for_table_coord_periods("35-10-0003",coordinate="1.12",periods=3)
+#' get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 #' }
 #' @export
-get_cansim_data_for_table_coord_periods<-function(cansimTableNumber, coordinate, periods=1,
+get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL,
                                                   language="english",
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   CENSUS_TABLE_STARTING_STRING <- "9810"
+  if (is.null(periods) || is.na(periods)) {periods <- MAX_PERIODS}
+  periods <- as.integer(periods)
 
   # pad coordinate if needed
-  coordinate <- coordinate %>%
-    strsplit("\\.") %>%
-    unlist() %>%
-    c(., rep(0, pmax(0,10-length(.)))) %>%
-    paste(collapse = ".")
+  if ("list" %in% class(tableCoordinates)) {
+    tableCoordinates <- tibble::enframe(tableCoordinates) %>%
+      setNames(c("cansimTableNumber","COORDINATE")) %>%
+      tidyr::unnest_longer(.data$COORDINATE)
+  }
+  tableCoordinates <- tableCoordinates %>%
+    mutate(cansimTableNumber=naked_ndm_table_number(.data$cansimTableNumber)) %>%
+    mutate(COORDINATE = normalize_coordinates(.data$COORDINATE)) %>%
+    mutate(is_census_table=substr(.data$cansimTableNumber,1,4)==CENSUS_TABLE_STARTING_STRING) %>%
+    mutate(batch=paste0(.data$is_census_table,"_",.data$cansimTableNumber)) %>%
+    mutate(n=row_number(),.by="batch") %>%
+    mutate(b=(n-1) %% 300 == 0) %>%
+    mutate(batch=paste0(.data$batch,"_",cumsum(.data$b)),.by="batch")
 
-  cleaned_language <- cleaned_ndm_language(language)
-  table <- naked_ndm_table_number(cansimTableNumber)
-  is_census_table <- substr(table,1,4)==CENSUS_TABLE_STARTING_STRING
-  url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
-  body_string=paste0('{"productId":',table,',"coordinate":"',coordinate,'","latestN":',periods,'}') %>%
-    paste0(.,collapse = ", ") %>%
-    paste0("[",.,"]")
-  cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))
-  if (refresh || !file.exists(cache_path)) {
-    message(paste0("Accessing CANSIM NDM vectors from Statistics Canada"))
-    response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
-    if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
-    }
-    data <- httr::content(response)
-    data1 <- Filter(function(x)x$status=="SUCCESS",data)
-    data2 <- Filter(function(x)x$status!="SUCCESS",data)
-    if (length(data2)>0) {
-      message(paste0("Failed to load for ",length(data2)," coordinates "))
-      data2 %>% purrr::map(function(x){
-        message(x$object$coordinate)
-      })
-      if (is_census_table) {
-        warning(paste0("Table ",cansimTableNumber," is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
-      }
-    }
-    saveRDS(data1,cache_path)
+  if (!("periods") %in% names(tableCoordinates)) {
+    tableCoordinates <- tableCoordinates %>%
+      mutate(periods = !!periods)
   } else {
-    message(paste0("Reading CANSIM NDM vectors from temporary cache"))
-    data1 <- readRDS(cache_path)
+    tableCoordinates <- tableCoordinates %>%
+      mutate(periods = coalesce(.data$periods, MAX_PERIODS))
   }
 
-  result <- extract_vector_data(data1)
+  tableCoordinates <- tableCoordinates %>%
+    select(any_of(c("cansimTableNumber","COORDINATE","periods","is_census_table","batch"))) %>%
+    arrange(.data$is_census_table, .data$cansimTableNumber, .data$COORDINATE)
 
-  if (nrow(result)==0) {
-    result <- NULL
-  } else {
-    attr(result,"language") <- cleaned_language
-    coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  cleaned_language <- cleaned_ndm_language(language)
+  url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods"
+  result <- NULL
+  batches <- unique(tableCoordinates$batch)
+  batch_number=0
+  failed_coordinates <- NULL
+  for (batch in batches) {
+    batch_number <- batch_number + 1
+    working_data <- tableCoordinates %>%
+      filter(.data$batch==!!batch)  %>%
+      mutate(body_string=paste0('{"productId":',.data$cansimTableNumber,
+                                ',"coordinate":"',.data$COORDINATE,
+                                '","latestN":',.data$periods,'}'))
+    body_string=paste0(working_data$body_string, collapse = ", ") %>%
+      paste0("[",.,"]")
+    cache_path <- file.path(tempdir(), paste0("cansim_cache_",digest::digest(body_string, algo = "md5"), ".rda"))
+    if (refresh || !file.exists(cache_path)) {
+      addition=""
+      if (length(batches)>1) {
+        addition=paste0(" (batch ",batch_number," of ",length(batches),")")
+      }
+      message(paste0("Accessing CANSIM NDM coordinates from Statistics Canada",addition))
+      response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
+      if (response$status_code!=200) {
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+      }
+      data <- httr::content(response)
+      data1 <- Filter(function(x)x$status=="SUCCESS",data)
+      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+      new_failed_coordinates <- NULL
+      if (length(data2)>0) {
+        # message(paste0("Failed to load for ",length(data2)," coordinates "))
+        new_failed_coordinates <- data2 %>% purrr::map(function(x){x$object$coordinate}) |> unlist()
+        new_failed_coordinates <- tibble::tibble(cansimTableNumber=unique(working_data$cansimTableNumber),
+                                                 COORDINATE=new_failed_coordinates)
 
-    if (cleaned_language=="fra") { # need to rename columns
-      result <- result %>%
-        rename_columns_for_language("eng",cleaned_language)
+        # if (substr(batch,7,10) == CENSUS_TABLE_STARTING_STRING) {
+        #   warning(paste0("Table ",.data$cansimTableNumber,
+        #                  " is a census data table that does not coform to usual NDM standards, this likely means that the data for the queried data point is zero."))
+        # }
+        attr(data1,"failed_coordinates") <- new_failed_coordinates
+      }
+      saveRDS(data1,cache_path)
+    } else {
+      addition=""
+      if (length(batches)>1) {
+        addition=paste0(" (batch ",batch_number," of ",length(batches),")")
+      }
+      message(paste0("Reading CANSIM NDM coordinates from temporary cache",addition))
+      data1 <- readRDS(cache_path)
+      new_failed_coordinates <- attr(data1,"failed_coordinates")
     }
 
-    metadata <- result %>%
-      select("cansimTableNumber",all_of(coordinate_column)) %>%
-      unique() %>%
-      group_by(.data$cansimTableNumber) %>%
-      group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
-                                           coordinates=.x[[coordinate_column]],
-                                           language=cleaned_language)) %>%
-      bind_rows()
+    failed_coordinates <- bind_rows(failed_coordinates, new_failed_coordinates)
+    new_result <- extract_vector_data(data1)
 
-    result <- result %>%
-      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
-      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                              default_month = default_month, default_day = default_day, internal=TRUE) %>%
-      mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
+    if (nrow(new_result)==0) {
+      new_result <- NULL
+    } else {
+      coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+      if (cleaned_language=="fra") { # need to rename columns
+        new_result <- new_result %>%
+          rename_columns_for_language("eng",cleaned_language)
+      }
+
+      metadata <- new_result %>%
+        select("cansimTableNumber",all_of(coordinate_column)) %>%
+        unique() %>%
+        group_by(.data$cansimTableNumber) %>%
+        group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
+                                             coordinates=.x[[coordinate_column]],
+                                             language=cleaned_language)) %>%
+        bind_rows()
+
+      new_result <- new_result %>%
+        left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
+        normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                                default_month = default_month, default_day = default_day, internal=TRUE) %>%
+        mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
+    }
+    result <- bind_rows(result,new_result)
   }
 
   attr(result,"language") <- cleaned_language
+  if (!is.null(failed_coordinates) && nrow(failed_coordinates > 0)) {
+    regular_fails <- failed_coordinates %>%
+      filter(substr(.data$cansimTableNumber,1,4) != CENSUS_TABLE_STARTING_STRING)
+    census_fails <- failed_coordinates %>%
+      filter(substr(.data$cansimTableNumber,1,4) == CENSUS_TABLE_STARTING_STRING)
+
+    if (nrow(regular_fails)>0) {
+    attr(result,"failed_coordinates") <- regular_fails
+    message(paste0("Could not access data for ",nrow(regular_fails)," coordinates, see attr(<result>, 'failed_coordinates') for details.",
+                   "\n","This occurs when combinations of coordinates aren't available in the data table, values can safely be assumed to be NA."))
+    }
+    if (nrow(census_fails) > 0) {
+      attr(result,"failed_coordinates_census") <- census_fails
+      start_string <- "There were"
+      if (nrow(regular_fails) > 0) {
+        start_string <- "Additionally there were"
+      }
+      message(paste0(start_string," ",nrow(census_fails)," coordinates from Census data tables that were not available, this generally means that",
+                     "\n","the corresponding data values are zero. This is due to the fact that Census data tables do not conform to usual NDM standards.",
+                     "\n","Hopefully this will get fixed on StatCan servers in the future so data can be accessed more reliably.","\n",
+                     "See attr(<result>, 'failed_coordinates_census') for details on which coordinates had failed data download and likely zero value."))
+    }
+  }
   result
 }
 
 
 #' Retrieve metadata for specified Statistics Canada data vectors
 #'
-#' Allows for the retrieval of metadatadata for Statistics Canada data vectors
+#' Allows for the retrieval of metadata for Statistics Canada data vectors
 #'
 #' @param vectors a vector of cansim vectors
 #'
