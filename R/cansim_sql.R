@@ -6,7 +6,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #'
 #' Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
 #' cached permanently if a cache path is supplied or for duration of the current R session.
-#' The function will check against the lastest release data for the table and emit a warning message
+#' The function will check against the latest release data for the table and emit a warning message
 #' if the cached table is out of date.
 #'
 #' @param cansimTableNumber the NDM table number to load
@@ -143,7 +143,7 @@ create_index <- function(connection,table_name,field){
 #' @param table_name sql table name
 #' @param transform optional function that transforms each chunk
 #' @param chunk_size optional chunk size to read/write data, default=1,000,000
-#' @param append optional parameter, append to database or overwrite, defaul=`FALSE`
+#' @param append optional parameter, append to database or overwrite, default=`FALSE`
 #' @param col_types optional parameter for csv column types
 #' @param na na character strings
 #' @param text_encoding encoding of csv file (default UTF-8)

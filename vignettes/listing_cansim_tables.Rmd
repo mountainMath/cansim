@@ -39,7 +39,7 @@ list_cansim_cubes() %>%
          grepl("economic region",cubeTitleEn)) %>% 
   select(cansim_table_number,cubeTitleEn)
 ```
-The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onwards for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the `tidyr` package here to reshape data from a long format to a wider format. 
+The search came up with two tables. In this example we are interested in the unemployment rate for 2015 onward for the Lower Mainland, Vancouver Island, and Okanagan economic regions from the Labour Force Characteristics table. We use the `tidyr` package here to reshape data from a long format to a wider format. 
 ```{r}
 library(tidyr)
 
@@ -53,7 +53,8 @@ data <-get_cansim(selected_table) %>%
   spread(key="Statistics", value=val_norm)
 ```
 We can visualize then results with `ggplot2`. 
-```{r}
+
+```{r fig.alt="Vignette example plot, unemployent rate"}
 library(ggplot2)
 ggplot(data, aes(x=Date, group = GEO,y=Estimate)) +
   geom_ribbon(aes(ymin=Estimate - `Standard error of estimate`,

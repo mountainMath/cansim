@@ -380,11 +380,11 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
 #' The StatCan API can only process 300 coordinates at a time,
 #' if more than 300 coordinates are specified the function will batch the requests to the API.
 #'
-#' @param tableCoordinates Eitehr a list with vectors of coordinates by table number, or a
+#' @param tableCoordinates Either a list with vectors of coordinates by table number, or a
 #' (filtered) data frame as returned by \code{get_cansim_table_template}.
 #' @param periods Optional numeric value for number of latest periods to retrieve data for, default is \code{NULL} in which case data for all periods is downloaded.
 #' Alternatively this can be specified by
-#' coordinate if tableCoordinates is a data frame, this argumet will be ignored if that data frame as a "periods" column.
+#' coordinate if tableCoordinates is a data frame, this argument will be ignored if that data frame as a "periods" column.
 #' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
@@ -548,7 +548,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
 
 #' Retrieve metadata for specified Statistics Canada data vectors
 #'
-#' Allows for the retrieval of metadatadata for Statistics Canada data vectors
+#' Allows for the retrieval of metadata for Statistics Canada data vectors
 #'
 #' @param vectors a vector of cansim vectors
 #'

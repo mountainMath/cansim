@@ -30,7 +30,7 @@ csv2sqlite(
 
 \item{chunk_size}{optional chunk size to read/write data, default=1,000,000}
 
-\item{append}{optional parameter, append to database or overwrite, defaul=`FALSE`}
+\item{append}{optional parameter, append to database or overwrite, default=`FALSE`}
 
 \item{col_types}{optional parameter for csv column types}
 

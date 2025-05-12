@@ -122,7 +122,7 @@ statistical data, who are often concerned with specific time series such as the 
 typically know the exact series they need. If, for example, you are tracking the Canadian Consumer Price Index (CPI)
 over time, you might already know the Statistics Canada vector code the seasonally-unadjusted all-items CPI value: *v41690973*.
 To retrieve just this data series on its own without all of the additional data available in related tables, we can use
-the `get_cansim_vector()` function with the vector code and the date onwards from which we want to get vector results for.
+the `get_cansim_vector()` function with the vector code and the date onward from which we want to get vector results for.
 
 ```r
 get_cansim_vector("v41690973","2015-01-01")

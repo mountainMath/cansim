@@ -59,7 +59,7 @@ bp_data
 
 We then aggregate it to annual data and plot it by year and area, separating out dwellings newly created, created through conversion, those lost to deconversions and those demolished. 
 
-```{r}
+```{r fig.alt="Vignette example plot, building and demolition permits"}
 bp_data |>
   mutate(Value=case_when( # count demolitions and deconversions as negative
     Variables %in% c("Number of dwelling-units demolished","Number of dwelling-units lost") ~ - val_norm,
@@ -94,10 +94,10 @@ bp_data_vector <- bp_template_filtered_vecotrs$VECTOR |>
   get_cansim_vector()
 ```
 
-This gives us the same data as above, with possibly shorter time series for some coordinates as querying data by vector will not pull data for times when the specific vector was not available. When accessed by vector or by coordinate the data will only differ in this limited way, and the values on the difference will be `NA` and won't affect the results. For completeness we plot the vector data and obtain an idential graph.
+This gives us the same data as above, with possibly shorter time series for some coordinates as querying data by vector will not pull data for times when the specific vector was not available. When accessed by vector or by coordinate the data will only differ in this limited way, and the values on the difference will be `NA` and won't affect the results. For completeness we plot the vector data and obtain an identical graph.
 
 
-```{r}
+```{r fig.alt="Vignette example plot, building and demolition permits"}
 bp_data_vector |>
   mutate(Value=case_when( # count demolitions and deconversions as negative
     Variables %in% c("Number of dwelling-units demolished","Number of dwelling-units lost") ~ - val_norm,

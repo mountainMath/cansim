@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 )
 library(cansim)
 library(dplyr, warn.conflicts = FALSE)
-library(ggplot2)
 ```
 
 ### Retrieving individual vectors 
@@ -62,7 +61,7 @@ Data retrieved as vectors also gains the additional `val_norm` column with norma
 ### Putting it all together
 
 This quick example uses a list with two named vectors and a starting date as an input value, converts values ("normalizes") on the fly, and prepares a simple `ggplot2` graphic.
-```{r}
+```{r fig.alt="Vignette example plot, CPI time series"}
 
 vectors <- c("Canadian CPI"="v41690973",
              "BC CPI"="v41692462")

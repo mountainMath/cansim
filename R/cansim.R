@@ -1061,7 +1061,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' This can be used to check when a table has last been updated.
 #'
 #' @param cansimTableNumber the NDM table number
-#' @return A datatime object if a release data is available, NULL otherwise.
+#' @return A datetime object if a release data is available, NULL otherwise.
 #'
 #' @examples
 #' \dontrun{

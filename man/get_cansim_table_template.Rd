@@ -9,7 +9,7 @@ get_cansim_table_template(cansimTableNumber, language = "eng", refresh = FALSE)
 \arguments{
 \item{cansimTableNumber}{A new or old CANSIM/NDM table number or a vector of table numbers}
 
-\item{language}{Language for the dimension and memebr names, either "eng" or "fra"}
+\item{language}{Language for the dimension and member names, either "eng" or "fra"}
 
 \item{refresh}{Refresh the data from the Statistics Canada API}
 }
@@ -17,7 +17,7 @@ get_cansim_table_template(cansimTableNumber, language = "eng", refresh = FALSE)
 a tibble containing the table template
 }
 \description{
-A table templase consists of the dimensions and members and coordinates of a table that can be used to explore
+A table template consists of the dimensions and members and coordinates of a table that can be used to explore
 and filter table data before downloading subsets of the table. To add vector Ids to (a possibly filtered) template
 the `add_cansim_vectors_to_template` function can be used.
 }
