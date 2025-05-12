@@ -1,9 +1,5 @@
 ---
 title: "Listing Statistics Canada data tables"
-description: >
-  An example of how to identify and search for available datasets using the cansim package.
-author: ""
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Listing Statistics Canada data tables}

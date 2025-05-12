@@ -1,9 +1,5 @@
 ---
 title: "Working with Statistics Canada data table object hierarchies"
-description: >
-  Data retrieved from Statistics Canada frequently has complicated hierarchical structures. The cansim provides convenience tools to make it easier to work with these structures. 
-author: ""
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with Statistics Canada data table object hierarchies}

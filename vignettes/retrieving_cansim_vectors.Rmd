@@ -1,9 +1,5 @@
 ---
 title: "Retrieving individual Statistics Canada vectors"
-description: >
-  A worked example showing how to retrieve individual data vectors instead of entire tables. 
-author: ""
-date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Retrieving individual Statistics Canada vectors}
