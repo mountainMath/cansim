@@ -44,7 +44,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 
 ## Changes from version 0.3.5
 * Fold part of `normalize_cansim_values` into the default table and vector output, in particular always add a scaled variable column called `val_norm` and an imputed `Date` column and covert categories to factors by default.
-* New `get_cansim_sqlite` function that stores tables in an SQLite database and facilitates access and managemet of data.
+* New `get_cansim_sqlite` function that stores tables in an SQLite database and facilitates access and management of data.
 * Adapt to changes in dplyr, tidyr, and tibble
 * fix a bug that would not properly add hierarchies when category names are repeated
 * Use system unzip if `getOption("unzip")` is set to enable unzip for files larger than 4GB on unix-like systems
@@ -72,7 +72,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 # Changes from version 0.3.9
 ## Minor changes
 * Better error handling when StatCan returns empty tables
-* Add Hierachy for Geography in sqlite tables
+* Add Hierarchy for Geography in sqlite tables
 * Better fallback and warning messages when StatCan table categories are internally inconsistent
 * Performance improvements
 
@@ -110,7 +110,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 ## Minor changes
 * fix problem with reading French tables released by the census division
 * restore original column order after converting to factors
-* convery geography column to factor if available
+* convert geography column to factor if available
 * fix problem with `add_provincial_abbreviations` that could lead to mislabelling of provinces in some cases
 * improve handling of metadata, enable downloading only metadata instead of only via full table download
 * fold metadata into data when accessing via vector or coordinates
@@ -134,10 +134,10 @@ There were no ERRORs or WARNINGs or NOTEs.
 # cansim 0.4.2
 ## Minor changes
 * ensure proper ordering of levels even if StatCan metadata is not ordered
-* better error messages and information on how to diable peer checking when StatCan SSL certificates have problems
-* automatically batch vetor or coordinate data retrieval in case users request more than 300 series at a time
+* better error messages and information on how to disable peer checking when StatCan SSL certificates have problems
+* automatically batch vector or coordinate data retrieval in case users request more than 300 series at a time
 ## Major changes
 * enable series information by table and coordinate
-* generate table template and facitilate adding vector info to aid pinpointed data download
+* generate table template and facilitate adding vector info to aid pinpointed data download
 * enable downloading of data by vector and multiple coordinates in get_cansim_data_for_table_coord_periods (breaking changes with change to parameter)
 
