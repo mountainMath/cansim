@@ -1,3 +1,8 @@
+# cansim 0.4.3
+## Minor changes
+* better handling of duplicated levels in metadata, ignore duplication for geography names of census tables but emit warning
+
+
 # cansim 0.4.2
 ## Minor changes
 * ensure proper ordering of levels even if StatCan metadata is not ordered

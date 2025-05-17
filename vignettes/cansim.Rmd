@@ -60,7 +60,8 @@ Individual series in Statistics Canada data tables can also be accessed by using
 get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
                     "Metro Van CPI"="v41692930"),
                   start_time = "2015-05-01",
-                  end_time="2015-08-01")
+                  end_time="2015-08-01") |>
+  dplyr::select(Date,GEO,label,VALUE,val_norm)
 ```
 
 ### License

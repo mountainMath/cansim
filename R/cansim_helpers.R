@@ -460,31 +460,43 @@ get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
     mutate(...n=as.integer(.data$...id)) %>%
     arrange("...n") %>%
     select(-"...n") %>%
-    mutate(...count=n(),.by="...name") %>%
+    mutate(...count=n(),.by=c("...dim","...name")) %>%
     mutate(...duplicated=.data$...count>1) %>%
     mutate(...original=!.data$...duplicated) %>%
     mutate(...original_name=.data$...name) %>%
-    mutate(...name=ifelse(.data$...duplicated & is.na(.data$...parent_id),
-                          paste0(.data$...name," [",.data$...id,"]"), # deals with 36-10-0108
-                          .data$...name)) %>%
-  mutate(...count=n(),.by="...name") %>%
-    mutate(...duplicated=.data$...count>1)
+    mutate(...last_parent_id=.data$...parent_id)
 
+  fixed_level_table <- NULL
+  # don't try to dedup census geographies, too messy
+  if (substr(naked_ndm_table_number(cansimTableNumber),1,4)=="9810" && sum(filter(level_table,.data$...dim=="1")$...duplicated)>0) {
+    warning(paste0("Table ",cansimTableNumber," is a census data table that has duplicate geography names, not converting to factors. Treat with caution when accessng geographies by name and check geographic identifiers."))
+    fixed_level_table <- level_table %>%
+      filter(.data$...dim=="1")
+    level_table <- level_table %>%
+      filter(.data$...dim!="1")
+  }
+
+  # try to dedup
   max_run <- 30
   while (sum(level_table$...duplicated)>0 && max_run>0) { # deals with 36-10-0580
     max_run <- max_run - 1
     level_table <- level_table %>%
-      left_join(level_table %>% select("...id",...parent_name="...name"),
-                by=c("...parent_id"="...id")) %>%
-      mutate(...name=ifelse(.data$...duplicated,
-                            paste0(.data$...name," ==> ",.data$...parent_name),
-                            .data$...name)) %>%
-      select(-"...parent_name") %>%
-      mutate(...count=n(),.by="...name") %>%
-      mutate(...duplicated=.data$...count>1)
+      left_join(level_table %>% select("...id","...dim",...parent_name="...original_name",...new_parent_id="...last_parent_id"),
+                by=c("...last_parent_id"="...id","...dim"="...dim")) %>%
+      mutate(...name=case_when(.data$...duplicated & is.na(.data$...parent_name) ~ paste0(.data$...name," [",.data$...id,"]"),
+                               .data$...duplicated & !is.na(.data$...parent_name) ~  paste0(.data$...name," ==> ",.data$...parent_name),
+                              TRUE ~ .data$...name)) %>%
+      mutate(...last_parent_id=ifelse(.data$...duplicated,
+                                      .data$...new_parent_id,
+                                      .data$...last_parent_id)) %>%
+      mutate(...count=n(),.by=c("...dim","...name")) %>%
+      mutate(...duplicated=.data$...count>1) %>%
+      select(-any_of(c("...parent_name","...new_parent_id")))
+
   }
 
-  level_table %>%
+  bind_rows(fixed_level_table,level_table) %>%
+    arrange("...dim") %>%
     select("...dim","...id","...name","...original","...original_name")
 }
 
