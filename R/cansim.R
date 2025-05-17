@@ -152,7 +152,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
-        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,language=language,column=field) %>%
+        level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,
+                                                     language=language,column=field) %>%
           arrange(as.integer(.data$`...dim`),as.integer(.data$`...id`))
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
@@ -171,7 +172,9 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>% lapply(\(x)x[dimension_id]) %>% unlist()
+          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>%
+            lapply(\(x)x[dimension_id]) %>%
+            unlist()
 
           data <- data %>%
             select(-all_of(field)) %>%

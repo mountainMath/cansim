@@ -141,3 +141,7 @@ There were no ERRORs or WARNINGs or NOTEs.
 * generate table template and facilitate adding vector info to aid pinpointed data download
 * enable downloading of data by vector and multiple coordinates in get_cansim_data_for_table_coord_periods (breaking changes with change to parameter)
 
+# cansim 0.4.3
+## Minor changes
+* better handling of duplicated levels in metadata, ignore duplication for geography names of census tables but emit warning
+
