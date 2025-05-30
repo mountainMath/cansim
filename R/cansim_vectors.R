@@ -466,7 +466,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
       new_failed_coordinates <- NULL
       if (length(data2)>0) {
         # message(paste0("Failed to load for ",length(data2)," coordinates "))
-        new_failed_coordinates <- data2 %>% purrr::map(function(x){x$object$coordinate}) |> unlist()
+        new_failed_coordinates <- data2 %>% purrr::map(function(x){x$object$coordinate}) %>% unlist()
         new_failed_coordinates <- tibble::tibble(cansimTableNumber=unique(working_data$cansimTableNumber),
                                                  COORDINATE=new_failed_coordinates)
 

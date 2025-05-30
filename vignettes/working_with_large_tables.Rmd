@@ -1,9 +1,7 @@
 ---
 title: "Working with large tables"
 description: >
-  Very large StatCan tables can pose challenges for memory footprint and performace. We show how to overcome these challenges by accessing the data through an SQLite database connection.
-author: ""
-date: "`r Sys.Date()`"
+  Very large StatCan tables can pose challenges for memory footprint and performace. We show how to overcome these challenges by accessing the data through a parquet or SQLite database connection.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with large tables}
@@ -15,6 +13,9 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
+  cache = FALSE,
+  fig.width = 7,
+  fig.height = 5,
   eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 ```

@@ -1,5 +1,7 @@
 ---
 title: "Retrieving individual Statistics Canada vectors"
+description: >
+  The `cansim` package provides functionality to retrieve individual Statistics Canada vectors or access data by table and coordinate, which are often used for specific time series data and is generally faster than downloading entire tables.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Retrieving individual Statistics Canada vectors}
@@ -11,6 +13,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
+  cache = FALSE,
   eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 library(cansim)

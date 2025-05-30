@@ -1,6 +1,7 @@
 # cansim 0.4.3
 ## Minor changes
 * better handling of duplicated levels in metadata, ignore duplication for geography names of census tables but emit warning
+* fix issue with accessing tables without footnotes
 
 
 # cansim 0.4.2

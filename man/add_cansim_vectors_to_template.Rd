@@ -22,7 +22,8 @@ coordinates. Vector information is not available for census data tables.
 \examples{
 \dontrun{
 template <- get_cansim_table_template("34-10-0013")
-template |> filter(Geography=="Canada") |>
+template |>
+  filter(Geography=="Canada") |>
   add_cansim_vectors_to_template()
 }
 }

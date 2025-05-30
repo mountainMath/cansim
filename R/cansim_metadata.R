@@ -468,7 +468,8 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 #' @examples
 #' \dontrun{
 #' template <- get_cansim_table_template("34-10-0013")
-#' template |> filter(Geography=="Canada") |>
+#' template |>
+#'   filter(Geography=="Canada") |>
 #'   add_cansim_vectors_to_template()
 #' }
 #' @export
