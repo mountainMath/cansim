@@ -220,19 +220,17 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 ### Related packages
 
-* The [CANSIM2R package](https://CRAN.R-project.org/package=CANSIM2R) provides functionality to download entire StatCan tables.
-
-* The [statcanR package](https://CRAN.R-project.org/package=statcanR) provides functionality to download entire StatCan tables and basic data discovery functionality.
-
-* [CANSIM-dataviewer](https://github.com/bcgov/CANSIM-dataviewer) is another tool that depends on the existing *CANSIM2R* package with a focus on uses for the Province of British Columbia.
+* The [statcanR package](https://CRAN.R-project.org/package=statcanR) is an alternative package providing basic access to StatCan NDM tables and data discovery.
 
 * [cancensus](https://github.com/mountainMath/cancensus) is a package designed to access, retrieve, and work with Canadian Census data and geography. The *cansim* package is designed to work in conjunction with *cancensus* and data can easily be joined on standard geographic identifiers exposed and harmonized by both packages.
+
+* [cmhc](https://github.com/mountainMath/cmhc) is a package designed to access, retrieve, and work with CMHC data.
 
 ### Cite cansim
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.2. DOI: 10.32614/CRAN.package.cansim
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.3. DOI: 10.32614/CRAN.package.cansim
 
 A BibTeX entry for LaTeX users is
 
@@ -242,7 +240,7 @@ A BibTeX entry for LaTeX users is
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.2},
+    note = {R package version 0.4.3},
     url = {https://mountainmath.github.io/cansim/}
   }
 ```
