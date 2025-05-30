@@ -3,3 +3,7 @@ pre, code {
   size: 70%;
   color: #333;
 }
+
+.page-header img.logo {
+  width: 80px;
+}

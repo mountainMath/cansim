@@ -1,5 +1,7 @@
 ---
 title: "Working with Statistics Canada data table object hierarchies"
+description: >
+  Statistics Canada data tables comes with rich metadata, including on the hierarchy of categories in each dimension. The packages incorporates this metadata and allows for selecting data by hierarchy level.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Working with Statistics Canada data table object hierarchies}
@@ -10,6 +12,9 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
+  cache = FALSE,
+  fig.width = 7,
+  fig.height = 5,
   eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 ```

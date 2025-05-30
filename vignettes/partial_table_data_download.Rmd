@@ -1,5 +1,7 @@
 ---
 title: "Partial table data download"
+description: >
+  Data tables can be quite large, in many applications it makes sense to only download a small subset of a table. The package can create a synthetic template table containing all possible combinations of categories in each dimension that can be used for filtering and pinpointing data of interest, and then downloading just that data instead of the entire table.
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Partial table data download}
@@ -12,6 +14,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   cache = FALSE,
+  fig.width = 7,
+  fig.height = 5,
   eval = nzchar(Sys.getenv("COMPILE_VIG"))
 )
 ```
@@ -25,7 +29,7 @@ We demonstrate this process by taking the large Table 34-10-0285 on building per
 
 ```{r setup}
 library(cansim)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
 
 bp_template <- get_cansim_table_template("34-10-0285")

@@ -233,8 +233,11 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
           mutate(across(where(is.integer),as.character)) %>%
           arrange(as.integer(.data$footnoteId))
       }) %>%
-      unique() %>%
+      unique()
+    if (nrow(m3)>0) {
+      m3 <- m3 %>%
       arrange(as.integer(.data$footnoteId),as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
+    }
     saveRDS(m3, meta3_path)
   } else {
     m3 <- readRDS(meta3_path)
@@ -465,7 +468,8 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 #' @examples
 #' \dontrun{
 #' template <- get_cansim_table_template("34-10-0013")
-#' template |> filter(Geography=="Canada") |>
+#' template |>
+#'   filter(Geography=="Canada") |>
 #'   add_cansim_vectors_to_template()
 #' }
 #' @export

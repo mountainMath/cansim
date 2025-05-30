@@ -17,6 +17,15 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Getting started with the cansim package">
+<meta name="description" content="This vignette provides an overview of the `cansim` package, including how to install it, how to retrieve data from Statistics Canada's NDM, and how to work with the data.
+">
+<meta property="og:description" content="This vignette provides an overview of the `cansim` package, including how to install it, how to retrieve data from Statistics Canada's NDM, and how to work with the data.
+">
+<meta property="og:image" content="https://mountainmath.github.io/cansim/logo.png">
+<meta property="og:image:alt" content="cansim">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@vb_jens">
+<meta name="twitter:site" content="https://mountainmath.github.io/cansim/">
 <!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-107390160-2"></script><script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -33,7 +42,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -213,21 +222,17 @@ containing the specified name for each vector.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Metro Van Apartment Construction Price Index"</span><span class="op">=</span><span class="st">"v44176267"</span>,</span>
 <span>                    <span class="st">"Metro Van CPI"</span><span class="op">=</span><span class="st">"v41692930"</span><span class="op">)</span>,</span>
 <span>                  start_time <span class="op">=</span> <span class="st">"2015-05-01"</span>,</span>
-<span>                  end_time<span class="op">=</span><span class="st">"2015-08-01"</span><span class="op">)</span></span>
+<span>                  end_time<span class="op">=</span><span class="st">"2015-08-01"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Date</span>,<span class="va">GEO</span>,<span class="va">label</span>,<span class="va">VALUE</span>,<span class="va">val_norm</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 17</span></span></span>
-<span><span class="co">#&gt;   REF_DATE   Date       GEO            Products and product…¹ `Type of building`</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2015-05-01 2015-05-01 Vancouver, Br… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2015-06-01 2015-06-01 Vancouver, Br… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2015-07-01 2015-07-01 Vancouver, Br… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2015-08-01 2015-08-01 Vancouver, Br… All-items              <span style="color: #BB0000;">NA</span>                </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2015-07-01 2015-07-01 Vancouver, Br… <span style="color: #BB0000;">NA</span>                     Apartment         </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Products and product groups`</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 12 more variables: `Major sub-trade group` &lt;fct&gt;, label &lt;chr&gt;, VALUE &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;, frequencyCode &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   DECIMALS &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
+<span><span class="co">#&gt;   Date       GEO                         label                    VALUE val_norm</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2015-05-01 Vancouver, British Columbia Metro Van CPI             122.     122.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2015-06-01 Vancouver, British Columbia Metro Van CPI             122.     122.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2015-07-01 Vancouver, British Columbia Metro Van CPI             122.     122.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2015-08-01 Vancouver, British Columbia Metro Van CPI             123.     123.</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2015-07-01 Vancouver, British Columbia Metro Van Apartment Con…  153      153</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
