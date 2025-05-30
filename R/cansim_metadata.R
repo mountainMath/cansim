@@ -233,8 +233,11 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
           mutate(across(where(is.integer),as.character)) %>%
           arrange(as.integer(.data$footnoteId))
       }) %>%
-      unique() %>%
+      unique()
+    if (nrow(m3)>0) {
+      m3 <- m3 %>%
       arrange(as.integer(.data$footnoteId),as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
+    }
     saveRDS(m3, meta3_path)
   } else {
     m3 <- readRDS(meta3_path)
