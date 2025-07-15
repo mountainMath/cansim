@@ -146,3 +146,6 @@ There were no ERRORs or WARNINGs or NOTEs.
 * better handling of duplicated levels in metadata, ignore duplication for geography names of census tables but emit warning
 * fix issue with accessing tables without footnotes
 
+# cansim 0.4.4
+## Minor changes
+* fix a problem with metadata parsing does not work properly for table names

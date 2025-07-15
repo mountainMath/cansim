@@ -39,14 +39,22 @@ parse_metadata <- function(meta,data_path){
       if (length(grep("\u201C|\u201D",meta_part))>0){
         meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
       }
-      utils::read.delim(text=meta_part,sep=table_delim,header=TRUE,stringsAsFactors=FALSE,
+      d<-utils::read.delim(text=meta_part,sep=table_delim,header=FALSE,stringsAsFactors=FALSE,
                         quote="\"",na.strings="",
                  colClasses="character",check.names=FALSE) %>%
         as_tibble()
+      if (nrow(d>1)) {
+        nn <- as.character(d[1,])
+        d <- d %>%
+          select(which(!is.na(nn))) %>%
+          setNames(na.omit(nn)) %>%
+          slice(-1)
+      }
     } else {
-      suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
+      d<- suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
                                          delim=table_delim, col_types = readr::cols(.default="c")))
     }
+    d
   }
 
   read_notes <- function(meta_part) {
