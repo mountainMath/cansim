@@ -14,7 +14,7 @@ reference:
     - get_cansim_data_for_table_coord_periods
     - get_cansim_vector
     - get_cansim_vector_for_latest_periods
-  - title: SQLite database
+  - title: Local database caching
     desc: Managing data in local database
   - contents:
     - get_cansim_connection
@@ -24,6 +24,7 @@ reference:
     - disconnect_cansim_sqlite
     - cansim_repartition_cached_table
   - title: Locating data
+    desc: Help with data discovery
   - contents:
     - list_cansim_cubes
     #- list_cansim_tables
@@ -33,6 +34,7 @@ reference:
     - get_cansim_table_last_release_date
     - get_cansim_key_release_schedule
   - title: Metadata and information
+    desc: Browse metadata and table contents
   - contents:
     - get_cansim_cube_metadata
     - starts_with("get_cansim_table_")
@@ -44,6 +46,7 @@ reference:
     - view_cansim_webpage
     - categories_for_level
   - title: Miscellaneous
+    desc: Helper functions
   - contents:
     - add_provincial_abbreviations
     - cansim_old_to_new
