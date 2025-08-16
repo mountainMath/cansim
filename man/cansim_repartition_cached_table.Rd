@@ -9,7 +9,7 @@ cansim_repartition_cached_table(
   new_partitioning = c(),
   language = "english",
   format = "parquet",
-  cache_path = getOption("cansim.cache_path")
+  cache_path = Sys.getenv("CANSIM_CACHE_PATH")
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ cansim_repartition_cached_table(
 \item{format}{(Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).}
 
 \item{cache_path}{(Optional) Path to where to cache the table permanently. By default, the data is cached
-in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.}
+in the path specified by `Sys.getenv("CANSIM_CACHE_PATH")`, if this is set. Otherwise it will use `tempdir()`.}
 }
 \description{
 Repartitions and already downloaded and cached parquet or feather dataset

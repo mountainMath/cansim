@@ -41,7 +41,7 @@ table_base_path <- function(cansimTableNumber) {
 
 file_path_for_table_language <- function(cansimTableNumber, language){
   language <- cleaned_ndm_language(language)
-  if (is.na(language)) stop(paste0("Unkown Lanaguage ",language))
+  if (is.na(language)) stop(paste0("Unkown Lanaguage ",language),call.=FALSE)
   base_table <- naked_ndm_table_number(cansimTableNumber)
   file.path(paste0(base_table,"-",language))
 }
@@ -91,7 +91,7 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FAL
            "Statistics Canada has a history of failty SSL certificats on their API,\n",
            "if you are reasonably sure that your connection is not getting hijacked you\n",
            "can disable peer checking for the duration of the R session by typing\n\n",
-           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.")
+           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
     }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
@@ -141,7 +141,7 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE
            "Statistics Canada has a history of failty SSL certificats on their API,\n",
            "if you are reasonably sure that your connection is not getting hijacked you\n",
            "can disable peer checking for the duration of the R session by typing\n\n",
-           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.")
+           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
     }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
@@ -290,7 +290,7 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
                                 refresh=FALSE){
   code_sets <- c("scalar", "frequency", "symbol", "status", "uom", "survey",  "subject", "wdsResponseStatus")
   if (length(code_set)!=1 | !(code_set %in% code_sets)) {
-    stop(paste0("Invalid code set, code_set must be one of ",paste0(code_sets,collapse=", ")))
+    stop(paste0("Invalid code set, code_set must be one of ",paste0(code_sets,collapse=", ")),call.=FALSE)
   }
   path=file.path(tempdir(),"cansim_code_sets.Rmd")
   if (refresh | !file.exists(path)) {
@@ -301,7 +301,7 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
       saveRDS(content,path)
     } else {
       warning("Problem downloading code sets.")
-      stop(httr::content(r))
+      stop(httr::content(r),call.=FALSE)
     }
   } else {
     content <- readRDS(path)
@@ -410,7 +410,7 @@ format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ..
       else if (endsWith(units, "b"))
         standard <- "legacy"
       else if (units == "kB")
-        stop("For SI units, specify 'standard = \"SI\"'")
+        stop("For SI units, specify 'standard = \"SI\"'",call.=FALSE)
     }
   }
   base <- known_bases[[standard]]
@@ -426,7 +426,7 @@ format_file_size <- function (x, units = "b", standard = "auto", digits = 1L, ..
       1L
     if (is.na(power))
       stop(gettextf("Unit \"%s\" is not part of standard \"%s\"",
-                    sQuote(units), sQuote(standard)), domain = NA)
+                    sQuote(units), sQuote(standard)), domain = NA,call.=FALSE)
   }
   unit <- units_map[power + 1L]
   if (power == 0 && standard == "legacy")
@@ -579,5 +579,19 @@ normalize_coordinates <- function(coordinates){
 
 }
 
-
+get_robust_cache_path <- function(cache_path) {
+  if (is.null(cache_path) || cache_path=="") {
+    cache_path <- Sys.getenv("CANSIM_CACHE_PATH")
+    if (cache_path=="") cache_path <- get_option("cansim.cache_path",default="")
+    if (cache_path=="") {
+      cache_path <- file.path(tempdir(),"cansim_cache")
+      if (!dir.exists(cache_path)) dir.create(cache_path)
+      message(cansim_no_cache_path_message)
+    }
+  }
+  if (!dir.exists(cache_path)) {
+    stop("Cache path ",cache_path," does not exist, please create it first.",call.=FALSE)
+  }
+  cache_path
+}
 

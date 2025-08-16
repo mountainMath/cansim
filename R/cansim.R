@@ -254,7 +254,7 @@ cansim_old_to_new <- function(oldCansimTableNumber){
     filter(.data$CANSIM_ID == as.integer(cleaned_number)) %>%
     pull(.data$PRODUCT_ID)
   if (identical(new_number, integer(0))) {
-    stop(paste0("Unable to match old CANSIM table number ",cleaned_number))
+    stop(paste0("Unable to match old CANSIM table number ",cleaned_number),call.=FALSE)
   }
   n=as.character(new_number)
   new_table <- paste0(substr(n,1,2),"-",substr(n,3,4),"-",substr(n,5,8))
@@ -746,7 +746,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
       dplyr::pull(!!as.name(dimension_id_column))
     data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda_column_",column_index)
     if (!file.exists(data_path)){
-      stop(paste0("Unkown column ",column))
+      stop(paste0("Unkown column ",column),call.=FALSE)
     }
     result <- readRDS(file=data_path)
   } else {
@@ -781,7 +781,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
                     exceeded_hierarchy_warning_message=exceeded_hierarchy_warning_message)
 
     if (nrow(result)==0){
-      stop(paste0("Unkown column ",column))
+      stop(paste0("Unkown column ",column),call.=FALSE)
     }
   }
 
@@ -930,7 +930,7 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
   if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
   }
   httr::content(response)$object
 }
@@ -956,7 +956,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
     last_available_date = last_available_date  -1
   }
   if (start_date>last_available_date) {
-    stop(paste0("Last available date is ",last_available_date,", please try with a start date on or before that date."))
+    stop(paste0("Last available date is ",last_available_date,", please try with a start date on or before that date."),call.=FALSE)
   }
   if (is.null(end_date)) end_date=start_date
   if (as.Date(end_date) > last_available_date) {
@@ -977,7 +977,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
       response <- httr::GET(url)
       if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
       }
       httr::content(response)$object %>%
         map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%

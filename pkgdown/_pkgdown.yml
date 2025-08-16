@@ -23,6 +23,8 @@ reference:
     - remove_cansim_cached_tables
     - disconnect_cansim_sqlite
     - cansim_repartition_cached_table
+    - set_cansim_cache_path
+    - show_cansim_cache_path
   - title: Locating data
     desc: Help with data discovery
   - contents:

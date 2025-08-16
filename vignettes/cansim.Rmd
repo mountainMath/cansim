@@ -68,6 +68,16 @@ get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
                   end_time="2015-08-01") |>
   dplyr::select(Date,GEO,label,VALUE,val_norm)
 ```
+Larger tables, or tables that update infrequently can be cached in database form for faster access and better performance. The `get_cansim_connection` function facilitates this, it works mostly identitcal to the `get_cansim` function, but returns a database connection to a local database with the StatCan Table data. Calling `collect_and_normalize`, after possibly filtering data, adds metadata and loads data into memory in a form that is identical to the data retrieved by `get_cansim`. 
+
+```{r}
+data <- get_cansim_connection("14-10-0293") |>
+  collect_and_normalize()
+head(data)
+```
+
+For more information refer to the _Working with large tables_ vignette.
+
 
 ### License
 

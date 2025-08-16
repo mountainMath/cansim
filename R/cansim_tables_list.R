@@ -83,7 +83,7 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
 #' @export
 list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
   data <- NULL
-  directory <- tempdir() #getOption("cansim.cache_path")
+  directory <- tempdir()
   path <- file.path(directory,paste0("cansim_cube_list_",ifelse(lite,"lite","regular"),".Rda"))
   if (refresh | !file.exists(path)) {
     if (!quiet) message("Retrieving cube information from StatCan servers...")
@@ -204,7 +204,7 @@ get_cansim_key_release_schedule <- function(){
   response <- get_with_timeout_retry(url)
 
   if (response$status_code!=200){
-    stop("Problem accessing release schedule.")
+    stop("Problem accessing release schedule.",call.=FALSE)
   }
 
   httr::content(response) %>%

@@ -164,7 +164,7 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
 get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=FALSE){
   type <- type[1]
   if (!(type %in% c("overview", "members", "notes", "corrections"))) {
-    stop("type must be one of 'overview', 'members', 'notes', or 'corrections'")
+    stop("type must be one of 'overview', 'members', 'notes', or 'corrections'",call.=FALSE)
   }
   tmp_base <- table_base_path(cansimTableNumber)
   if (!dir.exists(tmp_base)) dir.create(tmp_base)
@@ -180,7 +180,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
                            httr::add_headers("Content-Type"="application/json")
     )
     if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
     }
     data <- httr::content(response)
     data1 <- Filter(function(x)x$status=="SUCCESS",data)
@@ -438,7 +438,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
                              httr::timeout(timeout)
       )
       if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response))
+        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
       }
       data <- httr::content(response)
       data1 <- Filter(function(x)x$status=="SUCCESS",data)
@@ -485,14 +485,14 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 add_cansim_vectors_to_template <- function(template, refresh=FALSE) {
 
   if (!("cansimTableNumber" %in% names(template))) {
-    stop("The template does not have a cansimTableNumber column.")
+    stop("The template does not have a cansimTableNumber column.",call.=FALSE)
   }
   if (!("COORDINATE" %in% names(template))) {
-    stop("The template does not have a COORDINATE column.")
+    stop("The template does not have a COORDINATE column.",call.=FALSE)
   }
 
   if (nrow(template)==0) {
-    stop("No rows in the template.")
+    stop("No rows in the template.",call.=FALSE)
   }
 
   tnr <- unique(template$cansimTableNumber)

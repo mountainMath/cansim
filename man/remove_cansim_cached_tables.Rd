@@ -8,7 +8,7 @@ remove_cansim_cached_tables(
   cansimTableNumber,
   format = c("parquet", "feather", "sqlite"),
   language = NULL,
-  cache_path = getOption("cansim.cache_path")
+  cache_path = Sys.getenv("CANSIM_CACHE_PATH")
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ with the list of tables to be removed.}
 
 \item{language}{Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages will be removed.}
 
-\item{cache_path}{Optional, default value is `getOption("cansim.cache_path")`}
+\item{cache_path}{Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`}
 }
 \value{
 `NULL``
