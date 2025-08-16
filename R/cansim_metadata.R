@@ -344,7 +344,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 #' get_cansim_table_template("34-10-0013")
 #' }
 #' @export
-get_cansim_table_template <- function(cansimTableNumber, language="eng",refresh=FALSE){
+get_cansim_table_template <- function(cansimTableNumber, language="english",refresh=FALSE){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
 
