@@ -185,23 +185,6 @@ short_prov.en <- c(
   "Canada"="CAN"
 )
 
-# short_prov.fr <- c(
-#   "Colombie-Britannique"="BC",
-#   "Alberta"="AB",
-#   "Saskatchewan"="SK",
-#   "Manitoba"="MB",
-#   "Ontario"="ON",
-#   "Qu\U00E9bec"="QC",
-#   "Nouveau-Brunswick"="NB",
-#   "\u00CEle-du-Prince-\U00C9douard"="PE",
-#   "Nouvelle-\U00C9cosse"="NS",
-#   "Terre-Neuve-et-Labrador"="NL",
-#   "Yukon"="YT",
-#   "Territoires du Nord-Ouest"="NT",
-#   "Nunavut"="NU",
-#   "Territoires du Nord-Ouest incluant Nunavut"="NTNU",
-#   "Canada"="CAN"
-# )
 
 short_prov.fr <- setNames(c(
   "BC",
