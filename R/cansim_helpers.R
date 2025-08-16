@@ -582,7 +582,7 @@ normalize_coordinates <- function(coordinates){
 get_robust_cache_path <- function(cache_path) {
   if (is.null(cache_path) || cache_path=="") {
     cache_path <- Sys.getenv("CANSIM_CACHE_PATH")
-    if (cache_path=="") cache_path <- get_option("cansim.cache_path",default="")
+    if (cache_path=="") cache_path <- getOption("cansim.cache_path",default="")
     if (cache_path=="") {
       cache_path <- file.path(tempdir(),"cansim_cache")
       if (!dir.exists(cache_path)) dir.create(cache_path)
