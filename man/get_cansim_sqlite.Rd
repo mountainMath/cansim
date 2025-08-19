@@ -10,7 +10,7 @@ get_cansim_sqlite(
   refresh = FALSE,
   auto_refresh = FALSE,
   timeout = 1000,
-  cache_path = getOption("cansim.cache_path")
+  cache_path = Sys.getenv("CANSIM_CACHE_PATH")
 )
 }
 \arguments{
@@ -25,7 +25,7 @@ get_cansim_sqlite(
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 
 \item{cache_path}{(Optional) Path to where to cache the table permanently. By default, the data is cached
-in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.}
+in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.}
 }
 \value{
 A database connection to a local SQLite database with the StatCan Table data.

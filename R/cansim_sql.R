@@ -15,7 +15,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' @param auto_refresh (Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
-#' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
+#' in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.
 #  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
 #'
 #' @return A database connection to a local SQLite database with the StatCan Table data.
@@ -33,7 +33,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' @export
 get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FALSE, auto_refresh = FALSE,
                               timeout=1000,
-                       cache_path=getOption("cansim.cache_path")){
+                       cache_path=Sys.getenv('CANSIM_CACHE_PATH')){
   .Deprecated("get_cansim_connection",
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use get_cansim_connection(..., format='sqlite'') instead.")
@@ -73,7 +73,7 @@ disconnect_cansim_sqlite <- function(connection){
 
 #' List cached cansim SQLite database
 #'
-#' @param cache_path Optional, default value is `getOption("cansim.cache_path")`.
+#' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`.
 #' @param refresh Optional, refresh the last updated date of cached cansim tables
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
@@ -82,7 +82,7 @@ disconnect_cansim_sqlite <- function(connection){
 #' }
 #' @keywords internal
 #' @export
-list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
+list_cansim_sqlite_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH'),refresh=FALSE){
   .Deprecated("list_cansim_cached_tables",
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cached_tables(...) instead.")
@@ -96,7 +96,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' @param cansimTableNumber Number of the table to be removed
 #' @param language Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages
 #' will be removed
-#' @param cache_path Optional, default value is `getOption("cansim.cache_path")`
+#' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`
 #' @return `NULL``
 #'
 #' @examples
@@ -107,7 +107,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=getOption("cansim.cache_
 #' }
 #' @keywords internal
 #' @export
-remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=getOption("cansim.cache_path")){
+remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=Sys.getenv('CANSIM_CACHE_PATH')){
   .Deprecated("remove_cansim_cached_tables",
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use remove_cansim_cached_tables(..., format='sqlite'') instead.")

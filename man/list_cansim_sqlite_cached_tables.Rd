@@ -5,12 +5,12 @@
 \title{List cached cansim SQLite database}
 \usage{
 list_cansim_sqlite_cached_tables(
-  cache_path = getOption("cansim.cache_path"),
+  cache_path = Sys.getenv("CANSIM_CACHE_PATH"),
   refresh = FALSE
 )
 }
 \arguments{
-\item{cache_path}{Optional, default value is `getOption("cansim.cache_path")`.}
+\item{cache_path}{Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`.}
 
 \item{refresh}{Optional, refresh the last updated date of cached cansim tables}
 }

@@ -1,8 +1,13 @@
+# cansim 0.4.4
+## Minor changes
+* fix a problem with metadata parsing does not work properly for table names
+* make documentations more consistent wrt default langauge names
+* add convenience functions for setting cache paths for data accessed via get_cansim_connection
+
 # cansim 0.4.3
 ## Minor changes
 * better handling of duplicated levels in metadata, ignore duplication for geography names of census tables but emit warning
 * fix issue with accessing tables without footnotes
-
 
 # cansim 0.4.2
 ## Minor changes

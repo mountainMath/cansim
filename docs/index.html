@@ -40,7 +40,7 @@
 
     <a class="navbar-brand me-2" href="index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -155,7 +155,7 @@
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">GEO</span> <span class="op">==</span> <span class="st">"Canada"</span>,</span>
 <span>                <span class="va">Gender</span> <span class="op">==</span> <span class="st">"Total - gender"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/collect_and_normalize.html">collect_and_normalize</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>One further difference to just calling <code><a href="reference/get_cansim.html">get_cansim()</a></code> is that the data is cached before sessions if the “cansim.cache_path” option variable is set. Typically this will be set in the <code>.Rprofile</code> file in the home directory to share the cache between sessions and between projects.</p>
+<p>One further difference to just calling <code><a href="reference/get_cansim.html">get_cansim()</a></code> is that the data is cached before sessions if the ‘CANSIM_CACHE_PATH’ environment variable is set. Typically this will be set in the <code>.Renviron</code> file in the home directory to share the cache between sessions and between projects. The <code><a href="reference/set_cansim_cache_path.html">set_cansim_cache_path()</a></code> function can be used to set the cache path environment variable and optionally install it permanently into the <code>.Renviron</code> file.</p>
 <p>The function will emit a warning if the package we query is cached and a newer version is available from StatCan. Setting the <code>refresh = "auto"</code> argument will automatically refresh the data if a newer version is available, setting <code>refresh = TRUE</code> forces a refresh irrespective if the cached data is out of date or not.</p>
 <p>This approach is especially useful when working with large tables, see more example usage and workflow in the <em>Working with large tables</em> vignette.</p>
 </div>
@@ -199,10 +199,10 @@
 <code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard <code>dplyr</code> verbs.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></span></code></pre></div>
-<p>As table search functions require a full scrape of Statistics Canada’s data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying <code>refresh=TRUE</code> when calling <code>list_cansim_tables</code>. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting <code>options(cansim.cache_path="your cache path")</code> option so that table information is cached across R sessions.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></span></code></pre></div>
+<p>Retrieving the table list takes a little bit of time, so results are cached for the duration of a session. If sessions span several days the <code>refresh=TRUE</code> argument can be passed to regenerate the list to capture newly published tables.</p>
 <p>The <em>Listing Statistics Canada data tables</em> vignette has additional detail and examples.</p>
 </div>
 <div class="section level3">
@@ -269,14 +269,14 @@ In doing any of the above, you shall:
 <h3 id="cite-cansim">Cite cansim<a class="anchor" aria-label="anchor" href="#cite-cansim"></a>
 </h3>
 <p>If you wish to cite the <code>cansim</code> package in your work:</p>
-<p>von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.3. DOI: 10.32614/CRAN.package.cansim</p>
+<p>von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.4. DOI: 10.32614/CRAN.package.cansim</p>
 <p>A BibTeX entry for LaTeX users is</p>
 <pre><code>  @Manual{cansim,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.3},
+    note = {R package version 0.4.4},
     url = {https://mountainmath.github.io/cansim/}
   }</code></pre>
 </div>
@@ -335,7 +335,7 @@ In doing any of the above, you shall:
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

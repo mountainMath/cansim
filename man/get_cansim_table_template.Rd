@@ -4,7 +4,11 @@
 \alias{get_cansim_table_template}
 \title{Retrieve table template from Statistics Canada API}
 \usage{
-get_cansim_table_template(cansimTableNumber, language = "eng", refresh = FALSE)
+get_cansim_table_template(
+  cansimTableNumber,
+  language = "english",
+  refresh = FALSE
+)
 }
 \arguments{
 \item{cansimTableNumber}{A new or old CANSIM/NDM table number or a vector of table numbers}

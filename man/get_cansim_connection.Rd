@@ -11,7 +11,7 @@ get_cansim_connection(
   partitioning = c(),
   refresh = FALSE,
   timeout = 1000,
-  cache_path = getOption("cansim.cache_path")
+  cache_path = Sys.getenv("CANSIM_CACHE_PATH")
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ a warning will be emitted to alert the user that the data is outdated.}
 \item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
 
 \item{cache_path}{(Optional) Path to where to cache the table permanently. By default, the data is cached
-in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.}
+in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.}
 }
 \value{
 A database connection to a local parquet, feather, or sqlite database with the StatCan Table data. The data

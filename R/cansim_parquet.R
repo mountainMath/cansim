@@ -15,7 +15,7 @@
 #' a warning will be emitted to alert the user that the data is outdated.
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
-#' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
+#' in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.
 #  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
 #'
 #' @return A database connection to a local parquet, feather, or sqlite database with the StatCan Table data. The data
@@ -36,10 +36,12 @@ get_cansim_connection <- function(cansimTableNumber,
                           partitioning=c(),
                           refresh=FALSE,
                           timeout=1000,
-                          cache_path=getOption("cansim.cache_path")){
+                          cache_path=Sys.getenv('CANSIM_CACHE_PATH')){
+
+  cache_path <- get_robust_cache_path(cache_path)
 
   if (!c(format %in% c("parquet","feather","sqlite")) || length(format)!=1) {
-    stop("format must be either 'parquet', 'feather', or 'sqlite'.")
+    stop("format must be either 'parquet' (recommended), 'feather', or 'sqlite'.",call.=FALSE)
   }
 
   auto_refresh <- is.character(refresh) && refresh=="auto"
@@ -89,7 +91,7 @@ get_cansim_connection <- function(cansimTableNumber,
     time_check <- Sys.time()
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
     if (is.null(response)|| (response$status_code!=200) && ("result" %in% names(response)) && is.null(response$result)) {
-      stop(paste0("Failed to download ",cansimTableNumber,"."))
+      stop(paste0("Failed to download ",cansimTableNumber,"."),call.=FALSE)
       return(NULL)
     }
     data <- NA
@@ -183,7 +185,7 @@ get_cansim_connection <- function(cansimTableNumber,
       dupes <- header[toupper(header) %in% hd]
       unlink(exdir, recursive=TRUE)
       stop(paste0("This table has duplicated columns names: ",paste0(dupes,collapse = ", "),
-                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."))
+                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."),call.=FALSE)
     }
 
     if (format=="sqlite") {
@@ -424,8 +426,7 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
 #' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
 #' @param new_partitioning (Optional) Partition columns to use for parquet or feather formats.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
-#' in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.
-#  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
+#' in the path specified by `Sys.getenv("CANSIM_CACHE_PATH")`, if this is set. Otherwise it will use `tempdir()`.
 #'
 #' @return NULL
 #'
@@ -439,9 +440,10 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
                                             new_partitioning=c(),
                                             language="english",
                                             format="parquet",
-                                            cache_path=getOption("cansim.cache_path")){
+                                            cache_path=Sys.getenv("CANSIM_CACHE_PATH")){
+  cache_path <- get_robust_cache_path(cache_path)
   if (!(format %in% c("parquet","feather"))) {
-    stop("Format must be one of 'parquet' or 'feather'.")
+    stop("Format must be one of 'parquet' or 'feather'.",call.=FALSE)
   }
 
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
@@ -452,12 +454,12 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
 
   cache_path <- file.path(cache_path,path_name)
   if (!dir.exists(cache_path)) {
-    stop("Table ",cansimTableNumber, " for ",language," and ",format," not found in cache, download it with the desired partitioning using `get_cansim_connection`")
+    stop("Table ",cansimTableNumber, " for ",language," and ",format," not found in cache, download it with the desired partitioning using `get_cansim_connection`",call.=FALSE)
   }
   file_extension <- ifelse(format=="feather","arrow",format)
   db_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".",file_extension)
   if (!dir.exists(db_path)) {
-    stop("Table not found in cache, download it with the desired partitioning using `get_cansim_connection`")
+    stop("Table not found in cache, download it with the desired partitioning using `get_cansim_connection`.",call.=FALSE)
   }
 
   schema_path <- file.path(dirname(db_path),paste0(basename(db_path),".schema"))
@@ -472,7 +474,7 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
   }
 
   if (!file.exists(schema_path)) {
-    stop("Could not access existing database schema, please redownload the table.")
+    stop("Could not access existing database schema, please redownload the table.",call.=FALSE)
   }
   arrow_schema <- arrow::open_dataset(schema_path, format=format) %>% arrow::schema()
   old_path <- paste0(db_path,".old")
@@ -526,7 +528,7 @@ collect_and_normalize <- function(connection,
     cansimTableNumber <- md$cansimTableNumber
     language <- md$language
     if ((is.null(language)||is.null(cansimTableNumber))) {
-      stop("Connection does not have the necessary attributes to normalize the data")
+      stop("Connection does not have the necessary attributes to normalize the data",call.=FALSE)
     }
   }
 
@@ -550,7 +552,7 @@ collect_and_normalize <- function(connection,
         transform_value_column(value_string)
     }
   } else {
-    stop("Don't know how to handle connections of class ",paste0(class(connection),collapse=", "))
+    stop("Don't know how to handle connections of class ",paste0(class(connection),collapse=", "),call.=FALSE)
   }
 
   if (nrow(data)>0){
@@ -572,7 +574,7 @@ collect_and_normalize <- function(connection,
 
 #' List cached cansim arrow and SQlite databases
 #'
-#' @param cache_path Optional, default value is `getOption("cansim.cache_path")`.
+#' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`.
 #' @param refresh Optional, refresh the last updated date of cached cansim tables
 #' @return A tibble with the list of all tables that are currently cached at the given cache path.
 #' @examples
@@ -580,9 +582,8 @@ collect_and_normalize <- function(connection,
 #' list_cansim_cached_tables()
 #' }
 #' @export
-list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),refresh=FALSE){
-  have_custom_path <- !is.null(cache_path)
-  if (!have_custom_path) cache_path <- tempdir()
+list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH'),refresh=FALSE){
+  cache_path <- get_robust_cache_path(cache_path)
 
   # check for legacy tables
   result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_eng|cansim_\\d+_fra"))
@@ -699,7 +700,7 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 #' with the list of tables to be removed.
 #' @param format Format of cache to remove, possible values are `"parquet"`, `"feather"` or `"sqlite"` or a subset of these (the default is all of these)
 #' @param language Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages will be removed.
-#' @param cache_path Optional, default value is `getOption("cansim.cache_path")`
+#' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`
 #' @return `NULL``
 #'
 #' @examples
@@ -709,11 +710,11 @@ list_cansim_cached_tables <- function(cache_path=getOption("cansim.cache_path"),
 #' }
 #' @export
 remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","feather","sqlite"), language=NULL,
-                                              cache_path=getOption("cansim.cache_path")){
-
+                                              cache_path=Sys.getenv('CANSIM_CACHE_PATH')){
+  cache_path <- get_robust_cache_path(cache_path)
   format=tolower(format)
   if (length(setdiff(format,c("parquet","sqlite","feather")))>0) {
-    stop("Invalid format, must be a subset of 'parquet', 'sqlite', or 'sqlite'.")
+    stop("Invalid format, must be a subset of 'parquet' (recommended), 'sqlite', or 'sqlite'.",call.=FALSE)
   }
   if (is.null(language)) language <- c("eng","fra")
   cleaned_language <- cleaned_ndm_language(language)
@@ -723,7 +724,7 @@ remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","f
 
   if (is.data.frame(cansimTableNumber)) {
     if (!sum(c("cansimTableNumber","language","dataFormat") %in% colnames(cansimTableNumber))) {
-      stop("cansimTableNumber must be a character vector or a (filtered) data frame as returned by list_cansim_cached_tables.")
+      stop("cansimTableNumber must be a character vector or a (filtered) data frame as returned by list_cansim_cached_tables.",call.=FALSE)
     }
     # ensure that tables actually exist
     tables <- cansimTableNumber %>%

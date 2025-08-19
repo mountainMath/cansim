@@ -85,8 +85,9 @@ births <- get_cansim_connection("17-10-0016") |>
 ```
 
 One further difference to just calling `get_cansim()` is that the data is cached before sessions if the
-"cansim.cache_path" option variable is set. Typically this will be set in the `.Rprofile` file in the home directory
-to share the cache between sessions and between projects.
+'CANSIM_CACHE_PATH' environment variable is set. Typically this will be set in the `.Renviron` file in the home directory
+to share the cache between sessions and between projects. The `set_cansim_cache_path()` function can be used to set the cache
+path environment variable and optionally install it permanently into the `.Renviron` file.
 
 The function will emit a warning if the package we query is cached and a newer version is available from StatCan.
 Setting the `refresh = "auto"` argument will automatically refresh the data if a newer version is available, setting
@@ -160,7 +161,7 @@ list_cansim_cubes() %>%
   select("cansim_table_number","cubeTitleEn")
 ```
 
-As table search functions require a full scrape of Statistics Canada's data repository webpages, generating this list can be quite slow so a saved list of tables is included with the package. As Statistics Canada adds additional tables and data products, the list that comes with the package will become out of date and will require refreshing. Tables can be refreshed by specifying `refresh=TRUE` when calling `list_cansim_tables`. The full list of tables can be cached locally to avoid delays and prevent unnecessary web scraping. This can (and should) be enabled by setting `options(cansim.cache_path="your cache path")` option so that table information is cached across R sessions.
+Retrieving the table list takes a little bit of time, so results are cached for the duration of a session. If sessions span several days the `refresh=TRUE` argument can be passed to regenerate the list to capture newly published tables.
 
 The _Listing Statistics Canada data tables_ vignette has additional detail and examples. 
 
@@ -230,7 +231,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.3. DOI: 10.32614/CRAN.package.cansim
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.4. DOI: 10.32614/CRAN.package.cansim
 
 A BibTeX entry for LaTeX users is
 
@@ -240,7 +241,7 @@ A BibTeX entry for LaTeX users is
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.3},
+    note = {R package version 0.4.4},
     url = {https://mountainmath.github.io/cansim/}
   }
 ```

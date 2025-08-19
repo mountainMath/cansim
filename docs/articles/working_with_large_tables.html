@@ -42,7 +42,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,9 +116,13 @@ SQLite database format using the <code>get_cansim_connection</code>
 function instead of the usual <code>get_cansim</code>. In these
 circumstances it is also useful to cache the data for longer than just
 the current R session, and the <code>data_cache</code> option allows to
-specify a permanent location. It defaults to
-<code>getOption("cansim.cache_path")</code>, and if this option is not
-set it will only cache the data for the duration of the current
+specify a permanent location. It defaults to the
+<code>CANSIM_CACHE_PATH</code> environment variable. It is recommended
+to set this in the <code>.Renviron</code> file so it’s accessible in all
+R sessions, the <code><a href="../reference/set_cansim_cache_path.html">set_cansim_cache_path()</a></code> function
+facilitates that and allows for installing this permanently via the
+<code>install=TRUE</code> option. If the environment variable is not set
+the package will only cache the data for the duration of the current
 session.</p>
 <p>For this vignette we use the (rather small) motor vehicle sales data
 as an example.</p>
@@ -184,9 +188,9 @@ by the GeoUID.</p>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#NA" id="NA-tab" type="button" role="tab" aria-controls="NA" aria-selected="false" class="nav-link">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"20-10-0001"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading CANSIM NDM product 20-10-0001 information from cache.</span></span>
-<span><span class="co">#&gt; 20100001</span></span>
+<span><span class="co">#&gt; New motor vehicle sales, inactive</span></span>
 <span><span class="co">#&gt; CANSIM Table 20-10-0001</span></span>
-<span><span class="co">#&gt; Start Reference Period: 2024-12-01, End Reference Period: 5, Frequency: 1946-01-01</span></span>
+<span><span class="co">#&gt; Start Reference Period: 1946-01-01, End Reference Period: 2024-12-01, Frequency: Monthly</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Column Geography (11)</span></span>
 <span><span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia and the Territories, ...</span></span>
@@ -284,7 +288,7 @@ by the GeoUID.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.sqlite</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 19</span></span>
-<span><span class="co">#&gt; Database: sqlite 3.49.1 [/private/var/folders/z4/gcjq2cd93p3bs5bgp8j2vv240000gp/T/RtmpFtI688/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
+<span><span class="co">#&gt; Database: sqlite 3.50.1 [/Users/jens/data/cansim.data/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
 <span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1…</span></span>
 <span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canad…</span></span>
 <span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"…</span></span>
@@ -357,12 +361,12 @@ entire table into memory and normalizes the data.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
 <span><span class="co">#&gt;   REF_DATE Date       GEO    DGUID  GeoUID `Vehicle type` Origin of manufactur…¹</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1978-05  1978-05-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1978-05  1978-05-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1978-06  1978-06-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1978-06  1978-06-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1978-07  1978-07-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1978-07  1978-07-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1975-11  1975-11-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1975-11  1975-11-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1975-12  1975-12-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1975-12  1975-12-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1976-01  1976-01-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1976-01  1976-01-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: Sales &lt;fct&gt;, `Seasonal adjustment` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;, SCALAR_FACTOR &lt;chr&gt;,</span></span></span>
@@ -386,12 +390,12 @@ entire table into memory and normalizes the data.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
 <span><span class="co">#&gt;   REF_DATE Date       GEO    DGUID  GeoUID `Vehicle type` Origin of manufactur…¹</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1965-07  1965-07-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1965-07  1965-07-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1965-08  1965-08-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1965-08  1965-08-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1965-09  1965-09-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1965-09  1965-09-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1970-03  1970-03-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1970-03  1970-03-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1970-04  1970-04-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1970-04  1970-04-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1970-05  1970-05-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1970-05  1970-05-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: Sales &lt;fct&gt;, `Seasonal adjustment` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;, SCALAR_FACTOR &lt;chr&gt;,</span></span></span>
@@ -527,12 +531,20 @@ care to manage that space properly. The
 overview over the cached data we have.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_cansim_cached_tables.html">list_cansim_cached_tables</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 10</span></span></span>
-<span><span class="co">#&gt;   cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 20-10-0001        eng      feather    2025-05-30 <span style="color: #949494;">12:41:27</span> 10.5 Mb  11<span style="text-decoration: underline;">021</span>778</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 20-10-0001        eng      parquet    2025-05-30 <span style="color: #949494;">12:41:25</span> 1.1 Mb    1<span style="text-decoration: underline;">161</span>363</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 20-10-0001        eng      sqlite     2025-05-30 <span style="color: #949494;">12:41:28</span> 47.1 Mb  49<span style="text-decoration: underline;">410</span>048</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 10</span></span></span>
+<span><span class="co">#&gt;    cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 11-10-0004        eng      parquet    2025-07-18 <span style="color: #949494;">22:22:12</span> 1.8 Mb    1<span style="text-decoration: underline;">884</span>578</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 11-10-0008        eng      parquet    2025-07-18 <span style="color: #949494;">23:12:15</span> 14.4 Mb  15<span style="text-decoration: underline;">047</span>191</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 11-10-0009        eng      parquet    2025-07-18 <span style="color: #949494;">22:06:31</span> 2 Mb      2<span style="text-decoration: underline;">125</span>776</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 11-10-0009        eng      sqlite     1900-01-01 <span style="color: #949494;">01:00:00</span> <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 11-10-0017        eng      parquet    2025-02-11 <span style="color: #949494;">11:49:21</span> 9.3 Mb    9<span style="text-decoration: underline;">767</span>494</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 11-10-0047        eng      parquet    2025-07-15 <span style="color: #949494;">14:44:05</span> 918 Kb     <span style="text-decoration: underline;">940</span>072</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 11-10-0191        eng      parquet    2025-05-01 <span style="color: #949494;">13:48:11</span> 12.5 Mb  13<span style="text-decoration: underline;">142</span>229</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 11-10-0223        eng      parquet    2025-05-21 <span style="color: #949494;">13:12:41</span> 4.2 Mb    4<span style="text-decoration: underline;">404</span>277</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 11-10-0239        eng      parquet    2025-07-18 <span style="color: #949494;">22:30:23</span> 27.7 Mb  29<span style="text-decoration: underline;">072</span>464</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 13-10-0418        eng      parquet    2025-06-22 <span style="color: #949494;">15:37:38</span> 18.9 Kb     <span style="text-decoration: underline;">19</span>367</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: title &lt;chr&gt;, path &lt;chr&gt;, timeReleased &lt;dttm&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
 </div>
@@ -564,7 +576,7 @@ connection to the <em>sqlite</em> database.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
