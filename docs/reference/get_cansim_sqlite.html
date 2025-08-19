@@ -19,7 +19,7 @@ if the cached table is out of date."><meta property="og:image" content="https://
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,7 @@ if the cached table is out of date.</p>
 <span>  refresh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  auto_refresh <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cansim.cache_path"</span><span class="op">)</span></span>
+<span>  cache_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CANSIM_CACHE_PATH"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -112,7 +112,7 @@ if the cached table is out of date.</p>
 
 <dt id="arg-cache-path">cache_path<a class="anchor" aria-label="anchor" href="#arg-cache-path"></a></dt>
 <dd><p>(Optional) Path to where to cache the table permanently. By default, the data is cached
-in the path specified by `getOption("cansim.cache_path")`, if this is set. Otherwise it will use `tempdir()`.</p></dd>
+in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -141,7 +141,7 @@ in the path specified by `getOption("cansim.cache_path")`, if this is set. Other
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>

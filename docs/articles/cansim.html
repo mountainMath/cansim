@@ -42,7 +42,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -185,9 +185,9 @@ first step. This is implemented in the package with the
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_table_overview.html">get_cansim_table_overview</a></span><span class="op">(</span><span class="st">"14-10-0293"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading CANSIM NDM product 14-10-0293 information from cache.</span></span>
-<span><span class="co">#&gt; 14100293</span></span>
+<span><span class="co">#&gt; Labour force characteristics by economic region, three-month moving average, unadjusted for seasonality, last 5 months, inactive</span></span>
 <span><span class="co">#&gt; CANSIM Table 14-10-0293</span></span>
-<span><span class="co">#&gt; Start Reference Period: 2020-12-01, End Reference Period: 3, Frequency: 2001-03-01</span></span>
+<span><span class="co">#&gt; Start Reference Period: 2001-03-01, End Reference Period: 2020-12-01, Frequency: Monthly</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Column Geography (76)</span></span>
 <span><span class="co">#&gt; Newfoundland and Labrador, Prince Edward Island, Nova Scotia, New Brunswick, Quebec, Ontario, Manitoba, Saskatchewan, Alberta, British Columbia, ...</span></span>
@@ -233,6 +233,37 @@ containing the specified name for each vector.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2015-07-01 Vancouver, British Columbia Metro Van CPI             122.     122.</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2015-08-01 Vancouver, British Columbia Metro Van CPI             123.     123.</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2015-07-01 Vancouver, British Columbia Metro Van Apartment Con…  153      153</span></span></code></pre></div>
+<p>Larger tables, or tables that update infrequently can be cached in
+database form for faster access and better performance. The
+<code>get_cansim_connection</code> function facilitates this, it works
+mostly identitcal to the <code>get_cansim</code> function, but returns a
+database connection to a local database with the StatCan Table data.
+Calling <code>collect_and_normalize</code>, after possibly filtering
+data, adds metadata and loads data into memory in a form that is
+identical to the data retrieved by <code>get_cansim</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_cansim_connection.html">get_cansim_connection</a></span><span class="op">(</span><span class="st">"14-10-0293"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/collect_and_normalize.html">collect_and_normalize</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Reading CANSIM NDM product 14-10-0293 from parquet.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 24</span></span></span>
+<span><span class="co">#&gt;   REF_DATE Date       GEO    DGUID      GeoUID Labour force charact…¹ Statistics</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Population             Estimate  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Labour force           Estimate  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Labour force           Standard …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Labour force           Standard …</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Employment             Estimate  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 2001-03  2001-03-01 Canada 2016A0000… 11124  Employment             Standard …</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Labour force characteristics`</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 17 more variables: VALUE &lt;dbl&gt;, val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   SCALAR_FACTOR &lt;chr&gt;, SCALAR_ID &lt;chr&gt;, VECTOR &lt;chr&gt;, COORDINATE &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   STATUS &lt;chr&gt;, SYMBOL &lt;chr&gt;, TERMINATED &lt;chr&gt;, DECIMALS &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for GEO` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Classification Code for Labour force characteristics` &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   `Hierarchy for Labour force characteristics` &lt;chr&gt;, …</span></span></span></code></pre></div>
+<p>For more information refer to the <em>Working with large tables</em>
+vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
@@ -284,7 +315,7 @@ acknowledgement of source:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

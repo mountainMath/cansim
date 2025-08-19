@@ -59,6 +59,8 @@
 <url><loc>https://mountainmath.github.io/cansim/reference/remove_cansim_sqlite_cached_table.html</loc></url>
 <url><loc>https://mountainmath.github.io/cansim/reference/search_cansim_cubes.html</loc></url>
 <url><loc>https://mountainmath.github.io/cansim/reference/search_cansim_tables.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/set_cansim_cache_path.html</loc></url>
+<url><loc>https://mountainmath.github.io/cansim/reference/show_cansim_cache_path.html</loc></url>
 <url><loc>https://mountainmath.github.io/cansim/reference/view_cansim_webpage.html</loc></url>
 </urlset>
 
