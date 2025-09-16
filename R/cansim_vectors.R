@@ -207,6 +207,9 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
                                             timeout = timeout)
       }
       if (is.null(response)) return(response)
+      if (is.null(response$status_code)) {
+        stop("Problem downloading data.\n",response$error,call.=FALSE)
+      }
       if (response$status_code!=200) {
         stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
       }
@@ -317,6 +320,9 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
       message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
       if (is.null(response)) return(response)
+      if (is.null(response$status_code)) {
+        stop("Problem downloading data.\n",response$error,call.=FALSE)
+      }
       if (response$status_code!=200) {
         stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
       }
@@ -457,6 +463,10 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
       }
       message(paste0("Accessing CANSIM NDM coordinates from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
+      if (is.null(response)) {return(response)}
+      if (is.null(response$status_code)) {
+        stop("Problem downloading data.\n",response$error,call.=FALSE)
+      }
       if (response$status_code!=200) {
         stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
       }
@@ -564,6 +574,10 @@ get_cansim_vector_info <- function(vectors){
   url="https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromVector"
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,'}')),collapse = ", "),"]")
   response <- post_with_timeout_retry(url, body=vectors_string)
+  if (is.null(response)){return(response)}
+  if (is.null(response$status_code)) {
+    stop("Problem downloading data.\n",response$error,call.=FALSE)
+  }
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
   }

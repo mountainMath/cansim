@@ -929,6 +929,10 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- httr::GET(url)
+  if (is.null(response)){return(response)}
+  if (is.null(response$status_code)) {
+    stop("Problem downloading data.\n",response$error,call.=FALSE)
+  }
   if (response$status_code!=200) {
     stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
   }
@@ -976,6 +980,10 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
     lapply(function(date){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
       response <- httr::GET(url)
+      if (is.null(response)){return(response)}
+      if (is.null(response$status_code)) {
+        stop("Problem downloading data.\n",response$error,call.=FALSE)
+      }
       if (response$status_code!=200) {
         stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
       }
