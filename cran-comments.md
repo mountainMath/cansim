@@ -151,3 +151,8 @@ There were no ERRORs or WARNINGs or NOTEs.
 * fix a problem with metadata parsing does not work properly for table names
 * make documentations more consistent wrt default langauge names
 * add convenience functions for setting cache paths for data accessed via get_cansim_connection
+
+# cansim 0.4.5
+## Minor changes
+* better connection error handling
+

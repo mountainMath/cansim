@@ -1,3 +1,7 @@
+# cansim 0.4.5
+## Minor changes
+* better connection error handling
+
 # cansim 0.4.4
 ## Minor changes
 * fix a problem with metadata parsing does not work properly for table names
