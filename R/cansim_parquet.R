@@ -237,6 +237,9 @@ get_cansim_connection <- function(cansimTableNumber,
 
       con <- DBI::dbConnect(RSQLite::SQLite(), dbname=db_path)
       db_fields <- con %>% tbl(table_name) %>% head(1) %>% collect() %>% names
+
+      # Validate and normalize field names
+      valid_fields <- c()
       for (field in fields) {
         if (!(field %in% db_fields)) {
           geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
@@ -246,12 +249,15 @@ get_cansim_connection <- function(cansimTableNumber,
           }
         }
         if (field %in% db_fields) {
-          message(paste0("Indexing ",field))
-          create_index(con,table_name,field)
+          valid_fields <- c(valid_fields, field)
         } else {
           warning("Do not know how to index field ",field)
         }
       }
+
+      # Use batched index creation for better performance
+      create_indexes_batch(con, table_name, valid_fields, show_progress = TRUE)
+
       DBI::dbDisconnect(con)
     }
 

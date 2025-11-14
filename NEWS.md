@@ -1,3 +1,14 @@
+# cansim 0.4.5 (Development)
+## Performance improvements
+* **SQLite index creation optimization**: Indexes are now created in a single batched transaction instead of individually, significantly improving table initialization time for tables with many dimensions
+* **CSV to SQLite conversion optimization**: All chunks are now written within a single transaction, reducing conversion time for large tables
+* **Query optimization**: Added ANALYZE command after index creation to update SQLite query planner statistics, improving query performance
+* **Progress indicators**: Added detailed progress messages during index creation to provide better feedback for large table operations
+
+## Testing enhancements
+* Added comprehensive performance optimization tests to ensure data consistency across optimizations
+* Added microbenchmark infrastructure for validating performance improvements
+
 # cansim 0.4.4
 ## Minor changes
 * fix a problem with metadata parsing does not work properly for table names

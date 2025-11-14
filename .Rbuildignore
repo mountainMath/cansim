@@ -21,3 +21,5 @@ fix_meta.sh
 ^CRAN-SUBMISSION$
 ^\.github$
 R-CMD-check-old.yaml
+^benchmarks$
+^benchmarks/*
