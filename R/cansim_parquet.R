@@ -189,7 +189,23 @@ get_cansim_connection <- function(cansimTableNumber,
     }
 
     if (format=="sqlite") {
-      chunk_size=ceiling(5000000/pmax(sl,1))
+      # Adaptive chunk size calculation
+      # Base chunk size adjusted for symbol columns (wide tables)
+      base_chunk <- 5000000
+      symbol_adjusted <- ceiling(base_chunk/pmax(sl,1))
+
+      # Further adjust based on total number of columns to optimize memory usage
+      num_columns <- length(header)
+      if (num_columns > 50) {
+        # For very wide tables (>50 columns), reduce chunk size further
+        column_factor <- pmin(num_columns / 50, 3)  # Max 3x reduction
+        chunk_size <- ceiling(symbol_adjusted / column_factor)
+      } else {
+        chunk_size <- symbol_adjusted
+      }
+
+      # Ensure minimum chunk size for efficiency (at least 10,000 rows)
+      chunk_size <- pmax(chunk_size, 10000)
 
       csv2sqlite(file.path(exdir, paste0(base_table, ".csv")),
                  sqlite_file = db_path,
@@ -237,6 +253,17 @@ get_cansim_connection <- function(cansimTableNumber,
 
       con <- DBI::dbConnect(RSQLite::SQLite(), dbname=db_path)
       db_fields <- con %>% tbl(table_name) %>% head(1) %>% collect() %>% names
+
+      # Cache field list for faster subsequent connections
+      fields_cache_path <- paste0(db_path, ".fields")
+      tryCatch({
+        saveRDS(db_fields, fields_cache_path)
+      }, error = function(e) {
+        # Silently ignore cache write errors
+      })
+
+      # Validate and normalize field names
+      valid_fields <- c()
       for (field in fields) {
         if (!(field %in% db_fields)) {
           geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
@@ -246,12 +273,23 @@ get_cansim_connection <- function(cansimTableNumber,
           }
         }
         if (field %in% db_fields) {
-          message(paste0("Indexing ",field))
-          create_index(con,table_name,field)
+          valid_fields <- c(valid_fields, field)
         } else {
           warning("Do not know how to index field ",field)
         }
       }
+
+      # Use batched index creation for better performance
+      create_indexes_batch(con, table_name, valid_fields, show_progress = TRUE)
+
+      # Cache valid indexed fields for reference
+      indexed_fields_cache_path <- paste0(db_path, ".indexed_fields")
+      tryCatch({
+        saveRDS(valid_fields, indexed_fields_cache_path)
+      }, error = function(e) {
+        # Silently ignore cache write errors
+      })
+
       DBI::dbDisconnect(con)
     }
 

@@ -1,3 +1,40 @@
+# Session-level cache for connection metadata to reduce redundant queries
+.cansim_connection_cache <- new.env(parent = emptyenv())
+
+#' Clear connection metadata cache
+#'
+#' @return NULL
+#' @keywords internal
+clear_connection_cache <- function() {
+  rm(list = ls(envir = .cansim_connection_cache), envir = .cansim_connection_cache)
+  invisible(NULL)
+}
+
+#' Get cached connection metadata
+#'
+#' @param cache_key unique key for this connection
+#' @return cached metadata or NULL
+#' @keywords internal
+get_cached_connection_metadata <- function(cache_key) {
+  if (exists(cache_key, envir = .cansim_connection_cache)) {
+    get(cache_key, envir = .cansim_connection_cache)
+  } else {
+    NULL
+  }
+}
+
+#' Set cached connection metadata
+#'
+#' @param cache_key unique key for this connection
+#' @param metadata metadata to cache
+#' @return NULL
+#' @keywords internal
+set_cached_connection_metadata <- function(cache_key, metadata) {
+  assign(cache_key, metadata, envir = .cansim_connection_cache)
+  invisible(NULL)
+}
+
+
 cleaned_ndm_table_number <- function(cansimTableNumber){
   if (is.numeric(cansimTableNumber)) {
     warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",
