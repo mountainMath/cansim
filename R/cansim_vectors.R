@@ -417,7 +417,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
   if ("list" %in% class(tableCoordinates)) {
     tableCoordinates <- tibble::enframe(tableCoordinates) %>%
       setNames(c("cansimTableNumber","COORDINATE")) %>%
-      tidyr::unnest_longer(.data$COORDINATE)
+      tidyr::unnest_longer("COORDINATE")
   }
   tableCoordinates <- tableCoordinates %>%
     mutate(cansimTableNumber=naked_ndm_table_number(.data$cansimTableNumber)) %>%
