@@ -7,3 +7,7 @@ pre, code {
 .page-header img.logo {
   width: 80px;
 }
+
+main#main img#readme-logo {
+  display:none;
+}
