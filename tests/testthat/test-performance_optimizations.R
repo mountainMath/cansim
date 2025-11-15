@@ -28,7 +28,7 @@ test_that("batched index creation produces correct indexes", {
   stat_tables <- DBI::dbGetQuery(con$src$con,
     "SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_stat1'")
   expect_equal(nrow(stat_tables), 1,
-               info = "ANALYZE should create sqlite_stat1 table for query optimization")
+               label = "ANALYZE should create sqlite_stat1 table for query optimization")
 
   DBI::dbDisconnect(con$src$con)
 })
@@ -54,8 +54,8 @@ test_that("SQLite data integrity after transaction optimization", {
   expect_true("DGUID" %in% names(sqlite_data))
 
   # Check for data integrity
-  expect_gt(nrow(sqlite_data), 0, info = "SQLite table should contain data")
-  expect_false(all(is.na(sqlite_data$VALUE)), info = "Not all values should be NA")
+  expect_gt(nrow(sqlite_data), 0, label = "SQLite table should contain data")
+  expect_false(all(is.na(sqlite_data$VALUE)), label = "Not all values should be NA")
 
   # Verify no duplicate primary keys (if applicable)
   # Most tables should have unique combinations of dimensions + REF_DATE
@@ -69,7 +69,7 @@ test_that("SQLite data integrity after transaction optimization", {
       nrow()
     # Some tables might have legitimate duplicates, but usually there shouldn't be many
     expect_lt(dup_count / nrow(sqlite_data), 0.01,
-             info = "Less than 1% duplicates expected")
+              label = "Less than 1% duplicates expected")
   }
 })
 
@@ -84,37 +84,63 @@ test_that("consistency across database formats after optimizations", {
   formats <- c("sqlite", "parquet", "feather")
   data_list <- list()
 
+  var_list <- get_cansim_column_list(table_number)$`Dimension name` %>%
+    setdiff("Geography") |>
+    c("REF_DATE", "DGUID") %>%
+    rev()
+
   for (fmt in formats) {
     con <- get_cansim_connection(table_number, format = fmt)
     data_list[[fmt]] <- con %>%
       dplyr::filter(REF_DATE >= "2020-01-01") %>%
       collect_and_normalize(disconnect = TRUE) %>%
-      dplyr::arrange(REF_DATE, DGUID)
+      dplyr::arrange(!!!rlang::syms(var_list))
   }
 
-  # Compare dimensions
-  for (i in 2:length(formats)) {
-    expect_equal(nrow(data_list[[formats[1]]]), nrow(data_list[[formats[i]]]),
-                info = paste("Row count should match between", formats[1], "and", formats[i]))
+  data_list$memory <- get_cansim(table_number) %>%
+    dplyr::filter(REF_DATE >= "2020-01-01") %>%
+    dplyr::arrange(!!!rlang::syms(var_list))
 
-    expect_equal(ncol(data_list[[formats[1]]]), ncol(data_list[[formats[i]]]),
-                info = paste("Column count should match between", formats[1], "and", formats[i]))
+  # Compare dimensions
+  for (i in 1:length(formats)) {
+    expect_equal(nrow(data_list[["memory"]]), nrow(data_list[[formats[i]]]),
+                 label = paste("Row count should match between", formats[1], "and", formats[i]))
+
+    expect_equal(ncol(data_list[["memory"]]), ncol(data_list[[formats[i]]]),
+                 label = paste("Column count should match between", formats[1], "and", formats[i]))
   }
 
   # Compare VALUE columns (core data)
-  for (i in 2:length(formats)) {
+  for (i in 1:length(formats)) {
     # Allow for small numeric differences due to float representation
-    expect_equal(data_list[[formats[1]]]$VALUE, data_list[[formats[i]]]$VALUE,
+    expect_equal(data_list[["memory"]]$VALUE, data_list[[formats[i]]]$VALUE,
                 tolerance = 1e-10,
-                info = paste("VALUES should match between", formats[1], "and", formats[i]))
+                label = paste("VALUES should match between", formats[1], "and", formats[i]))
   }
 
   # Compare REF_DATE
-  for (i in 2:length(formats)) {
+  for (i in 1:length(formats)) {
     expect_equal(data_list[[formats[1]]]$REF_DATE, data_list[[formats[i]]]$REF_DATE,
-                info = paste("REF_DATE should match between", formats[1], "and", formats[i]))
+                 label = paste("REF_DATE should match between", formats[1], "and", formats[i]))
   }
-})
+
+  count_differences <- function(d1,d2) {
+    d1 <- d1 |>
+      dplyr::mutate(SCALAR_FACTOR=gsub(" +$","",SCALAR_FACTOR)) |>
+      dplyr::arrange(Date,COORDINATE)
+    d2 <- d2 |>
+      dplyr::mutate(SCALAR_FACTOR=gsub(" +$","",SCALAR_FACTOR)) |>
+      dplyr::arrange(Date,COORDINATE)
+
+    (d1==d2) |> dplyr::as_tibble() |> dplyr::summarize_all(\(x) sum(!is.na(x) & x==FALSE)) |> rowSums()
+  }
+
+  for (i in 1:length(formats)) {
+    expect_equal(count_differences(data_list[[formats[i]]],data_list$memory),0,
+                 label = paste("Table output should match between get_cansim and", formats[i]))
+  }
+
+ })
 
 
 test_that("SQLite query performance with ANALYZE", {
@@ -124,9 +150,12 @@ test_that("SQLite query performance with ANALYZE", {
   table_number <- "23-10-0061"
   con <- get_cansim_connection(table_number, format = "sqlite")
 
+
+  tbl <- DBI::dbListTables(con$src$con)
+  tbl <- tbl[grepl("^cansim", tbl)]
   # Get query plan for a filtered query
   query_plan <- DBI::dbGetQuery(con$src$con,
-    "EXPLAIN QUERY PLAN SELECT * FROM data WHERE REF_DATE >= '2020-01-01'")
+    paste0("EXPLAIN QUERY PLAN SELECT * FROM ",tbl," WHERE REF_DATE >= '2020-01-01'"))
 
   # Query plan should exist
   expect_gt(nrow(query_plan), 0)
@@ -136,7 +165,7 @@ test_that("SQLite query performance with ANALYZE", {
 
   # After ANALYZE, SQLite should be able to use indexes more effectively
   # The query plan should show some optimization strategy
-  expect_true(nchar(plan_text) > 0, info = "Query plan should not be empty")
+  expect_true(nchar(plan_text) > 0, label = "Query plan should not be empty")
 
   DBI::dbDisconnect(con$src$con)
 })
@@ -157,11 +186,14 @@ test_that("no data loss in chunked CSV to SQLite conversion", {
   # Download and convert (will use optimized csv2sqlite)
   con <- get_cansim_connection(table_number, format = "sqlite")
 
+  tbl <- DBI::dbListTables(con$src$con)
+  tbl <- tbl[grepl("^cansim", tbl)]
+
   # Count rows
-  row_count <- DBI::dbGetQuery(con$src$con, "SELECT COUNT(*) as count FROM data")$count
+  row_count <- DBI::dbGetQuery(con$src$con, paste0("SELECT COUNT(*) as count FROM ",tbl))$count
 
   # Should have data
-  expect_gt(row_count, 0, info = "SQLite database should contain rows after conversion")
+  expect_gt(row_count, 0, label = "SQLite database should contain rows after conversion")
 
   # Get all data
   all_data <- dplyr::collect(con)
@@ -192,11 +224,11 @@ test_that("index creation shows progress messages", {
   # Should see index-related progress messages
   expect_true(any(grepl("Creating.*indexes", messages)) ||
               any(grepl("Indexing", messages)),
-              info = "Should show index creation progress")
+              label = "Should show index creation progress")
 
   # Should see ANALYZE message
   expect_true(any(grepl("ANALYZE", messages)),
-             info = "Should show ANALYZE progress")
+              label = "Should show ANALYZE progress")
 
   DBI::dbDisconnect(con$src$con)
 })
