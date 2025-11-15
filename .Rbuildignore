@@ -23,3 +23,4 @@ fix_meta.sh
 R-CMD-check-old.yaml
 ^benchmarks$
 ^benchmarks/*
+^CODE_REVIEW.md
