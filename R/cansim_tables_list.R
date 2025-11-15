@@ -89,6 +89,10 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
     if (!quiet) message("Retrieving cube information from StatCan servers...")
     url=ifelse(lite,"https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite","https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesList")
     r<-get_with_timeout_retry(url,retry=0,warn_only=TRUE)
+    if (is.null(r)||is.null(r$status_code)){
+      warning("Could not retrieve cube list from StatCan servers.")
+      return(NULL)
+    }
     if (r$status_code==200) {
       content <- httr::content(r)
 

@@ -279,6 +279,10 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
   if (refresh | !file.exists(path)) {
     url='https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
     r<-get_with_timeout_retry(url)
+    if (is.null(r)||is.null(r$status_code)){
+      warning("Problem downloading code sets.")
+      return(NULL)
+    }
     if (r$status_code==200) {
       content <- httr::content(r)
       saveRDS(content,path)
