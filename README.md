@@ -4,7 +4,7 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/cansim)](https://CRAN.R-project.org/package=cansim)
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/cansim)](https://cranlogs.r-pkg.org/badges/cansim)
 [![R-CMD-check](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://img.shields.io/badge/doi-10.32614-d2b24a.svg](https://doi.org/10.32614/CRAN.package.cansim)
+[![DOI](https://img.shields.io/badge/	DOI-10.32614/CRAN.package.cansim-d2b24a.svg)](https://doi.org/10.32614/CRAN.package.cansim)
 <!-- badges: end -->
 
 <a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
@@ -231,7 +231,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.5. DOI: 10.32614/CRAN.package.cansim
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.4. DOI: 10.32614/CRAN.package.cansim
 
 A BibTeX entry for LaTeX users is
 
@@ -241,7 +241,7 @@ A BibTeX entry for LaTeX users is
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.5},
+    note = {R package version 0.4.4},
     url = {https://mountainmath.github.io/cansim/}
   }
 ```
