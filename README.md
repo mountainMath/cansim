@@ -7,7 +7,12 @@
 [![DOI](https://img.shields.io/badge/	DOI-10.32614/CRAN.package.cansim-d2b24a.svg)](https://doi.org/10.32614/CRAN.package.cansim)
 <!-- badges: end -->
 
-<a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
+<style>
+main#main img#readme-logo {
+  display:none;
+}
+</style>
+<a href="https://mountainmath.github.io/cansim/index.html"><img id="readme-logo" src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
 
 An R package to retrieve and work with public Statistics Canada data tables.
 

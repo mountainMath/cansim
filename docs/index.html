@@ -40,7 +40,7 @@
 
     <a class="navbar-brand me-2" href="index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,7 +98,12 @@
 </div>
 <!-- badges: start -->
 
-<p><a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width="25%" height="25%"></a></p>
+<style>
+main#main img#readme-logo {
+  display:none;
+}
+</style>
+<p><a href="https://mountainmath.github.io/cansim/index.html"><img id="readme-logo" src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width="25%" height="25%"></a></p>
 <p>An R package to retrieve and work with public Statistics Canada data tables.</p>
 <p>This package:</p>
 <ul>
@@ -199,9 +204,9 @@
 <code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The appropriate table can be found by subsetting or filtering on the properties we want to use to find the appropriate tables. This work well with standard <code>dplyr</code> verbs.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/list_cansim_cubes.html">list_cansim_cubes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Labour force characteristics"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"economic region"</span>,<span class="va">cubeTitleEn</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="st">"cansim_table_number"</span>,<span class="st">"cubeTitleEn"</span><span class="op">)</span></span></code></pre></div>
 <p>Retrieving the table list takes a little bit of time, so results are cached for the duration of a session. If sessions span several days the <code>refresh=TRUE</code> argument can be passed to regenerate the list to capture newly published tables.</p>
 <p>The <em>Listing Statistics Canada data tables</em> vignette has additional detail and examples.</p>
 </div>
@@ -322,7 +327,7 @@ In doing any of the above, you shall:
 <li><a href="https://CRAN.R-project.org/package=cansim" class="external-link"><img src="https://www.r-pkg.org/badges/version/cansim" alt="CRAN status"></a></li>
 <li><a href="https://cranlogs.r-pkg.org/badges/cansim" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/cansim" alt="CRAN_Downloads_Badge"></a></li>
 <li><a href="https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://doi.org/10.32614/CRAN.package.cansim" class="external-link"><img src="https://img.shields.io/badge/doi-10.32614/CRAN.package.cansim-#d2b24a.svg" alt="DOI"></a></li>
+<li><a href="https://doi.org/10.32614/CRAN.package.cansim" class="external-link"><img src="https://img.shields.io/badge/%20DOI-10.32614/CRAN.package.cansim-d2b24a.svg" alt="DOI"></a></li>
 </ul>
 </div>
 
