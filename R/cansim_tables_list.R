@@ -177,7 +177,11 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
 #'
 #' @export
 search_cansim_cubes <- function(search_term, refresh=FALSE){
-  list_cansim_cubes(refresh = refresh) %>%
+  cube_list <- list_cansim_cubes(refresh = refresh)
+  if (is.null(cube_list)) {
+    stop("Could not retrieve cube list from StatCan servers.",call.=FALSE)
+  }
+  cube_list %>%
     filter(grepl(search_term,.data$cubeTitleEn,ignore.case = TRUE) |
              grepl(search_term,.data$cubeTitleFr,ignore.case = TRUE) |
              grepl(search_term,.data$surveyEn,ignore.case = TRUE) |
