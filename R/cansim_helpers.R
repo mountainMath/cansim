@@ -1,3 +1,62 @@
+# Session-level cache for connection metadata to reduce redundant queries
+.cansim_connection_cache <- new.env(parent = emptyenv())
+
+#' Clear connection metadata cache
+#'
+#' @return NULL
+#' @keywords internal
+clear_connection_cache <- function() {
+  rm(list = ls(envir = .cansim_connection_cache), envir = .cansim_connection_cache)
+  invisible(NULL)
+}
+
+#' Get cached connection metadata
+#'
+#' @param cache_key unique key for this connection
+#' @return cached metadata or NULL
+#' @keywords internal
+get_cached_connection_metadata <- function(cache_key) {
+  if (exists(cache_key, envir = .cansim_connection_cache)) {
+    get(cache_key, envir = .cansim_connection_cache)
+  } else {
+    NULL
+  }
+}
+
+#' Set cached connection metadata
+#'
+#' @param cache_key unique key for this connection
+#' @param metadata metadata to cache
+#' @return NULL
+#' @keywords internal
+set_cached_connection_metadata <- function(cache_key, metadata) {
+  assign(cache_key, metadata, envir = .cansim_connection_cache)
+  invisible(NULL)
+}
+
+#' Get cached date format for a table
+#'
+#' @param table_number the table number
+#' @return date format string or NULL
+#' @keywords internal
+get_cached_date_format <- function(table_number) {
+  cache_key <- paste0("date_format_", table_number)
+  get_cached_connection_metadata(cache_key)
+}
+
+#' Cache date format for a table
+#'
+#' @param table_number the table number
+#' @param format_type the detected format type
+#' @return NULL
+#' @keywords internal
+cache_date_format <- function(table_number, format_type) {
+  cache_key <- paste0("date_format_", table_number)
+  set_cached_connection_metadata(cache_key, format_type)
+  invisible(NULL)
+}
+
+
 cleaned_ndm_table_number <- function(cansimTableNumber){
   if (is.numeric(cansimTableNumber)) {
     warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",
@@ -552,14 +611,22 @@ geography_colum_names <- function(language) {
 
 
 normalize_coordinates <- function(coordinates){
-  coordinates <- lapply(coordinates,\(coordinate)
-                        coordinate %>%
-                          strsplit("\\.") %>%
-                          unlist() %>%
-                          c(., rep(0, pmax(0,10-length(.)))) %>%
-                          paste(collapse = ".")
-  ) %>% unlist()
+  # Vectorized coordinate normalization for better performance
+  # Split all coordinates at once (vectorized operation)
+  split_coords <- strsplit(coordinates, "\\.", fixed = FALSE)
 
+  # Pad each coordinate to 10 elements and collapse
+  # This is faster than lapply because we pre-allocate and vectorize
+  normalized <- vapply(split_coords, function(parts) {
+    # Pad to 10 elements with zeros
+    n_parts <- length(parts)
+    if (n_parts < 10) {
+      parts <- c(parts, rep("0", 10 - n_parts))
+    }
+    paste(parts, collapse = ".")
+  }, character(1), USE.NAMES = FALSE)
+
+  normalized
 }
 
 get_robust_cache_path <- function(cache_path) {

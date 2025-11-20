@@ -14,8 +14,8 @@ test_that("consistent data output", {
 
   tables <- formats |>
     lapply(\(f) get_cansim_connection("20-10-0001", format=f, refres="auto") |>
-    filter_function() |>
-    collect_and_normalize(disconnect=TRUE)) |>
+        filter_function() |>
+        collect_and_normalize(disconnect=TRUE)) |>
     setNames(formats)
   tables$memory <- get_cansim("20-10-0001") |>
     filter_function()
@@ -31,9 +31,11 @@ test_that("consistent data output", {
     (d1==d2) |> dplyr::as_tibble() |> dplyr::summarize_all(\(x) sum(!is.na(x) & x==FALSE)) |> rowSums()
   }
 
-  expect_equal(count_differences(tables$parquet,tables$memory),0)
-  expect_equal(count_differences(tables$feather,tables$memory),0)
-  expect_equal(count_differences(tables$sqlite,tables$memory),0)
+  for (i in 1:length(formats)) {
+    expect_equal(count_differences(tables[[formats[[i]]]],tables$memory),0,
+                 label = paste("Table output should match between get_cansim and", formats[i]))
+  }
+
 })
 
 

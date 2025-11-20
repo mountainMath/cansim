@@ -85,34 +85,49 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 
   date_field=ifelse(language=="fra",paste0("P",intToUtf8(0x00C9),"RIODE DE R",intToUtf8(0x00C9),"F",intToUtf8(0x00C9),"RENCE"),"REF_DATE")
 
-  sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
-  if (is.na(sample_date)) {
-    sample_date <- pull(date_field) %>% na.omit() %>% first()
+  # Check cache for date format to avoid repeated regex checks
+  cached_format <- get_cached_date_format(cansimTableNumber)
 
+  if (!trad_cansim || is.null(cached_format)) {
+    # Need to detect format - sample the date field
+    sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
+    if (is.na(sample_date)) {
+      sample_date <- pull(date_field) %>% na.omit() %>% first()
+    }
+
+    # Detect and cache the format
+    if (!trad_cansim) {
+      cached_format <- "none"
+    } else if (grepl("^\\d{4}$",sample_date)) {
+      cached_format <- "year"
+    } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
+      cached_format <- "year_range"
+    } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
+      cached_format <- "year_month"
+    } else if (grepl("^\\d{4}-\\d{2}-\\d{2}$",sample_date)) {
+      cached_format <- "year_month_day"
+    } else {
+      cached_format <- "unknown"
+    }
+
+    # Cache the detected format for future use
+    cache_date_format(cansimTableNumber, cached_format)
   }
-  # sample_date <- data[[date_field]] %>%
-  #   na.omit %>%
-  #   first()
 
-
-  if (!trad_cansim) {
-    # do nothing
-  } else if (grepl("^\\d{4}$",sample_date)) {
-    # year
+  # Apply the appropriate date transformation based on cached format
+  if (cached_format == "year") {
     data <- data %>%
       mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
-  } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
-    # year range, use second year as anchor
+  } else if (cached_format == "year_range") {
     data <- data %>%
       mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
-  } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
-    # year and month
+  } else if (cached_format == "year_month") {
     data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
-  } else if (grepl("^\\d{4}-\\d{2}-\\d{2}$",sample_date)) {
-    # year, month and day
+  } else if (cached_format == "year_month_day") {
     data <- data %>%
       mutate(Date=as.Date(!!as.name(date_field)))
   }
+  # If "none" or "unknown", no date transformation is applied
 
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_number <- cleaned_ndm_table_number(cansimTableNumber)
@@ -149,6 +164,14 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (factors){
     if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
 
+    # Performance optimization: pre-split coordinates once instead of per-field
+    # This avoids repeated string operations on the entire coordinate column
+    if (coordinate_column %in% names(data)) {
+      split_coordinates <- strsplit(data[[coordinate_column]], "\\.", fixed = FALSE)
+    } else {
+      split_coordinates <- NULL
+    }
+
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
@@ -172,9 +195,15 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>%
-            lapply(\(x)x[dimension_id]) %>%
-            unlist()
+          # Use pre-split coordinates for better performance
+          if (!is.null(split_coordinates)) {
+            data$`...id` <- vapply(split_coordinates, function(x) x[dimension_id], character(1), USE.NAMES = FALSE)
+          } else {
+            # Fallback to original method if coordinates not available
+            data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>%
+              lapply(\(x)x[dimension_id]) %>%
+              unlist()
+          }
 
           data <- data %>%
             select(-all_of(field)) %>%

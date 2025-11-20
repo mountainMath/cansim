@@ -115,32 +115,59 @@ parse_metadata <- function(meta,data_path){
 
 add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierarchy_column,exceeded_hierarchy_warning_message){
   meta_x <- meta_x %>% mutate(across(all_of(c(member_id_column,parent_member_id_column)),as.character))
-  parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
-  current_top <- function(c){
-    strsplit(c,"\\.") %>%
-      purrr::map(dplyr::first) %>%
-      unlist
+
+  # Performance optimization: Build hierarchy using recursive lookup instead of iterative mutations
+  member_ids <- meta_x[[member_id_column]]
+  parent_ids <- meta_x[[parent_member_id_column]]
+
+  # Create lookup table for fast parent access
+  parent_lookup <- rlang::set_names(parent_ids, member_ids)
+
+  # Recursive function to build full hierarchy path for a member
+  build_hierarchy_path <- function(member_id, visited = character(0), max_depth = 100) {
+    # Check for cycles or max depth
+    if (length(visited) >= max_depth || member_id %in% visited) {
+      return(member_id)
+    }
+
+    parent_id <- parent_lookup[member_id]
+
+    # If no parent or parent is NA, we're at the root
+    if (is.na(parent_id) || is.na(parent_lookup[parent_id])) {
+      return(member_id)
+    }
+
+    # Recursively build parent's path
+    parent_path <- build_hierarchy_path(parent_id, c(visited, member_id), max_depth)
+
+    # Append current member to parent's path
+    paste0(parent_path, ".", member_id)
   }
-  parent_for_current_top <- function(c){
-    as.character(parent_lookup[current_top(c)])
+
+  # Vectorized hierarchy building with memoization for better performance
+  hierarchy_cache <- new.env(hash = TRUE, parent = emptyenv())
+
+  build_hierarchy_cached <- function(member_id) {
+    cache_key <- as.character(member_id)
+    if (exists(cache_key, envir = hierarchy_cache)) {
+      return(get(cache_key, envir = hierarchy_cache))
+    }
+
+    result <- build_hierarchy_path(member_id)
+    assign(cache_key, result, envir = hierarchy_cache)
+    result
   }
-  meta_x <- meta_x %>%
-    dplyr::mutate(!!as.name(hierarchy_column):=.data[[member_id_column]])
-  added=TRUE
-  max_depth=100
-  count=0
-  while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
-    old <- meta_x[[hierarchy_column]]
-    meta_x <- meta_x %>%
-      dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
-      dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
-      dplyr::select(-"p")
-    added <- sum(old != meta_x[[hierarchy_column]])>0
-    count=count+1
-  }
-  if (added) {
+
+  # Build hierarchies for all members
+  hierarchies <- vapply(member_ids, build_hierarchy_cached, character(1), USE.NAMES = FALSE)
+
+  # Check if any hierarchies weren't fully resolved (hit max depth)
+  if (any(grepl("^[^.]+$", hierarchies) & !is.na(parent_ids))) {
     warning(exceeded_hierarchy_warning_message)
   }
+
+  # Add hierarchy column to metadata
+  meta_x[[hierarchy_column]] <- hierarchies
   meta_x
 }
 

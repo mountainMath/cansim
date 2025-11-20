@@ -133,6 +133,69 @@ create_index <- function(connection,table_name,field){
 }
 
 
+#' create multiple database indexes in a single transaction
+#'
+#' This function creates all specified indexes within a single database transaction,
+#' which is significantly faster than creating them individually. After creating
+#' the indexes, it runs ANALYZE to update SQLite's query planner statistics.
+#'
+#' @param connection connection to database
+#' @param table_name sql table name
+#' @param fields vector of field names to index
+#' @param show_progress whether to show progress messages (default TRUE)
+#' @return `NULL``
+#' @keywords internal
+create_indexes_batch <- function(connection, table_name, fields, show_progress = TRUE) {
+  if (length(fields) == 0) {
+    return(NULL)
+  }
+
+  if (show_progress) {
+    message(paste0("Creating ", length(fields), " indexes in batch transaction..."))
+  }
+
+  # Begin transaction for better performance
+  DBI::dbBegin(connection)
+
+  tryCatch({
+    # Create all indexes
+    for (i in seq_along(fields)) {
+      field <- fields[i]
+      field_index <- paste0("index_", gsub("[^[:alnum:]]", "_", field))
+      query <- paste0("CREATE INDEX IF NOT EXISTS ", field_index,
+                     " ON ", table_name, " (`", field, "`)")
+
+      if (show_progress) {
+        message(paste0("  [", i, "/", length(fields), "] Indexing ", field))
+      }
+
+      r <- DBI::dbSendQuery(connection, query)
+      DBI::dbClearResult(r)
+    }
+
+    # Run ANALYZE to update query planner statistics
+    if (show_progress) {
+      message("Running ANALYZE to update query statistics...")
+    }
+    r <- DBI::dbSendQuery(connection, "ANALYZE")
+    DBI::dbClearResult(r)
+
+    # Commit the transaction
+    DBI::dbCommit(connection)
+
+    if (show_progress) {
+      message("Index creation complete")
+    }
+  }, error = function(e) {
+    # Rollback on error
+    DBI::dbRollback(connection)
+    stop(paste("Error creating indexes:", e$message))
+  })
+
+  NULL
+}
+
+
 
 
 #' convert csv to sqlite
@@ -159,19 +222,31 @@ csv2sqlite <- function(csv_file, sqlite_file, table_name, transform=NULL,chunk_s
   if (!append && file.exists(sqlite_file)) file.remove(sqlite_file)
   con <- DBI::dbConnect(RSQLite::SQLite(), dbname=sqlite_file)
 
+  # Use a single transaction for all chunks for better performance
+  DBI::dbBegin(con)
+
   chunk_handler <- function(df, pos) {
     if (nrow(readr::problems(df)) > 0) print(readr::problems(df))
     if (!is.null(transform)) df <- df %>% transform()
     DBI::dbWriteTable(con, table_name, as.data.frame(df), append=TRUE)
   }
 
-  readr::read_delim_chunked(csv_file, delim=delim,
-                          callback=readr::DataFrameCallback$new(chunk_handler),
-                          col_types=col_types,
-                          chunk_size = chunk_size,
-                          locale=readr::locale(encoding = text_encoding),
-                          na=na,
-                          ...)
+  tryCatch({
+    readr::read_delim_chunked(csv_file, delim=delim,
+                            callback=readr::DataFrameCallback$new(chunk_handler),
+                            col_types=col_types,
+                            chunk_size = chunk_size,
+                            locale=readr::locale(encoding = text_encoding),
+                            na=na,
+                            ...)
+    # Commit the transaction after all chunks are written
+    DBI::dbCommit(con)
+  }, error = function(e) {
+    # Rollback on error
+    DBI::dbRollback(con)
+    DBI::dbDisconnect(con)
+    stop(paste("Error converting CSV to SQLite:", e$message))
+  })
 
   DBI::dbDisconnect(con)
 }

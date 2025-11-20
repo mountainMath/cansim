@@ -34,12 +34,13 @@ Imports: digest (>= 0.6),
     utils (>= 4.3),
     dbplyr (>= 2.5)
 RoxygenNote: 7.3.2
-Suggests: 
+Suggests:
     knitr,
     rmarkdown,
     ggplot2,
     scales,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    microbenchmark
 URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
 BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr
