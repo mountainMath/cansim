@@ -93,7 +93,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
       warning("Could not retrieve cube list from StatCan servers.")
       return(NULL)
     }
-    if (r$status_code==200) {
+    if (!is.null(r$status_code) && r$status_code==200) {
       content <- httr::content(r)
 
       header <- content[[1]] %>%
