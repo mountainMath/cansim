@@ -19,7 +19,8 @@ extract_vector_data <- function(data1){
     if (length(vdp)==0) {return(NULL)}
     value_data <- lapply(vf,function(f){
       x=purrr::map(vdp,function(cc)cc[[f]])
-      x[sapply(x, is.null)] <- NA
+      # P8: Use vapply instead of sapply for type-safe, faster null check
+      x[vapply(x, is.null, logical(1))] <- NA
       unlist(x)
     }) %>%
       tibble::as_tibble() %>%
