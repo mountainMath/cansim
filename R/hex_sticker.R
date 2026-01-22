@@ -67,24 +67,6 @@ generate_cansim_hex_sticker <- function (){
           h_fill="grey40",
           p_color="white",
           filename=here::here("images/cansim-sticker.png"))
-
-  if (FALSE) {
-    hexSticker::sticker(pp, package="CanViz",
-                        p_size=8, p_y=1.5,
-                        s_x=1, s_y=0.78, s_width=1.5, s_height=1.5,
-                        h_color="#FF0000",
-                        h_fill= "grey40",
-                        p_color="white",
-                        filename=here::here("~/Downloads/canviz-sticker.svg"))
-  }
-
-}
-
-#' Internal function to update table list
-#' @keywords internal
-update_internal_data <- function(){
-  cansim_table_list <- list_cansim_tables(refresh=TRUE)
-  usethis::use_data(cansim_table_list, internal = TRUE,overwrite = TRUE)
 }
 
 #' @importFrom dplyr %>%
