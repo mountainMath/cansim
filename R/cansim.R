@@ -2,13 +2,13 @@
 #'
 #' Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
-#' @param data A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
+#' @param data A retrieved data table as returned from \code{get_cansim()} or \code{get_cansim_ndm()}
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"
 #' @param normalize_percent (Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
-#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped
+#' @param strip_classification_code Logical value indicating if classification code should be stripped
 #' from names. (Default set to \code{FALSE}, if \code{factors=TRUE} this is overridden and set to \code{TRUE}).
 #' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
 #' @param internal (Optional) Flag to indicate that this function is called internally.
@@ -746,7 +746,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
       dplyr::pull(!!as.name(dimension_id_column))
     data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda_column_",column_index)
     if (!file.exists(data_path)){
-      stop(paste0("Unkown column ",column),call.=FALSE)
+      stop(paste0("Unknown column ",column),call.=FALSE)
     }
     result <- readRDS(file=data_path)
   } else {
@@ -781,7 +781,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
                     exceeded_hierarchy_warning_message=exceeded_hierarchy_warning_message)
 
     if (nrow(result)==0){
-      stop(paste0("Unkown column ",column),call.=FALSE)
+      stop(paste0("Unknown column ",column),call.=FALSE)
     }
   }
 

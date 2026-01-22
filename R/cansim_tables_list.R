@@ -110,7 +110,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
       surveys_fr <- setNames(surveys$surveyFr,surveys$surveyCode)
       subjects <- get_cansim_code_set("subject")
       subjects_en <- setNames(subjects$subjectEn,subjects$subjectCode)
-      subjects_fr <- setNames(subjects$subjectEn,subjects$subjectCode)
+      subjects_fr <- setNames(subjects$subjectFr,subjects$subjectCode)
 
       if (lite) {
         r<-content %>%

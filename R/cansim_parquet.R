@@ -179,7 +179,7 @@ get_cansim_connection <- function(cansimTableNumber,
     }
 
 
-    hd <- header[duplicated(toupper(header))]
+    hd <- header[duplicated(toupper(header)) | duplicated(toupper(header), fromLast = TRUE)]
 
     if (length(hd)>0) {
       dupes <- header[toupper(header) %in% hd]
@@ -616,7 +616,7 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
   }
 
   result <- dplyr::tibble(path=dir(cache_path,"cansim_\\d+_parquet_eng|cansim_\\d+_parquet_fra|cansim_\\d+_feather_eng|cansim_\\d+_feather_fra|cansim_\\d+_sqlite_eng|cansim_\\d+_sqlite_fra")) %>%
-    dplyr::mutate(cansimTableNumber=gsub("^cansim_|_eng$|_fra$|_parquet_eng$|_parquet_fra|_feather_eng$|_feather_fra|_sqlite_eng$|_sqlte_fra$","",.data$path) %>% cleaned_ndm_table_number()) %>%
+    dplyr::mutate(cansimTableNumber=gsub("^cansim_|_eng$|_fra$|_parquet_eng$|_parquet_fra|_feather_eng$|_feather_fra|_sqlite_eng$|_sqlite_fra$","",.data$path) %>% cleaned_ndm_table_number()) %>%
     dplyr::mutate(dataFormat=case_when(grepl("_parquet",.data$path)~"parquet",
                                      grepl("_feather",.data$path)~"feather",
                                      grepl("_sqlite",.data$path)~"sqlite",

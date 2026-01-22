@@ -519,7 +519,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
   }
 
   attr(result,"language") <- cleaned_language
-  if (!is.null(failed_coordinates) && nrow(failed_coordinates > 0)) {
+  if (!is.null(failed_coordinates) && nrow(failed_coordinates) > 0) {
     regular_fails <- failed_coordinates %>%
       filter(substr(.data$cansimTableNumber,1,4) != CENSUS_TABLE_STARTING_STRING)
     census_fails <- failed_coordinates %>%
