@@ -295,9 +295,12 @@ get_cansim_connection <- function(cansimTableNumber,
     # legacy support for old column files
     if (length(column_files)>0) {
       meta2 <- readRDS(file.path(meta_dir_name,meta_files[grepl("\\.Rda2$",meta_files)]))
+      # Use column names instead of hardcoded indices
+      dimension_id_col <- names(meta2)[1]  # "Dimension ID" or French equivalent
+      dimension_name_col <- names(meta2)[2]  # "Dimension name" or French equivalent
       for (f in column_files) {
         nn <- gsub(".+_column_","",f)
-        id <- meta2[meta2[,2]==nn,1] %>% as.character()
+        id <- meta2[meta2[[dimension_name_col]]==nn, dimension_id_col] %>% as.character()
         if (length(id)==1) {
           new_name <- f %>% gsub("_column_.+$",paste0("_column_",id),x=.)
           file.rename(file.path(meta_dir_name,f),file.path(meta_dir_name,new_name))

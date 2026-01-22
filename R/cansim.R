@@ -79,7 +79,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
-      mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
+      mutate(!!as.name(uom_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),"Rate",!!as.name(uom_string)))
   }
 
 
