@@ -138,11 +138,16 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
   if (strip_classification_code){
-    for (field in fields) {
-      if (sum(!is.na(data[[paste0(classification_prefix,field)]]))>0) {
-        data <- data %>%
-          mutate(!!field:=gsub(" \\[.+\\]$","",!!as.name(field)))
-      }
+    # Identify fields that have classification codes to strip (non-NA values in classification column)
+    fields_to_strip <- fields[vapply(fields, function(field) {
+      cc_col <- paste0(classification_prefix, field)
+      cc_col %in% names(data) && sum(!is.na(data[[cc_col]])) > 0
+    }, logical(1))]
+
+    if (length(fields_to_strip) > 0) {
+      # Use across() to strip all classification codes in a single pass
+      data <- data %>%
+        mutate(across(all_of(fields_to_strip), ~gsub(" \\[.+\\]$", "", .x)))
     }
   }
 
@@ -333,7 +338,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
+        mutate(!!member_id_column:=purrr::map_chr(.data$...pos, ~.x[column_index])) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else if (column[[dimension_name_column]] %in% names(data)){
@@ -345,7 +350,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
+        mutate(!!member_id_column:=purrr::map_chr(.data$...pos, ~.x[column_index])) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else {
@@ -853,7 +858,7 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
   hierarchy_name=paste0("Hierarchy for ",column_name)
   h <- data %>% dplyr::select(column_name,hierarchy_name) %>%
     unique %>%
-    dplyr::mutate(hierarchy_level=(strsplit(!!as.name(hierarchy_name),"\\.") %>% lapply(length) %>% unlist)-1)
+    dplyr::mutate(hierarchy_level=lengths(strsplit(!!as.name(hierarchy_name),"\\."))-1)
   max_level=max(h$hierarchy_level,na.rm = TRUE)
   if (is.na(level) | level>max_level) level=max_level
   h <- h %>%

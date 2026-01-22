@@ -68,8 +68,8 @@ parse_metadata <- function(meta,data_path){
                            quote="\"",na.strings="",
                            colClasses="character",check.names=FALSE) %>%
       names()
-    notes <- tibble(!!h[1]:=meta_part[-1] %>% lapply(\(x)gsub(",.+","",x)) %>% unlist(),
-                    !!h[2]:=meta_part[-1] %>% lapply(\(x)gsub("^\\d+,","",x) %>% gsub("^\"|\"$","",.)) %>% unlist())
+    notes <- tibble(!!h[1]:=gsub(",.+", "", meta_part[-1]),
+                    !!h[2]:=gsub("^\"|\"$", "", gsub("^\\d+,", "", meta_part[-1])))
 
   }
 
@@ -95,11 +95,16 @@ parse_metadata <- function(meta,data_path){
 
   column_ids <- dplyr::pull(meta2,dimension_id_column)
   column_names <- dplyr::pull(meta2,dimension_name_column)
+
+  # P2: Pre-split meta3 by dimension_id for O(1) lookup instead of O(n) filter per column
+  meta3_split <- split(meta3, meta3[[dimension_id_column]])
+  meta2_split <- split(meta2, meta2[[dimension_id_column]])
+
   for (column_index in column_ids) { # iterate through columns for which we have meta data
-    column <- meta2 %>% dplyr::filter(.data[[dimension_id_column]]==column_index)
+    column_key <- as.character(column_index)
+    column <- meta2_split[[column_key]]
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) & !(column[[dimension_name_column]] %in% column_names)
-    meta_x <- meta3 %>%
-      dplyr::filter(.data[[dimension_id_column]]==column_index) %>%
+    meta_x <- meta3_split[[column_key]] %>%
       add_hierarchy(parent_member_id_column=parent_member_id_column,
                     member_id_column=member_id_column,
                     hierarchy_column=hierarchy_column,
@@ -208,7 +213,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 
   if (!file.exists(meta1_path)||refresh) {
     m1 <- d %>% tibble::enframe() %>%
-      mutate(l=lapply(.data$value,class) %>% unlist()) %>%
+      mutate(l=vapply(.data$value, function(x) class(x)[1], character(1))) %>%
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
       select(-"l") %>%
       tidyr::pivot_wider() %>%
