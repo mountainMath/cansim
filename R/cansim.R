@@ -61,7 +61,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     return (data)
   }
 
-  data <- data %>% as_tibble()
+  # P10: Avoid unnecessary tibble conversion if data is already a tibble
+  if (!tibble::is_tibble(data)) data <- as_tibble(data)
 
   attr(data,"cansimTableNumber") <- cansimTableNumber
   attr(data,"language") <- language
