@@ -115,25 +115,14 @@ parse_metadata <- function(meta,data_path){
 
 add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierarchy_column,exceeded_hierarchy_warning_message){
   meta_x <- meta_x %>% mutate(across(all_of(c(member_id_column,parent_member_id_column)),as.character))
-
-  # P4/P11: Use environment hash table for O(1) lookup instead of O(n) named vector
-  # Significant improvement for large datasets (10k+ members)
-  parent_lookup_env <- new.env(hash = TRUE, parent = emptyenv())
-  member_ids <- meta_x[[member_id_column]]
-  parent_member_ids <- meta_x[[parent_member_id_column]]
-  for (i in seq_along(member_ids)) {
-    parent_lookup_env[[member_ids[i]]] <- parent_member_ids[i]
-  }
-
+  parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
   current_top <- function(c){
     strsplit(c,"\\.") %>%
       purrr::map(dplyr::first) %>%
       unlist
   }
   parent_for_current_top <- function(c){
-    tops <- current_top(c)
-    # mget with ifnotfound handles batch lookup from environment efficiently
-    unlist(mget(tops, envir = parent_lookup_env, ifnotfound = list(NA_character_)))
+    as.character(parent_lookup[current_top(c)])
   }
   meta_x <- meta_x %>%
     dplyr::mutate(!!as.name(hierarchy_column):=.data[[member_id_column]])
