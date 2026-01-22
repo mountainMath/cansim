@@ -87,8 +87,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 
   sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
   if (is.na(sample_date)) {
-    sample_date <- pull(date_field) %>% na.omit() %>% first()
-
+    sample_date <- data %>% pull(date_field) %>% na.omit() %>% first()
   }
   # sample_date <- data[[date_field]] %>%
   #   na.omit %>%
@@ -893,11 +892,10 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
 #' @export
 view_cansim_webpage <- function(cansimTableNumber = NULL){
   browser <- getOption("browser")
-  cansimTableNumber <- tolower(cansimTableNumber)
 
-  if (is.null(cansimTableNumber)) {
+  if (is.null(cansimTableNumber) || length(cansimTableNumber) == 0) {
     url <- 'https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action#tables'
-  } else if (grepl("^v\\d+$",cansimTableNumber)) {
+  } else if (grepl("^v\\d+$", tolower(cansimTableNumber))) {
     url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",cansimTableNumber)
   } else {
     cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
@@ -928,10 +926,7 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
-  response <- httr::GET(url)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-  }
+  response <- get_with_timeout_retry(url)
   httr::content(response)$object
 }
 
@@ -975,10 +970,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
   seq(as.Date(start_date),as.Date(end_date),"days") %>%
     lapply(function(date){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
-      response <- httr::GET(url)
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
+      response <- get_with_timeout_retry(url)
       httr::content(response)$object %>%
         map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
         bind_rows

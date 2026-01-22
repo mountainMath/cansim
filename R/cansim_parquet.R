@@ -52,6 +52,7 @@ get_cansim_connection <- function(cansimTableNumber,
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   have_custom_path <- !is.null(cache_path)
   if (!have_custom_path) cache_path <- tempdir()
+  base_cache_path <- cache_path  # Save base cache path before it's overwritten
   cleaned_number <- cansimTableNumber
   cleaned_language <- cleaned_ndm_language(language)
   base_table <- naked_ndm_table_number(cansimTableNumber)
@@ -68,15 +69,18 @@ get_cansim_connection <- function(cansimTableNumber,
   if (is.na(last_updated)) {
     warning("Could not determine if existing table is out of date.")
   } else {
-    last_downloaded <- list_cansim_cached_tables() %>%
-      filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format) %>%
+    last_downloaded <- list_cansim_cached_tables(cache_path=base_cache_path) %>%
+      filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format, .data$language==cleaned_language) %>%
       pull(.data$timeCached)
 
-    if (file.exists(db_path) && auto_refresh && !is.na(last_downloaded) && !is.null(last_updated) &&
-        as.numeric(last_downloaded)<as.numeric(last_updated)) {
+    # Handle empty vector (no matching cache entry) or NA
+    has_valid_last_downloaded <- !is.null(last_downloaded) && length(last_downloaded) > 0 && !is.na(last_downloaded[1])
+
+    if (file.exists(db_path) && auto_refresh && has_valid_last_downloaded && !is.null(last_updated) &&
+        as.numeric(last_downloaded[1])<as.numeric(last_updated)) {
       message(paste0("A newer version of ",cansimTableNumber," is available, auto-refreshing the table..."))
       refresh=TRUE
-    } else if (file.exists(db_path) && auto_refresh && (is.na(last_updated)||is.na(last_downloaded))){
+    } else if (file.exists(db_path) && auto_refresh && (is.na(last_updated)||!has_valid_last_downloaded)){
       message(paste0("Could not determine if ",cansimTableNumber," is up to date..."))
     }
   }
@@ -256,7 +260,10 @@ get_cansim_connection <- function(cansimTableNumber,
     }
 
     # saving timestamp
-    saveRDS(strftime(time_check,format=TIME_FORMAT),paste0(meta_base_path,"_time"))
+    tryCatch(
+      saveRDS(strftime(time_check,format=TIME_FORMAT),paste0(meta_base_path,"_time")),
+      error = function(e) warning("Failed to save cache timestamp: ", e$message)
+    )
 
 
   } else {
@@ -413,7 +420,10 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
   schema_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".schema"))
   partitioning_path <- file.path(dirname(arrow_file),paste0(basename(arrow_file),".partitioning"))
   arrow::write_dataset(input %>% dplyr::slice_head(n=1), format=format, schema_path)
-  saveRDS(partitioning,partitioning_path)
+  tryCatch(
+    saveRDS(partitioning,partitioning_path),
+    error = function(e) warning("Failed to save partitioning metadata: ", e$message)
+  )
 }
 
 
@@ -485,7 +495,10 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
 
   unlink(old_path,recursive=TRUE)
 
-  saveRDS(new_partitioning,partitioning_path)
+  tryCatch(
+    saveRDS(new_partitioning,partitioning_path),
+    error = function(e) warning("Failed to save partitioning metadata: ", e$message)
+  )
   invisible()
 }
 
