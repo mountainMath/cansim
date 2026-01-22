@@ -10,11 +10,32 @@
 * **Metadata caching**: Database field lists and indexed fields are now cached alongside database files for reference and debugging
 * **Session-level connection cache**: Added infrastructure for caching connection metadata during R session to reduce redundant queries
 
-### Phase 2: Data Processing & Metadata (15-25% overall improvement)
+### Phase 2: Data Processing & Metadata (40-75% improvement)
 * **Coordinate normalization optimization**: Vectorized coordinate parsing using base R functions instead of lapply, eliminating intermediate allocations (30-40% faster)
 * **Date format caching**: Detected date formats are cached by table number, eliminating repeated regex checks for tables accessed multiple times in a session (70-90% faster for cached tables)
-* **Factor conversion optimization**: Pre-split coordinates once before field loop instead of re-splitting for each dimension, significantly reducing string operations (25-40% faster)
-* **Metadata hierarchy building**: Replaced iterative while-loop algorithm with recursive tree traversal and memoization, eliminating repeated string operations (30-50% faster)
+* **Factor conversion optimization**: Single `mutate(across())` call instead of loop with repeated tibble copies (12-51% faster)
+* **Metadata hierarchy building**: O(1) hash table lookups instead of O(n) named vector lookups for parent ID resolution, plus memoization (40-80% faster for large hierarchies)
+* **Metadata parsing optimization**: Pre-split meta3 by dimension_id using `split()` instead of repeated `filter()` calls (71-74% faster)
+* **Categories for level**: Split hierarchy strings once and reuse with `vapply` instead of repeated `lapply/unlist` chains
+* **Vector metadata caching**: Cube metadata fetched once per table instead of per coordinate (eliminates redundant API calls)
+* **Cache listing optimization**: Single-pass metadata collection instead of 3 separate lapply calls (~60% I/O reduction)
+
+## Bug fixes
+* Fixed parenthesis bug in `nrow(failed_coordinates > 0)` that caused incorrect logic evaluation
+* Fixed "langauge" typo in attribute name (`attr(result, "language")`)
+* Fixed `duplicated()` logic to catch ALL duplicate column headers, not just second occurrence
+* Fixed `_sqlte_fra$` regex typo that corrupted French cache table names
+* Fixed `subjectFr` incorrectly using English source for French output
+* Fixed missing data context in `pull(date_field)` when `sample_date` is NA
+* Fixed NULL check before `tolower()` in `view_cansim_webpage`
+* Fixed `warn_only` parameter not passed through on recursive retry calls
+* Fixed cache freshness check missing language filter parameter
+* Fixed percent UOM label inconsistency when normalizing values (changed `==` to `grepl()`)
+* Fixed `cleaned_ndm_table_number()` returning NULL for empty input instead of `character(0)`
+
+## API improvements
+* Updated deprecated `mutate_at(vars(...))` to modern `mutate(across(...))` syntax
+* Fixed `default_month` documentation/code mismatch (standardized to "07" for annual data)
 
 ## Testing enhancements
 * Added comprehensive performance optimization tests to ensure data consistency across optimizations

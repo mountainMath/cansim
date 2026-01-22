@@ -25,7 +25,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' con <- get_cansim_connection("34-10-0013", format="sqlite")
 #'
 #' # Work with the data connection
-#' gplimpse(con)
+#' glimpse(con)
 #'
 #' disconnect_cansim_sqlite(con)
 #' }

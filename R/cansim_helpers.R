@@ -58,6 +58,9 @@ cache_date_format <- function(table_number, format_type) {
 
 
 cleaned_ndm_table_number <- function(cansimTableNumber){
+  # Handle empty input - return empty character vector instead of NULL
+  if (length(cansimTableNumber) == 0) return(character(0))
+
   if (is.numeric(cansimTableNumber)) {
     warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",
                    "it is safer to encode table numbers as character strings."))
@@ -100,7 +103,7 @@ table_base_path <- function(cansimTableNumber) {
 
 file_path_for_table_language <- function(cansimTableNumber, language){
   language <- cleaned_ndm_language(language)
-  if (is.na(language)) stop(paste0("Unkown Lanaguage ",language),call.=FALSE)
+  if (is.na(language)) stop(paste0("Unknown Language ",language),call.=FALSE)
   base_table <- naked_ndm_table_number(cansimTableNumber)
   file.path(paste0(base_table,"-",language))
 }
@@ -147,14 +150,14 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FAL
     if ("curl_error_peer_failed_verification" %in% class(response$error)) {
       stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
            "This means that the authenticity of the StatCan API server can't be verified.\n",
-           "Statistics Canada has a history of failty SSL certificats on their API,\n",
+           "Statistics Canada has a history of faulty SSL certificates on their API,\n",
            "if you are reasonably sure that your connection is not getting hijacked you\n",
            "can disable peer checking for the duration of the R session by typing\n\n",
            "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
     }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
-      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path)
+      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path,warn_only=warn_only)
     } else {
       message("Got timeout from StatCan, giving up")
     }
@@ -197,14 +200,14 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE
     if ("curl_error_peer_failed_verification" %in% class(response$error)) {
       stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
            "This means that the authenticity of the StatCan API server can't be verified.\n",
-           "Statistics Canada has a history of failty SSL certificats on their API,\n",
+           "Statistics Canada has a history of faulty SSL certificates on their API,\n",
            "if you are reasonably sure that your connection is not getting hijacked you\n",
            "can disable peer checking for the duration of the R session by typing\n\n",
            "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
     }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
-      response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1)
+      response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1,warn_only=warn_only)
     } else {
       message("Got timeout from StatCan, giving up")
       response=response$result

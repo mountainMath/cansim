@@ -17,16 +17,20 @@ extract_vector_data <- function(data1){
     ctn <- cleaned_ndm_table_number(as.character(d$object$productId))
     vdp <- d$object$vectorDataPoint
     if (length(vdp)==0) {return(NULL)}
-    value_data <- lapply(vf,function(f){
-      x=purrr::map(vdp,function(cc)cc[[f]])
-      x[sapply(x, is.null)] <- NA
-      unlist(x)
+
+    # Performance optimization P8: Use purrr::map with null handling
+    # instead of nested sapply/unlist chains, preserving original types
+    value_data <- lapply(vf, function(f){
+      purrr::map(vdp, function(cc) {
+        val <- cc[[f]]
+        if (is.null(val)) NA else val
+      }) %>% unlist()
     }) %>%
       tibble::as_tibble() %>%
       mutate(COORDINATE=d$object$coordinate,
-             VECTOR=paste0("v",d$object$vectorId)) %>%
-      mutate(cansimTableNumber=ctn) %>%
-      mutate(VECTOR=na_if(.data$VECTOR,"v0"))
+             VECTOR=paste0("v",d$object$vectorId),
+             cansimTableNumber=ctn,
+             VECTOR=na_if(.data$VECTOR,"v0"))
 
     value_data
   }) %>%
@@ -41,14 +45,25 @@ extract_vector_data <- function(data1){
 
 
 metadata_for_coordinates <- function(cansimTableNumber,coordinates,language) {
+  # Performance optimization P12: Fetch cube metadata once and pass to all coordinates
+  # instead of re-fetching inside each metadata_for_coordinate call
+  members <- get_cansim_cube_metadata(cansimTableNumber, type = "members")
+
   unique(coordinates) %>%
-    purrr::map_dfr(\(coord)metadata_for_coordinate(cansimTableNumber,coord,language))
+    purrr::map_dfr(\(coord) metadata_for_coordinate_cached(cansimTableNumber, coord, language, members))
 }
 
+# Original function that fetches metadata itself (for backwards compatibility)
 metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
+  members <- get_cansim_cube_metadata(cansimTableNumber, type = "members")
+  metadata_for_coordinate_cached(cansimTableNumber, coordinate, language, members)
+}
+
+# Performance optimization P12: Version that accepts pre-fetched members to avoid
+# repeated API calls when processing multiple coordinates from the same table
+metadata_for_coordinate_cached <- function(cansimTableNumber, coordinate, language, members) {
   cleaned_language <- cleaned_ndm_language(language)
   coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
-  members <- get_cansim_cube_metadata(cansimTableNumber,type="members")
   coordinates <- coordinate %>% strsplit("\\.") %>% unlist()
   dimensions <- members %>% pull(.data$dimensionPositionId) %>% unique()
   result <- tibble::tibble(cansimTableNumber=cansimTableNumber, !!coordinate_column:=coordinate)
@@ -519,7 +534,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
   }
 
   attr(result,"language") <- cleaned_language
-  if (!is.null(failed_coordinates) && nrow(failed_coordinates > 0)) {
+  if (!is.null(failed_coordinates) && nrow(failed_coordinates) > 0) {
     regular_fails <- failed_coordinates %>%
       filter(substr(.data$cansimTableNumber,1,4) != CENSUS_TABLE_STARTING_STRING)
     census_fails <- failed_coordinates %>%

@@ -8,7 +8,7 @@ normalize_cansim_values(
   data,
   replacement_value = "val_norm",
   normalize_percent = TRUE,
-  default_month = "01",
+  default_month = "07",
   default_day = "01",
   factors = TRUE,
   strip_classification_code = FALSE,
@@ -17,13 +17,13 @@ normalize_cansim_values(
 )
 }
 \arguments{
-\item{data}{A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}}
+\item{data}{A retrieved data table as returned from \code{get_cansim()} or \code{get_cansim_ndm()}}
 
 \item{replacement_value}{(Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"}
 
 \item{normalize_percent}{(Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates}
 
-\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "01")}
+\item{default_month}{The default month that should be used when creating Date objects for annual data (default set to "07")}
 
 \item{default_day}{The default day of the month that should be used when creating Date objects for monthly data (default set to "01")}
 

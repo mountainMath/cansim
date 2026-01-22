@@ -24,5 +24,7 @@ R-CMD-check-old.yaml
 ^benchmarks$
 ^benchmarks/*
 ^CODE_REVIEW.md
+^CODE_AUDIT_PLAN.md
 ^\.claude$
 ^\.claude/*
+^CLAUDE\.md$

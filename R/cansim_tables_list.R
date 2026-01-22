@@ -110,7 +110,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
       surveys_fr <- setNames(surveys$surveyFr,surveys$surveyCode)
       subjects <- get_cansim_code_set("subject")
       subjects_en <- setNames(subjects$subjectEn,subjects$subjectCode)
-      subjects_fr <- setNames(subjects$subjectEn,subjects$subjectCode)
+      subjects_fr <- setNames(subjects$subjectFr,subjects$subjectCode)
 
       if (lite) {
         r<-content %>%
@@ -132,10 +132,11 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
       }
 
       data <- r %>%
-        mutate_at(vars(ends_with("Date")),as.Date) %>%
-        mutate_at(vars(matches("releaseTime")),function(d)readr::parse_datetime(d,
+        # M11: Updated from deprecated mutate_at/vars to modern across() syntax
+        mutate(across(ends_with("Date"), as.Date)) %>%
+        mutate(across(matches("releaseTime"), function(d) readr::parse_datetime(d,
                                                                                 #format=STATCAN_TIME_FORMAT,
-                                                                                locale=readr::locale(tz=STATCAN_TIMEZONE))) %>%
+                                                                                locale=readr::locale(tz=STATCAN_TIMEZONE)))) %>%
         mutate(archived=.data$archived==1) %>%
         mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
         select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),

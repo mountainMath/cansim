@@ -2,10 +2,10 @@
 #'
 #' Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
-#' @param data A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
+#' @param data A retrieved data table as returned from \code{get_cansim()} or \code{get_cansim_ndm()}
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"
 #' @param normalize_percent (Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates
-#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
+#' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped
@@ -23,7 +23,7 @@
 #' @keywords internal
 #' @export
 normalize_cansim_values <- function(data, replacement_value="val_norm", normalize_percent=TRUE,
-                                    default_month="01", default_day="01",
+                                    default_month="07", default_day="01",
                                     factors=TRUE,strip_classification_code=FALSE,
                                     cansimTableNumber=NULL, internal=FALSE){
 
@@ -61,7 +61,10 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     return (data)
   }
 
-  data <- data %>% as_tibble()
+  # Performance optimization: only convert to tibble if not already one
+  if (!inherits(data, "tbl_df")) {
+    data <- as_tibble(data)
+  }
 
   attr(data,"cansimTableNumber") <- cansimTableNumber
   attr(data,"language") <- language
@@ -79,7 +82,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
-      mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
+      mutate(!!as.name(uom_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),"Rate",!!as.name(uom_string)))
   }
 
 
@@ -91,8 +94,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (!trad_cansim || is.null(cached_format)) {
     # Need to detect format - sample the date field
     sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
-    if (is.na(sample_date)) {
-      sample_date <- pull(date_field) %>% na.omit() %>% first()
+    if (length(sample_date) == 0 || is.na(sample_date)) {
+      sample_date <- data %>% pull(date_field) %>% na.omit() %>% first()
     }
 
     # Detect and cache the format
@@ -153,11 +156,17 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
   if (strip_classification_code){
-    for (field in fields) {
-      if (sum(!is.na(data[[paste0(classification_prefix,field)]]))>0) {
-        data <- data %>%
-          mutate(!!field:=gsub(" \\[.+\\]$","",!!as.name(field)))
-      }
+    # Performance optimization: identify eligible fields once, then apply gsub in single pass
+    # instead of creating new tibble per field iteration
+    eligible_fields <- fields[vapply(fields, function(field) {
+      col_name <- paste0(classification_prefix, field)
+      col_name %in% names(data) && sum(!is.na(data[[col_name]])) > 0
+    }, logical(1))]
+
+    if (length(eligible_fields) > 0) {
+      # Single mutate(across()) call instead of loop with repeated tibble copies
+      data <- data %>%
+        mutate(across(all_of(eligible_fields), ~ gsub(" \\[.+\\]$", "", .x)))
     }
   }
 
@@ -361,9 +370,10 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
                !!hierarchy_name:=!!as.name(hierarchy_column)) %>%
         select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
 
+      # Performance optimization: use vapply instead of lapply %>% unlist for type-safe vectorized extraction
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
-        dplyr::left_join(join_column,by=member_id_column) %>%
+        mutate(!!member_id_column := vapply(.data$...pos, function(d) d[column_index], character(1))) %>%
+        dplyr::left_join(join_column, by = member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else if (column[[dimension_name_column]] %in% names(data)){
       classification_name <- paste0(classification_code_prefix," ",column[[dimension_name_column]])
@@ -373,9 +383,10 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
                !!hierarchy_name:=!!as.name(hierarchy_column)) %>%
         select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
 
+      # Performance optimization: use vapply instead of lapply %>% unlist for type-safe vectorized extraction
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
-        dplyr::left_join(join_column,by=member_id_column) %>%
+        mutate(!!member_id_column := vapply(.data$...pos, function(d) d[column_index], character(1))) %>%
+        dplyr::left_join(join_column, by = member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else {
       if (cleaned_language=="eng")
@@ -880,23 +891,34 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
 #' @export
 categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remove_duplicates=TRUE){
   hierarchy_name=paste0("Hierarchy for ",column_name)
-  h <- data %>% dplyr::select(column_name,hierarchy_name) %>%
-    unique %>%
-    dplyr::mutate(hierarchy_level=(strsplit(!!as.name(hierarchy_name),"\\.") %>% lapply(length) %>% unlist)-1)
+
+  # Performance optimization: split hierarchy strings once, reuse for all operations
+  h <- data %>% dplyr::select(all_of(c(column_name,hierarchy_name))) %>%
+    unique
+
+  # Split once, use vapply for type-safe extraction (faster than lapply %>% unlist)
+  hierarchy_values <- h[[hierarchy_name]]
+  split_hierarchies <- strsplit(hierarchy_values, "\\.", fixed = FALSE)
+
+  h <- h %>%
+    dplyr::mutate(
+      hierarchy_level = vapply(split_hierarchies, length, integer(1)) - 1L,
+      `Member ID` = vapply(split_hierarchies, function(x) as.integer(x[length(x)]), integer(1))
+    )
+
   max_level=max(h$hierarchy_level,na.rm = TRUE)
   if (is.na(level) | level>max_level) level=max_level
   h <- h %>%
-    dplyr::mutate(`Member ID`=strsplit(!!as.name(hierarchy_name),"\\.") %>% lapply(last) %>% as.integer) %>%
     dplyr::filter(.data$hierarchy_level<=level)
   #strict_hierarchy=h %>% dplyr::filter(.data$hierarchy_level==level) %>% dplyr::pull(hierarchy_name) %>% unique
   if (strict) {
     h <- h %>% dplyr::filter(.data$hierarchy_level==level)
   } else if (remove_duplicates) {
-    higher_ids <- h %>% pull(hierarchy_name) %>% #strict_hierarchy %>%
-      as.character() %>%
-      strsplit("\\.") %>%
-      lapply(function(x){utils::head(as.integer(x),-1)}) %>%
-      unlist() %>% unique() %>% as.integer()
+    # Get all parent IDs (all but last element of each hierarchy path)
+    filtered_hierarchies <- strsplit(h[[hierarchy_name]], "\\.", fixed = FALSE)
+    higher_ids <- unique(unlist(lapply(filtered_hierarchies, function(x) {
+      if (length(x) > 1) as.integer(utils::head(x, -1)) else integer(0)
+    })))
     h <- h %>% dplyr::filter(!(.data$`Member ID` %in% higher_ids))
   }
   h[[column_name]] %>% as.character()
@@ -922,15 +944,17 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
 #' @export
 view_cansim_webpage <- function(cansimTableNumber = NULL){
   browser <- getOption("browser")
-  cansimTableNumber <- tolower(cansimTableNumber)
 
-  if (is.null(cansimTableNumber)) {
+  if (is.null(cansimTableNumber) || length(cansimTableNumber) == 0) {
     url <- 'https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action#tables'
-  } else if (grepl("^v\\d+$",cansimTableNumber)) {
-    url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",cansimTableNumber)
   } else {
-    cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
-    url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",gsub("-","",cansimTableNumber))
+    cansimTableNumber <- tolower(cansimTableNumber)
+    if (grepl("^v\\d+$",cansimTableNumber)) {
+      url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",cansimTableNumber)
+    } else {
+      cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
+      url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",gsub("-","",cansimTableNumber))
+    }
   }
 
   utils::browseURL(url,browser)

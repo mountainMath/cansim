@@ -95,11 +95,20 @@ parse_metadata <- function(meta,data_path){
 
   column_ids <- dplyr::pull(meta2,dimension_id_column)
   column_names <- dplyr::pull(meta2,dimension_name_column)
+
+  # Performance optimization: pre-split meta3 by dimension_id once instead of filtering N times
+  # This changes O(N*M) filtering to O(M) split + O(N) lookup
+  meta3_split <- split(meta3, meta3[[dimension_id_column]])
+
   for (column_index in column_ids) { # iterate through columns for which we have meta data
     column <- meta2 %>% dplyr::filter(.data[[dimension_id_column]]==column_index)
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) & !(column[[dimension_name_column]] %in% column_names)
-    meta_x <- meta3 %>%
-      dplyr::filter(.data[[dimension_id_column]]==column_index) %>%
+
+    # Use pre-split data instead of filtering (O(1) lookup vs O(n) filter)
+    meta_x_raw <- meta3_split[[as.character(column_index)]]
+    if (is.null(meta_x_raw)) meta_x_raw <- meta3[0, ]  # empty tibble with same structure
+
+    meta_x <- meta_x_raw %>%
       add_hierarchy(parent_member_id_column=parent_member_id_column,
                     member_id_column=member_id_column,
                     hierarchy_column=hierarchy_column,
@@ -120,46 +129,71 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
   member_ids <- meta_x[[member_id_column]]
   parent_ids <- meta_x[[parent_member_id_column]]
 
-  # Create lookup table for fast parent access
-  parent_lookup <- rlang::set_names(parent_ids, member_ids)
+  # Performance optimization P4/P11: Use environment hash table for O(1) parent lookup
+  # instead of named vector's O(n) lookup - critical for large hierarchies
+  parent_lookup_env <- new.env(hash = TRUE, parent = emptyenv())
+  for (i in seq_along(member_ids)) {
+    assign(member_ids[i], parent_ids[i], envir = parent_lookup_env)
+  }
 
-  # Recursive function to build full hierarchy path for a member
-  build_hierarchy_path <- function(member_id, visited = character(0), max_depth = 100) {
-    # Check for cycles or max depth
-    if (length(visited) >= max_depth || member_id %in% visited) {
-      return(member_id)
+  # Helper function to get parent (O(1) instead of O(n))
+  get_parent <- function(id) {
+    if (exists(id, envir = parent_lookup_env, inherits = FALSE)) {
+      get(id, envir = parent_lookup_env, inherits = FALSE)
+    } else {
+      NA_character_
     }
-
-    parent_id <- parent_lookup[member_id]
-
-    # If no parent or parent is NA, we're at the root
-    if (is.na(parent_id) || is.na(parent_lookup[parent_id])) {
-      return(member_id)
-    }
-
-    # Recursively build parent's path
-    parent_path <- build_hierarchy_path(parent_id, c(visited, member_id), max_depth)
-
-    # Append current member to parent's path
-    paste0(parent_path, ".", member_id)
   }
 
   # Vectorized hierarchy building with memoization for better performance
   hierarchy_cache <- new.env(hash = TRUE, parent = emptyenv())
 
-  build_hierarchy_cached <- function(member_id) {
-    cache_key <- as.character(member_id)
-    if (exists(cache_key, envir = hierarchy_cache)) {
-      return(get(cache_key, envir = hierarchy_cache))
+  # Recursive function to build full hierarchy path for a member
+  # Uses environment for O(1) cycle detection instead of O(n) %in% check
+  build_hierarchy_path <- function(member_id, visited_env = NULL, depth = 0, max_depth = 100) {
+    if (is.null(visited_env)) {
+      visited_env <- new.env(hash = TRUE, parent = emptyenv())
     }
 
-    result <- build_hierarchy_path(member_id)
-    assign(cache_key, result, envir = hierarchy_cache)
+    # Check for cycles or max depth using O(1) hash lookup
+    if (depth >= max_depth || exists(member_id, envir = visited_env, inherits = FALSE)) {
+      return(member_id)
+    }
+
+    # Check memoization cache first
+    if (exists(member_id, envir = hierarchy_cache, inherits = FALSE)) {
+      return(get(member_id, envir = hierarchy_cache, inherits = FALSE))
+    }
+
+    parent_id <- get_parent(member_id)
+
+    # If no parent or parent is NA, we're at the root
+    if (is.na(parent_id)) {
+      assign(member_id, member_id, envir = hierarchy_cache)
+      return(member_id)
+    }
+
+    parent_parent <- get_parent(parent_id)
+    if (is.na(parent_parent)) {
+      result <- member_id
+      assign(member_id, result, envir = hierarchy_cache)
+      return(result)
+    }
+
+    # Mark as visited for cycle detection
+    assign(member_id, TRUE, envir = visited_env)
+
+    # Recursively build parent's path
+    parent_path <- build_hierarchy_path(parent_id, visited_env, depth + 1, max_depth)
+
+    # Append current member to parent's path
+    result <- paste0(parent_path, ".", member_id)
+    assign(member_id, result, envir = hierarchy_cache)
     result
   }
 
   # Build hierarchies for all members
-  hierarchies <- vapply(member_ids, build_hierarchy_cached, character(1), USE.NAMES = FALSE)
+  hierarchies <- vapply(member_ids, function(id) build_hierarchy_path(id), character(1), USE.NAMES = FALSE)
 
   # Check if any hierarchies weren't fully resolved (hit max depth)
   if (any(grepl("^[^.]+$", hierarchies) & !is.na(parent_ids))) {
@@ -417,7 +451,7 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
     mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
 
   attr(result, "cansimTableNumber") <- cansimTableNumber
-  attr(result, "langauge") <- language
+  attr(result, "language") <- language
 
   result
 }
