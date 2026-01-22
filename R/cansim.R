@@ -149,6 +149,10 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (factors){
     if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
 
+    # Pre-split coordinates once for efficient dimension extraction in the loop
+    coord_split_matrix <- NULL
+    n_dims <- length(fields)
+
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
@@ -172,9 +176,13 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>%
-            lapply(\(x)x[dimension_id]) %>%
-            unlist()
+          # Lazily initialize coordinate matrix only when needed
+          if (is.null(coord_split_matrix)) {
+            coord_split_matrix <- stringr::str_split_fixed(data[[coordinate_column]], "\\.", n_dims)
+          }
+
+          # Extract dimension IDs directly from pre-split matrix (vectorized)
+          data$`...id` <- coord_split_matrix[, dimension_id]
 
           data <- data %>%
             select(-all_of(field)) %>%
@@ -299,9 +307,13 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 
 
   if (!is.null(getOption("cansim.debug"))) message('Generating base hierarchy')
-  hierarchy_data <- tibble(X=pull(data,coordinate_column) %>% unique) %>%
-    setNames(coordinate_column) %>%
-    mutate(...pos=strsplit(!!as.name(coordinate_column),"\\."))
+
+  # Get unique coordinates and pre-split into matrix for efficient column extraction
+  unique_coords <- pull(data, coordinate_column) %>% unique()
+  n_dims <- nrow(meta2)
+  coord_matrix <- stringr::str_split_fixed(unique_coords, "\\.", n_dims)
+
+  hierarchy_data <- tibble(!!coordinate_column := unique_coords)
 
   for (column_name in column_names) {
     if (!is.null(getOption("cansim.debug"))) message(paste0("Generating ",column_name," hierarchy"))
@@ -325,6 +337,9 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     # is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column_index))
 
+    # Extract member IDs directly from pre-split matrix (vectorized)
+    member_ids_for_col <- coord_matrix[, column_index]
+
     if (is_geo_column) {
       hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
       join_column <- meta_x %>%
@@ -333,7 +348,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
+        mutate(!!member_id_column := member_ids_for_col) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else if (column[[dimension_name_column]] %in% names(data)){
@@ -345,7 +360,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
+        mutate(!!member_id_column := member_ids_for_col) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else {
@@ -356,7 +371,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     }
   }
   if (!is.null(getOption("cansim.debug"))) message('Folding in hierarchy')
-  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-"...pos"), by=coordinate_column)
+  data %>% dplyr::left_join(hierarchy_data, by=coordinate_column)
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package

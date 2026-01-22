@@ -115,32 +115,82 @@ parse_metadata <- function(meta,data_path){
 
 add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierarchy_column,exceeded_hierarchy_warning_message){
   meta_x <- meta_x %>% mutate(across(all_of(c(member_id_column,parent_member_id_column)),as.character))
-  parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
-  current_top <- function(c){
-    strsplit(c,"\\.") %>%
-      purrr::map(dplyr::first) %>%
-      unlist
+
+  # Build parent lookup once
+  member_ids <- meta_x[[member_id_column]]
+  parent_ids <- meta_x[[parent_member_id_column]]
+  parent_lookup <- rlang::set_names(parent_ids, member_ids)
+
+  # Pre-allocate result vector
+  n <- length(member_ids)
+  hierarchy_paths <- character(n)
+
+  # Build path from each member to root by tracing parents
+ # Use memoization to avoid recomputing paths for shared ancestors
+  path_cache <- new.env(hash = TRUE, parent = emptyenv())
+  max_depth <- 100
+
+  build_path <- function(id) {
+    if (is.na(id)) return(NULL)
+
+    # Check cache first
+    cached <- path_cache[[id]]
+    if (!is.null(cached)) return(cached)
+
+    # Trace path to root
+    path <- id
+    current <- id
+    depth <- 0
+
+    while (depth < max_depth) {
+      parent <- parent_lookup[[current]]
+      if (is.na(parent)) break
+      path <- c(parent, path)
+      current <- parent
+      depth <- depth + 1
+    }
+
+    # Cache and return
+    result <- paste(path, collapse = ".")
+    path_cache[[id]] <- result
+    result
   }
-  parent_for_current_top <- function(c){
-    as.character(parent_lookup[current_top(c)])
+
+  # Build all hierarchy paths - vectorized where possible
+  exceeded <- FALSE
+  for (i in seq_len(n)) {
+    id <- member_ids[i]
+    path <- id
+    current <- id
+    depth <- 0
+
+    # Check if we have a cached ancestor path we can reuse
+    while (depth < max_depth) {
+      parent <- parent_lookup[[current]]
+      if (is.na(parent)) break
+
+      # Check if parent's full path is already cached
+      cached_parent <- path_cache[[parent]]
+      if (!is.null(cached_parent)) {
+        path <- paste0(cached_parent, ".", path)
+        break
+      }
+
+      path <- paste0(parent, ".", path)
+      current <- parent
+      depth <- depth + 1
+    }
+
+    if (depth >= max_depth) exceeded <- TRUE
+    hierarchy_paths[i] <- path
+    path_cache[[id]] <- path
   }
-  meta_x <- meta_x %>%
-    dplyr::mutate(!!as.name(hierarchy_column):=.data[[member_id_column]])
-  added=TRUE
-  max_depth=100
-  count=0
-  while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
-    old <- meta_x[[hierarchy_column]]
-    meta_x <- meta_x %>%
-      dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
-      dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
-      dplyr::select(-"p")
-    added <- sum(old != meta_x[[hierarchy_column]])>0
-    count=count+1
-  }
-  if (added) {
+
+  if (exceeded) {
     warning(exceeded_hierarchy_warning_message)
   }
+
+  meta_x[[hierarchy_column]] <- hierarchy_paths
   meta_x
 }
 
@@ -263,60 +313,12 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   }
 
 
-  if (FALSE) {
-    short_language <- c("eng"="En","fra"="Fr")[[language]]
-
-    m1_renames <- c(
-      "Cube Title"=paste0("cubeTitle",short_language),
-      "Product Id"="productId",
-      "CANSIM Id"="cansimId",
-      "URL"="URL",
-      "Cube Notes"="cubeNotes",
-      "Archive Status"=paste0("archiveStatus",short_language),
-      "Frequency"=paste0("frequencyDesc",short_language),
-      "Start Reference Period"="cubeStartDate",
-      "End Reference Period"="cubeEndDate",
-      "Total number of dimensions"="nbDatapointsCube"
-    )
-
-    frequency_codes <- get_cansim_code_set("frequency")
-
-    meta1 <- m1 %>%
-      left_join(frequency_codes,by="frequencyCode") %>%
-      mutate(URL=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",productId)) %>%
-      mutate(cubeNotes=m3 %>% filter(dimensionPositionId==0,memberId==0) %>% pull(footnoteId) %>% paste0(collapse=", ")) %>%
-      rename(!!!m1_renames) %>%
-      relocate(names(m1_renames))
-
-    writeRDS(meta1, paste0(base_path_for_table_language(cansimTableNumber, language), ".Rda1"))
-  }
-
   if (type=="overview") {
-
-    if (FALSE) { # experimental code
-    fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
-                "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
-                "surveyCode",  "dimension","releaseTime")
-    result <- lapply(fields, function(field){
-      purrr::map(data1,function(d){
-        dd<-d$object[[field]]
-        if (typeof(dd)=="list") dd <- dd %>% unlist %>% as.character() %>% paste(collapse = ",")
-        dd
-      }) %>% as.character()
-    }) %>%
-      purrr::set_names(fields) %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
-      dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
-                                                      format=STATCAN_TIME_FORMAT,
-                                                      locale=readr::locale(tz=STATCAN_TIMEZONE)))
-    } else {
     result <- m1 %>%
       dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
       dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
                                                       format=STATCAN_TIME_FORMAT,
                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))
-    }
   } else if (type=="notes") {
     result <- m3
   } else if (type=="members") {
