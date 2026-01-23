@@ -363,31 +363,43 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
   dimensions <- member_info %>%
     select("dimensionPositionId", "dimensionName") %>%
     unique() %>%
-    arrange("dimensionPositionId")
+    arrange(.data$dimensionPositionId)
 
-  result <- tibble(...link="link",COORDINATE="")
+  # Build dimension data for expand_grid (more efficient than iterative full_join)
+  dim_list <- list()
+  dim_names <- character(nrow(dimensions))
+  member_id_cols <- character(nrow(dimensions))
 
   for (i in seq_len(nrow(dimensions))) {
     dim <- dimensions[i,]
     dim_name <- dim$dimensionName
-    member <- member_info %>%
-      filter(.data$dimensionPositionId==dim$dimensionPositionId) %>%
-      select("memberId", "memberName") %>%
-      unique() %>%
-      arrange("memberId") %>%
-      rename(!!dim_name:="memberName") %>%
-      mutate(...link="link")
+    dim_names[i] <- dim_name
+    member_id_col <- paste0("...mid_", i)
+    member_id_cols[i] <- member_id_col
 
-    result <- result %>%
-      full_join(member, by="...link",
-                relationship = "many-to-many") %>%
-      mutate(COORDINATE=ifelse(.data$COORDINATE=="", .data$memberId, paste0(.data$COORDINATE, ".", .data$memberId))) %>%
-      select(-any_of("memberId"))
+    members <- member_info %>%
+      filter(.data$dimensionPositionId == dim$dimensionPositionId) %>%
+      select("memberId", "memberName") %>%
+      unique()
+
+    dim_data <- tibble(
+      !!dim_name := members$memberName,
+      !!member_id_col := members$memberId
+    )
+    dim_list[[i]] <- dim_data
   }
 
+  # Create Cartesian product in one operation
+  result <- do.call(tidyr::expand_grid, dim_list)
+
+  # Build COORDINATE column using vectorized paste
+  coord_cols <- lapply(member_id_cols, function(col) result[[col]])
+  result$COORDINATE <- do.call(paste, c(coord_cols, sep = "."))
+
+  # Reorder columns: cansimTableNumber, COORDINATE, then dimension columns
   result <- result %>%
-    select(-any_of("...link")) %>%
-    mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
+    mutate(cansimTableNumber = !!cansimTableNumber) %>%
+    select("cansimTableNumber", "COORDINATE", all_of(dim_names))
 
   attr(result, "cansimTableNumber") <- cansimTableNumber
   attr(result, "langauge") <- language
