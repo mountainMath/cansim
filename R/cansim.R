@@ -98,20 +98,37 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (!trad_cansim) {
     # do nothing
   } else if (grepl("^\\d{4}$",sample_date)) {
-    # year
-    data <- data %>%
-      mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
+    # year - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(paste0(unique_dates, "-", default_month, "-", default_day)),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
-    # year range, use second year as anchor
-    data <- data %>%
-      mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
+    # year range, use second year as anchor - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(paste0(gsub("^\\d{4}/", "", unique_dates), "-", default_month, "-", default_day)),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
-    # year and month
-    data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
+    # year and month - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(paste0(unique_dates, "-", default_day)),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   } else if (grepl("^\\d{4}-\\d{2}-\\d{2}$",sample_date)) {
-    # year, month and day
-    data <- data %>%
-      mutate(Date=as.Date(!!as.name(date_field)))
+    # year, month and day - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(unique_dates),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   }
 
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
