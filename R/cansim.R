@@ -152,9 +152,9 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
+        # get_deduped_column_level_data now returns pre-sorted data, no need for arrange()
         level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,
-                                                     language=language,column=field) %>%
-          arrange(as.integer(.data$`...dim`),as.integer(.data$`...id`))
+                                                     language=language,column=field)
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
           data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
@@ -191,8 +191,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
                          "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
                          "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
         } else {
-          data <- data %>%
-            mutate(!!field:=factor(!!as.name(field),levels=level_table$...name))
+          # Use base R for factor conversion - faster than dplyr's mutate for this operation
+          data[[field]] <- factor(data[[field]], levels = level_table$...name)
         }
 
       },
