@@ -41,7 +41,7 @@ table_base_path <- function(cansimTableNumber) {
 
 file_path_for_table_language <- function(cansimTableNumber, language){
   language <- cleaned_ndm_language(language)
-  if (is.na(language)) stop(paste0("Unkown Lanaguage ",language),call.=FALSE)
+  if (is.na(language)) stop(paste0("Unknown Lanaguage ",language),call.=FALSE)
   base_table <- naked_ndm_table_number(cansimTableNumber)
   file.path(paste0(base_table,"-",language))
 }
@@ -88,7 +88,7 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FAL
     if ("curl_error_peer_failed_verification" %in% class(response$error)) {
       stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
            "This means that the authenticity of the StatCan API server can't be verified.\n",
-           "Statistics Canada has a history of failty SSL certificats on their API,\n",
+           "Statistics Canada has a history of faulty SSL certificats on their API,\n",
            "if you are reasonably sure that your connection is not getting hijacked you\n",
            "can disable peer checking for the duration of the R session by typing\n\n",
            "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
@@ -138,7 +138,7 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE
     if ("curl_error_peer_failed_verification" %in% class(response$error)) {
       stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
            "This means that the authenticity of the StatCan API server can't be verified.\n",
-           "Statistics Canada has a history of failty SSL certificats on their API,\n",
+           "Statistics Canada has a history of faulty SSL certificats on their API,\n",
            "if you are reasonably sure that your connection is not getting hijacked you\n",
            "can disable peer checking for the duration of the R session by typing\n\n",
            "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
@@ -363,7 +363,7 @@ transform_value_column <- function(data,value_column){
         dplyr::mutate(!!value_column:=as.numeric(!!as.name(value_column)))
     }
   } else {
-    warning("Unkown table type")
+    warning("Unknown table type")
   }
   data
 }

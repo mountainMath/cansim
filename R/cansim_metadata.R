@@ -390,7 +390,7 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
     mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
 
   attr(result, "cansimTableNumber") <- cansimTableNumber
-  attr(result, "langauge") <- language
+  attr(result, "language") <- language
 
   result
 }
