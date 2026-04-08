@@ -431,13 +431,17 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
                                  col_names = FALSE) %>%
       as.character()
 
-    symbols <- which(header=="Symbol")
+    symbols <- which(header=="Symbol" | header=="Symbole")
     if (length(symbols)==0) {
-      symbols <- which(header=="Symbols"|header=="Symboles")
+      symbols <- which(header=="Symbols"| header=="Symboles")
     }
 
     if (length(symbols)>1) {
-      header[symbols] <- paste0("Symbol ",seq(1,length(symbols)))
+      if (cleaned_language=="fra") {
+        header[symbols] <- paste0("Symbole ",seq(1,length(symbols)))
+      } else {
+        header[symbols] <- paste0("Symbol ",seq(1,length(symbols)))
+      }
     }
 
     coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))

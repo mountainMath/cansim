@@ -154,18 +154,20 @@ get_cansim_connection <- function(cansimTableNumber,
                                 col_names = FALSE) %>%
       as.character()
 
-    symbols <- which(header=="Symbol")
+    symbols <- which(header=="Symbol" | header=="Symbole")
     if (length(symbols)==0) {
-      symbols <- which(header=="Symbols"|header=="Symboles")
+      symbols <- which(header=="Symbols"| header=="Symboles")
     }
-
 
     sl <- length(symbols)
 
     if (sl>1) {
-      header[symbols] <- paste0("Symbol ",seq(1,sl))
+      if (cleaned_language=="fra") {
+        header[symbols] <- paste0("Symbole ",seq(1,sl))
+      } else {
+        header[symbols] <- paste0("Symbol ",seq(1,sl))
+      }
     }
-
 
     if (!(coordinate_column %in% header)) {
       ci <- which(grepl(coordinate_column,header,ignore.case = TRUE))

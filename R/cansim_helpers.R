@@ -305,7 +305,7 @@ transform_value_column <- function(data,value_column){
   language <- attr(data,"language")
   cansimTableNumber <- attr(data,"cansimTableNumber")
 
-  symbols <- which(grepl("^Symbol( \\d+)*$",names(data)))
+  symbols <- which(grepl("^Symbol( \\d+)*$|^Symbole( \\d+)*$",names(data)))
   if (!(value_column %in% names(data)) & length(symbols)>1) {
     #message("\nTransforming to long form.")
     dimension_grep_string <- paste0("^.+ \\(",length(symbols),"[A-Za-z]*\\):.+\\[\\d+\\]$")
@@ -323,7 +323,7 @@ transform_value_column <- function(data,value_column){
       if (length(dimension_name)>1) {
         warning("Unable to identify dimension name")
       } else {
-        symbol_string <- "Symbol"
+        symbol_string <- ifelse(language=="fra","Symbole","Symbol")
         renames <- c(setNames(names(data)[dimensions],paste0(member_ids," --- ",value_column)),
                      setNames(names(data)[symbols],paste0(member_ids," --- ",symbol_string)))
 
