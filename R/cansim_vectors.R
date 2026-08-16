@@ -71,11 +71,7 @@ metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
       mutate(memberLevel=if_else(.data$n==1,.data$memberName,paste0(.data$memberName," (",.data$nn,")")))
 
     data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
-    geography_columns <- case_when(cleaned_language=="eng" ~
-                                     c("Geography","Geographic name","Geography of origin"),
-                                   TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
-                                            paste0("Nom g",intToUtf8(0x00E9),"ographique"),
-                                            paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+    geography_columns <- geography_colum_names(cleaned_language)
 
     m<-dm %>%
       filter(.data$memberId==member_pos)

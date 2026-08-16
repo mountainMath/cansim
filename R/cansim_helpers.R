@@ -562,11 +562,14 @@ rename_columns_for_language <- function(data,from_language,to_language) {
 }
 
 geography_colum_names <- function(language) {
-  geography_columns <- case_when(language=="eng" ~
-                                   c("Geography","Geographic name","Geography of origin"),
-                                 TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
-                                          paste0("Nom g",intToUtf8(0x00E9),"ographique"),
-                                          paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+  # `language` is a single value, an unrecognized (NA) language falls back to the French names
+  if (isTRUE(language=="eng")) {
+    c("Geography","Geographic name","Geography of origin")
+  } else {
+    c(paste0("G",intToUtf8(0x00E9),"ographie"),
+      paste0("Nom g",intToUtf8(0x00E9),"ographique"),
+      paste0("G",intToUtf8(0x00E9),"ographie d'origine"))
+  }
 }
 
 

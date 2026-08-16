@@ -129,11 +129,7 @@ get_cansim_connection <- function(cansimTableNumber,
 
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
-    geography_columns <- case_when(cleaned_language=="eng" ~
-                                     c("Geography","Geographic name","Geography of origin"),
-                                   TRUE ~ c(paste0("G",intToUtf8(0x00E9),"ographie"),
-                                            paste0("Nom g",intToUtf8(0x00E9),"ographique"),
-                                            paste0("G",intToUtf8(0x00E9),"ographie d'origine")))
+    geography_columns <- geography_colum_names(cleaned_language)
     data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
     coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
 
