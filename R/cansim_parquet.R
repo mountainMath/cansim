@@ -639,46 +639,48 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
     }
 
   if (nrow(result)>0) {
-    result$timeCached <- do.call("c",
-                                       lapply(result$path,function(p){
-                                         pp <- dir(file.path(cache_path,p),"\\.Rda_time")
-                                         if (length(pp)==1) {
-                                           d<-readRDS(file.path(cache_path,p,pp))
-                                           dd<- strptime(d,format=TIME_FORMAT)
-                                         } else {
-                                           dd <- strptime("1900-01-01 01:00:00",format=TIME_FORMAT)
-                                         }
-                                       }))
-    result$rawSize <- do.call("c",
-                           lapply(result$path,function(p){
-                             pp <- dir(file.path(cache_path,p),"\\.sqlite$|\\.arrow$|\\.parquet$")
-                             if (length(pp)==1) {
-                               file_path <- file.path(cache_path,p,pp)
-                               if (dir.exists(file_path)) {
-                                 d<-list.files(file.path(cache_path,p,pp),full.names = TRUE,recursive = TRUE) %>%
-                                   lapply(file.size) %>%
-                                   unlist() %>%
-                                   sum()
-                               } else {
-                                d<-file.size(file.path(cache_path,p,pp))
-                               }
-                             } else {
-                               d <- NA_real_
-                             }
-                             d
-                           }))
-    result$niceSize <-  do.call("c",lapply(result$rawSize,\(x)ifelse(is.na(x),NA_real_,format_file_size(x,"auto"))))
-    result$title <- do.call("c",
-                            lapply(result$path,function(p){
-                              pp <- dir(file.path(cache_path,p),"\\.Rda1")
-                              if (length(pp)==1) {
-                                d <- readRDS(file.path(cache_path,p,pp))
-                                dd <- as.character(d[1,1])
-                              } else {
-                                dd <- NA_character_
-                              }
-                              dd
-                            }))
+    # P3: Single pass to collect all metadata instead of three separate lapply calls
+    cache_metadata <- lapply(result$path, function(p) {
+      full_path <- file.path(cache_path, p)
+
+      # Get timeCached
+      time_file <- dir(full_path, "\\.Rda_time")
+      if (length(time_file) == 1) {
+        time_cached <- strptime(readRDS(file.path(full_path, time_file)), format = TIME_FORMAT)
+      } else {
+        time_cached <- strptime("1900-01-01 01:00:00", format = TIME_FORMAT)
+      }
+
+      # Get rawSize
+      data_file <- dir(full_path, "\\.sqlite$|\\.arrow$|\\.parquet$")
+      if (length(data_file) == 1) {
+        data_path <- file.path(full_path, data_file)
+        if (dir.exists(data_path)) {
+          raw_size <- sum(file.size(list.files(data_path, full.names = TRUE, recursive = TRUE)))
+        } else {
+          raw_size <- file.size(data_path)
+        }
+      } else {
+        raw_size <- NA_real_
+      }
+
+      # Get title
+      title_file <- dir(full_path, "\\.Rda1")
+      if (length(title_file) == 1) {
+        title <- as.character(readRDS(file.path(full_path, title_file))[1, 1])
+      } else {
+        title <- NA_character_
+      }
+
+      list(timeCached = time_cached, rawSize = raw_size, title = title)
+    })
+
+    result$timeCached <- do.call("c", lapply(cache_metadata, `[[`, "timeCached"))
+    result$rawSize <- vapply(cache_metadata, `[[`, numeric(1), "rawSize")
+    result$niceSize <- vapply(result$rawSize, function(x) {
+      if (is.na(x)) NA_character_ else format_file_size(x, "auto")
+    }, character(1))
+    result$title <- vapply(cache_metadata, `[[`, character(1), "title")
   }
 
   cube_info <- list_cansim_cubes(lite=TRUE,refresh = refresh,quiet=TRUE)
