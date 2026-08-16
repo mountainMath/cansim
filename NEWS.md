@@ -14,6 +14,7 @@
 * table templates are built with a single cartesian product instead of joining one dimension at a time
 
 ## Minor changes
+* fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read
 * better connection error handling
 * fix `get_cansim_cube_metadata()` and `get_cansim_table_template()` for vectors of table numbers, metadata for
   all tables is still retrieved in a single API call and cached per table
