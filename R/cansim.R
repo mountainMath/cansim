@@ -171,6 +171,10 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (factors){
     if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
 
+    # coordinates are split once into a character matrix and reused for all dimensions,
+    # built lazily since only some tables need it
+    coordinate_matrix <- NULL
+
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
@@ -194,9 +198,11 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>%
-            lapply(\(x)x[dimension_id]) %>%
-            unlist()
+          if (is.null(coordinate_matrix)) {
+            coordinate_parts <- max(c(0,stringr::str_count(data[[coordinate_column]],"\\.")),na.rm=TRUE)+1
+            coordinate_matrix <- stringr::str_split_fixed(data[[coordinate_column]],"\\.",coordinate_parts)
+          }
+          data$`...id` <- coordinate_matrix[,dimension_id]
 
           data <- data %>%
             select(-all_of(field)) %>%
@@ -321,9 +327,13 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 
 
   if (!is.null(getOption("cansim.debug"))) message('Generating base hierarchy')
-  hierarchy_data <- tibble(X=pull(data,coordinate_column) %>% unique) %>%
-    setNames(coordinate_column) %>%
-    mutate(...pos=strsplit(!!as.name(coordinate_column),"\\."))
+  # the unique coordinates are split once into a character matrix, member ids for each
+  # dimension are then read off as whole columns rather than element by element
+  unique_coordinates <- pull(data,coordinate_column) %>% unique()
+  coordinate_parts <- max(c(0,stringr::str_count(unique_coordinates,"\\.")),na.rm=TRUE)+1
+  coordinate_matrix <- stringr::str_split_fixed(unique_coordinates,"\\.",coordinate_parts)
+
+  hierarchy_data <- tibble(!!coordinate_column:=unique_coordinates)
 
   for (column_name in column_names) {
     if (!is.null(getOption("cansim.debug"))) message(paste0("Generating ",column_name," hierarchy"))
@@ -347,6 +357,8 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     # is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column_index))
 
+    member_ids_for_column <- coordinate_matrix[,column_index]
+
     if (is_geo_column) {
       hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
       join_column <- meta_x %>%
@@ -355,7 +367,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=purrr::map_chr(.data$...pos, ~.x[column_index])) %>%
+        mutate(!!member_id_column:=member_ids_for_column) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else if (column[[dimension_name_column]] %in% names(data)){
@@ -367,7 +379,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=purrr::map_chr(.data$...pos, ~.x[column_index])) %>%
+        mutate(!!member_id_column:=member_ids_for_column) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else {
@@ -378,7 +390,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     }
   }
   if (!is.null(getOption("cansim.debug"))) message('Folding in hierarchy')
-  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-"...pos"), by=coordinate_column)
+  data %>% dplyr::left_join(hierarchy_data, by=coordinate_column)
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package
