@@ -155,8 +155,12 @@ test_that("repairing warns about what was changed", {
   expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
                  "Characteristics<U+00A0>", fixed=TRUE)
   # the warning is wrapped to the console width, so it is matched on the collapsed text
-  expect_match(warning_text(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE)),
-               "non-breaking spaces or control characters", fixed=TRUE)
+  warning <- warning_text(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
+  expect_match(warning, "non-breaking spaces or control characters", fixed=TRUE)
+  # the reader has to be told this is StatCan's to fix, and where to watch for it being fixed
+  expect_match(warning, "This warning will disappear on its own once StatCan stops sending them",
+               fixed=TRUE)
+  expect_match(warning, "https://github.com/mountainMath/cansim/issues/169", fixed=TRUE)
 
   old <- options(cansim.suppress_repair_warnings=TRUE)
   on.exit(options(old), add=TRUE)

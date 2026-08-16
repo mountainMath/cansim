@@ -53,6 +53,8 @@ wrap_warning_text <- function(...) {
   paste(strwrap(paste0(...),width=max(40,getOption("width",80))),collapse="\n")
 }
 
+ISSUE_169_URL <- "https://github.com/mountainMath/cansim/issues/169"
+
 # `original_values` are the names as StatCan sent them, before repair
 warn_statcan_repairs <- function(original_values,context) {
   if (length(original_values)==0 || isTRUE(getOption("cansim.suppress_repair_warnings"))) return(invisible(NULL))
@@ -63,7 +65,10 @@ warn_statcan_repairs <- function(original_values,context) {
             "copy-pasted, the package has replaced them with regular spaces. ",
             if (length(original_values)==1) paste0("Repaired \"",example,"\".")
             else paste0("Repaired ",length(original_values)," names, for example \"",example,"\"."),
-            " Set options(cansim.suppress_repair_warnings=TRUE) to silence this."),
+            " Nothing on your end causes this and nothing on your end can fix it, the characters are ",
+            "in the data StatCan publishes. This warning will disappear on its own once StatCan stops ",
+            "sending them, which is tracked at ",ISSUE_169_URL,". ",
+            "Set options(cansim.suppress_repair_warnings=TRUE) to silence this."),
           call.=FALSE)
   invisible(NULL)
 }

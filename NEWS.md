@@ -20,7 +20,10 @@
   covers table downloads, vector and coordinate calls, cube metadata, table templates and the cube list,
   and emits a warning that shows the offending characters by code point, for example
   `Performance<U+00A0> strategy`, together with a count of how many names were repaired. Set
-  `options(cansim.suppress_repair_warnings=TRUE)` to silence the warning. Column names of tables cached before this release keep the original characters
+  `options(cansim.suppress_repair_warnings=TRUE)` to silence the warning. The warning also says that
+  the characters are in the data StatCan publishes rather than anything the user did, and that it
+  will disappear on its own once StatCan stops sending them, pointing at the issue where that is
+  tracked. Column names of tables cached before this release keep the original characters
   until the table is downloaded again, `get_cansim_connection()` warns when it finds such a cache (#169)
 * the same repair now also covers the member labels in the data itself, not just the names of the
   columns holding them. These characters turn out to be more common in member labels than in dimension
