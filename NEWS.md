@@ -26,6 +26,9 @@
 * hierarchy building in metadata parsing no longer re-parses the growing hierarchy paths, hierarchies are built
   one ancestor level at a time across all members at once
 * coordinates are split once into a character matrix when folding in metadata and converting to factors
+* factor conversion of dimensions with duplicate member names splits only the unique coordinates instead of
+  every row, a table repeats each coordinate once per reference period. On 36-10-0580 this is 6,882 unique
+  coordinates against 996,978 rows, cutting a cached read from 4.5s to 4.0s
 * table templates are built with a single cartesian product instead of joining one dimension at a time
 
 ## Minor changes

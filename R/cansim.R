@@ -171,9 +171,11 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (factors){
     if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
 
-    # coordinates are split once into a character matrix and reused for all dimensions,
-    # built lazily since only some tables need it
-    coordinate_matrix <- NULL
+    # Coordinates are split once into a character matrix and reused for all dimensions, built
+    # lazily since only dimensions with duplicate member names need it. Only the unique
+    # coordinates are split and rows are read back through an index, a table repeats each
+    # coordinate once per reference period so the unique set is a small fraction of the rows.
+    coordinate_lookup <- NULL
 
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
@@ -198,11 +200,14 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          if (is.null(coordinate_matrix)) {
-            coordinate_parts <- max(c(0,stringr::str_count(data[[coordinate_column]],"\\.")),na.rm=TRUE)+1
-            coordinate_matrix <- stringr::str_split_fixed(data[[coordinate_column]],"\\.",coordinate_parts)
+          if (is.null(coordinate_lookup)) {
+            coordinates <- data[[coordinate_column]]
+            unique_coordinates <- unique(coordinates)
+            coordinate_parts <- max(c(0,stringr::str_count(unique_coordinates,"\\.")),na.rm=TRUE)+1
+            coordinate_lookup <- list(matrix=stringr::str_split_fixed(unique_coordinates,"\\.",coordinate_parts),
+                                      index=match(coordinates,unique_coordinates))
           }
-          data$`...id` <- coordinate_matrix[,dimension_id]
+          data$`...id` <- coordinate_lookup$matrix[coordinate_lookup$index,dimension_id]
 
           data <- data %>%
             select(-all_of(field)) %>%
