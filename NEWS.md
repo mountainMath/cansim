@@ -29,6 +29,15 @@
   label would have become `NA`. Labels are now also identical whichever way the data is retrieved, so
   a table can be joined to template, vector or coordinate data on its dimension columns (#169)
 
+* cached tables now record the package version they were parsed under, next to the download timestamp
+  that already records how old the data is. The timestamp says whether StatCan has newer data, it says
+  nothing about whether the package has since changed how it reads that data. `list_cansim_cached_tables()`
+  reports it in a new `cansimVersion` column, empty for anything cached before this release.
+  `get_cansim_connection()` uses it to check whether a cache predates the repair of non-breaking spaces
+  and control characters, and if so reads the metadata cached alongside the table to see whether its
+  dimension names or member labels actually carry any. Only then does it warn, naming the offending
+  label and pointing at `refresh=TRUE` (#169)
+
 ## Deprecations
 * `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now
   also documented as deprecated, matching the deprecation warnings they already emit. Use

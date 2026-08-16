@@ -127,6 +127,56 @@ repair_statcan_dimension_values <- function(data,dimension_names,cleaned_languag
   data
 }
 
+# A cached table holds whatever the parser of the day wrote into it. The download timestamp says
+# whether StatCan has newer data, it says nothing about whether the package has since changed how it
+# reads that data, so the version that did the parsing is recorded alongside it.
+CACHE_VERSION_SUFFIX <- "_version"
+
+# non-breaking spaces and control characters in column names and member labels are repaired as of
+# this version, anything cached before it still carries the characters StatCan sent
+VALUE_REPAIR_VERSION <- package_version("0.4.5")
+
+write_cache_version <- function(meta_base_path) {
+  tryCatch(
+    saveRDS(as.character(utils::packageVersion("cansim")),paste0(meta_base_path,CACHE_VERSION_SUFFIX)),
+    error = function(e) warning("Failed to save cache version: ", e$message)
+  )
+}
+
+# The marker itself only arrived in 0.4.5, so a cache that has none was built before that. Returns
+# `NULL` in that case rather than a version, the caller decides what an unmarked cache means.
+read_cache_version <- function(cache_dir) {
+  version_file <- dir(cache_dir,paste0("\\.Rda",CACHE_VERSION_SUFFIX,"$"))
+  if (length(version_file)!=1) return(NULL)
+  tryCatch(package_version(readRDS(file.path(cache_dir,version_file))),error=function(e) NULL)
+}
+
+cache_predates_value_repair <- function(cache_dir) {
+  version <- read_cache_version(cache_dir)
+  is.null(version) || version < VALUE_REPAIR_VERSION
+}
+
+# The dimension names and member labels cached with an old table carry the same unrepaired characters
+# as its data, so they are what an old cache can be checked against. The footnotes and the table title
+# are not looked at, a line feed inside a footnote is part of the text rather than a defect.
+CACHE_METADATA_LABEL_PATTERN <- "\\.Rda2$|\\.Rda_column_"
+
+# The names and labels the cached metadata holds that the repair would change. Reading them back is
+# what tells us whether a cache that predates the repair is actually affected, most tables are not.
+stale_cached_labels <- function(cache_dir) {
+  files <- dir(cache_dir,CACHE_METADATA_LABEL_PATTERN,full.names=TRUE)
+  labels <- lapply(files, function(file) {
+    tryCatch({
+      meta <- readRDS(file)
+      values <- c(names(meta),unlist(lapply(meta, function(column) {
+        if (is.factor(column)) levels(column) else if (is.character(column)) unique(column) else NULL
+      }),use.names=FALSE))
+      values[!is.na(values) & values!=repair_statcan_strings(values)]
+    }, error=function(e) character(0))
+  })
+  unique(unlist(labels,use.names=FALSE))
+}
+
 cleaned_ndm_table_number <- function(cansimTableNumber){
   if (is.numeric(cansimTableNumber)) {
     warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",

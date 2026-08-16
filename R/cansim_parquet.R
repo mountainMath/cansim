@@ -269,6 +269,9 @@ get_cansim_connection <- function(cansimTableNumber,
       error = function(e) warning("Failed to save cache timestamp: ", e$message)
     )
 
+    # the timestamp says how old the data is, this says how old the parsing of it is
+    write_cache_version(meta_base_path)
+
 
   } else {
     if (!has_last_downloaded) message(paste0("Could not access the date table ",cleaned_number," was cached."))
@@ -321,6 +324,10 @@ get_cansim_connection <- function(cansimTableNumber,
     }
 
 
+    # the version marker sits next to the metadata, a cache that has none was built before 0.4.5
+    stale_cache <- cache_predates_value_repair(meta_dir_name)
+    stale_labels <- if (stale_cache) stale_cached_labels(meta_dir_name) else character(0)
+
     meta_base_path <- table_base_path(cansimTableNumber)
     for (f in meta_files) file.copy(file.path(meta_dir_name,f),file.path(meta_base_path,f))
   }
@@ -358,18 +365,28 @@ get_cansim_connection <- function(cansimTableNumber,
   attr(con,"language") <- cleaned_language
   attr(con,"cansimTableNumber") <- cansimTableNumber
 
-  # Column names are baked into the cached files, so a table cached before these characters were
-  # repaired keeps them until it is downloaded again.
+  # Names and labels are baked into the cached files, so a table cached before these characters were
+  # repaired keeps them until it is downloaded again. The cached metadata says whether this table is
+  # one of the affected ones, most are not, and it carries the same characters as the data next to it.
   cached_names <- tryCatch(if (inherits(con,"tbl_lazy")) colnames(con) else names(con),
                            error=function(e) character(0))
   stale_names <- cached_names[cached_names!=repair_statcan_strings(cached_names)]
-  if (length(stale_names)>0 && !isTRUE(getOption("cansim.suppress_repair_warnings"))) {
-    example <- stale_names[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
-    warning("The cached copy of table ",cleaned_number," has ",length(stale_names)," column name",
-            ifelse(length(stale_names)==1,"","s")," containing non-breaking spaces or control ",
-            "characters, for example \"",example,"\". These cannot be typed or copy-pasted. The ",
-            "cache predates the automatic repair of these characters, pass `refresh=TRUE` to ",
-            "download the table again and fix the names.",
+  stale_labels <- setdiff(stale_labels,stale_names)
+  if (stale_cache && (length(stale_names)>0 || length(stale_labels)>0) &&
+      !isTRUE(getOption("cansim.suppress_repair_warnings"))) {
+    cached_version <- read_cache_version(dirname(db_path))
+    example <- c(stale_names,stale_labels)[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
+    warning("The cached copy of table ",cleaned_number," was built by cansim ",
+            ifelse(is.null(cached_version),"0.4.4 or earlier",as.character(cached_version)),
+            ", before non-breaking spaces and control characters were repaired, and it has ",
+            ifelse(length(stale_names)>0,paste0(length(stale_names)," column name",
+                                                ifelse(length(stale_names)==1,"","s"),
+                                                ifelse(length(stale_labels)>0," and ","")),""),
+            ifelse(length(stale_labels)>0,paste0(length(stale_labels)," member label",
+                                                 ifelse(length(stale_labels)==1,"","s")),""),
+            " containing them, for example \"",example,"\". These cannot be typed or copy-pasted, ",
+            "and they do not match the same table retrieved by vector, coordinate or table template, ",
+            "which are repaired. Pass `refresh=TRUE` to download the table again and fix the cache.",
             call.=FALSE)
   }
 
@@ -671,13 +688,14 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
     dplyr::mutate(language=gsub("^cansim_\\d+_sqlite_|^cansim_\\d+_parquet_|^cansim_\\d+_feather_","",.data$path)) %>%
     dplyr::mutate(title=NA_character_,
                   timeCached=NA_character_,
+                  cansimVersion=NA_character_,
                   rawSize=NA_real_,
                   niceSize=NA_character_)
 
     if (nrow(result)>0) {
       result <- result %>%
-        dplyr::select("cansimTableNumber","language","dataFormat","timeCached","niceSize","rawSize",
-                      "title","path")
+        dplyr::select("cansimTableNumber","language","dataFormat","timeCached","cansimVersion",
+                      "niceSize","rawSize","title","path")
     }
 
   if (nrow(result)>0) {
@@ -714,10 +732,15 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
         title <- NA_character_
       }
 
-      list(timeCached = time_cached, rawSize = raw_size, title = title)
+      # the package version the cache was parsed under, absent for anything cached before 0.4.5
+      cansim_version <- read_cache_version(full_path)
+      cansim_version <- if (is.null(cansim_version)) NA_character_ else as.character(cansim_version)
+
+      list(timeCached = time_cached, rawSize = raw_size, title = title, cansimVersion = cansim_version)
     })
 
     result$timeCached <- do.call("c", lapply(cache_metadata, `[[`, "timeCached"))
+    result$cansimVersion <- vapply(cache_metadata, `[[`, character(1), "cansimVersion")
     result$rawSize <- vapply(cache_metadata, `[[`, numeric(1), "rawSize")
     result$niceSize <- vapply(result$rawSize, function(x) {
       if (is.na(x)) NA_character_ else format_file_size(x, "auto")
