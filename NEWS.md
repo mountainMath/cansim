@@ -39,6 +39,11 @@
   every row, a table repeats each coordinate once per reference period. On 36-10-0580 this is 6,882 unique
   coordinates against 996,978 rows, cutting a cached read from 4.5s to 4.0s
 * table templates are built with a single cartesian product instead of joining one dimension at a time
+* metadata for data retrieved by vector or by table/coordinate is now resolved for all coordinates at once.
+  The member table of each dimension used to be rebuilt for every single coordinate, which made this step
+  grow linearly at about 24ms per coordinate. Resolving 200 coordinates of 36-10-0580 went from 5.0s to
+  0.02s, and all 10,164 coordinates of that table now take 0.03s. Warnings about members missing from the
+  cube metadata are reported once per member rather than once per coordinate that uses it
 
 ## Minor changes
 * fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read

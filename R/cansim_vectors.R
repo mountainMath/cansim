@@ -41,9 +41,71 @@ extract_vector_data <- function(data1){
 }
 
 
+# The member table of a dimension, and with it the disambiguation of duplicated member names and the
+# resulting factor levels, is the same for every coordinate of a table. It is therefore built once per
+# dimension and all coordinates are looked up against it in a single pass, rather than rebuilding it
+# for every coordinate in turn.
 metadata_for_coordinates <- function(cansimTableNumber,coordinates,language) {
-  unique(coordinates) %>%
-    purrr::map_dfr(\(coord)metadata_for_coordinate(cansimTableNumber,coord,language)) %>%
+  cleaned_language <- cleaned_ndm_language(language)
+  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  coordinates <- unique(coordinates)
+
+  members <- get_cansim_cube_metadata(cansimTableNumber,type="members")
+  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, !!coordinate_column:=coordinates)
+
+  # without cube metadata the data still stands on its own, it just carries no dimension names
+  if (!is.null(members)) {
+    dimensions <- members %>% pull(.data$dimensionPositionId) %>% unique()
+
+    if (cleaned_language=="fra") {
+      members <- members %>%
+        select("dimensionPositionId","memberId",dimensionName="dimensionNameFr",memberName="memberNameFr")
+    } else {
+      members <- members %>%
+        select("dimensionPositionId","memberId",dimensionName="dimensionNameEn",memberName="memberNameEn")
+    }
+
+    data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+    geography_columns <- geography_colum_names(cleaned_language)
+
+    # split the coordinates once, the member ids of a dimension are then a column of this matrix
+    coordinate_parts <- max(c(0,stringr::str_count(coordinates,"\\.")),na.rm=TRUE)+1
+    coordinate_matrix <- stringr::str_split_fixed(coordinates,"\\.",coordinate_parts)
+
+    dimension_columns <- lapply(dimensions, function(dimension) {
+      dm <- members %>%
+        filter(.data$dimensionPositionId==dimension) %>%
+        mutate(n=n(),.by="memberName") %>%
+        mutate(nn=row_number(),.by="memberName") %>%
+        mutate(memberLevel=if_else(.data$n==1,.data$memberName,paste0(.data$memberName," (",.data$nn,")")))
+
+      position <- as.integer(dimension)
+      if (position<=ncol(coordinate_matrix)) {
+        member_ids <- coordinate_matrix[,position]
+        member_ids[is.na(member_ids) | member_ids==""] <- NA_character_
+      } else { # coordinates that are shorter than the cube has dimensions carry nothing for this one
+        member_ids <- rep(NA_character_,length(coordinates))
+      }
+
+      index <- match(member_ids,as.character(dm$memberId))
+      for (missing_id in unique(member_ids[is.na(index)])) {
+        warning("Could not find metadata for dimension ",unique(dm$dimensionName)," member ",missing_id,
+                " in table ",cansimTableNumber)
+      }
+      # a dimension no coordinate resolves against adds a column of nothing but NA
+      if (all(is.na(index))) return(NULL)
+
+      dn <- dm$dimensionName[1]
+      if (position==1 && (dn %in% geography_columns)) dn <- data_geography_column
+
+      tibble::tibble(!!dn:=factor(dm$memberLevel[index],levels=dm$memberLevel))
+    })
+
+    dimension_columns <- Filter(Negate(is.null),dimension_columns)
+    if (length(dimension_columns)>0) result <- bind_cols(c(list(result),dimension_columns))
+  }
+
+  result %>%
     add_uom_for_coordinates(cansimTableNumber,language)
 }
 
@@ -98,60 +160,6 @@ add_uom_for_coordinates <- function(data,cansimTableNumber,language) {
   data %>%
     mutate(!!uom_column:=uom_names,
            !!uom_id_column:=uom_ids)
-}
-
-metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
-  cleaned_language <- cleaned_ndm_language(language)
-  coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
-  members <- get_cansim_cube_metadata(cansimTableNumber,type="members")
-  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, !!coordinate_column:=coordinate)
-  # without cube metadata the data still stands on its own, it just carries no dimension names
-  if (is.null(members)) return(result)
-
-  coordinates <- coordinate %>% strsplit("\\.") %>% unlist()
-  dimensions <- members %>% pull(.data$dimensionPositionId) %>% unique()
-
-  if (cleaned_language=="fra") {
-    members <- members %>%
-      select("dimensionPositionId","memberId",dimensionName="dimensionNameFr",memberName="memberNameFr")
-  } else {
-    members <- members %>%
-      select("dimensionPositionId","memberId",dimensionName="dimensionNameEn",memberName="memberNameEn")
-  }
-
-  for (dimension in dimensions) {
-    member_pos <- coordinates[as.integer(dimension)]
-    dm<-members %>%
-      filter(.data$dimensionPositionId==dimension) %>%
-      mutate(n=n(),.by = "memberName") %>%
-      mutate(nn=row_number(),.by="memberName") %>%
-      mutate(memberLevel=if_else(.data$n==1,.data$memberName,paste0(.data$memberName," (",.data$nn,")")))
-
-    data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
-    geography_columns <- geography_colum_names(cleaned_language)
-
-    m<-dm %>%
-      filter(.data$memberId==member_pos)
-
-    if (nrow(m)==0) {
-      warning("Could not find metadata for dimension ",unique(dm$dimensionName)," member ",member_pos," in table ",cansimTableNumber)
-      next
-    }
-    if (dimension==1 && (m$dimensionName %in% geography_columns)) {
-      m$dimensionName <- data_geography_column
-    }
-
-    dn <- m$dimensionName
-
-    result_new <- m %>%
-      select("dimensionName","memberLevel") %>%
-      tidyr::pivot_wider(names_from="dimensionName",values_from="memberLevel") %>%
-      mutate(!!dn:=factor(!!as.name(dn),levels=dm$memberLevel))
-
-    result <- result %>%
-      bind_cols(result_new)
-  }
-  result
 }
 
 extract_vector_metadata <- function(data1){
