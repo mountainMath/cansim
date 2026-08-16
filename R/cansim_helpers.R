@@ -450,20 +450,24 @@ get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
                                           column = column,
                                           language = language)
 
-  # full level values from metadata
+  # full level values from metadata - combine mutates for efficiency
   level_table <- columns %>%
     select(...dim=!!as.name(dimension_id_column),
            ...id=!!as.name(member_id_column),
            ...name=!!as.name(member_name_column),
-           ...parent_id=!!as.name(parent_member_id_column)) %>%
-    mutate(...n=as.integer(.data$...id)) %>%
-    arrange("...n") %>%
-    select(-"...n") %>%
-    mutate(...count=n(),.by=c("...dim","...name")) %>%
-    mutate(...duplicated=.data$...count>1) %>%
-    mutate(...original=!.data$...duplicated) %>%
-    mutate(...original_name=.data$...name) %>%
-    mutate(...last_parent_id=.data$...parent_id)
+           ...parent_id=!!as.name(parent_member_id_column))
+
+  # Sort once using base R for efficiency
+  level_table <- level_table[order(as.integer(level_table$...id)), ]
+
+  # Compute duplicates in one pass
+  level_table <- level_table %>%
+    mutate(...count=n(),
+           ...duplicated=.data$...count>1,
+           ...original=.data$...count==1,
+           ...original_name=.data$...name,
+           ...last_parent_id=.data$...parent_id,
+           .by=c("...dim","...name"))
 
   fixed_level_table <- NULL
   # don't try to dedup census geographies, too messy
@@ -475,27 +479,26 @@ get_deduped_column_level_data <- function(cansimTableNumber,language,column) {
       filter(.data$...dim!="1")
   }
 
-  # try to dedup
+  # try to dedup - only if there are duplicates
   max_run <- 30
   while (sum(level_table$...duplicated)>0 && max_run>0) { # deals with 36-10-0580
     max_run <- max_run - 1
+    # Use join-based approach for deduplication as it handles dynamic parent chains efficiently
     level_table <- level_table %>%
       left_join(level_table %>% select("...id","...dim",...parent_name="...original_name",...new_parent_id="...last_parent_id"),
                 by=c("...last_parent_id"="...id","...dim"="...dim")) %>%
       mutate(...name=case_when(.data$...duplicated & is.na(.data$...parent_name) ~ paste0(.data$...name," [",.data$...id,"]"),
                                .data$...duplicated & !is.na(.data$...parent_name) ~  paste0(.data$...name," ==> ",.data$...parent_name),
-                              TRUE ~ .data$...name)) %>%
-      mutate(...last_parent_id=ifelse(.data$...duplicated,
-                                      .data$...new_parent_id,
-                                      .data$...last_parent_id)) %>%
-      mutate(...count=n(),.by=c("...dim","...name")) %>%
-      mutate(...duplicated=.data$...count>1) %>%
+                               TRUE ~ .data$...name),
+             ...last_parent_id=ifelse(.data$...duplicated, .data$...new_parent_id, .data$...last_parent_id)) %>%
+      mutate(...count=n(), ...duplicated=.data$...count>1, .by=c("...dim","...name")) %>%
       select(-any_of(c("...parent_name","...new_parent_id")))
-
   }
 
-  bind_rows(fixed_level_table,level_table) %>%
-    arrange("...dim") %>%
+  result <- bind_rows(fixed_level_table,level_table)
+  # Sort by dim and id for final output
+  result <- result[order(as.integer(result$...dim), as.integer(result$...id)), ]
+  result %>%
     select("...dim","...id","...name","...original","...original_name")
 }
 
