@@ -249,8 +249,35 @@ naked_ndm_table_number <- function(cansimTableNumber){
   as.character(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)))
 }
 
+# StatCan publishes in both languages and so do the people using this package, so a language can be
+# named in either one. Everything is folded to lower case and stripped of accents before it is
+# matched, which is what lets "Français", "francais" and "FRA" all name the same language.
+ACCENTED_LETTERS <- intToUtf8(c(0x00E0,0x00E1,0x00E2,0x00E3,0x00E4,0x00E5,0x00E7,0x00E8,0x00E9,
+                                0x00EA,0x00EB,0x00EE,0x00EF,0x00F4,0x00F6,0x00F9,0x00FB,0x00FC))
+UNACCENTED_LETTERS <- "aaaaaaceeeeiioouuu"
+
+ENGLISH_LANGUAGE_NAMES <- c("en","eng","engl","english","an","ang","angl","anglais","anglaise")
+FRENCH_LANGUAGE_NAMES <- c("fr","fre","fren","french","fra","fran","franc","francais","francaise")
+
+# Errors on anything it does not recognize rather than passing an NA on. An unrecognized language used
+# to travel as far as the name of a cache directory or the tail of a StatCan URL, where it surfaced as
+# a download failure or as a column that could not be found, neither of which points at the argument
+# that caused it. Vectors are allowed, `remove_cansim_cached_tables()` asks for both languages at once.
 cleaned_ndm_language <- function(language){
-  ifelse(tolower(language) %in% c("english","eng","en"),"eng",ifelse(tolower(language) %in% c("fra","french","fr"),"fra",NA))
+  normalized <- language %>% as.character() %>% trimws() %>% tolower() %>%
+    chartr(ACCENTED_LETTERS,UNACCENTED_LETTERS,.)
+  cleaned <- ifelse(normalized %in% ENGLISH_LANGUAGE_NAMES,"eng",
+                    ifelse(normalized %in% FRENCH_LANGUAGE_NAMES,"fra",NA_character_))
+
+  unknown <- unique(language[is.na(cleaned)])
+  if (length(unknown)>0) {
+    stop("Unknown language ",paste0('"',unknown,'"',collapse=", "),
+         '. Use "english" (or "en", "eng", "anglais") for English and ',
+         '"french" (or "fr", "fra", "francais") for French, case and accents are ignored.',
+         call.=FALSE)
+  }
+
+  cleaned
 }
 
 table_base_path <- function(cansimTableNumber) {
@@ -270,7 +297,6 @@ validate_single_table_number <- function(cansimTableNumber){
 file_path_for_table_language <- function(cansimTableNumber, language){
   validate_single_table_number(cansimTableNumber)
   language <- cleaned_ndm_language(language)
-  if (is.na(language)) stop(paste0("Unknown Lanaguage ",language),call.=FALSE)
   base_table <- naked_ndm_table_number(cansimTableNumber)
   file.path(paste0(base_table,"-",language))
 }

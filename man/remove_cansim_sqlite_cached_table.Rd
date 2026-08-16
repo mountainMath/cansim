@@ -13,8 +13,8 @@ remove_cansim_sqlite_cached_table(
 \arguments{
 \item{cansimTableNumber}{Number of the table to be removed}
 
-\item{language}{Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages
-will be removed}
+\item{language}{Language for which to remove the cached data, named as in \code{get_cansim()}. If
+unspecified (`NULL`) tables for all languages will be removed}
 
 \item{cache_path}{Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`}
 }

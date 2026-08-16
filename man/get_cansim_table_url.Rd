@@ -4,12 +4,12 @@
 \alias{get_cansim_table_url}
 \title{Retrieve a Statistics Canada data table URL given a table number}
 \usage{
-get_cansim_table_url(cansimTableNumber, language = "en")
+get_cansim_table_url(cansimTableNumber, language = "english")
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 }
 \value{
 String object containing URL for specified table number

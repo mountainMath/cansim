@@ -23,7 +23,7 @@ get_cansim_data_for_table_coord_periods(
 Alternatively this can be specified by
 coordinate if tableCoordinates is a data frame, this argument will be ignored if that data frame as a "periods" column.}
 
-\item{language}{\code{"eng"} or \code{"english"} for English and \code{"fra"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 

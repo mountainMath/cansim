@@ -13,7 +13,7 @@ get_cansim_table_template(
 \arguments{
 \item{cansimTableNumber}{A new or old CANSIM/NDM table number or a vector of table numbers}
 
-\item{language}{Language for the dimension and member names, either "eng" or "fra"}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{refresh}{Refresh the data from the Statistics Canada API}
 }

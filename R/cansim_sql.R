@@ -12,7 +12,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' if the cached table is out of date.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param auto_refresh (Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
@@ -103,8 +103,8 @@ list_cansim_sqlite_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE
 #' `remove_cansim_cached_tables(..., format="sqlite")` instead.
 #'
 #' @param cansimTableNumber Number of the table to be removed
-#' @param language Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages
-#' will be removed
+#' @param language Language for which to remove the cached data, named as in \code{get_cansim()}. If
+#' unspecified (`NULL`) tables for all languages will be removed
 #' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`
 #' @return `NULL``
 #'

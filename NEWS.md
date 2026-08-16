@@ -63,6 +63,14 @@
   cube metadata are reported once per member rather than once per coordinate that uses it
 
 ## Minor changes
+* an unrecognized `language` argument is now an error naming what was passed, instead of an `NA` that
+  travelled on into a cache directory name or the tail of a StatCan URL and surfaced later as a
+  download failure or a missing column. Either language can be named in either language, so
+  `"english"`, `"en"`, `"eng"` and `"anglais"` all select English and `"french"`, `"fr"`, `"fra"` and
+  `"français"` all select French, along with their longer and shorter forms; case, surrounding
+  whitespace and accents are ignored. `get_cansim_table_url()` and `get_cansim_table_notes()` now
+  default to `"english"` like every other function that takes a language, which selects the same
+  language their previous `"en"` default did (#152)
 * fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read
 * fix `get_cansim_changed_tables()` passing "days" to `difftime()` as a time zone instead of a unit
 * `get_cansim_connection()` no longer fails when the release date of a table cannot be determined, the

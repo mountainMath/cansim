@@ -411,7 +411,7 @@ NULL
 #' Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
@@ -554,7 +554,7 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 #' Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -613,7 +613,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' Returns table survey detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -646,7 +646,7 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -683,7 +683,7 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -731,7 +731,7 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #' Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -778,7 +778,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param column the specified column for which to retrieve category information for
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -852,7 +852,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
 #' Prints table overview information as console output. In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @return none
@@ -977,7 +977,7 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' Retrieve URL of a table from the API given a table number. Offers a more stable approach than manually guessing the URL of the table.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #'
 #' @return String object containing URL for specified table number
 #'
@@ -988,7 +988,7 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' get_cansim_table_url("34-10-0013", language = "fr")
 #' }
 #' @export
-get_cansim_table_url <- function(cansimTableNumber, language = "en"){
+get_cansim_table_url <- function(cansimTableNumber, language = "english"){
   validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   l <- cleaned_ndm_language(language) %>% substr(1,2)
@@ -1059,7 +1059,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
@@ -1071,7 +1071,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #' get_cansim_table_notes("34-10-0013")
 #' }
 #' @export
-get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE, timeout = 200) {
+get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=FALSE, timeout = 200) {
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
   dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")

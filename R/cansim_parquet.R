@@ -6,7 +6,7 @@
 #' and emit a warning message if the cached table is out of date.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
 #' @param partitioning (Optional) Partition columns to use for parquet or feather formats.
 #' @param refresh (Optional) Valid options are \code{FALSE} (the default), \code{TRUE}, and \code{"auto"}. When set
@@ -478,7 +478,7 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
 #' Repartitions and already downloaded and cached parquet or feather dataset
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param format (Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).
 #' @param new_partitioning (Optional) Partition columns to use for parquet or feather formats.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
@@ -761,7 +761,7 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
 #' @param cansimTableNumber Vector of the table(s) to be removed, or a (filtered) table as returned by `list_cansim_cached_tables`
 #' with the list of tables to be removed.
 #' @param format Format of cache to remove, possible values are `"parquet"`, `"feather"` or `"sqlite"` or a subset of these (the default is all of these)
-#' @param language Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages will be removed.
+#' @param language Language for which to remove the cached data, named as in \code{get_cansim()}. If unspecified (`NULL`) tables for all languages will be removed.
 #' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`
 #' @return `NULL``
 #'
