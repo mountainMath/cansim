@@ -1,6 +1,10 @@
 # cansim 0.4.5
 ## Minor changes
 * better connection error handling
+* fix `get_cansim_cube_metadata()` and `get_cansim_table_template()` for vectors of table numbers, metadata for
+  all tables is still retrieved in a single API call and cached per table
+* `get_cansim_cube_metadata()` adds a `cansimTableNumber` column for the "members", "notes" and "corrections" types
+* functions that only operate on a single table now fail with an informative message when given several table numbers
 
 # cansim 0.4.4
 ## Minor changes

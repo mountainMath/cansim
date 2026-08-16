@@ -39,7 +39,18 @@ table_base_path <- function(cansimTableNumber) {
   file.path(tempdir(),paste0("cansim_",naked_ndm_table_number(cansimTableNumber)))
 }
 
+# several functions only operate on a single table, guard against silently
+# processing just the first entry when a vector of table numbers is passed
+validate_single_table_number <- function(cansimTableNumber){
+  if (length(cansimTableNumber)>1) {
+    stop("This function only accepts a single table number, but ",length(cansimTableNumber),
+         " table numbers were given.",call.=FALSE)
+  }
+  invisible(cansimTableNumber)
+}
+
 file_path_for_table_language <- function(cansimTableNumber, language){
+  validate_single_table_number(cansimTableNumber)
   language <- cleaned_ndm_language(language)
   if (is.na(language)) stop(paste0("Unknown Lanaguage ",language),call.=FALSE)
   base_table <- naked_ndm_table_number(cansimTableNumber)
@@ -47,6 +58,7 @@ file_path_for_table_language <- function(cansimTableNumber, language){
 }
 
 base_path_for_table_language <- function(cansimTableNumber, language,base_dir = NULL){
+  validate_single_table_number(cansimTableNumber)
   if (is.null(base_dir)) {
     base_dir <- table_base_path(cansimTableNumber)
   }

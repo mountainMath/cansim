@@ -33,7 +33,6 @@ Imports: digest (>= 0.6),
     RSQLite (>= 2.3),
     utils (>= 4.3),
     dbplyr (>= 2.5)
-RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,
@@ -45,3 +44,4 @@ BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr
 Language: en-CA
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

@@ -41,7 +41,7 @@ if the cached table is out of date.
 con <- get_cansim_connection("34-10-0013", format="sqlite")
 
 # Work with the data connection
-gplimpse(con)
+glimpse(con)
 
 disconnect_cansim_sqlite(con)
 }

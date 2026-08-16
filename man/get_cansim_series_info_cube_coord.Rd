@@ -12,7 +12,7 @@ get_cansim_series_info_cube_coord(
 )
 }
 \arguments{
-\item{cansimTableNumber}{A new or old CANSIM/NDM table number or a vector of table numbers}
+\item{cansimTableNumber}{A new or old CANSIM/NDM table number, coordinates are specific to a single table}
 
 \item{coordinates}{A vector of coordinates}
 
@@ -21,13 +21,13 @@ get_cansim_series_info_cube_coord(
 \item{refresh}{Refresh the data from the Statistics Canada API}
 }
 \value{
-a tibble containing the table template
+a tibble containing the series information for the given coordinates
 }
 \description{
 Retrieves series information by coordinates
 }
 \examples{
 \dontrun{
-get_cansim_table_template("34-10-0013")
+get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
 }
 }

@@ -154,7 +154,9 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
 #' @param type Which type of metadata to get, options are "overview", "members", "notes", or "corrections".
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table metadata
+#' @return a tibble containing the table metadata. When several table numbers are given, the metadata for
+#' all tables is retrieved in a single API call and the results are stacked. Types other than "overview" carry
+#' no table identifier of their own, for those a `cansimTableNumber` column is added to identify the table.
 #'
 #' @examples
 #' \dontrun{
@@ -166,37 +168,69 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   if (!(type %in% c("overview", "members", "notes", "corrections"))) {
     stop("type must be one of 'overview', 'members', 'notes', or 'corrections'",call.=FALSE)
   }
-  tmp_base <- table_base_path(cansimTableNumber)
-  if (!dir.exists(tmp_base)) dir.create(tmp_base)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-  tmp <- file.path(tmp_base, paste0(cansimTableNumber,"_metadata", ".Rda"))
-  if (!file.exists(tmp) || refresh) {
-    table_id <- naked_ndm_table_number(cansimTableNumber)
-    url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
-    response <- httr::POST(url,
-                           #body=jsonlite::toJSON(list("productId"=table_id),auto_unbox =TRUE),
-                           body=paste0("[",paste(paste0('{"productId":',table_id,'}'),collapse = ", "),"]"),
-                           encode="json",
-                           httr::add_headers("Content-Type"="application/json")
-    )
-    if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-    }
-    data <- httr::content(response)
-    data1 <- Filter(function(x)x$status=="SUCCESS",data)
-    data2 <- Filter(function(x)x$status!="SUCCESS",data)
-    if (length(data2)>0) {
-      message(paste0("Failed to load metadata for ",length(data2)," tables "))
-      data2 %>% purrr::map(function(x){
-        message(x$object)
-      })
-    }
-    d <- data[[1]]$object
-    saveRDS(data1, tmp)
+
+  # metadata for all tables not yet cached is downloaded in a single API call
+  download_cube_metadata(cansimTableNumber, refresh=refresh)
+
+  result <- cansimTableNumber %>%
+    rlang::set_names() %>%
+    purrr::map(\(t)cube_metadata_for_table(t, type=type, refresh=refresh))
+
+  if (type=="overview") {
+    dplyr::bind_rows(result)
   } else {
-    data1 <- readRDS(tmp)
+    # member, footnote and correction metadata carry no table identifier of their own
+    dplyr::bind_rows(result, .id="cansimTableNumber")
   }
-  d <- data1[[1]]$object
+}
+
+cube_metadata_path <- function(cansimTableNumber){
+  file.path(table_base_path(cansimTableNumber),
+            paste0(cleaned_ndm_table_number(cansimTableNumber),"_metadata",".Rda"))
+}
+
+# Downloads cube metadata for one or several tables in a single API call, caching the
+# response for each table separately so that later calls can reuse individual tables.
+download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
+  needed <- cansimTableNumber[refresh | !file.exists(cube_metadata_path(cansimTableNumber))]
+  if (length(needed)==0) return(invisible(NULL))
+
+  purrr::walk(table_base_path(needed),\(p)if (!dir.exists(p)) dir.create(p,recursive=TRUE))
+
+  table_ids <- naked_ndm_table_number(needed)
+  url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
+  response <- httr::POST(url,
+                         body=paste0("[",paste(paste0('{"productId":',table_ids,'}'),collapse = ", "),"]"),
+                         encode="json",
+                         httr::add_headers("Content-Type"="application/json")
+  )
+  if (response$status_code!=200) {
+    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
+  }
+  data <- httr::content(response)
+  data1 <- Filter(function(x)x$status=="SUCCESS",data)
+  data2 <- Filter(function(x)x$status!="SUCCESS",data)
+  if (length(data2)>0) {
+    message(paste0("Failed to load metadata for ",length(data2)," tables "))
+    purrr::walk(data2,\(x)message(x$object))
+  }
+
+  downloaded <- purrr::map_chr(data1,\(x)cleaned_ndm_table_number(as.character(x$object$productId)))
+  purrr::walk2(data1,downloaded,\(d,tn)saveRDS(list(d), cube_metadata_path(tn)))
+
+  failed <- setdiff(needed,downloaded)
+  if (length(failed)>0) {
+    stop("Could not retrieve metadata for table",ifelse(length(failed)>1,"s ", " "),
+         paste0(failed,collapse=", "),call.=FALSE)
+  }
+
+  invisible(NULL)
+}
+
+cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=FALSE){
+  tmp_base <- table_base_path(cansimTableNumber)
+  d <- readRDS(cube_metadata_path(cansimTableNumber))[[1]]$object
 
 
   meta1_path <- file.path(tmp_base, paste0(cansimTableNumber, "_cubemeta1.Rda"))
@@ -337,7 +371,9 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 #' @param language Language for the dimension and member names, either "eng" or "fra"
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table template
+#' @return a tibble containing the table template, with a `cansimTableNumber` column identifying the table.
+#' When several table numbers are given, the templates are stacked and columns for dimensions that only appear
+#' in some of the tables are filled with `NA` for the other tables.
 #'
 #' @examples
 #' \dontrun{
@@ -346,10 +382,24 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 #' @export
 get_cansim_table_template <- function(cansimTableNumber, language="english",refresh=FALSE){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-  member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
-
   language <- cleaned_ndm_language(language)
 
+  # member metadata for all tables is retrieved in a single API call
+  member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
+
+  result <- cansimTableNumber %>%
+    purrr::map(\(tn)table_template_for_members(member_info %>% filter(.data$cansimTableNumber==tn),
+                                               tn, language)) %>%
+    dplyr::bind_rows()
+
+  attr(result, "cansimTableNumber") <- cansimTableNumber
+  attr(result, "language") <- language
+
+  result
+}
+
+# builds the template for a single table from its member metadata
+table_template_for_members <- function(member_info, cansimTableNumber, language){
   if (language=="fra") {
     member_info <- member_info %>%
       select("dimensionPositionId",dimensionName="dimensionNameFr","memberId",memberName="memberNameFr",
@@ -385,14 +435,9 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
       select(-any_of("memberId"))
   }
 
-  result <- result %>%
+  result %>%
     select(-any_of("...link")) %>%
     mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
-
-  attr(result, "cansimTableNumber") <- cansimTableNumber
-  attr(result, "language") <- language
-
-  result
 }
 
 
@@ -400,19 +445,23 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
 #'
 #' Retrieves series information by coordinates
 #'
-#' @param cansimTableNumber A new or old CANSIM/NDM table number or a vector of table numbers
+#' @param cansimTableNumber A new or old CANSIM/NDM table number, coordinates are specific to a single table
 #' @param coordinates A vector of coordinates
 #' @param timeout Timeout for the API call
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table template
+#' @return a tibble containing the series information for the given coordinates
 #'
 #' @examples
 #' \dontrun{
-#' get_cansim_table_template("34-10-0013")
+#' get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
 #' }
 #' @export
 get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, timeout=1000, refresh=FALSE){
+  if (length(cansimTableNumber)!=1) {
+    stop("Coordinates are specific to a single table, `cansimTableNumber` needs to be a single table number.",
+         call.=FALSE)
+  }
 
   productId <- naked_ndm_table_number(cansimTableNumber)
 

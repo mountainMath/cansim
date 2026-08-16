@@ -897,6 +897,7 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
 #' @export
 view_cansim_webpage <- function(cansimTableNumber = NULL){
   browser <- getOption("browser")
+  if (!is.null(cansimTableNumber)) validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- tolower(cansimTableNumber)
 
   if (is.null(cansimTableNumber)) {
@@ -929,6 +930,7 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' }
 #' @export
 get_cansim_table_url <- function(cansimTableNumber, language = "en"){
+  validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
@@ -1084,6 +1086,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' }
 #' @export
 get_cansim_table_last_release_date <- function(cansimTableNumber){
+  validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   pid <- paste0(naked_ndm_table_number(cansimTableNumber),"01")
   url <- "https://www150.statcan.gc.ca/n1/en/metadata.json"
