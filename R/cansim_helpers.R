@@ -251,12 +251,12 @@ naked_ndm_table_number <- function(cansimTableNumber){
 
 # StatCan publishes in both languages and so do the people using this package, so a language can be
 # named in either one. Everything is folded to lower case and stripped of accents before it is
-# matched, which is what lets "Français", "francais" and "FRA" all name the same language.
+# matched, which is what lets "Francais", accented or not, and "FRA" all name the same language.
 ACCENTED_LETTERS <- intToUtf8(c(0x00E0,0x00E1,0x00E2,0x00E3,0x00E4,0x00E5,0x00E7,0x00E8,0x00E9,
                                 0x00EA,0x00EB,0x00EE,0x00EF,0x00F4,0x00F6,0x00F9,0x00FB,0x00FC))
 UNACCENTED_LETTERS <- "aaaaaaceeeeiioouuu"
 
-ENGLISH_LANGUAGE_NAMES <- c("en","eng","engl","english","an","ang","angl","anglais","anglaise")
+ENGLISH_LANGUAGE_NAMES <- c("en","eng","engl","english","ang","angl","anglais","anglaise")
 FRENCH_LANGUAGE_NAMES <- c("fr","fre","fren","french","fra","fran","franc","francais","francaise")
 
 # Errors on anything it does not recognize rather than passing an NA on. An unrecognized language used

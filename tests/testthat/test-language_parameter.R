@@ -7,6 +7,9 @@ test_that("both languages are named in either language", {
                "anglais","Anglais","anglaise","ang","angl"," english ")
   for (name in english) expect_equal(cansim:::cleaned_ndm_language(name), "eng", info=name)
 
+  # "an" is not among them, every two letter form the package takes is an ISO 639-1 code
+  expect_error(cansim:::cleaned_ndm_language("an"), "Unknown language")
+
   french <- c("french","French","FRENCH","fr","FR","fra","fren",
               "francais","Francais","francaise","franc","fran"," french ")
   for (name in french) expect_equal(cansim:::cleaned_ndm_language(name), "fra", info=name)
