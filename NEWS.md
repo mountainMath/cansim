@@ -1,4 +1,10 @@
 # cansim 0.4.5
+## Major changes
+* data retrieved by vector or by table/coordinate now carries `UOM` and `UOM_ID` columns, taken from the
+  cube metadata. StatCan flags a single dimension of each cube as carrying the unit of measure and the unit
+  varies by member of that dimension, so the unit is resolved per coordinate. Tables that have no unit of
+  measure, for example census tables, get no unit columns, matching the full table download (#170)
+
 ## Deprecations
 * `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now
   also documented as deprecated, matching the deprecation warnings they already emit. Use
@@ -15,6 +21,8 @@
 
 ## Minor changes
 * fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read
+* the unit of measure columns of French language tables are now ordered with the other value columns,
+  as they already were in English language tables
 * better connection error handling
 * fix `get_cansim_cube_metadata()` and `get_cansim_table_template()` for vectors of table numbers, metadata for
   all tables is still retrieved in a single API call and cached per table

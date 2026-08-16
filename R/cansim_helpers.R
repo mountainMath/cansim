@@ -515,6 +515,7 @@ standardize_cansim_column_order <- function(data) {
   scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
   uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  uom_id_string=ifelse(language=="fra",paste0("IDENTIFICATEUR D'UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM_ID")
   classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
   hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -523,7 +524,7 @@ standardize_cansim_column_order <- function(data) {
 
   standard_order1 <- intersect(c("REF_DATE",date_field,"Date","REF_DATE2",data_geography_column,"DGUID","GeoUID") %>%
                                  unique(),names(data))
-  standard_order2 <- intersect(c(value_string,"val_norm","UOM","UOM_ID",scale_string2,scale_string,"VECTOR","cansimTableNumber",coordinate_column,
+  standard_order2 <- intersect(c(value_string,"val_norm",uom_string,uom_id_string,scale_string2,scale_string,"VECTOR","cansimTableNumber",coordinate_column,
                                  "STATUS","SYMBOL","releaseTime","frequencyCode",
                                  "TERMINATED","DECIMALS"), names(data))
   standard_order3 <- names(data)[grepl(paste0("^",hierarchy_prefix,"|^",classification_prefix),names(data))]
@@ -542,10 +543,11 @@ column_names_for_language <- function(language) {
   scale_string <- ifelse(language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
   scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
   uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  uom_id_string=ifelse(language=="fra",paste0("IDENTIFICATEUR D'UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM_ID")
   coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
   data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
   column_names <- c(date_field,classification_code_column,value_string,scale_string,scale_string2,
-                    uom_string,coordinate_column,data_geography_column)
+                    uom_string,uom_id_string,coordinate_column,data_geography_column)
   column_names
 }
 

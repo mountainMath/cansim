@@ -43,7 +43,61 @@ extract_vector_data <- function(data1){
 
 metadata_for_coordinates <- function(cansimTableNumber,coordinates,language) {
   unique(coordinates) %>%
-    purrr::map_dfr(\(coord)metadata_for_coordinate(cansimTableNumber,coord,language))
+    purrr::map_dfr(\(coord)metadata_for_coordinate(cansimTableNumber,coord,language)) %>%
+    add_uom_for_coordinates(cansimTableNumber,language)
+}
+
+# StatCan flags a single dimension of each cube as carrying the unit of measure, the unit itself
+# varies by member of that dimension. The member id at the matching position of the coordinate
+# therefore determines the unit, and the "uom" code set resolves that code to a name. This is done
+# for all coordinates of a table at once so the cube metadata and the code set are only consulted once.
+add_uom_for_coordinates <- function(data,cansimTableNumber,language) {
+  cleaned_language <- cleaned_ndm_language(language)
+  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+  uom_column <- ifelse(cleaned_language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
+  uom_id_column <- ifelse(cleaned_language=="fra",paste0("IDENTIFICATEUR D'UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM_ID")
+
+  # never overwrite a unit of measure that is already present, including a dimension that happens
+  # to carry the same name as the unit columns
+  if (nrow(data)==0 || !(coordinate_column %in% names(data)) ||
+      uom_column %in% names(data) || uom_id_column %in% names(data)) return(data)
+
+  members <- tryCatch(get_cansim_cube_metadata(cansimTableNumber,type="members"),
+                      error=function(e) NULL, warning=function(w) NULL)
+  if (is.null(members) || !all(c("hasUom","memberUomCode","dimensionPositionId","memberId") %in% names(members))) {
+    return(data)
+  }
+
+  uom_members <- members %>% filter(.data$hasUom)
+  uom_position <- unique(as.integer(uom_members$dimensionPositionId))
+  if (nrow(uom_members)==0 || length(uom_position)!=1 || is.na(uom_position)) return(data)
+
+  coordinates <- pull(data,coordinate_column)
+  coordinate_parts <- max(c(0,stringr::str_count(coordinates,"\\.")),na.rm=TRUE)+1
+  # coordinates that do not reach the unit dimension carry no unit information
+  if (coordinate_parts<uom_position) return(data)
+  member_ids <- stringr::str_split_fixed(coordinates,"\\.",coordinate_parts)[,uom_position]
+
+  code_lookup <- rlang::set_names(as.character(uom_members$memberUomCode),
+                                  as.character(uom_members$memberId))
+  uom_ids <- unname(code_lookup[member_ids])
+  # StatCan uses code 0 to mark members that have no unit of measure
+  uom_ids[!is.na(uom_ids) & uom_ids=="0"] <- NA_character_
+
+  if (all(is.na(uom_ids))) return(data)
+
+  uom_names <- rep(NA_character_,length(uom_ids))
+  uom_codes <- tryCatch(get_cansim_code_set("uom"), error=function(e) NULL)
+  if (!is.null(uom_codes)) {
+    uom_name_column <- ifelse(cleaned_language=="fra","memberUomFr","memberUomEn")
+    name_lookup <- rlang::set_names(as.character(uom_codes[[uom_name_column]]),
+                                    as.character(uom_codes$memberUomCode))
+    uom_names <- unname(name_lookup[uom_ids])
+  }
+
+  data %>%
+    mutate(!!uom_column:=uom_names,
+           !!uom_id_column:=uom_ids)
 }
 
 metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
