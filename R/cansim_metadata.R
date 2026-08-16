@@ -412,31 +412,30 @@ table_template_for_members <- function(member_info, cansimTableNumber, language)
   dimensions <- member_info %>%
     select("dimensionPositionId", "dimensionName") %>%
     unique() %>%
-    arrange("dimensionPositionId")
+    arrange(.data$dimensionPositionId)
 
-  result <- tibble(...link="link",COORDINATE="")
+  # member names and ids per dimension, in dimension position order
+  dim_data <- seq_len(nrow(dimensions)) %>%
+    lapply(function(i) {
+      dim_name <- dimensions$dimensionName[i]
+      member_info %>%
+        filter(.data$dimensionPositionId==dimensions$dimensionPositionId[i]) %>%
+        select("memberId", "memberName") %>%
+        unique() %>%
+        rename(!!dim_name:="memberName") %>%
+        select(!!dim_name, !!paste0("...mid",i):="memberId")
+    })
 
-  for (i in seq_len(nrow(dimensions))) {
-    dim <- dimensions[i,]
-    dim_name <- dim$dimensionName
-    member <- member_info %>%
-      filter(.data$dimensionPositionId==dim$dimensionPositionId) %>%
-      select("memberId", "memberName") %>%
-      unique() %>%
-      arrange("memberId") %>%
-      rename(!!dim_name:="memberName") %>%
-      mutate(...link="link")
+  # the cartesian product over all dimensions in one step, last dimension varying fastest
+  result <- do.call(tidyr::expand_grid, dim_data)
 
-    result <- result %>%
-      full_join(member, by="...link",
-                relationship = "many-to-many") %>%
-      mutate(COORDINATE=ifelse(.data$COORDINATE=="", .data$memberId, paste0(.data$COORDINATE, ".", .data$memberId))) %>%
-      select(-any_of("memberId"))
-  }
+  member_id_columns <- paste0("...mid",seq_len(nrow(dimensions)))
 
   result %>%
-    select(-any_of("...link")) %>%
-    mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
+    mutate(cansimTableNumber=!!cansimTableNumber,
+           COORDINATE=do.call(paste, c(unname(as.list(result[member_id_columns])), sep=".")),
+           .before=1) %>%
+    select(-any_of(member_id_columns))
 }
 
 
