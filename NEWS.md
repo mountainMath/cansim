@@ -10,12 +10,10 @@
   they are checked rather than merely displayed. Examples that download a full table or the cube list
   stay `\dontrun{}` because of their run time, and `cansim_old_to_new()` needs no network at all so its
   example now always runs
-
 * data retrieved by vector or by table/coordinate now carries `UOM` and `UOM_ID` columns, taken from the
   cube metadata. StatCan flags a single dimension of each cube as carrying the unit of measure and the unit
   varies by member of that dimension, so the unit is resolved per coordinate. Tables that have no unit of
   measure, for example census tables, get no unit columns, matching the full table download (#170)
-
 * non-breaking spaces and control characters in names returned by StatCan are now replaced with regular
   spaces. These characters render as an ordinary space or as nothing at all, so a column whose name
   contained one could not be reached by typing or copy-pasting what the console displayed. The repair
