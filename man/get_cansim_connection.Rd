@@ -36,6 +36,8 @@ in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Othe
 \value{
 A database connection to a local parquet, feather, or sqlite database with the StatCan Table data. The data
 frames after calling `collect()` or `collect_and_normalize()` are identical up to possibly different row order.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves a data table using an NDM catalogue number as parquet, feather, or SQLite database connection. Retrieved table data is

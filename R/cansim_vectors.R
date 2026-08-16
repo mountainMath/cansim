@@ -104,9 +104,12 @@ metadata_for_coordinate <- function(cansimTableNumber,coordinate,language) {
   cleaned_language <- cleaned_ndm_language(language)
   coordinate_column <- ifelse(language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
   members <- get_cansim_cube_metadata(cansimTableNumber,type="members")
+  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, !!coordinate_column:=coordinate)
+  # without cube metadata the data still stands on its own, it just carries no dimension names
+  if (is.null(members)) return(result)
+
   coordinates <- coordinate %>% strsplit("\\.") %>% unlist()
   dimensions <- members %>% pull(.data$dimensionPositionId) %>% unique()
-  result <- tibble::tibble(cansimTableNumber=cansimTableNumber, !!coordinate_column:=coordinate)
 
   if (cleaned_language=="fra") {
     members <- members %>%
@@ -212,8 +215,9 @@ rename_vectors <- function(data,vectors){
 #'
 #' @return A tibble with data for vectors released between start and end time
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_vector("v41690973","2015-01-01")
 #' }
 #' @export
@@ -258,12 +262,6 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
                                             timeout = timeout)
       }
       if (is.null(response)) return(response)
-      if (is.null(response$status_code)) {
-        stop("Problem downloading data.\n",response$error,call.=FALSE)
-      }
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
       data <- httr::content(response)
       data1 <- Filter(function(x)x$status=="SUCCESS",data)
       data2 <- Filter(function(x)x$status!="SUCCESS",data)
@@ -340,8 +338,9 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #'
 #' @return A tibble with data for specified vector(s) for the last N periods
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_vector_for_latest_periods("v41690973",10)
 #' }
 #' @export
@@ -371,12 +370,6 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
       message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
       if (is.null(response)) return(response)
-      if (is.null(response$status_code)) {
-        stop("Problem downloading data.\n",response$error,call.=FALSE)
-      }
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
       data <- httr::content(response)
       data1 <- Filter(function(x)x$status=="SUCCESS",data)
       data2 <- Filter(function(x)x$status!="SUCCESS",data)
@@ -451,8 +444,9 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
 #'
 #' @return A tibble with data matching specified coordinate and period input arguments
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 #' }
 #' @export
@@ -515,12 +509,6 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
       message(paste0("Accessing CANSIM NDM coordinates from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
       if (is.null(response)) {return(response)}
-      if (is.null(response$status_code)) {
-        stop("Problem downloading data.\n",response$error,call.=FALSE)
-      }
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
       data <- httr::content(response)
       data1 <- Filter(function(x)x$status=="SUCCESS",data)
       data2 <- Filter(function(x)x$status!="SUCCESS",data)
@@ -615,8 +603,9 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
 #'
 #' @return A tibble with metadata for selected vectors
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_vector_info("v41690973")
 #' }
 #' @export
@@ -626,12 +615,6 @@ get_cansim_vector_info <- function(vectors){
   vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,'}')),collapse = ", "),"]")
   response <- post_with_timeout_retry(url, body=vectors_string)
   if (is.null(response)){return(response)}
-  if (is.null(response$status_code)) {
-    stop("Problem downloading data.\n",response$error,call.=FALSE)
-  }
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-  }
   data <- httr::content(response)
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
   data2 <- Filter(function(x)x$status!="SUCCESS",data)

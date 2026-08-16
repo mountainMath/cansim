@@ -40,6 +40,8 @@ get_cansim_vector(
 }
 \value{
 A tibble with data for vectors released between start and end time
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Allows for the retrieval of data for specified vector series for a given time window.
@@ -51,7 +53,7 @@ The StatCan API can only process 300 coordinates at a time,
 if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_vector("v41690973","2015-01-01")
 }
 }

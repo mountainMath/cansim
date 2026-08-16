@@ -174,8 +174,9 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
 #' all tables is retrieved in a single API call and the results are stacked. Types other than "overview" carry
 #' no table identifier of their own, for those a `cansimTableNumber` column is added to identify the table.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_cube_metadata("34-10-0013")
 #' }
 #' @export
@@ -187,7 +188,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
 
   # metadata for all tables not yet cached is downloaded in a single API call
-  download_cube_metadata(cansimTableNumber, refresh=refresh)
+  if (!download_cube_metadata(cansimTableNumber, refresh=refresh)) return(NULL)
 
   result <- cansimTableNumber %>%
     rlang::set_names() %>%
@@ -208,9 +209,11 @@ cube_metadata_path <- function(cansimTableNumber){
 
 # Downloads cube metadata for one or several tables in a single API call, caching the
 # response for each table separately so that later calls can reuse individual tables.
+# Returns TRUE when the metadata for every requested table is cached and ready to be read, and
+# FALSE when StatCan could not be reached, so callers can hand back NULL rather than fail.
 download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
   needed <- cansimTableNumber[refresh | !file.exists(cube_metadata_path(cansimTableNumber))]
-  if (length(needed)==0) return(invisible(NULL))
+  if (length(needed)==0) return(invisible(TRUE))
 
   purrr::walk(table_base_path(needed),\(p)if (!dir.exists(p)) dir.create(p,recursive=TRUE))
 
@@ -218,6 +221,8 @@ download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
   url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
   body <- paste0("[",paste(paste0('{"productId":',table_ids,'}'),collapse = ", "),"]")
   response <- post_with_timeout_retry(url, body=body)
+  if (is.null(response)) return(invisible(FALSE))
+
   data <- httr::content(response)
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
   data2 <- Filter(function(x)x$status!="SUCCESS",data)
@@ -235,7 +240,7 @@ download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
          paste0(failed,collapse=", "),call.=FALSE)
   }
 
-  invisible(NULL)
+  invisible(TRUE)
 }
 
 cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=FALSE){
@@ -343,8 +348,9 @@ cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=
 #' When several table numbers are given, the templates are stacked and columns for dimensions that only appear
 #' in some of the tables are filled with `NA` for the other tables.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_template("34-10-0013")
 #' }
 #' @export
@@ -354,6 +360,7 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
 
   # member metadata for all tables is retrieved in a single API call
   member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
+  if (is.null(member_info)) return(NULL)
 
   result <- cansimTableNumber %>%
     purrr::map(\(tn)table_template_for_members(member_info %>% filter(.data$cansimTableNumber==tn),
@@ -419,8 +426,9 @@ table_template_for_members <- function(member_info, cansimTableNumber, language)
 #'
 #' @return a tibble containing the series information for the given coordinates
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
 #' }
 #' @export
@@ -437,7 +445,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
   chuncksize <- 300
   batches = split(coordinates, cumsum((1:length(coordinates)-1)%%chuncksize==0))
 
-  info <- purrr::map_dfr(batches, \(coordinates){
+  info <- purrr::map(batches, \(coordinates){
     body <- paste0("{\"productId\": ",productId,", \"coordinate\": \"",coordinates,"\"}") %>%
       paste0(.,collapse=", ") %>%
       paste0("[",.,"]")
@@ -447,15 +455,9 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 
     if (!file.exists(tmp) || refresh) {
       url <- "https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromCubePidCoord"
-      response <- httr::POST(url,
-                             body=body,
-                             encode="json",
-                             httr::add_headers("Content-Type"="application/json"),
-                             httr::timeout(timeout)
-      )
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
+      response <- post_with_timeout_retry(url, body=body, timeout=timeout)
+      if (is.null(response)) return(NULL)
+
       data <- httr::content(response)
       data1 <- Filter(function(x)x$status=="SUCCESS",data)
       data2 <- Filter(function(x)x$status!="SUCCESS",data)
@@ -473,7 +475,10 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
     info
   })
 
-  info  %>%
+  # a batch that could not be retrieved would quietly drop those coordinates from the result
+  if (any(vapply(info,is.null,logical(1)))) return(NULL)
+
+  dplyr::bind_rows(info) %>%
     filter(.data$responseStatusCode!=2) %>% # filter out invalid combinations
     select(-"responseStatusCode")
 }

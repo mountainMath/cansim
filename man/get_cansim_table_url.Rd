@@ -13,12 +13,14 @@ get_cansim_table_url(cansimTableNumber, language = "en")
 }
 \value{
 String object containing URL for specified table number
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieve URL of a table from the API given a table number. Offers a more stable approach than manually guessing the URL of the table.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_url("34-10-0013")
 get_cansim_table_url("34-10-0013", language = "fr")
 }

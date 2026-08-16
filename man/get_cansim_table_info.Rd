@@ -22,12 +22,14 @@ get_cansim_table_info(
 }
 \value{
 A tibble with the table overview information
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_info("34-10-0013")
 }
 }

@@ -14,12 +14,14 @@ default is same as start date}
 }
 \value{
 A tibble with Statistics Canada data table product ids and their release times
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieve a list of tables that have been modified or updated since the specified date.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_changed_tables("2018-08-01")
 }
 }

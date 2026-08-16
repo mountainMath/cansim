@@ -34,6 +34,8 @@ get_cansim_vector_for_latest_periods(
 }
 \value{
 A tibble with data for specified vector(s) for the last N periods
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Allows for the retrieval of data for specified vector series for the N most-recently released periods.
@@ -45,7 +47,7 @@ The StatCan API can only process 300 coordinates at a time,
 if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_vector_for_latest_periods("v41690973",10)
 }
 }

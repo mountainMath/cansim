@@ -25,12 +25,14 @@ get_cansim_column_categories(
 }
 \value{
 A tibble with detailed information on StatCan table categories for the specified field
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_column_categories("34-10-0013", "Geography")
 }
 }

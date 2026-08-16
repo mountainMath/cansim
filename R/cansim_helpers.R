@@ -168,10 +168,62 @@ response_status_code_translation <- list(
 )
 
 response_error_translation <- list(
-  "503"="StatCan website is currently unavailable"
+  "429"="StatCan is rate limiting requests, please try again later",
+  "502"="StatCan website is currently unreachable",
+  "503"="StatCan website is currently unavailable",
+  "504"="StatCan website did not respond in time"
 )
 
-get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FALSE){
+# StatCan servers time out, go down for maintenance, or serve error pages often enough that treating
+# it as a fatal error is the wrong default. Every failure to get a usable answer out of StatCan is
+# reported through here, which warns loudly and returns NULL so the calling function can return NULL
+# in turn. Erroring instead is what repeatedly got the package pulled from CRAN, since a check run
+# started while StatCan was down would fail on examples and vignettes that are not at fault.
+# Set options(cansim.error_on_unavailable=TRUE) to get an error rather than a warning.
+statcan_unavailable <- function(...){
+  message <- paste0(...)
+  if (isTRUE(getOption("cansim.error_on_unavailable"))) stop(message,call.=FALSE)
+  warning(message,call.=FALSE)
+  NULL
+}
+
+# Shared failure handling for the GET and POST helpers. Returns the response on success, and NULL on
+# any failure, so that callers only ever have to check for NULL rather than inspect status codes.
+# `again` retries the request that produced `response`, it takes the remaining retry count.
+check_statcan_response <- function(response,retry,again){
+  if (!is.null(response$error)) {
+    if ("curl_error_peer_failed_verification" %in% class(response$error)) {
+      return(statcan_unavailable(
+        stringr::str_wrap(gsub(".+\\): ","",as.character(response$error)),80),"\n",
+        "This means that the authenticity of the StatCan API server can't be verified.\n",
+        "Statistics Canada has a history of faulty SSL certificates on their API,\n",
+        "if you are reasonably sure that your connection is not getting hijacked you\n",
+        "can disable peer checking for the duration of the R session by typing\n\n",
+        "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console."))
+    }
+    if (retry>0) {
+      message("Got timeout from StatCan, trying again")
+      return(again(retry-1))
+    }
+    message("Got timeout from StatCan, giving up")
+    return(statcan_unavailable("Problem downloading data, multiple timeouts.\n",
+                               "Please check your network connection. If your connection is fine then ",
+                               "StatCan servers might be down."))
+  }
+
+  status_code <- response$result$status_code
+  if (is.null(status_code)) {
+    return(statcan_unavailable("Problem downloading data, StatCan did not return a response."))
+  }
+  if (status_code!=200) {
+    translation <- response_error_translation[[as.character(status_code)]]
+    return(statcan_unavailable(if (is.null(translation)) "" else paste0(translation,"\n"),
+                               "Problem downloading data, StatCan returned status code ",status_code,"."))
+  }
+  response$result
+}
+
+get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
   if (!is.na(path)) {
     response <- purrr::safely(httr::GET)(url,encode="json",
                                          httr::add_headers("Content-Type"="application/json"),
@@ -183,85 +235,18 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FAL
                                          httr::add_headers("Content-Type"="application/json"),
                                          httr::timeout(timeout))
   }
-  if (!is.null(response$error)){
-    if ("curl_error_peer_failed_verification" %in% class(response$error)) {
-      stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
-           "This means that the authenticity of the StatCan API server can't be verified.\n",
-           "Statistics Canada has a history of faulty SSL certificats on their API,\n",
-           "if you are reasonably sure that your connection is not getting hijacked you\n",
-           "can disable peer checking for the duration of the R session by typing\n\n",
-           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
-    }
-    if (retry>0) {
-      message("Got timeout from StatCan, trying again")
-      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path,warn_only=warn_only)
-    } else {
-      message("Got timeout from StatCan, giving up")
-    }
-  } else if (response$result$status_code %in% names(response_error_translation)){
-    if (warn_only) {
-      warning(sprintf("%s\nReturned status code %s",response_error_translation[[as.character(response$result$status_code)]], response$result$status_code),call.=FALSE)
-      response=response$result
-    } else {
-      stop(sprintf("%s\nReturned status code %s",response_error_translation[[as.character(response$result$status_code)]], response$result$status_code),call.=FALSE)
-    }
-  } else if (response$result$status_code != 200){
-    if (warn_only) {
-      warning(sprintf("Problem downloading data, returned status code %s.",response$result$status_code),call.=FALSE)
-      response=response$result
-    } else {
-      stop(sprintf("Problem downloading data, returned status code %s.",response$result$status_code),call.=FALSE)
-    }
-  } else {
-    response=response$result
-  }
-
-  if (is.null(response) && retry == 0) {
-    if (warn_only) {
-      warning(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
-      response=response$result
-    } else {
-      stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
-    }
-  }
-  response
+  check_statcan_response(response,retry=retry,
+                         again=\(r)get_with_timeout_retry(url,timeout=timeout,retry=r,path=path))
 }
 
-post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE){
+post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
   response <- purrr::safely(httr::POST)(url,
                                         body=body,
                                         encode="json",
                                         httr::add_headers("Content-Type"="application/json"),
                                         httr::timeout(timeout))
-  if (!is.null(response$error)){
-    if ("curl_error_peer_failed_verification" %in% class(response$error)) {
-      stop(stringr::str_wrap(gsub(".+\\): ","",as.character(response$error),80)),"\n",
-           "This means that the authenticity of the StatCan API server can't be verified.\n",
-           "Statistics Canada has a history of faulty SSL certificats on their API,\n",
-           "if you are reasonably sure that your connection is not getting hijacked you\n",
-           "can disable peer checking for the duration of the R session by typing\n\n",
-           "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console.",call.=FALSE)
-    }
-    if (retry>0) {
-      message("Got timeout from StatCan, trying again")
-      response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1,warn_only=warn_only)
-    } else {
-      message("Got timeout from StatCan, giving up")
-      response=response$result
-    }
-  } else {
-    response=response$result
-  }
-
-  if (is.null(response) && retry == 0) {
-    if (warn_only) {
-      warning(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
-      response=NULL
-    } else {
-      stop(sprintf("Problem downloading data, multiple timeouts.\nPlease check your network connection. If your connections is fine then StatCan servers might be down."),call.=FALSE)
-    }
-  }
-  response
+  check_statcan_response(response,retry=retry,
+                         again=\(r)post_with_timeout_retry(url,body=body,timeout=timeout,retry=r))
 }
 
 
@@ -364,8 +349,9 @@ add_provincial_abbreviations <- function(data){
 #'
 #' @return A tibble with english and french labels for the given code set
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_code_set("survey")
 #' }
 get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "status", "uom", "survey",  "subject", "wdsResponseStatus"),
@@ -378,17 +364,9 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
   if (refresh | !file.exists(path)) {
     url='https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
     r<-get_with_timeout_retry(url)
-    if (is.null(r)||is.null(r$status_code)){
-      warning("Problem downloading code sets.")
-      return(NULL)
-    }
-    if (r$status_code==200) {
-      content <- httr::content(r)
-      saveRDS(content,path)
-    } else {
-      warning("Problem downloading code sets.")
-      stop(httr::content(r),call.=FALSE)
-    }
+    if (is.null(r)) return(NULL)
+    content <- httr::content(r)
+    saveRDS(content,path)
   } else {
     content <- readRDS(path)
   }

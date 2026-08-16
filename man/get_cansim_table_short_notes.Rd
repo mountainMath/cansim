@@ -22,12 +22,14 @@ get_cansim_table_short_notes(
 }
 \value{
 A tibble with the StatCan Notes for the table
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_short_notes("34-10-0013")
 }
 }

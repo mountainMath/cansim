@@ -37,6 +37,8 @@ coordinate if tableCoordinates is a data frame, this argument will be ignored if
 }
 \value{
 A tibble with data matching specified coordinate and period input arguments
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Allows for the retrieval of data for a Statistics Canada data table with specific table and coordinates.
@@ -46,7 +48,7 @@ The StatCan API can only process 300 coordinates at a time,
 if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 }
 }

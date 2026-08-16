@@ -267,9 +267,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 #' @return A character string with the new-format NDM table number
 #'
 #' @examples
-#' \dontrun{
 #' cansim_old_to_new("026-0018")
-#' }
 #' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
   # cache the file as data, old table numbers should not change
@@ -424,6 +422,7 @@ NULL
 #' @return A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
 #' added \code{val_norm} column with normalized value from the \code{VALUE} column.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' get_cansim("34-10-0013")
@@ -560,8 +559,9 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 #'
 #' @return A tibble with the table overview information
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_info("34-10-0013")
 #' }
 #' @export
@@ -583,6 +583,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
     archived_column <- "Archive Status"
 
     d <- get_cansim_cube_metadata(cansimTableNumber, type="overview",refresh=refresh)
+    if (is.null(d)) return(NULL)
 
     if (cleaned_language=="fra") {
       result <- d %>%
@@ -617,8 +618,9 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #'
 #' @return A tibble with the table survey code and name
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_survey("34-10-0013")
 #' }
 #' @export
@@ -630,7 +632,9 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
   } else {
     cleaned_language <- cleaned_ndm_language(language)
     survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
-    result<-get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh) %>% select(!!survey_code_grepl_field:=.data$surveyCode)
+    d <- get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh)
+    if (is.null(d)) return(NULL)
+    result<-d %>% select(!!survey_code_grepl_field:=.data$surveyCode)
   }
   result
 }
@@ -647,8 +651,9 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #'
 #' @return A tibble with the table subject code and name.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_subject("34-10-0013")
 #' }
 #' @export
@@ -660,7 +665,9 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
   } else {
     cleaned_language <- cleaned_ndm_language(language)
     subject_code_grepl_field <- ifelse(cleaned_language=="eng","Subject Code","Code du sujet")
-    result<-get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh) %>%
+    d <- get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh)
+    if (is.null(d)) return(NULL)
+    result<-d %>%
       select(.data$subjectCode) %>%
       mutate(subjectCode=strsplit(.data$subjectCode,", ")) %>%
       tidyr::unnest_longer(.data$subjectCode) %>%
@@ -681,8 +688,9 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #'
 #' @return A tibble with the StatCan Notes for the table
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_short_notes("34-10-0013")
 #' }
 #' @export
@@ -696,6 +704,7 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
   }
   if (refresh || !file.exists(data_path)){
     notes <- get_cansim_cube_metadata(cansimTableNumber,refresh=refresh,type="notes")
+    if (is.null(notes)) return(NULL)
     cleaned_language <- cleaned_ndm_language(language)
     note_id_grepl_field <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
 
@@ -727,8 +736,9 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #'
 #' @return A tibble listing the column names of the StatCan table.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_column_list("34-10-0013")
 #' }
 #' @export
@@ -742,6 +752,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
     dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     d <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh=refresh)
+    if (is.null(d)) return(NULL)
 
     if (cleaned_language=="fra") {
      result <- d %>%
@@ -772,8 +783,9 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #'
 #' @return A tibble with detailed information on StatCan table categories for the specified field
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_column_categories("34-10-0013", "Geography")
 #' }
 #' @export
@@ -805,6 +817,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
     exceeded_hierarchy_warning_message <- ifelse(cleaned_language=="eng","Exceeded max depth for hierarchy, hierarchy information may be faulty.",
                                                  paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
     d <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh=refresh)
+    if (is.null(d)) return(NULL)
 
     if (cleaned_language=="fra") {
       result <- d %>%
@@ -842,14 +855,16 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
 #'
 #' @return none
 #'
+#' Nothing is printed if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_overview("34-10-0013")
 #' }
 #' @export
 get_cansim_table_overview <- function(cansimTableNumber, language="english", refresh=FALSE){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   info <- get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
+  if (is.null(info)) return(invisible(NULL))
   #refresh=FALSE
   cleaned_language <- cleaned_ndm_language(language)
   cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
@@ -864,6 +879,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
                  end_period_column,": ",info[[end_period_column]],", ",
                  frequency_column,": ",info[[frequency_column]],"\n")
   columns <- get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
+  if (is.null(columns)) return(invisible(NULL))
   for (column in columns[[dimension_name_column]]) {
     text <- paste0(text,"\n","Column ",column)
     categories <- get_cansim_column_categories(cansimTableNumber,column,language=language,refresh=refresh)
@@ -963,8 +979,9 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #'
 #' @return String object containing URL for specified table number
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_url("34-10-0013")
 #' get_cansim_table_url("34-10-0013", language = "fr")
 #' }
@@ -975,6 +992,7 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- get_with_timeout_retry(url)
+  if (is.null(response)) return(NULL)
   httr::content(response)$object
 }
 
@@ -988,8 +1006,9 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
 #'
 #' @return A tibble with Statistics Canada data table product ids and their release times
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_changed_tables("2018-08-01")
 #' }
 #' @export
@@ -1012,18 +1031,24 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
     start_date <- end_date
     end_date <-d
   }
-  if (difftime(end_date,start_date,"days")>31) {
+  # the third argument of difftime is the time zone, the unit has to be named
+  if (difftime(end_date,start_date,units="days")>31) {
     message("Querying for long time intervals may be slow.")
   }
-  seq(as.Date(start_date),as.Date(end_date),"days") %>%
+  changes <- seq(as.Date(start_date),as.Date(end_date),"days") %>%
     lapply(function(date){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
       response <- get_with_timeout_retry(url)
+      if (is.null(response)) return(NULL)
       httr::content(response)$object %>%
         map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
         bind_rows
-    }) %>%
-    bind_rows
+    })
+
+  # a single unavailable day makes the result silently incomplete, which is worse than no result
+  if (any(vapply(changes,is.null,logical(1)))) return(NULL)
+
+  bind_rows(changes)
 }
 
 
@@ -1038,8 +1063,9 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #' @return A tibble with table notes.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_notes("34-10-0013")
 #' }
 #' @export
@@ -1074,6 +1100,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
   } else {
     full_notes <- get_cansim_cube_metadata(cansimTableNumber,type="notes",refresh=refresh)
     members <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh = refresh)
+    if (is.null(full_notes) || is.null(members)) return(NULL)
 
     if (cleaned_language=="fra") {
       members <- members %>%
@@ -1106,8 +1133,9 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' @param cansimTableNumber the NDM table number
 #' @return A datetime object if a release data is available, NULL otherwise.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_last_release_date("34-10-0013")
 #' }
 #' @export
@@ -1115,25 +1143,20 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
   validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   pid <- paste0(naked_ndm_table_number(cansimTableNumber),"01")
-  url <- "https://www150.statcan.gc.ca/n1/en/metadata.json"
-  response <- purrr::safely(httr::GET)(url,query=list(productid=pid))
-  if (!is.null(response$error) || response$result$status_code!=200) {
-    warning(paste0("Could not access information for table ",cansimTableNumber,
-                   " (productID: ",pid,").\n",
-                   response$error))
-    release_date <- NA
-  } else {
-    c <- httr::content(response$result)
-    r<-c$result
-    if (length(r)>0) {
-      rd <- unique(unlist(lapply(r,function(rr)rr$releasedate)))
-      release_date <- strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
-        max()
-    } else {
-      release_date <- NA
-    }
+  url <- paste0("https://www150.statcan.gc.ca/n1/en/metadata.json?productid=",pid)
+  response <- get_with_timeout_retry(url)
+  if (is.null(response)) return(NULL)
+
+  r <- httr::content(response)$result
+  if (length(r)==0) {
+    warning("Could not access release information for table ",cansimTableNumber,
+            " (productID: ",pid,").",call.=FALSE)
+    return(NA)
   }
-  release_date
+
+  rd <- unique(unlist(lapply(r,function(rr)rr$releasedate)))
+  strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
+    max()
   #get_cansim_cube_metadata(cansimTableNumber) %>% pull(releaseTime)
 }
 

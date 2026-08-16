@@ -22,12 +22,14 @@ get_cansim_table_survey(
 }
 \value{
 A tibble with the table survey code and name
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns table survey detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_survey("34-10-0013")
 }
 }

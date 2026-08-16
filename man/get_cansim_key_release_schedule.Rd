@@ -8,13 +8,15 @@ get_cansim_key_release_schedule()
 }
 \value{
 a tibble with data, and details for major economic indicator release
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns every release date of major economic indicators since March 14, 2012.
 This also includes scheduled future releases.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_key_release_schedule()
 }
 

@@ -22,12 +22,14 @@ get_cansim_series_info_cube_coord(
 }
 \value{
 a tibble containing the series information for the given coordinates
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves series information by coordinates
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
 }
 }

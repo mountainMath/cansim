@@ -18,12 +18,14 @@ To refresh the code list during a running R session set to \code{TRUE}}
 }
 \value{
 A tibble with english and french labels for the given code set
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Useful to get a list of surveys  or subjects and used internally
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_code_set("survey")
 }
 }

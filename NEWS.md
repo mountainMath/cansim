@@ -1,5 +1,16 @@
 # cansim 0.4.5
 ## Major changes
+* StatCan being unavailable no longer aborts with an error. Timeouts, connection failures and error
+  responses are now reported with a loud warning and the function returns `NULL`, so that a script or a
+  document can decide for itself what to do when the servers are down. This applies to every function
+  that talks to StatCan, and it also covers the two calls that previously bypassed the retry helper,
+  `get_cansim_table_last_release_date()` and `get_cansim_series_info_cube_coord()`. Set
+  `options(cansim.error_on_unavailable=TRUE)` to get the previous behaviour of raising an error
+* examples that make a single lightweight API call are now `\donttest{}` rather than `\dontrun{}`, so
+  they are checked rather than merely displayed. Examples that download a full table or the cube list
+  stay `\dontrun{}` because of their run time, and `cansim_old_to_new()` needs no network at all so its
+  example now always runs
+
 * data retrieved by vector or by table/coordinate now carries `UOM` and `UOM_ID` columns, taken from the
   cube metadata. StatCan flags a single dimension of each cube as carrying the unit of measure and the unit
   varies by member of that dimension, so the unit is resolved per coordinate. Tables that have no unit of
@@ -33,6 +44,9 @@
 
 ## Minor changes
 * fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read
+* fix `get_cansim_changed_tables()` passing "days" to `difftime()` as a time zone instead of a unit
+* `get_cansim_connection()` no longer fails when the release date of a table cannot be determined, the
+  staleness check is skipped with a message instead
 * the unit of measure columns of French language tables are now ordered with the other value columns,
   as they already were in English language tables
 * better connection error handling

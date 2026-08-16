@@ -22,12 +22,14 @@ get_cansim_table_subject(
 }
 \value{
 A tibble with the table subject code and name.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_subject("34-10-0013")
 }
 }

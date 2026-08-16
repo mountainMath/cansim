@@ -17,12 +17,14 @@ get_cansim_cube_metadata(cansimTableNumber, type = "overview", refresh = FALSE)
 a tibble containing the table metadata. When several table numbers are given, the metadata for
 all tables is retrieved in a single API call and the results are stacked. Types other than "overview" carry
 no table identifier of their own, for those a `cansimTableNumber` column is added to identify the table.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves table metadata given an input table number or vector of table numbers using either the new or old table number format. Patience is suggested as the Statistics Canada API can be very slow. The `list_cansim_tables()` function can be used as an alternative to retrieve a (cached) list of CANSIM tables with (more limited) metadata.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_cube_metadata("34-10-0013")
 }
 }

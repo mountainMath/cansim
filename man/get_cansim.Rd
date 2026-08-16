@@ -33,6 +33,8 @@ Set to higher values for large tables and slow network connection. (Default is \
 \value{
 A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
 added \code{val_norm} column with normalized value from the \code{VALUE} column.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.

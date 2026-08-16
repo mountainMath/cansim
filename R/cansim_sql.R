@@ -22,6 +22,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #'
 #' @return A database connection to a local SQLite database with the StatCan Table data.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' con <- get_cansim_connection("34-10-0013", format="sqlite")

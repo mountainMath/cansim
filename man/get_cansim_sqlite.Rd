@@ -29,6 +29,8 @@ in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Othe
 }
 \value{
 A database connection to a local SQLite database with the StatCan Table data.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 This method is deprecated and will be removed in a future version, please use

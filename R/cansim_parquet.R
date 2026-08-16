@@ -21,6 +21,7 @@
 #' @return A database connection to a local parquet, feather, or sqlite database with the StatCan Table data. The data
 #' frames after calling `collect()` or `collect_and_normalize()` are identical up to possibly different row order.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' con <- get_cansim_connection("34-10-0013")
@@ -65,22 +66,23 @@ get_cansim_connection <- function(cansimTableNumber,
   db_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".",file_extension)
 
   last_updated <- tryCatch(get_cansim_table_last_release_date(cleaned_number), error=function(cond)return(NA))
+  # NULL when StatCan could not be reached, NA when they returned no release date, and it has to
+  # survive both without reaching an `if` with a zero-length or NA condition
+  has_last_updated <- length(last_updated)==1 && !is.na(last_updated)
 
-  if (is.na(last_updated)) {
-    warning("Could not determine if existing table is out of date.")
-  } else {
-    last_downloaded <- list_cansim_cached_tables(cache_path=base_cache_path) %>%
-      filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format, .data$language==cleaned_language) %>%
-      pull(.data$timeCached)
+  last_downloaded <- list_cansim_cached_tables(cache_path=base_cache_path) %>%
+    filter(.data$cansimTableNumber==cleaned_number, .data$dataFormat==format, .data$language==cleaned_language) %>%
+    pull(.data$timeCached)
+  # no matching cache entry gives a zero length vector, an unreadable one gives NA
+  has_last_downloaded <- length(last_downloaded)==1 && !is.na(last_downloaded)
+  cache_is_stale <- has_last_updated && has_last_downloaded &&
+    as.numeric(last_downloaded)<as.numeric(last_updated)
 
-    # Handle empty vector (no matching cache entry) or NA
-    has_valid_last_downloaded <- !is.null(last_downloaded) && length(last_downloaded) > 0 && !is.na(last_downloaded[1])
-
-    if (file.exists(db_path) && auto_refresh && has_valid_last_downloaded && !is.null(last_updated) &&
-        as.numeric(last_downloaded[1])<as.numeric(last_updated)) {
+  if (has_last_updated && file.exists(db_path) && auto_refresh) {
+    if (cache_is_stale) {
       message(paste0("A newer version of ",cansimTableNumber," is available, auto-refreshing the table..."))
       refresh=TRUE
-    } else if (file.exists(db_path) && auto_refresh && (is.na(last_updated)||!has_valid_last_downloaded)){
+    } else if (!has_last_downloaded) {
       message(paste0("Could not determine if ",cansimTableNumber," is up to date..."))
     }
   }
@@ -94,10 +96,7 @@ get_cansim_connection <- function(cansimTableNumber,
 
     time_check <- Sys.time()
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
-    if (is.null(response)|| (response$status_code!=200) && ("result" %in% names(response)) && is.null(response$result)) {
-      stop(paste0("Failed to download ",cansimTableNumber,"."),call.=FALSE)
-      return(NULL)
-    }
+    if (is.null(response)) return(NULL)
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
@@ -268,23 +267,23 @@ get_cansim_connection <- function(cansimTableNumber,
 
 
   } else {
-    if (!is.na(last_updated)) {
-      if (is.na(last_downloaded)) message(paste0("Could not accesses date table ",cleaned_number," was cached."))
-      if (is.null(last_updated)) message(paste0("Could not accesses date table ",cleaned_number," was last updated."))
-      if (!is.na(last_downloaded) && !is.null(last_updated) &&
-          as.numeric(last_downloaded)<as.numeric(last_updated)) {
-        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
-        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
-        if (ld_date==lu_date) {
-          ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
-          lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
-        }
-        warning(paste0("Cached ",format," table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
-                       "There is a newer version of the table available, it was last updated ",
-                       lu_date,".\n",
-                       "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
-                       "or set it to automatically update to the newest version by setting the `refresh='auto'` option."))
+    if (!has_last_downloaded) message(paste0("Could not access the date table ",cleaned_number," was cached."))
+    # StatCan being unreachable is reported by the download helper, this only says what it costs here
+    if (!has_last_updated) message(paste0("Could not determine whether the cached copy of ",cleaned_number,
+                                          " is out of date."))
+    if (cache_is_stale) {
+      ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d")
+      lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d")
+      if (ld_date==lu_date) {
+        ld_date <- format(as.POSIXct(last_downloaded), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
+        lu_date <- format(as.POSIXct(last_updated), tz="",usetz=FALSE,format="%Y-%m-%d %H:%M")
       }
+      warning(paste0("Cached ",format," table ",cleaned_number," is out of date, it was last downloaded and cached ",ld_date,".\n",
+                     "There is a newer version of the table available, it was last updated ",
+                     lu_date,".\n",
+                     "Consider manually updating the cached version by passing the `refresh=TRUE` option,\n",
+                     "or set it to automatically update to the newest version by setting the `refresh='auto'` option."),
+              call.=FALSE)
     }
     if (cleaned_language=="eng")
       message(paste0("Reading CANSIM NDM product ",cleaned_number)," from ",format,".")

@@ -21,6 +21,8 @@ get_cansim_table_template(
 a tibble containing the table template, with a `cansimTableNumber` column identifying the table.
 When several table numbers are given, the templates are stacked and columns for dimensions that only appear
 in some of the tables are filled with `NA` for the other tables.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 A table template consists of the dimensions and members and coordinates of a table that can be used to explore
@@ -28,7 +30,7 @@ and filter table data before downloading subsets of the table. To add vector Ids
 the `add_cansim_vectors_to_template` function can be used.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_template("34-10-0013")
 }
 }

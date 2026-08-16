@@ -15,6 +15,8 @@ search_cansim_tables(search_term, search_fields = "both", refresh = FALSE)
 }
 \value{
 A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 This method is deprecated, please use `search_cansim_cubes` instead.
