@@ -12,6 +12,7 @@ csv2arrow(
   value_column = "VALUE",
   partitioning = c(),
   na = c(NA, "..", "", "...", "F"),
+  repair_columns = c(),
   text_encoding = "UTF-8",
   delim = ","
 )
@@ -30,6 +31,9 @@ csv2arrow(
 \item{partitioning}{optional partition columns}
 
 \item{na}{na character strings}
+
+\item{repair_columns}{columns whose values should be repaired of non-breaking spaces and control
+characters before writing, usually the dimension columns}
 
 \item{text_encoding}{encoding of csv file (default UTF-8)}
 

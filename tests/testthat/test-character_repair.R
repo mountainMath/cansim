@@ -34,6 +34,67 @@ test_that("repair leaves ordinary strings untouched", {
   expect_equal(repair(once), once)
 })
 
+test_that("values are repaired through their distinct values", {
+  repair <- cansim:::repair_statcan_values
+
+  x <- c(paste0("Total",NON_BREAKING_SPACE),"Total","Other",paste0("Total",NON_BREAKING_SPACE))
+  expect_equal(repair(x), c("Total","Total","Other","Total"))
+
+  # scanning distinct values must give the same answer as scanning every one of them
+  y <- rep(c(paste0("a",NON_BREAKING_SPACE,"b"),"c",NA_character_), 50)
+  expect_equal(repair(y), cansim:::repair_statcan_strings(y))
+
+  expect_equal(repair(c("clean","values")), c("clean","values"))
+  expect_equal(repair(character(0)), character(0))
+  expect_equal(repair(1:3), 1:3)
+})
+
+test_that("the dimension columns of the data are the ones that get repaired", {
+  columns <- cansim:::dimension_columns_in_data
+
+  # StatCan names the geography dimension in the metadata but calls the column GEO in the data
+  expect_equal(columns(c("REF_DATE","GEO","Age group","VALUE"),
+                       c("Geography","Age group"),"eng"),
+               c("GEO","Age group"))
+  expect_equal(columns(c("PERIODE DE REFERENCE",paste0("G",intToUtf8(0x00C9),"O"),"Sexe"),
+                       c(paste0("G",intToUtf8(0x00E9),"ographie"),"Sexe"),"fra"),
+               c(paste0("G",intToUtf8(0x00C9),"O"),"Sexe"))
+
+  # the coordinate column holds one distinct value per series, scanning it is what this avoids
+  expect_false("COORDINATE" %in% columns(c("COORDINATE","GEO"),c("Geography"),"eng"))
+  # a dimension that has no column in the data is skipped rather than erroring
+  expect_equal(columns(c("REF_DATE","VALUE"),c("Geography","Age group"),"eng"), character(0))
+})
+
+test_that("member labels in the data match the repaired metadata", {
+  skip_on_cran()
+
+  # 13-10-0920 has a member label ending in a non-breaking space. The metadata is repaired, so a
+  # data value that is not repaired the same way falls outside the factor levels and becomes NA.
+  table <- "13-10-0920"
+  column <- "Indicators"
+  member <- "Dental insurance coverage, none"
+
+  check <- function(data,label) {
+    expect_false(has_problem_characters(levels(data[[column]])), label=paste0(label," levels"))
+    expect_true(member %in% levels(data[[column]]), label=paste0(label," member"))
+    expect_equal(sum(is.na(data[[column]])), 0, label=paste0(label," NA count"))
+  }
+
+  # each of the three readers parses the csv on its own and needs the repair separately
+  check(suppressWarnings(get_cansim(table, refresh=TRUE)), "get_cansim")
+
+  for (format in c("sqlite","parquet")) {
+    connection <- suppressWarnings(get_cansim_connection(table, format=format, refresh=TRUE))
+    check(suppressWarnings(collect_and_normalize(connection)), format)
+    disconnect_cansim_sqlite(connection)
+  }
+
+  # the label is the same whichever way it is retrieved, so the two can be joined
+  template <- suppressWarnings(get_cansim_table_template(table))
+  expect_true(member %in% template[[column]])
+})
+
 test_that("cube metadata and table templates have usable names", {
   skip_on_cran()
 

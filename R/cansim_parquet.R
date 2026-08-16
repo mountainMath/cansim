@@ -133,7 +133,8 @@ get_cansim_connection <- function(cansimTableNumber,
     coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
 
     meta2 <- readRDS(paste0(meta_base_path,"2"))
-    geo_column_pos <- which(pull(meta2,dimension_name_column) %in% geography_columns)
+    dimension_names <- pull(meta2,dimension_name_column)
+    geo_column_pos <- which(dimension_names %in% geography_columns)
 
 
     if (length(geo_column_pos)>1) geo_column_pos <- geo_column_pos[1]
@@ -207,7 +208,9 @@ get_cansim_connection <- function(cansimTableNumber,
                  transform=function(data){
                    attr(data,"language") <- cleaned_language
                    attr(data,"cansimTableNumber") <- cleaned_number
-                   data <- data %>% transform_value_column(value_string)
+                   data <- data %>%
+                     transform_value_column(value_string) %>%
+                     repair_statcan_dimension_values(dimension_names,cleaned_language)
                    if (length(geo_column_pos)==1) {
                      data <- data %>%
                        fold_in_metadata_for_columns(meta_base_path,geography_column) %>%
@@ -226,6 +229,7 @@ get_cansim_connection <- function(cansimTableNumber,
                 partitioning = partitioning,
                 na = na_strings,
                 value_column = value_string,
+                repair_columns = dimension_columns_in_data(header,dimension_names,cleaned_language),
                 delim = delim)
     }
 
@@ -382,6 +386,8 @@ get_cansim_connection <- function(cansimTableNumber,
 #' @param value_column name of the value column with numeric data
 #' @param partitioning optional partition columns
 #' @param na na character strings
+#' @param repair_columns columns whose values should be repaired of non-breaking spaces and control
+#' characters before writing, usually the dimension columns
 #' @param text_encoding encoding of csv file (default UTF-8)
 #' @param delim (Optional) csv deliminator, default is ","
 #'
@@ -391,6 +397,7 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
                       col_names, value_column = "VALUE",
                       partitioning = c(),
                        na=c(NA,"..","","...","F"),
+                       repair_columns = c(),
                        text_encoding="UTF-8",delim = ",") {
 
   if (file.exists(arrow_file)) unlink(arrow_file,recursive=TRUE)
@@ -417,6 +424,15 @@ csv2arrow <- function(csv_file, arrow_file, format="parquet",
                                    read_options = arrow::csv_read_options(encoding=text_encoding,
                                                                           skip_rows=1,
                                                                           column_names=col_names))
+
+  # arrow has no binding for the string squishing the repair does, an arrow side mutate would silently
+  # pull the whole table into R and take seven times as long. The columns are pulled over one at a
+  # time instead, and only the distinct values of each are actually scanned.
+  for (column in intersect(repair_columns,names(input))) {
+    values <- as.vector(input[[column]])
+    repaired <- repair_statcan_values(values)
+    if (!identical(repaired,values)) input[[column]] <- arrow::Array$create(repaired)
+  }
 
   if ("DGUID" %in% names(input)) {
     input <- input %>%

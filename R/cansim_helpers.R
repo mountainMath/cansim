@@ -85,6 +85,48 @@ repair_statcan_columns <- function(data,columns,context=NULL) {
   data
 }
 
+# The member names in the metadata are repaired, so the labels in the data have to be repaired the
+# same way or the two no longer match and every row carrying an affected label turns into NA when the
+# dimension is converted to a factor. Dimension columns hold a handful of distinct labels repeated
+# across millions of rows, so only the distinct values are scanned and the rows are read back through
+# an index. Scanning every row instead costs about seventy times as much on a large table.
+repair_statcan_values <- function(x) {
+  if (length(x)==0 || !is.character(x)) return(x)
+  values <- unique(x)
+  repaired <- repair_statcan_strings(values)
+  if (identical(repaired,values)) return(x)
+  repaired[match(x,values)]
+}
+
+# The dimension columns are the ones whose labels come from the metadata, and the only ones that need
+# repairing. Everything else is either numeric, an identifier, or the coordinate column, which holds
+# one distinct value per series and would make the scan above the expensive thing it avoids.
+dimension_columns_in_data <- function(data_columns,dimension_names,cleaned_language) {
+  geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",
+                             paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
+  data_geography_column <- ifelse(cleaned_language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
+  geography_columns <- geography_colum_names(cleaned_language)
+
+  columns <- vapply(dimension_names, function(field) {
+    if (field %in% data_columns) return(field)
+    # StatCan names the geography dimension in the metadata but calls the column GEO in the data
+    if ((grepl(geography_column,field) || field %in% geography_columns) &&
+        data_geography_column %in% data_columns) return(data_geography_column)
+    NA_character_
+  }, character(1), USE.NAMES=FALSE)
+
+  unique(columns[!is.na(columns)])
+}
+
+# repairs the dimension columns of a table, silently, the caller has already reported on the names
+repair_statcan_dimension_values <- function(data,dimension_names,cleaned_language) {
+  columns <- dimension_columns_in_data(names(data),dimension_names,cleaned_language)
+  for (column in columns) {
+    data[[column]] <- repair_statcan_values(data[[column]])
+  }
+  data
+}
+
 cleaned_ndm_table_number <- function(cansimTableNumber){
   if (is.numeric(cansimTableNumber)) {
     warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",

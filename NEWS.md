@@ -22,6 +22,12 @@
   `Performance<U+00A0> strategy`, together with a count of how many names were repaired. Set
   `options(cansim.suppress_repair_warnings=TRUE)` to silence the warning. Column names of tables cached before this release keep the original characters
   until the table is downloaded again, `get_cansim_connection()` warns when it finds such a cache (#169)
+* the same repair now also covers the member labels in the data itself, not just the names of the
+  columns holding them. These characters turn out to be more common in member labels than in dimension
+  names, 53 of 500 sampled tables carry at least one. Repairing only the metadata side would have left
+  the labels in the data unable to match their own factor levels, so every row carrying an affected
+  label would have become `NA`. Labels are now also identical whichever way the data is retrieved, so
+  a table can be joined to template, vector or coordinate data on its dimension columns (#169)
 
 ## Deprecations
 * `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now

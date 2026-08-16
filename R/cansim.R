@@ -518,7 +518,9 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       parse_metadata(meta_lines,data_path)
       meta2 <- readRDS(paste0(data_path,"2"))
       dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
-      data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
+      data <- data %>%
+        repair_statcan_dimension_values(pull(meta2,dimension_name_column),cleaned_language) %>%
+        fold_in_metadata_for_columns(data_path,pull(meta2,dimension_name_column))
     }, error = function(e) {
       warning("Could not fold in metadata")
       if (nrow(data)==0) warning(paste0("StatCan returned zero rows of data for table ",cleaned_number,
