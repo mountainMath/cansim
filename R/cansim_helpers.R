@@ -46,16 +46,24 @@ abbreviate_around_escape <- function(x,width=60) {
   paste0(if (start>1) ellipsis else "",substr(x,start,end),if (end<nchar(x)) ellipsis else "")
 }
 
+# R prints a warning as it was assembled, so a message built from several sentences arrives as one
+# long line. Wrapping it to the console width the way ordinary console output is wrapped keeps it
+# readable. Only for messages that are plain prose, anything laid out by hand keeps its own breaks.
+wrap_warning_text <- function(...) {
+  paste(strwrap(paste0(...),width=max(40,getOption("width",80))),collapse="\n")
+}
+
 # `original_values` are the names as StatCan sent them, before repair
 warn_statcan_repairs <- function(original_values,context) {
   if (length(original_values)==0 || isTRUE(getOption("cansim.suppress_repair_warnings"))) return(invisible(NULL))
   example <- original_values[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
-  warning("StatCan returned ",context," containing non-breaking spaces or control characters. ",
-          "These render as an ordinary space or as nothing at all, so the names cannot be typed or ",
-          "copy-pasted, the package has replaced them with regular spaces. ",
-          if (length(original_values)==1) paste0("Repaired \"",example,"\".")
-          else paste0("Repaired ",length(original_values)," names, for example \"",example,"\"."),
-          " Set options(cansim.suppress_repair_warnings=TRUE) to silence this.",
+  warning(wrap_warning_text(
+            "StatCan returned ",context," containing non-breaking spaces or control characters. ",
+            "These render as an ordinary space or as nothing at all, so the names cannot be typed or ",
+            "copy-pasted, the package has replaced them with regular spaces. ",
+            if (length(original_values)==1) paste0("Repaired \"",example,"\".")
+            else paste0("Repaired ",length(original_values)," names, for example \"",example,"\"."),
+            " Set options(cansim.suppress_repair_warnings=TRUE) to silence this."),
           call.=FALSE)
   invisible(NULL)
 }

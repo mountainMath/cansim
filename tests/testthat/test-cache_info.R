@@ -99,8 +99,11 @@ test_that("a cached table carries its version and reports on stale labels", {
   member_name_column <- grep("Member Name",names(members),value=TRUE)
   members[[member_name_column]][1] <- paste0(members[[member_name_column]][1],NBSP)
   saveRDS(members,member_file)
-  expect_warning(get_cansim_connection(table, format="parquet"), "built by cansim 0.4.4 or earlier")
-  expect_warning(get_cansim_connection(table, format="parquet"), "refresh=TRUE", fixed=TRUE)
+  expect_warning(get_cansim_connection(table, format="parquet"))
+  # the warning is wrapped to the console width, so it is matched on the collapsed text
+  warning <- warning_text(get_cansim_connection(table, format="parquet"))
+  expect_match(warning, "built by cansim 0.4.4 or earlier", fixed=TRUE)
+  expect_match(warning, "refresh=TRUE", fixed=TRUE)
 
   old <- options(cansim.suppress_repair_warnings=TRUE)
   on.exit(options(old), add=TRUE)

@@ -154,8 +154,9 @@ test_that("repairing warns about what was changed", {
   # the warning has to show the name as StatCan sent it, a repaired name would hide the problem
   expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
                  "Characteristics<U+00A0>", fixed=TRUE)
-  expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
-                 "non-breaking spaces or control characters")
+  # the warning is wrapped to the console width, so it is matched on the collapsed text
+  expect_match(warning_text(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE)),
+               "non-breaking spaces or control characters", fixed=TRUE)
 
   old <- options(cansim.suppress_repair_warnings=TRUE)
   on.exit(options(old), add=TRUE)

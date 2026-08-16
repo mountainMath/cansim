@@ -370,17 +370,18 @@ get_cansim_connection <- function(cansimTableNumber,
       !isTRUE(getOption("cansim.suppress_repair_warnings"))) {
     cached_version <- read_cache_version(dirname(db_path))
     example <- c(stale_names,stale_labels)[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
-    warning("The cached copy of table ",cleaned_number," was built by cansim ",
-            ifelse(is.null(cached_version),"0.4.4 or earlier",as.character(cached_version)),
-            ", before non-breaking spaces and control characters were repaired, and it has ",
-            ifelse(length(stale_names)>0,paste0(length(stale_names)," column name",
-                                                ifelse(length(stale_names)==1,"","s"),
-                                                ifelse(length(stale_labels)>0," and ","")),""),
-            ifelse(length(stale_labels)>0,paste0(length(stale_labels)," member label",
-                                                 ifelse(length(stale_labels)==1,"","s")),""),
-            " containing them, for example \"",example,"\". These cannot be typed or copy-pasted, ",
-            "and they do not match the same table retrieved by vector, coordinate or table template, ",
-            "which are repaired. Pass `refresh=TRUE` to download the table again and fix the cache.",
+    warning(wrap_warning_text(
+              "The cached copy of table ",cleaned_number," was built by cansim ",
+              ifelse(is.null(cached_version),"0.4.4 or earlier",as.character(cached_version)),
+              ", before non-breaking spaces and control characters were repaired, and it has ",
+              ifelse(length(stale_names)>0,paste0(length(stale_names)," column name",
+                                                  ifelse(length(stale_names)==1,"","s"),
+                                                  ifelse(length(stale_labels)>0," and ","")),""),
+              ifelse(length(stale_labels)>0,paste0(length(stale_labels)," member label",
+                                                   ifelse(length(stale_labels)==1,"","s")),""),
+              " containing them, for example \"",example,"\". These cannot be typed or copy-pasted, ",
+              "and they do not match the same table retrieved by vector, coordinate or table template, ",
+              "which are repaired. Pass `refresh=TRUE` to download the table again and fix the cache."),
             call.=FALSE)
   }
 
