@@ -205,14 +205,8 @@ download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
 
   table_ids <- naked_ndm_table_number(needed)
   url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
-  response <- httr::POST(url,
-                         body=paste0("[",paste(paste0('{"productId":',table_ids,'}'),collapse = ", "),"]"),
-                         encode="json",
-                         httr::add_headers("Content-Type"="application/json")
-  )
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-  }
+  body <- paste0("[",paste(paste0('{"productId":',table_ids,'}'),collapse = ", "),"]")
+  response <- post_with_timeout_retry(url, body=body)
   data <- httr::content(response)
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
   data2 <- Filter(function(x)x$status!="SUCCESS",data)

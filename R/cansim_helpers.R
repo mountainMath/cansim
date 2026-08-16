@@ -107,7 +107,7 @@ get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,warn_only=FAL
     }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
-      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path)
+      response <- get_with_timeout_retry(url,timeout=timeout,retry=retry-1,path=path,warn_only=warn_only)
     } else {
       message("Got timeout from StatCan, giving up")
     }
@@ -157,7 +157,7 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3,warn_only=FALSE
     }
     if (retry>0) {
       message("Got timeout from StatCan, trying again")
-      response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1)
+      response <- post_with_timeout_retry(url,body=body,timeout=timeout,retry=retry-1,warn_only=warn_only)
     } else {
       message("Got timeout from StatCan, giving up")
       response=response$result
