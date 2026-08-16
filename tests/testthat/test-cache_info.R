@@ -6,26 +6,45 @@ new_cache_dir <- function() {
   dir
 }
 
-test_that("the cache records the package version it was parsed under", {
+test_that("the cache records when it was downloaded and what parsed it", {
   dir <- new_cache_dir()
   base <- file.path(dir,"13100920-eng.Rda")
+  downloaded <- as.POSIXct("2026-08-16 11:06:30")
 
-  # a cache with no marker was written before the marker existed, which is to say before 0.4.5
+  # nothing on disk at all
+  expect_equal(cansim:::read_cache_info(dir), list(timeCached=NA_character_,cansimVersion=NA_character_))
   expect_null(cansim:::read_cache_version(dir))
   expect_true(cansim:::cache_predates_value_repair(dir))
 
-  cansim:::write_cache_version(base)
-  expect_true(file.exists(paste0(base,"_version")))
+  cansim:::write_cache_info(base,downloaded)
+  expect_true(file.exists(paste0(base,"_info")))
+  info <- cansim:::read_cache_info(dir)
+  expect_equal(info$timeCached, "2026-08-16 11:06:30")
+  expect_equal(info$cansimVersion, as.character(utils::packageVersion("cansim")))
   expect_equal(cansim:::read_cache_version(dir), utils::packageVersion("cansim"))
   expect_false(cansim:::cache_predates_value_repair(dir))
 
-  # an unreadable or nonsensical marker is treated the same as a missing one rather than erroring
-  saveRDS("not a version",paste0(base,"_version"))
+  # a nonsensical version is treated the same as a missing one rather than erroring
+  saveRDS(list(timeCached="2026-08-16 11:06:30",cansimVersion="not a version"),paste0(base,"_info"))
   expect_null(cansim:::read_cache_version(dir))
   expect_true(cansim:::cache_predates_value_repair(dir))
+  expect_equal(cansim:::read_cache_info(dir)$timeCached, "2026-08-16 11:06:30")
+})
 
-  saveRDS("0.4.4",paste0(base,"_version"))
+test_that("a cache written before 0.4.5 still gives up its timestamp", {
+  dir <- new_cache_dir()
+  base <- file.path(dir,"13100920-eng.Rda")
+
+  # up to 0.4.4 the timestamp lived on its own and there was no version
+  saveRDS("2025-08-16 14:16:06",paste0(base,"_time"))
+  expect_equal(cansim:::read_cache_info(dir),
+               list(timeCached="2025-08-16 14:16:06",cansimVersion=NA_character_))
   expect_true(cansim:::cache_predates_value_repair(dir))
+
+  # refreshing such a cache replaces the old file rather than leaving it behind to go stale
+  cansim:::write_cache_info(base,as.POSIXct("2026-08-16 11:06:30"))
+  expect_false(file.exists(paste0(base,"_time")))
+  expect_equal(cansim:::read_cache_info(dir)$timeCached, "2026-08-16 11:06:30")
 })
 
 test_that("an old cache is checked against the metadata cached with it", {
@@ -73,7 +92,8 @@ test_that("a cached table carries its version and reports on stale labels", {
   # a cache written before 0.4.5 has no marker and holds the characters StatCan sent in the metadata
   # cached with it, which is what puts them in the data next to it
   table_dir <- file.path(cache_path,dir(cache_path,"parquet"))
-  file.remove(file.path(table_dir,dir(table_dir,"\\.Rda_version$")))
+  info_file <- file.path(table_dir,dir(table_dir,"\\.Rda_info$"))
+  saveRDS(readRDS(info_file)["timeCached"],info_file)
   member_file <- file.path(table_dir,dir(table_dir,"\\.Rda_column_1$"))
   members <- readRDS(member_file)
   member_name_column <- grep("Member Name",names(members),value=TRUE)

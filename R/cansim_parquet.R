@@ -263,14 +263,8 @@ get_cansim_connection <- function(cansimTableNumber,
       DBI::dbDisconnect(con)
     }
 
-    # saving timestamp
-    tryCatch(
-      saveRDS(strftime(time_check,format=TIME_FORMAT),paste0(meta_base_path,"_time")),
-      error = function(e) warning("Failed to save cache timestamp: ", e$message)
-    )
-
-    # the timestamp says how old the data is, this says how old the parsing of it is
-    write_cache_version(meta_base_path)
+    # when the data was downloaded, and which version of the package parsed it
+    write_cache_info(meta_base_path,time_check)
 
 
   } else {
@@ -703,13 +697,11 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
     cache_metadata <- lapply(result$path, function(p) {
       full_path <- file.path(cache_path, p)
 
-      # Get timeCached
-      time_file <- dir(full_path, "\\.Rda_time")
-      if (length(time_file) == 1) {
-        time_cached <- strptime(readRDS(file.path(full_path, time_file)), format = TIME_FORMAT)
-      } else {
-        time_cached <- strptime("1900-01-01 01:00:00", format = TIME_FORMAT)
-      }
+      # when the table was downloaded and which version of the package parsed it, the version is
+      # absent for anything cached before 0.4.5
+      info <- read_cache_info(full_path)
+      time_cached <- strptime(ifelse(is.na(info$timeCached),"1900-01-01 01:00:00",info$timeCached),
+                              format = TIME_FORMAT)
 
       # Get rawSize
       data_file <- dir(full_path, "\\.sqlite$|\\.arrow$|\\.parquet$")
@@ -732,11 +724,8 @@ list_cansim_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE_PATH')
         title <- NA_character_
       }
 
-      # the package version the cache was parsed under, absent for anything cached before 0.4.5
-      cansim_version <- read_cache_version(full_path)
-      cansim_version <- if (is.null(cansim_version)) NA_character_ else as.character(cansim_version)
-
-      list(timeCached = time_cached, rawSize = raw_size, title = title, cansimVersion = cansim_version)
+      list(timeCached = time_cached, rawSize = raw_size, title = title,
+           cansimVersion = info$cansimVersion)
     })
 
     result$timeCached <- do.call("c", lapply(cache_metadata, `[[`, "timeCached"))

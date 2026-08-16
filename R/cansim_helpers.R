@@ -127,28 +127,59 @@ repair_statcan_dimension_values <- function(data,dimension_names,cleaned_languag
   data
 }
 
-# A cached table holds whatever the parser of the day wrote into it. The download timestamp says
-# whether StatCan has newer data, it says nothing about whether the package has since changed how it
-# reads that data, so the version that did the parsing is recorded alongside it.
-CACHE_VERSION_SUFFIX <- "_version"
+# Two things about a cached table are not in the data itself, when it was downloaded and which
+# version of the package parsed it. The first says whether StatCan has newer data, the second says
+# whether this version of the package would read the same files the same way. They are kept together
+# in one file next to the data, `.Rda_info`, as a named list so that further entries can join them.
+CACHE_INFO_SUFFIX <- "_info"
+
+# up to 0.4.4 the timestamp lived on its own in `.Rda_time` and there was no version at all
+LEGACY_CACHE_TIME_SUFFIX <- "_time"
 
 # non-breaking spaces and control characters in column names and member labels are repaired as of
 # this version, anything cached before it still carries the characters StatCan sent
 VALUE_REPAIR_VERSION <- package_version("0.4.5")
 
-write_cache_version <- function(meta_base_path) {
+write_cache_info <- function(meta_base_path,time_cached) {
   tryCatch(
-    saveRDS(as.character(utils::packageVersion("cansim")),paste0(meta_base_path,CACHE_VERSION_SUFFIX)),
-    error = function(e) warning("Failed to save cache version: ", e$message)
+    saveRDS(list(timeCached=strftime(time_cached,format=TIME_FORMAT),
+                 cansimVersion=as.character(utils::packageVersion("cansim"))),
+            paste0(meta_base_path,CACHE_INFO_SUFFIX)),
+    error = function(e) warning("Failed to save cache info: ", e$message)
   )
+  # a table refreshed into a cache that still has the old timestamp file leaves it behind stale
+  legacy_file <- paste0(meta_base_path,LEGACY_CACHE_TIME_SUFFIX)
+  if (file.exists(legacy_file)) unlink(legacy_file)
+  invisible(NULL)
 }
 
-# The marker itself only arrived in 0.4.5, so a cache that has none was built before that. Returns
-# `NULL` in that case rather than a version, the caller decides what an unmarked cache means.
+# Always returns both entries, either of them `NA` when the cache does not say. A cache written
+# before 0.4.5 has the timestamp on its own and no version, which is itself the tell that the files
+# were parsed by a version that predates everything the version is consulted about.
+read_cache_info <- function(cache_dir) {
+  info_file <- dir(cache_dir,paste0("\\.Rda",CACHE_INFO_SUFFIX,"$"))
+  if (length(info_file)==1) {
+    info <- tryCatch(readRDS(file.path(cache_dir,info_file)),error=function(e) NULL)
+    if (is.list(info)) {
+      entry <- function(name) if (length(info[[name]])==1) as.character(info[[name]]) else NA_character_
+      return(list(timeCached=entry("timeCached"),cansimVersion=entry("cansimVersion")))
+    }
+  }
+
+  time_file <- dir(cache_dir,paste0("\\.Rda",LEGACY_CACHE_TIME_SUFFIX,"$"))
+  time_cached <- NA_character_
+  if (length(time_file)==1) {
+    time_cached <- tryCatch(as.character(readRDS(file.path(cache_dir,time_file))),
+                            error=function(e) NA_character_)
+  }
+  list(timeCached=time_cached,cansimVersion=NA_character_)
+}
+
+# `NULL` when the cache does not record one, the caller decides what an unmarked cache means
 read_cache_version <- function(cache_dir) {
-  version_file <- dir(cache_dir,paste0("\\.Rda",CACHE_VERSION_SUFFIX,"$"))
-  if (length(version_file)!=1) return(NULL)
-  tryCatch(package_version(readRDS(file.path(cache_dir,version_file))),error=function(e) NULL)
+  version <- read_cache_info(cache_dir)$cansimVersion
+  if (is.na(version)) return(NULL)
+  tryCatch(package_version(version),error=function(e) NULL)
 }
 
 cache_predates_value_repair <- function(cache_dir) {
