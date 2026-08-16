@@ -5,6 +5,14 @@
   varies by member of that dimension, so the unit is resolved per coordinate. Tables that have no unit of
   measure, for example census tables, get no unit columns, matching the full table download (#170)
 
+* non-breaking spaces and control characters in names returned by StatCan are now replaced with regular
+  spaces. These characters render as an ordinary space or as nothing at all, so a column whose name
+  contained one could not be reached by typing or copy-pasting what the console displayed. The repair
+  covers table downloads, vector and coordinate calls, cube metadata, table templates and the cube list,
+  and emits a warning naming what was changed. Set `options(cansim.suppress_repair_warnings=TRUE)` to
+  silence the warning. Column names of tables cached before this release keep the original characters
+  until the table is downloaded again, `get_cansim_connection()` warns when it finds such a cache (#169)
+
 ## Deprecations
 * `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now
   also documented as deprecated, matching the deprecation warnings they already emit. Use

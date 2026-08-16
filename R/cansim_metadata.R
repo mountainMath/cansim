@@ -75,11 +75,17 @@ parse_metadata <- function(meta,data_path){
 
   cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
 
-  meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)])
+  # Dimension and member names have to be repaired the same way as the column names of the data
+  # itself, otherwise the two no longer match and metadata stops folding in. The repair is silent
+  # here, the caller has already reported on the column names of this table.
+  meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)]) %>%
+    repair_statcan_columns(cube_title_column)
   saveRDS(meta1,file=paste0(data_path,"1"))
-  meta2 <- read_meta(meta[seq(cut_indices[1],cut_indices[2]-1)])
+  meta2 <- read_meta(meta[seq(cut_indices[1],cut_indices[2]-1)]) %>%
+    repair_statcan_columns(dimension_name_column)
   saveRDS(meta2,file=paste0(data_path,"2"))
-  meta3 <- read_meta(meta[seq(cut_indices[2],cut_indices[3]-1)])
+  meta3 <- read_meta(meta[seq(cut_indices[2],cut_indices[3]-1)]) %>%
+    repair_statcan_columns(member_name_column)
   saveRDS(meta3,file=paste0(data_path,"2m"))
   correction_index <- grep(paste0('^"',correction_id_grepl_field,'"'),meta)
   if (length(correction_index)==0) correction_index=length(meta)
@@ -250,7 +256,9 @@ cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
       select(-"l") %>%
       tidyr::pivot_wider() %>%
-      mutate_all(\(x)paste0(unlist(x), collapse=", "))
+      mutate_all(\(x)paste0(unlist(x), collapse=", ")) %>%
+      repair_statcan_columns(c("cubeTitleEn","cubeTitleFr"),
+                             context=paste0("the title of table ",cansimTableNumber))
     saveRDS(m1, meta1_path)
   } else {
     m1 <- readRDS(meta1_path)
@@ -264,7 +272,9 @@ cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=
           tidyr::unnest_wider("member")  %>%
           mutate(across(where(is.integer),as.character))
       }) %>%
-      arrange(as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
+      arrange(as.integer(.data$dimensionPositionId),as.integer(.data$memberId)) %>%
+      repair_statcan_columns(c("dimensionNameEn","dimensionNameFr","memberNameEn","memberNameFr"),
+                             context=paste0("dimension or member names for table ",cansimTableNumber))
     saveRDS(m2, meta2_path)
   } else {
     m2 <- readRDS(meta2_path)

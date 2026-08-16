@@ -1,0 +1,83 @@
+NON_BREAKING_SPACE <- intToUtf8(0x00A0)
+ZERO_WIDTH_SPACE <- intToUtf8(0x200B)
+PROBLEM_CHARACTERS <- paste0("[",intToUtf8(c(0x00A0,0x0009,0x000A,0x000D,0x200B,0xFEFF)),"]")
+
+has_problem_characters <- function(x) any(grepl(PROBLEM_CHARACTERS,x),na.rm=TRUE)
+
+test_that("non-standard whitespace is repaired", {
+  repair <- cansim:::repair_statcan_strings
+
+  expect_equal(repair(paste0("Characteristics",NON_BREAKING_SPACE)), "Characteristics")
+  expect_equal(repair(paste0("Factors for job promotion ",NON_BREAKING_SPACE)), "Factors for job promotion")
+  expect_equal(repair(paste0("Performance",NON_BREAKING_SPACE,"strategy")), "Performance strategy")
+  expect_equal(repair(paste0("Performance",NON_BREAKING_SPACE," strategy")), "Performance strategy")
+  expect_equal(repair("Geographic region\n"), "Geographic region")
+  expect_equal(repair("a\tb"), "a b")
+
+  # zero width characters are dropped rather than turned into a space
+  expect_equal(repair(paste0("ab",ZERO_WIDTH_SPACE,"cd")), "abcd")
+})
+
+test_that("repair leaves ordinary strings untouched", {
+  repair <- cansim:::repair_statcan_strings
+
+  # squishing and trimming must not reach strings that hold none of the problem characters
+  expect_equal(repair("Already clean"), "Already clean")
+  expect_equal(repair("Double  space kept"), "Double  space kept")
+  expect_equal(repair(" leading and trailing kept "), " leading and trailing kept ")
+  expect_equal(repair(c(NA_character_,"")), c(NA_character_,""))
+  expect_equal(repair(character(0)), character(0))
+  expect_equal(repair(1:3), 1:3)
+
+  # applying the repair twice changes nothing further
+  once <- repair(paste0("a",NON_BREAKING_SPACE,"b"))
+  expect_equal(repair(once), once)
+})
+
+test_that("cube metadata and table templates have usable names", {
+  skip_on_cran()
+
+  # 46-10-0101 has non-breaking spaces inside a dimension name, 13-10-0397 has one trailing,
+  # 37-10-0295 has a line feed
+  for (table in c("46-10-0101","13-10-0397","37-10-0295")) {
+    members <- suppressWarnings(get_cansim_cube_metadata(table, type="members", refresh=TRUE))
+    expect_false(has_problem_characters(members$dimensionNameEn))
+    expect_false(has_problem_characters(members$dimensionNameFr))
+    expect_false(has_problem_characters(members$memberNameEn))
+    expect_false(has_problem_characters(members$memberNameFr))
+
+    template <- suppressWarnings(get_cansim_table_template(table))
+    expect_false(has_problem_characters(names(template)))
+  }
+})
+
+test_that("repaired columns are reachable and still carry their metadata", {
+  skip_on_cran()
+
+  table <- "27-10-0123"
+  data <- suppressWarnings(get_cansim(table, refresh=TRUE))
+
+  expect_false(has_problem_characters(names(data)))
+  # the dimension StatCan spells with a non-breaking space can be addressed by its plain name
+  expect_true("Performance strategy" %in% names(data))
+  expect_equal(nrow(dplyr::select(data,"Performance strategy")), nrow(data))
+
+  # metadata still folds in, which only works when the data columns and the metadata dimension
+  # names are repaired the same way
+  expect_true("Hierarchy for Performance strategy" %in% names(data))
+  expect_true("Classification Code for Performance strategy" %in% names(data))
+
+  expect_false(any(vapply(data[vapply(data,is.factor,logical(1))],
+                          \(f) has_problem_characters(levels(f)), logical(1))))
+})
+
+test_that("repairing warns about what was changed", {
+  skip_on_cran()
+
+  expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
+                 "non-breaking spaces or control characters")
+
+  old <- options(cansim.suppress_repair_warnings=TRUE)
+  on.exit(options(old), add=TRUE)
+  expect_no_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
+})

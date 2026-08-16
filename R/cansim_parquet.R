@@ -152,7 +152,10 @@ get_cansim_connection <- function(cansimTableNumber,
                                 locale=readr::locale(encoding="UTF-8"),
                                 col_types = list(.default = "c"),
                                 col_names = FALSE) %>%
-      as.character()
+      as.character() %>%
+      # repaired before the duplicate check below, since the repair itself can turn two names that
+      # differed only by a non-breaking space into the same name
+      repair_statcan_names(context=paste0("column names for table ",cansimTableNumber))
 
     symbols <- which(header=="Symbol" | header=="Symbole")
     if (length(symbols)==0) {
@@ -351,6 +354,19 @@ get_cansim_connection <- function(cansimTableNumber,
 
   attr(con,"language") <- cleaned_language
   attr(con,"cansimTableNumber") <- cansimTableNumber
+
+  # Column names are baked into the cached files, so a table cached before these characters were
+  # repaired keeps them until it is downloaded again.
+  cached_names <- tryCatch(if (inherits(con,"tbl_lazy")) colnames(con) else names(con),
+                           error=function(e) character(0))
+  stale_names <- cached_names[cached_names!=repair_statcan_strings(cached_names)]
+  if (length(stale_names)>0 && !isTRUE(getOption("cansim.suppress_repair_warnings"))) {
+    warning("The cached copy of table ",cleaned_number," has column names containing non-breaking ",
+            "spaces or control characters: ",paste0("\"",stale_names,"\"",collapse=", "),
+            ". These cannot be typed or copy-pasted. The cache predates the automatic repair of ",
+            "these characters, pass `refresh=TRUE` to download the table again and fix the names.",
+            call.=FALSE)
+  }
 
   con
 }

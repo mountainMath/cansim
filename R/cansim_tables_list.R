@@ -147,7 +147,11 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
         mutate(surveyEn=lapply(.data$surveyCode,function(d)surveys_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
         mutate(surveyFr=lapply(.data$surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
         mutate(subjectEn=lapply(.data$subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(subjectFr=lapply(.data$subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist)
+        mutate(subjectFr=lapply(.data$subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+        # the cube list doubles as an internal lookup, for example when checking whether a cached
+        # table is out of date, so it only reports on repairs when called on the user's behalf
+        repair_statcan_columns(c("cubeTitleEn","cubeTitleFr","dimensionNameEn","dimensionNameFr"),
+                               context=if (quiet) NULL else "table titles or dimension names")
 
       saveRDS(data,path)
     } else {

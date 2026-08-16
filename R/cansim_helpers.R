@@ -1,3 +1,65 @@
+# StatCan returns some names containing characters that are either invisible or that render as an
+# ordinary space, most importantly the non-breaking space U+00A0. A name holding one of these cannot
+# be reached by typing or copy-pasting what the console displays, which makes the corresponding
+# column inaccessible in an R session. Line feeds and other control characters cause the same problem.
+ZERO_WIDTH_CHARACTERS <- paste0("[",intToUtf8(c(0x200B,0x200C,0x200D,0xFEFF)),"]")
+SPACE_LIKE_CHARACTERS <- paste0("[",intToUtf8(c(0x0009,0x000A,0x000B,0x000C,0x000D,0x00A0,0x1680,
+                                               0x2000:0x200A,0x2028,0x2029,0x202F,0x205F,0x3000)),"]")
+
+# Zero width characters are dropped, everything else that behaves like a space becomes a regular
+# space. Strings that contain none of these are returned untouched, so that the squishing and
+# trimming below can never alter a name StatCan spelled with ordinary characters.
+repair_statcan_strings <- function(x) {
+  if (length(x)==0 || !is.character(x)) return(x)
+  needs_repair <- !is.na(x) & grepl(paste0(ZERO_WIDTH_CHARACTERS,"|",SPACE_LIKE_CHARACTERS),x)
+  if (!any(needs_repair)) return(x)
+
+  x[needs_repair] <- x[needs_repair] %>%
+    gsub(ZERO_WIDTH_CHARACTERS,"",.) %>%
+    gsub(SPACE_LIKE_CHARACTERS," ",.) %>%
+    gsub(" {2,}"," ",.) %>%
+    trimws()
+
+  x
+}
+
+warn_statcan_repairs <- function(repaired_values,context) {
+  if (length(repaired_values)==0 || isTRUE(getOption("cansim.suppress_repair_warnings"))) return(invisible(NULL))
+  shown <- utils::head(repaired_values,5)
+  warning("StatCan returned ",context," containing non-breaking spaces or control characters. ",
+          "Such names cannot be typed or copy-pasted and would make the affected data inaccessible, ",
+          "the package has replaced these characters with regular spaces. Repaired: ",
+          paste0("\"",shown,"\"",collapse=", "),
+          if (length(repaired_values)>length(shown)) paste0(" and ",length(repaired_values)-length(shown)," more") else "",
+          ". Set options(cansim.suppress_repair_warnings=TRUE) to silence this.",
+          call.=FALSE)
+  invisible(NULL)
+}
+
+# repairs a character vector of names and reports once on what changed
+repair_statcan_names <- function(x,context=NULL) {
+  repaired <- repair_statcan_strings(x)
+  if (!is.null(context)) {
+    warn_statcan_repairs(unique(repaired[!is.na(x) & repaired!=x]),context)
+  }
+  repaired
+}
+
+# repairs the given columns of a table and reports once across all of them
+repair_statcan_columns <- function(data,columns,context=NULL) {
+  columns <- intersect(columns,names(data))
+  changed <- character(0)
+  for (column in columns) {
+    repaired <- repair_statcan_strings(data[[column]])
+    if (!identical(repaired,data[[column]])) {
+      changed <- c(changed,repaired[!is.na(data[[column]]) & repaired!=data[[column]]])
+      data[[column]] <- repaired
+    }
+  }
+  if (!is.null(context)) warn_statcan_repairs(unique(changed),context)
+  data
+}
+
 cleaned_ndm_table_number <- function(cansimTableNumber){
   if (is.numeric(cansimTableNumber)) {
     warning(paste0("The cansim table number ",cansimTableNumber," used in this query is numeric,\n",

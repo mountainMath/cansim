@@ -463,7 +463,8 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
                                                       grouping_mark = "."),
                                  col_types = list(.default = "c"),
                                  col_names = FALSE) %>%
-      as.character()
+      as.character() %>%
+      repair_statcan_names(context=paste0("column names for table ",cleaned_number))
 
     symbols <- which(header=="Symbol" | header=="Symbole")
     if (length(symbols)==0) {
