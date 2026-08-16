@@ -9,8 +9,9 @@
   spaces. These characters render as an ordinary space or as nothing at all, so a column whose name
   contained one could not be reached by typing or copy-pasting what the console displayed. The repair
   covers table downloads, vector and coordinate calls, cube metadata, table templates and the cube list,
-  and emits a warning naming what was changed. Set `options(cansim.suppress_repair_warnings=TRUE)` to
-  silence the warning. Column names of tables cached before this release keep the original characters
+  and emits a warning that shows the offending characters by code point, for example
+  `Performance<U+00A0> strategy`, together with a count of how many names were repaired. Set
+  `options(cansim.suppress_repair_warnings=TRUE)` to silence the warning. Column names of tables cached before this release keep the original characters
   until the table is downloaded again, `get_cansim_connection()` warns when it finds such a cache (#169)
 
 ## Deprecations

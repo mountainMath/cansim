@@ -71,9 +71,28 @@ test_that("repaired columns are reachable and still carry their metadata", {
                           \(f) has_problem_characters(levels(f)), logical(1))))
 })
 
+test_that("the offending characters are shown by code point", {
+  escape <- cansim:::escape_statcan_characters
+  abbreviate <- cansim:::abbreviate_around_escape
+
+  expect_equal(escape(paste0("Performance",NON_BREAKING_SPACE," strategy")), "Performance<U+00A0> strategy")
+  expect_equal(escape("Geographic region\n"), "Geographic region<U+000A>")
+  expect_equal(escape(paste0("ab",ZERO_WIDTH_SPACE,"cd")), "ab<U+200B>cd")
+  expect_equal(escape("nothing to escape"), "nothing to escape")
+
+  # a short name is shown whole, a long one is windowed so the marker stays visible
+  expect_equal(abbreviate("a<U+00A0>b"), "a<U+00A0>b")
+  long <- abbreviate(escape(paste0(strrep("x",90),NON_BREAKING_SPACE,"31")))
+  expect_true(nchar(long) < 90)
+  expect_true(endsWith(long, "<U+00A0>31"))
+})
+
 test_that("repairing warns about what was changed", {
   skip_on_cran()
 
+  # the warning has to show the name as StatCan sent it, a repaired name would hide the problem
+  expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
+                 "Characteristics<U+00A0>", fixed=TRUE)
   expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
                  "non-breaking spaces or control characters")
 

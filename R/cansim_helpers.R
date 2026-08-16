@@ -2,9 +2,11 @@
 # ordinary space, most importantly the non-breaking space U+00A0. A name holding one of these cannot
 # be reached by typing or copy-pasting what the console displays, which makes the corresponding
 # column inaccessible in an R session. Line feeds and other control characters cause the same problem.
-ZERO_WIDTH_CHARACTERS <- paste0("[",intToUtf8(c(0x200B,0x200C,0x200D,0xFEFF)),"]")
-SPACE_LIKE_CHARACTERS <- paste0("[",intToUtf8(c(0x0009,0x000A,0x000B,0x000C,0x000D,0x00A0,0x1680,
-                                               0x2000:0x200A,0x2028,0x2029,0x202F,0x205F,0x3000)),"]")
+ZERO_WIDTH_CODE_POINTS <- c(0x200B,0x200C,0x200D,0xFEFF)
+SPACE_LIKE_CODE_POINTS <- c(0x0009,0x000A,0x000B,0x000C,0x000D,0x00A0,0x1680,
+                            0x2000:0x200A,0x2028,0x2029,0x202F,0x205F,0x3000)
+ZERO_WIDTH_CHARACTERS <- paste0("[",intToUtf8(ZERO_WIDTH_CODE_POINTS),"]")
+SPACE_LIKE_CHARACTERS <- paste0("[",intToUtf8(SPACE_LIKE_CODE_POINTS),"]")
 
 # Zero width characters are dropped, everything else that behaves like a space becomes a regular
 # space. Strings that contain none of these are returned untouched, so that the squishing and
@@ -23,15 +25,37 @@ repair_statcan_strings <- function(x) {
   x
 }
 
-warn_statcan_repairs <- function(repaired_values,context) {
-  if (length(repaired_values)==0 || isTRUE(getOption("cansim.suppress_repair_warnings"))) return(invisible(NULL))
-  shown <- utils::head(repaired_values,5)
+# Renders the offending characters as their code points. A report that showed the repaired name
+# would hide the very thing it is reporting on, since these characters are invisible on screen.
+escape_statcan_characters <- function(x) {
+  for (code_point in c(ZERO_WIDTH_CODE_POINTS,SPACE_LIKE_CODE_POINTS)) {
+    x <- gsub(intToUtf8(code_point),sprintf("<U+%04X>",code_point),x,fixed=TRUE)
+  }
+  x
+}
+
+# Keeps the report readable when the offending character sits in the middle of a long table title,
+# by showing a window around it rather than the whole string.
+abbreviate_around_escape <- function(x,width=60) {
+  if (is.na(x) || nchar(x)<=width) return(x)
+  ellipsis <- intToUtf8(0x2026)
+  at <- regexpr("<U+",x,fixed=TRUE)
+  if (at<0) return(paste0(substr(x,1,width),ellipsis))
+  end <- min(nchar(x),max(width,at-1+floor(width/2)))
+  start <- max(1,end-width+1)
+  paste0(if (start>1) ellipsis else "",substr(x,start,end),if (end<nchar(x)) ellipsis else "")
+}
+
+# `original_values` are the names as StatCan sent them, before repair
+warn_statcan_repairs <- function(original_values,context) {
+  if (length(original_values)==0 || isTRUE(getOption("cansim.suppress_repair_warnings"))) return(invisible(NULL))
+  example <- original_values[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
   warning("StatCan returned ",context," containing non-breaking spaces or control characters. ",
-          "Such names cannot be typed or copy-pasted and would make the affected data inaccessible, ",
-          "the package has replaced these characters with regular spaces. Repaired: ",
-          paste0("\"",shown,"\"",collapse=", "),
-          if (length(repaired_values)>length(shown)) paste0(" and ",length(repaired_values)-length(shown)," more") else "",
-          ". Set options(cansim.suppress_repair_warnings=TRUE) to silence this.",
+          "These render as an ordinary space or as nothing at all, so the names cannot be typed or ",
+          "copy-pasted, the package has replaced them with regular spaces. ",
+          if (length(original_values)==1) paste0("Repaired \"",example,"\".")
+          else paste0("Repaired ",length(original_values)," names, for example \"",example,"\"."),
+          " Set options(cansim.suppress_repair_warnings=TRUE) to silence this.",
           call.=FALSE)
   invisible(NULL)
 }
@@ -40,7 +64,7 @@ warn_statcan_repairs <- function(repaired_values,context) {
 repair_statcan_names <- function(x,context=NULL) {
   repaired <- repair_statcan_strings(x)
   if (!is.null(context)) {
-    warn_statcan_repairs(unique(repaired[!is.na(x) & repaired!=x]),context)
+    warn_statcan_repairs(unique(x[!is.na(x) & repaired!=x]),context)
   }
   repaired
 }
@@ -50,9 +74,10 @@ repair_statcan_columns <- function(data,columns,context=NULL) {
   columns <- intersect(columns,names(data))
   changed <- character(0)
   for (column in columns) {
-    repaired <- repair_statcan_strings(data[[column]])
-    if (!identical(repaired,data[[column]])) {
-      changed <- c(changed,repaired[!is.na(data[[column]]) & repaired!=data[[column]]])
+    original <- data[[column]]
+    repaired <- repair_statcan_strings(original)
+    if (!identical(repaired,original)) {
+      changed <- c(changed,original[!is.na(original) & repaired!=original])
       data[[column]] <- repaired
     }
   }

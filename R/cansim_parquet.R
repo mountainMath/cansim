@@ -361,10 +361,12 @@ get_cansim_connection <- function(cansimTableNumber,
                            error=function(e) character(0))
   stale_names <- cached_names[cached_names!=repair_statcan_strings(cached_names)]
   if (length(stale_names)>0 && !isTRUE(getOption("cansim.suppress_repair_warnings"))) {
-    warning("The cached copy of table ",cleaned_number," has column names containing non-breaking ",
-            "spaces or control characters: ",paste0("\"",stale_names,"\"",collapse=", "),
-            ". These cannot be typed or copy-pasted. The cache predates the automatic repair of ",
-            "these characters, pass `refresh=TRUE` to download the table again and fix the names.",
+    example <- stale_names[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
+    warning("The cached copy of table ",cleaned_number," has ",length(stale_names)," column name",
+            ifelse(length(stale_names)==1,"","s")," containing non-breaking spaces or control ",
+            "characters, for example \"",example,"\". These cannot be typed or copy-pasted. The ",
+            "cache predates the automatic repair of these characters, pass `refresh=TRUE` to ",
+            "download the table again and fix the names.",
             call.=FALSE)
   }
 
