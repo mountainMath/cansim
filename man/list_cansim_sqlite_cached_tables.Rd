@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{list_cansim_sqlite_cached_tables}
 \alias{list_cansim_sqlite_cached_tables}
-\title{List cached cansim SQLite database}
+\title{List cached cansim SQLite database (deprecated)}
 \usage{
 list_cansim_sqlite_cached_tables(
   cache_path = Sys.getenv("CANSIM_CACHE_PATH"),
@@ -18,7 +18,8 @@ list_cansim_sqlite_cached_tables(
 A tibble with the list of all tables that are currently cached at the given cache path.
 }
 \description{
-List cached cansim SQLite database
+This method is deprecated and will be removed in a future version, please use
+`list_cansim_cached_tables()` instead.
 }
 \examples{
 \dontrun{

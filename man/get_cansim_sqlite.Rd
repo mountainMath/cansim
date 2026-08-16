@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{get_cansim_sqlite}
 \alias{get_cansim_sqlite}
-\title{Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection}
+\title{Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection (deprecated)}
 \usage{
 get_cansim_sqlite(
   cansimTableNumber,
@@ -31,6 +31,8 @@ in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Othe
 A database connection to a local SQLite database with the StatCan Table data.
 }
 \description{
+This method is deprecated and will be removed in a future version, please use
+`get_cansim_connection(..., format="sqlite")` instead.
 Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
 cached permanently if a cache path is supplied or for duration of the current R session.
 The function will check against the latest release data for the table and emit a warning message

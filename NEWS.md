@@ -1,4 +1,18 @@
 # cansim 0.4.5
+## Deprecations
+* `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now
+  also documented as deprecated, matching the deprecation warnings they already emit. Use
+  `get_cansim_connection(..., format="sqlite")`, `list_cansim_cached_tables()` and
+  `remove_cansim_cached_tables(..., format="sqlite")` instead
+* the deprecated `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()`, `remove_cansim_sqlite_cached_table()`,
+  `list_cansim_tables()` and `search_cansim_tables()` are scheduled for removal in a future release
+
+## Performance
+* hierarchy building in metadata parsing no longer re-parses the growing hierarchy paths, hierarchies are built
+  one ancestor level at a time across all members at once
+* coordinates are split once into a character matrix when folding in metadata and converting to factors
+* table templates are built with a single cartesian product instead of joining one dimension at a time
+
 ## Minor changes
 * better connection error handling
 * fix `get_cansim_cube_metadata()` and `get_cansim_table_template()` for vectors of table numbers, metadata for

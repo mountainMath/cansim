@@ -2,8 +2,10 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 
 
 
-#' Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection
+#' Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection (deprecated)
 #'
+#' This method is deprecated and will be removed in a future version, please use
+#' `get_cansim_connection(..., format="sqlite")` instead.
 #' Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
 #' cached permanently if a cache path is supplied or for duration of the current R session.
 #' The function will check against the latest release data for the table and emit a warning message
@@ -71,7 +73,10 @@ disconnect_cansim_sqlite <- function(connection){
 
 
 
-#' List cached cansim SQLite database
+#' List cached cansim SQLite database (deprecated)
+#'
+#' This method is deprecated and will be removed in a future version, please use
+#' `list_cansim_cached_tables()` instead.
 #'
 #' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`.
 #' @param refresh Optional, refresh the last updated date of cached cansim tables
@@ -91,7 +96,10 @@ list_cansim_sqlite_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE
     filter(.data$dataFormat=="sqlite")
 }
 
-#' Remove cached cansim SQLite database
+#' Remove cached cansim SQLite database (deprecated)
+#'
+#' This method is deprecated and will be removed in a future version, please use
+#' `remove_cansim_cached_tables(..., format="sqlite")` instead.
 #'
 #' @param cansimTableNumber Number of the table to be removed
 #' @param language Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages

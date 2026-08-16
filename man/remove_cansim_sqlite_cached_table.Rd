@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{remove_cansim_sqlite_cached_table}
 \alias{remove_cansim_sqlite_cached_table}
-\title{Remove cached cansim SQLite database}
+\title{Remove cached cansim SQLite database (deprecated)}
 \usage{
 remove_cansim_sqlite_cached_table(
   cansimTableNumber,
@@ -22,7 +22,8 @@ will be removed}
 `NULL``
 }
 \description{
-Remove cached cansim SQLite database
+This method is deprecated and will be removed in a future version, please use
+`remove_cansim_cached_tables(..., format="sqlite")` instead.
 }
 \examples{
 \dontrun{
