@@ -30,7 +30,7 @@ TIME_FORMAT <- "%Y-%m-%d %H:%M:%S"
 #' # Work with the data connection
 #' glimpse(con)
 #'
-#' disconnect_cansim_sqlite(con)
+#' disconnect_cansim_connection(con)
 #' }
 #' @keywords internal
 #' @export
@@ -53,22 +53,27 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                 cache_path=cache_path)
 }
 
-#' Disconnect from a cansim database connection
+#' Disconnect from a cansim database connection (deprecated)
+#'
+#' This method is deprecated and will be removed in a future version, please use
+#' `disconnect_cansim_connection()` instead.
 #'
 #' @param connection connection to database
 #' @return `NULL``
 #'
 #' @examples
 #' \dontrun{
-#' con <- get_cansim_sqlite("34-10-0013")
-#' disconnect_cansim_sqlite(con)
+#' con <- get_cansim_connection("34-10-0013", format="sqlite")
+#' disconnect_cansim_connection(con)
 #' }
+#' @keywords internal
 #' @export
 disconnect_cansim_sqlite <- function(connection){
-  if ("tbl_sql" %in% class(connection)) {
-    DBI::dbDisconnect(connection$src$con)
-  }
-  invisible()
+  .Deprecated("disconnect_cansim_connection",
+              package="cansim",
+              msg="This function has been deprecated, it will be removed in future versions. Please use disconnect_cansim_connection(...) instead.")
+
+  disconnect_cansim_connection(connection)
 }
 
 
@@ -111,7 +116,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE
 #' @examples
 #' \dontrun{
 #' con <- get_cansim_connection("34-10-0013", format="sqlite")
-#' disconnect_cansim_sqlite(con)
+#' disconnect_cansim_connection(con)
 #' remove_cansim_cached_tables("34-10-0013", format="sqlite")
 #' }
 #' @keywords internal

@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Working with large tables">
@@ -218,10 +218,10 @@ by the GeoUID.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.parquet</span><span class="op">)</span></span>
 <span><span class="co">#&gt; FileSystemDataset with 1 Parquet file</span></span>
 <span><span class="co">#&gt; 163,410 rows x 19 columns</span></span>
-<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1965-06", "1965-06", "1965-06", "1965-06", "…</span></span>
-<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Quebec", "Quebec", "Quebec", "Quebec", "Onta…</span></span>
-<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "2016A000224", "2016A000224", "2016A000224", …</span></span>
-<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Trucks", "Trucks", "Trucks", "Trucks", "Pass…</span></span>
+<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1983-05", "1983-05", "1983-05", "1983-05", "…</span></span>
+<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Manitoba", "Manitoba", "Manitoba", "Manitoba…</span></span>
+<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "2016A000246", "2016A000246", "2016A000246", …</span></span>
+<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Passenger cars", "Passenger cars", "Passenge…</span></span>
 <span><span class="co">#&gt; $ `Origin of manufacture` <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "North America", "North America", "Total, ove…</span></span>
 <span><span class="co">#&gt; $ Sales                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Dollars", "Unit…</span></span>
 <span><span class="co">#&gt; $ `Seasonal adjustment`   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Unadjusted", "Unadjusted", "Unadjusted", "Un…</span></span>
@@ -229,14 +229,14 @@ by the GeoUID.</p>
 <span><span class="co">#&gt; $ UOM_ID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "300", "81", "300", "81", "300", "81", "300",…</span></span>
 <span><span class="co">#&gt; $ SCALAR_FACTOR           <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "units", "thousands", "units", "thousands", "…</span></span>
 <span><span class="co">#&gt; $ SCALAR_ID               <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "3", "0", "3", "0", "3", "0", "3", "0", …</span></span>
-<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "v42170117", "v42170118", "v42170119", "v4217…</span></span>
-<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "6.3.2.1.1", "6.3.2.2.1", "6.3.3.1.1", "6.3.3…</span></span>
-<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;double&gt;</span> 2314, 10590, 32, 84, 27810, 92118, 2944, 6173…</span></span>
+<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "v42170161", "v42170162", "v42170163", "v4217…</span></span>
+<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "8.2.2.1.1", "8.2.2.2.1", "8.2.3.1.1", "8.2.3…</span></span>
+<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;double&gt;</span> 2261, 24380, 657, 6552, 578, 5246, 79, 1306, …</span></span>
 <span><span class="co">#&gt; $ STATUS                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
 <span><span class="co">#&gt; $ SYMBOL                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
 <span><span class="co">#&gt; $ TERMINATED              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
 <span><span class="co">#&gt; $ DECIMALS                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "0", "0", "0", "0", "0", "0", "0", "0", …</span></span>
-<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "24", "24", "24", "24", "35", "35", "35", "35…</span></span>
+<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "46", "46", "46", "46", "46", "46", "46", "46…</span></span>
 <span><span class="co">#&gt; Call `print()` for full schema details</span></span></code></pre></div>
 </div>
 <div class="tab-pane" id="feather" role="tabpanel" aria-labelledby="feather-tab">
@@ -249,25 +249,25 @@ by the GeoUID.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.feather</span><span class="op">)</span></span>
 <span><span class="co">#&gt; FileSystemDataset with 1 Feather file</span></span>
 <span><span class="co">#&gt; 163,410 rows x 19 columns</span></span>
-<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1973-04", "1973-04", "1973-04", "1973-04", "…</span></span>
-<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Canada", "Newfoundland and Labrador", "Newfo…</span></span>
-<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "2016A000011124", "2016A000210", "2016A000210…</span></span>
-<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Trucks", "Total, new motor vehicles", "Total…</span></span>
-<span><span class="co">#&gt; $ `Origin of manufacture` <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Total, overseas", "Total, country of manufac…</span></span>
-<span><span class="co">#&gt; $ Sales                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Dollars", "Units", "Dollars", "Units", "Doll…</span></span>
+<span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1980-11", "1980-11", "1980-11", "1980-11", "…</span></span>
+<span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "New Brunswick", "New Brunswick", "New Brunsw…</span></span>
+<span><span class="co">#&gt; $ DGUID                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "2016A000213", "2016A000213", "2016A000213", …</span></span>
+<span><span class="co">#&gt; $ `Vehicle type`          <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Passenger cars", "Passenger cars", "Passenge…</span></span>
+<span><span class="co">#&gt; $ `Origin of manufacture` <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "North America", "North America", "Total, ove…</span></span>
+<span><span class="co">#&gt; $ Sales                   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Dollars", "Unit…</span></span>
 <span><span class="co">#&gt; $ `Seasonal adjustment`   <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Unadjusted", "Unadjusted", "Unadjusted", "Un…</span></span>
-<span><span class="co">#&gt; $ UOM                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Dollars", "Units", "Dollars", "Units", "Doll…</span></span>
-<span><span class="co">#&gt; $ UOM_ID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "81", "300", "81", "300", "81", "300", "81", …</span></span>
-<span><span class="co">#&gt; $ SCALAR_FACTOR           <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "thousands", "units", "thousands", "units", "…</span></span>
-<span><span class="co">#&gt; $ SCALAR_ID               <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "3", "0", "3", "0", "3", "0", "3", "0", "3", …</span></span>
-<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "v42169939", "v42169996", "v42169998", "v4217…</span></span>
-<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "1.3.3.2.1", "2.1.1.1.1", "2.1.1.2.1", "2.2.1…</span></span>
-<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;double&gt;</span> 8052, 2210, 8726, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, 1512, 5855, 314, 10…</span></span>
-<span><span class="co">#&gt; $ STATUS                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "x", "x", <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "x", "x…</span></span>
+<span><span class="co">#&gt; $ UOM                     <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "Units", "Dollars", "Units", "Dollars", "Unit…</span></span>
+<span><span class="co">#&gt; $ UOM_ID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "300", "81", "300", "81", "300", "81", "300",…</span></span>
+<span><span class="co">#&gt; $ SCALAR_FACTOR           <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "units", "thousands", "units", "thousands", "…</span></span>
+<span><span class="co">#&gt; $ SCALAR_ID               <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "3", "0", "3", "0", "3", "0", "3", "0", …</span></span>
+<span><span class="co">#&gt; $ VECTOR                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "v42170080", "v42170081", "v42170082", "v4217…</span></span>
+<span><span class="co">#&gt; $ COORDINATE              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "5.2.2.1.1", "5.2.2.2.1", "5.2.3.1.1", "5.2.3…</span></span>
+<span><span class="co">#&gt; $ VALUE                   <span style="color: #949494; font-style: italic;">&lt;double&gt;</span> 1290, 10346, 336, 2319, 243, 1645, 93, 674, <span style="color: #BB0000;">N</span>…</span></span>
+<span><span class="co">#&gt; $ STATUS                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, "x", "x", <span style="color: #BB0000;">NA</span>,…</span></span>
 <span><span class="co">#&gt; $ SYMBOL                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
 <span><span class="co">#&gt; $ TERMINATED              <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">NA</span>, <span style="color: #BB0000;">N</span>…</span></span>
 <span><span class="co">#&gt; $ DECIMALS                <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "0", "0", "0", "0", "0", "0", "0", "0", "0", …</span></span>
-<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "11124", "10", "10", "10", "10", "10", "10", …</span></span>
+<span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;string&gt;</span> "13", "13", "13", "13", "13", "13", "13", "13…</span></span>
 <span><span class="co">#&gt; Call `print()` for full schema details</span></span></code></pre></div>
 </div>
 <div class="tab-pane" id="sqlite" role="tabpanel" aria-labelledby="sqlite-tab">
@@ -288,7 +288,6 @@ by the GeoUID.</p>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">connection.sqlite</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: ??</span></span>
 <span><span class="co">#&gt; Columns: 19</span></span>
-<span><span class="co">#&gt; Database: sqlite 3.50.4 [/Users/jens/data/cansim.data/cansim_20100001_sqlite_eng/20100001-eng.sqlite]</span></span>
 <span><span class="co">#&gt; $ REF_DATE                <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1946-01"<span style="color: #949494;">, </span>"1…</span></span>
 <span><span class="co">#&gt; $ GEO                     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canada"<span style="color: #949494;">, </span>"Canad…</span></span>
 <span><span class="co">#&gt; $ GeoUID                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"11124"<span style="color: #949494;">, </span>"…</span></span>
@@ -361,12 +360,12 @@ entire table into memory and normalizes the data.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
 <span><span class="co">#&gt;   REF_DATE Date       GEO    DGUID  GeoUID `Vehicle type` Origin of manufactur…¹</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1975-11  1975-11-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1975-11  1975-11-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1975-12  1975-12-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1975-12  1975-12-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1976-01  1976-01-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1976-01  1976-01-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1983-06  1983-06-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1983-06  1983-06-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1983-07  1983-07-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1983-07  1983-07-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1983-08  1983-08-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1983-08  1983-08-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: Sales &lt;fct&gt;, `Seasonal adjustment` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;, SCALAR_FACTOR &lt;chr&gt;,</span></span></span>
@@ -390,12 +389,12 @@ entire table into memory and normalizes the data.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 30</span></span></span>
 <span><span class="co">#&gt;   REF_DATE Date       GEO    DGUID  GeoUID `Vehicle type` Origin of manufactur…¹</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1975-11  1975-11-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1975-11  1975-11-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1975-12  1975-12-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1975-12  1975-12-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1976-01  1976-01-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1976-01  1976-01-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1980-12  1980-12-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1980-12  1980-12-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1981-01  1981-01-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1981-01  1981-01-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1981-02  1981-02-01 Canada 2016A… 11124  Passenger cars Total, country of man…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1981-02  1981-02-01 Canada 2016A… 11124  Trucks         Total, country of man…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Origin of manufacture`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 23 more variables: Sales &lt;fct&gt;, `Seasonal adjustment` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;, SCALAR_FACTOR &lt;chr&gt;,</span></span></span>
@@ -486,7 +485,7 @@ with the data as if it was fetched and subsequently filtered via
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">d</span>,scale<span class="op">=</span><span class="fl">10</span><span class="op">^</span><span class="op">-</span><span class="fl">3</span>,suffix<span class="op">=</span><span class="st">"k"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title<span class="op">=</span><span class="st">"Canada new motor vehicle sales"</span>,caption<span class="op">=</span><span class="st">"StatCan Table 20-10-0001"</span>,</span>
 <span>       x<span class="op">=</span><span class="cn">NULL</span>,y<span class="op">=</span><span class="st">"Number of units"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="working_with_large_tables_files/figure-html/unnamed-chunk-10-1.png" alt="Vignette example plot, new motor vehicle sales" width="672"></p>
+<p><img src="working_with_large_tables_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="Vignette example plot, new motor vehicle sales" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="partitioning">Partitioning<a class="anchor" aria-label="anchor" href="#partitioning"></a>
@@ -531,22 +530,22 @@ care to manage that space properly. The
 overview over the cached data we have.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_cansim_cached_tables.html">list_cansim_cached_tables</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 67 × 10</span></span></span>
-<span><span class="co">#&gt;    cansimTableNumber language dataFormat timeCached          niceSize  rawSize</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 11-10-0004        eng      parquet    2025-07-18 <span style="color: #949494;">22:22:12</span> 1.8 Mb    1<span style="text-decoration: underline;">884</span>578</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 11-10-0008        eng      parquet    2025-07-18 <span style="color: #949494;">23:12:15</span> 14.4 Mb  15<span style="text-decoration: underline;">047</span>191</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 11-10-0009        eng      parquet    2025-07-18 <span style="color: #949494;">22:06:31</span> 2 Mb      2<span style="text-decoration: underline;">125</span>776</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 11-10-0009        eng      sqlite     1900-01-01 <span style="color: #949494;">01:00:00</span> <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 11-10-0017        eng      parquet    2025-02-11 <span style="color: #949494;">11:49:21</span> 9.3 Mb    9<span style="text-decoration: underline;">767</span>494</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 11-10-0047        eng      parquet    2025-07-15 <span style="color: #949494;">14:44:05</span> 918 Kb     <span style="text-decoration: underline;">940</span>072</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 11-10-0191        eng      parquet    2025-05-01 <span style="color: #949494;">13:48:11</span> 12.5 Mb  13<span style="text-decoration: underline;">142</span>229</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 11-10-0223        eng      parquet    2025-05-21 <span style="color: #949494;">13:12:41</span> 4.2 Mb    4<span style="text-decoration: underline;">404</span>277</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 11-10-0239        eng      parquet    2025-07-18 <span style="color: #949494;">22:30:23</span> 27.7 Mb  29<span style="text-decoration: underline;">072</span>464</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 13-10-0418        eng      parquet    2025-06-22 <span style="color: #949494;">15:37:38</span> 18.9 Kb     <span style="text-decoration: underline;">19</span>367</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 57 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 more variables: title &lt;chr&gt;, path &lt;chr&gt;, timeReleased &lt;dttm&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 47 × 11</span></span></span>
+<span><span class="co">#&gt;    cansimTableNumber language dataFormat timeCached          cansimVersion</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 11-10-0004        eng      parquet    2025-07-18 <span style="color: #949494;">22:22:12</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 11-10-0008        eng      parquet    2025-07-18 <span style="color: #949494;">23:12:15</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 11-10-0047        eng      parquet    2025-07-15 <span style="color: #949494;">14:44:05</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 11-10-0223        eng      parquet    2025-05-21 <span style="color: #949494;">13:12:41</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 11-10-0239        eng      parquet    2026-04-29 <span style="color: #949494;">07:34:19</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 14-10-0293        eng      parquet    2025-08-16 <span style="color: #949494;">14:16:06</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 14-10-0473        eng      parquet    2025-02-24 <span style="color: #949494;">09:45:30</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 17-10-0004        eng      parquet    2025-03-31 <span style="color: #949494;">10:36:38</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 17-10-0005        eng      parquet    2025-12-13 <span style="color: #949494;">23:11:30</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 17-10-0008        eng      parquet    2025-09-24 <span style="color: #949494;">10:54:47</span> <span style="color: #BB0000;">NA</span>           </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 37 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: niceSize &lt;chr&gt;, rawSize &lt;dbl&gt;, title &lt;chr&gt;, path &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   timeReleased &lt;dttm&gt;, upToDate &lt;lgl&gt;</span></span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="removing-cached-data">Removing cached data<a class="anchor" aria-label="anchor" href="#removing-cached-data"></a>
@@ -576,7 +575,7 @@ connection to the <em>sqlite</em> database.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

@@ -81,7 +81,7 @@ test_that("a cached table carries its version and reports on stale labels", {
 
   table <- "13-10-0920"
   connection <- suppressWarnings(get_cansim_connection(table, format="parquet", refresh=TRUE))
-  disconnect_cansim_sqlite(connection)
+  disconnect_cansim_connection(connection)
 
   cached <- list_cansim_cached_tables(cache_path=cache_path)
   expect_equal(cached$cansimVersion, as.character(utils::packageVersion("cansim")))

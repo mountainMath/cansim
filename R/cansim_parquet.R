@@ -548,6 +548,29 @@ cansim_repartition_cached_table <- function(cansimTableNumber,
   invisible()
 }
 
+#' Disconnect from a cansim connection
+#'
+#' Closes the database connection behind a table retrieved with
+#' \code{get_cansim_connection(..., format="sqlite")}. Parquet and feather connections hold no
+#' connection to close and are left alone, so code that does not know which format it was handed
+#' can close it either way.
+#'
+#' @param connection A connection to a cansim table as returned by \code{get_cansim_connection}
+#' @return `NULL`
+#'
+#' @examples
+#' \dontrun{
+#' con <- get_cansim_connection("34-10-0013", format="sqlite")
+#' disconnect_cansim_connection(con)
+#' }
+#' @export
+disconnect_cansim_connection <- function(connection){
+  if ("tbl_sql" %in% class(connection)) {
+    DBI::dbDisconnect(connection$src$con)
+  }
+  invisible()
+}
+
 #' Collect data from a parquet, feather or sqlite query and normalize cansim table output
 #'
 #' @param connection A connection to a local arrow connection as returned by \code{get_cansim_connection},
@@ -599,7 +622,7 @@ collect_and_normalize <- function(connection,
     attr(data,"language") <- language
     attr(data,"cansimTableNumber") <- cansimTableNumber
 
-    if (disconnect) disconnect_cansim_sqlite(connection)
+    if (disconnect) disconnect_cansim_connection(connection)
   } else if ("arrow_dplyr_query" %in% class(connection) || "ArrowObject" %in% class(connection)){
     data <- connection %>%
       dplyr::as_tibble()

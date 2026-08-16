@@ -55,8 +55,14 @@
   also documented as deprecated, matching the deprecation warnings they already emit. Use
   `get_cansim_connection(..., format="sqlite")`, `list_cansim_cached_tables()` and
   `remove_cansim_cached_tables(..., format="sqlite")` instead
+* `disconnect_cansim_sqlite()` is deprecated in favour of the new `disconnect_cansim_connection()`,
+  which does the same thing under a name that does not claim a format. It closes a sqlite connection
+  and leaves parquet and feather connections alone, so a connection can be closed without knowing
+  which format it came from. It was the last function still named for sqlite that was not itself
+  deprecated, and its own example demonstrated the deprecated `get_cansim_sqlite()`
 * the deprecated `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()`, `remove_cansim_sqlite_cached_table()`,
-  `list_cansim_tables()` and `search_cansim_tables()` are scheduled for removal in a future release
+  `disconnect_cansim_sqlite()`, `list_cansim_tables()` and `search_cansim_tables()` are scheduled for
+  removal in a future release
 
 ## Performance
 * hierarchy building in metadata parsing no longer re-parses the growing hierarchy paths, hierarchies are built

@@ -47,7 +47,7 @@ con <- get_cansim_connection("34-10-0013", format="sqlite")
 # Work with the data connection
 glimpse(con)
 
-disconnect_cansim_sqlite(con)
+disconnect_cansim_connection(con)
 }
 }
 \keyword{internal}

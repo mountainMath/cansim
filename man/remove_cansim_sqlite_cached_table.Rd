@@ -28,7 +28,7 @@ This method is deprecated and will be removed in a future version, please use
 \examples{
 \dontrun{
 con <- get_cansim_connection("34-10-0013", format="sqlite")
-disconnect_cansim_sqlite(con)
+disconnect_cansim_connection(con)
 remove_cansim_cached_tables("34-10-0013", format="sqlite")
 }
 }

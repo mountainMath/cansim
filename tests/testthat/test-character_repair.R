@@ -87,7 +87,7 @@ test_that("member labels in the data match the repaired metadata", {
   for (format in c("sqlite","parquet")) {
     connection <- suppressWarnings(get_cansim_connection(table, format=format, refresh=TRUE))
     check(suppressWarnings(collect_and_normalize(connection)), format)
-    disconnect_cansim_sqlite(connection)
+    disconnect_cansim_connection(connection)
   }
 
   # the label is the same whichever way it is retrieved, so the two can be joined
