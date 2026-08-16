@@ -34,25 +34,22 @@ parse_metadata <- function(meta,data_path){
     while (meta_part[length(meta_part)]=="") {
       meta_part <- meta_part[-length(meta_part)]
     }
-    if (TRUE) {
-      # This is a workaround for problems with StatCan Metadata found in Table 17-10-0016
-      if (length(grep("\u201C|\u201D",meta_part))>0){
-        meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
-      }
-      d<-utils::read.delim(text=meta_part,sep=table_delim,header=FALSE,stringsAsFactors=FALSE,
-                        quote="\"",na.strings="",
-                 colClasses="character",check.names=FALSE) %>%
-        as_tibble()
-      if (nrow(d>1)) {
-        nn <- as.character(d[1,])
-        d <- d %>%
-          select(which(!is.na(nn))) %>%
-          setNames(na.omit(nn)) %>%
-          slice(-1)
-      }
-    } else {
-      d<- suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
-                                         delim=table_delim, col_types = readr::cols(.default="c")))
+    # This is a workaround for problems with StatCan Metadata found in Table 17-10-0016
+    if (length(grep("\u201C|\u201D",meta_part))>0){
+      meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
+    }
+    d<-utils::read.delim(text=meta_part,sep=table_delim,header=FALSE,stringsAsFactors=FALSE,
+                      quote="\"",na.strings="",
+               colClasses="character",check.names=FALSE) %>%
+      as_tibble()
+    # the section is read without a header so that its first line can be taken as the column names
+    # here, which is what lets the unnamed trailing columns StatCan pads its metadata with be dropped
+    if (nrow(d)>0) {
+      nn <- as.character(d[1,])
+      d <- d %>%
+        select(which(!is.na(nn))) %>%
+        setNames(na.omit(nn)) %>%
+        slice(-1)
     }
     d
   }

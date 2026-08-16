@@ -71,6 +71,9 @@
   whitespace and accents are ignored. `get_cansim_table_url()` and `get_cansim_table_notes()` now
   default to `"english"` like every other function that takes a language, which selects the same
   language their previous `"en"` default did (#152)
+* drop the unreachable `if (TRUE) ... else ...` in metadata parsing. The else branch held the
+  `readr::read_delim()` implementation that `utils::read.delim()` replaced in February 2025 and had
+  since fallen behind the live branch, so it was no longer a working fallback (#151)
 * fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read
 * fix `get_cansim_changed_tables()` passing "days" to `difftime()` as a time zone instead of a unit
 * `get_cansim_connection()` no longer fails when the release date of a table cannot be determined, the
