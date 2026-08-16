@@ -32,6 +32,13 @@
   label would have become `NA`. Labels are now also identical whichever way the data is retrieved, so
   a table can be joined to template, vector or coordinate data on its dimension columns (#169)
 
+* an internal `scan_statcan_character_problems()` reads the cube metadata straight off the API,
+  without the repair applied, and reports every title, dimension name and member name StatCan
+  publishes with a non-breaking space or a control character in it, by table, level and language.
+  `summarize_statcan_character_problems()` aggregates that by survey. Neither is exported, they
+  exist to track whether the upstream problem is shrinking, and both go away along with the repair
+  once it has (#169)
+
 * cached tables now record the package version they were parsed under alongside the download
   timestamp, in a single `.Rda_info` file that replaces the `.Rda_time` file the timestamp used to
   have to itself. The timestamp says whether StatCan has newer data, the version says whether this
