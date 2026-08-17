@@ -79,6 +79,48 @@
   simply not released yet, and an HTTP 416 names the limit the request went past. Those two status
   codes also got the plain-language translation the other codes already had
 
+* three new functions expose StatCan's changed series methods, which report what changed at a finer
+  grain than `get_cansim_changed_tables()` does. `get_cansim_changed_series_list()` lists the series
+  StatCan changed today as vectors, with the table and coordinate each belongs to, and
+  `get_cansim_changed_series_data_for_vectors()` and
+  `get_cansim_changed_series_data_for_coordinates()` retrieve the changed data points themselves, in
+  the same shape and with the same metadata as the corresponding `get_cansim_vector()` and
+  coordinate calls. Series that did not change simply contribute no rows, and if none of the ones
+  asked about changed the answer is an empty table rather than an error. Like the other vector
+  methods they batch requests of more than 300 items
+
+* the package now talks to StatCan through `httr2` rather than `httr`. Requests that fail on a status
+  StatCan recovers from within seconds, an HTTP 429, 500, 502 or 504, are now retried with
+  exponential backoff and jitter and honour a `Retry-After` header, where the previous retries went
+  out back to back and stood a good chance of arriving while the server was still busy. Requests are
+  also throttled to the 25 per second StatCan documents as its per-IP limit, so a script asking for
+  many tables or vectors no longer risks being turned away for asking too quickly, and they now
+  identify themselves with a `cansim/<version>` user agent. Statuses that will not improve on a retry
+  are deliberately not retried: an HTTP 416 carries more items than StatCan accepts however often it
+  is sent, an HTTP 409 is the nightly update window, and an HTTP 503 is StatCan being down for
+  maintenance or an outage, which lasts far longer than any retry budget worth spending. The 503 case
+  says so, and says to try again later, rather than appearing to hang while retries run down. Users
+  behind a proxy should note that `httr2` reads the standard `http_proxy` and `https_proxy`
+  environment variables instead of taking an `httr::set_config()` call
+
+* the `timeout` argument now bounds how long StatCan may go without sending anything, rather than how
+  long the whole transfer may take. As a cap on the total it could not tell a connection StatCan had
+  stopped answering on from a large table that was simply taking a while, and cut both off alike, so a
+  slow download could fail after two hundred seconds with most of the data already in hand. A transfer
+  that keeps delivering is now left alone however long it runs, and one that goes quiet for `timeout`
+  seconds is dropped, which is the distinction the argument was always described as making. Note that
+  StatCan works out a whole response before sending any of it, taking roughly a tenth of a second per
+  vector, so a request for a full batch of 300 is silent for something like thirty five seconds before
+  the first byte arrives; the default of two hundred seconds leaves ample room for that, but a much
+  smaller value passed by hand will cut off large requests. Establishing the connection is bounded
+  separately and briefly, so an unreachable host now fails in ten seconds instead of waiting out the
+  full timeout
+
+* `get_cansim()` and `get_cansim_connection()` now ask StatCan where a table lives instead of
+  assembling the download address from the table number. The address the package built was a guess at
+  a layout StatCan is free to change, and the extra call that replaces it is small next to the table
+  download it precedes
+
 ## Deprecations
 * `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now
   also documented as deprecated, matching the deprecation warnings they already emit. Use
@@ -124,6 +166,10 @@
   since fallen behind the live branch, so it was no longer a working fallback (#151)
 * fix a `case_when()` deprecation warning emitted by dplyr 1.2.0 on every table read
 * fix `get_cansim_changed_tables()` passing "days" to `difftime()` as a time zone instead of a unit
+* `get_cansim_changed_tables()` now takes both the current date and the cutoff after which the day's
+  changes are available in Eastern time. It used to compare against 9am, half an hour after StatCan
+  actually closes its nightly update window, and to take "today" from the local clock, so a machine
+  set west of Eastern could ask StatCan about a day that had not started there yet
 * `get_cansim_connection()` no longer fails when the release date of a table cannot be determined, the
   staleness check is skipped with a message instead
 * the unit of measure columns of French language tables are now ordered with the other value columns,

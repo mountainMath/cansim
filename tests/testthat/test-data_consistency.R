@@ -176,7 +176,11 @@ test_that("unit of measure for coordinate and vector data matches the full table
 
   # the unit of measure varies by member of the dimension StatCan flags with hasUom, so the
   # check covers several members of a table that uses a range of different units
-  members <- get_cansim_cube_metadata("18-10-0004", type="members") |>
+  metadata <- suppressWarnings(get_cansim_cube_metadata("18-10-0004", type="members"))
+  # metadata comes back NULL during the daily update window, when there is nothing to compare
+  skip_if(is.null(metadata), "StatCan unavailable")
+
+  members <- metadata |>
     dplyr::filter(.data$hasUom) |>
     dplyr::slice_head(n=1, by="memberUomCode")
 

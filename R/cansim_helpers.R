@@ -344,7 +344,9 @@ response_error_translation <- list(
   "416"="The request asked for more items than StatCan accepts in a single call",
   "429"="StatCan is rate limiting requests, please try again later",
   "502"="StatCan website is currently unreachable",
-  "503"="StatCan website is currently unavailable",
+  "503"=paste0("StatCan website is currently unavailable, either for scheduled maintenance or ",
+               "because of an outage. This lasts longer than it is worth waiting for, so the ",
+               "request was not retried, please try again later"),
   "504"="StatCan website did not respond in time"
 )
 
@@ -447,13 +449,20 @@ statcan_unavailable <- function(...){
   NULL
 }
 
+# The body of every WDS answer is JSON, and this is the only place that is assumed, so that the
+# fourteen call sites reading a response do not each have to say so. `check_type=FALSE` because a few
+# of the endpoints the package uses, the key release schedule among them, have been seen to label
+# their JSON as plain text.
+statcan_response_json <- function(response){
+  httr2::resp_body_json(response,check_type=FALSE)
+}
+
 # A response StatCan refuses carries a JSON body saying why, which the status code on its own does
 # not: the 409 served outside the daily release window explains that the product is not released
 # yet, and the 416 served for an oversized request names the item limit it went past. Anything that
 # is not JSON with a message in it, an HTML error page or a part-written download, yields NULL.
 statcan_response_message <- function(response){
-  parsed <- tryCatch(httr::content(response,as="parsed",type="application/json",encoding="UTF-8"),
-                     error=function(e) NULL)
+  parsed <- tryCatch(statcan_response_json(response),error=function(e) NULL)
   if (!is.list(parsed)) return(NULL)
   detail <- parsed$message
   if (is.null(detail) && is.character(parsed$object)) detail <- parsed$object
@@ -461,68 +470,161 @@ statcan_response_message <- function(response){
   detail
 }
 
-# Shared failure handling for the GET and POST helpers. Returns the response on success, and NULL on
-# any failure, so that callers only ever have to check for NULL rather than inspect status codes.
-# `again` retries the request that produced `response`, it takes the remaining retry count.
-check_statcan_response <- function(response,retry,again){
-  if (!is.null(response$error)) {
-    if ("curl_error_peer_failed_verification" %in% class(response$error)) {
+# StatCan documents a limit of 25 requests per second per IP address, and 50 across all callers. The
+# package makes its requests one after the other so it rarely comes close, but a script looping over
+# many tables or vectors can, and being throttled locally is better than being answered with an
+# HTTP 429.
+STATCAN_REQUESTS_PER_SECOND <- 25
+
+# Statuses worth trying again a moment later, being the ones a busy or briefly confused server
+# recovers from within seconds. Deliberately not in the list:
+#   409, the nightly update window, which lasts until 8:30am Eastern
+#   416, a request carrying more items than StatCan accepts, which stays oversized however often it
+#        is sent
+#   503, StatCan being down for maintenance or an outage, which lasts far longer than any retry
+#        budget worth spending
+# Retrying any of these would only fail more slowly, so they are reported to the caller instead,
+# with a message saying what to do about it.
+STATCAN_TRANSIENT_STATUS <- c(429L,500L,502L,504L)
+
+# An upper bound on the wall clock time one request may spend being retried, counted from the start of
+# the first attempt and so covering the requests themselves as well as the waiting between them. The
+# backoff sleeps for somewhere between one and 2^n seconds before the nth retry, which adds up to at
+# most 14 seconds across the three retries a request gets by default, so 30 seconds leaves room for
+# the full sequence to play out along with the requests it separates. Its purpose is the case that
+# sequence does not cover: a request that hangs rather than failing, where the default 200 second
+# timeout would otherwise let a single call sit for the better part of quarter of an hour before
+# giving up. One attempt that runs to that timeout now uses up the budget on its own, which is the
+# intended trade, since a connection StatCan has left hanging rarely comes back on an immediate retry.
+STATCAN_MAX_RETRY_SECONDS <- 30
+
+# The `timeout` every download function takes used to be a hard cap on the whole transfer, which
+# cannot tell a connection StatCan has stopped answering on from a large table that is simply taking a
+# while to arrive, and cut both off alike. It is now the length of time StatCan may go without sending
+# anything useful, which is the distinction the argument was always described as making. A transfer
+# that keeps delivering is left alone however long it runs, and one that goes quiet is dropped.
+#
+# The floor is set well under any real transfer, an 11.8MB table download runs at about 3MB/s, while
+# still being high enough that a connection dribbling a byte at a time to stay alive does not hold the
+# session open forever.
+STATCAN_MINIMUM_SPEED <- 100
+
+# StatCan answers a request by working out the whole response and only then sending it, so the wait
+# for the first byte grows with the size of the request: about 0.11 seconds per vector, putting the
+# 300 item batches this package sends at roughly 35 seconds of silence before any data arrives. That
+# silence counts against the timeout above, which is why the default is left far above it rather than
+# tightened to the few seconds a healthy connection needs. Establishing the connection is the one part
+# that is quick regardless, and is bounded separately so an unreachable host fails fast.
+STATCAN_CONNECT_TIMEOUT <- 10
+
+cansim_user_agent <- function(){
+  paste0("cansim/",utils::packageVersion("cansim")," (https://github.com/mountainMath/cansim)")
+}
+
+# The shape every request to StatCan has in common. Retry and throttling are handled by httr2 rather
+# than by hand: `req_retry()` backs off exponentially with jitter between attempts and honours a
+# `Retry-After` header if StatCan sends one, where the package used to retry immediately and only
+# ever on a connection failure, never on a status code that says to come back later.
+statcan_request <- function(url,timeout=200,retry=3){
+  req <- httr2::request(url) %>%
+    httr2::req_user_agent(cansim_user_agent()) %>%
+    # sent on GET as well as POST, which is what the package has always done
+    httr2::req_headers("Content-Type"="application/json") %>%
+    # `timeout` bounds how long StatCan may go without sending anything, not how long the whole
+    # transfer may take, see the note on STATCAN_MINIMUM_SPEED above
+    httr2::req_options(low_speed_limit=STATCAN_MINIMUM_SPEED,
+                       low_speed_time=timeout,
+                       connecttimeout=STATCAN_CONNECT_TIMEOUT) %>%
+    # every status is translated below rather than thrown, so that a caller only has to check for NULL
+    httr2::req_error(is_error=function(response) FALSE) %>%
+    httr2::req_throttle(capacity=STATCAN_REQUESTS_PER_SECOND,fill_time_s=1,realm="statcan") %>%
+    httr2::req_retry(max_tries=retry+1,
+                     max_seconds=STATCAN_MAX_RETRY_SECONDS,
+                     retry_on_failure=TRUE,
+                     is_transient=function(response) httr2::resp_status(response) %in% STATCAN_TRANSIENT_STATUS)
+
+  if (isTRUE(getOption("cansim.disable_ssl_verification"))) {
+    req <- httr2::req_options(req,ssl_verifypeer=0,ssl_verifystatus=0)
+  }
+  req
+}
+
+# The condition httr2 raises for a request that never got an answer wraps the underlying curl error
+# as its parent, so the reason has to be looked for down the chain rather than on the condition
+# itself.
+condition_classes <- function(cond){
+  classes <- character(0)
+  while (inherits(cond,"condition")) {
+    classes <- c(classes,class(cond))
+    cond <- cond$parent
+  }
+  classes
+}
+
+# Distinguishes "StatCan answered, and the answer is that there is nothing" from "StatCan did not
+# answer", which is the NULL every failure returns. The changed-series methods need the difference:
+# they report that none of the series asked about changed with an HTTP 404, which is an ordinary
+# answer for them rather than a sign that anything is wrong.
+STATCAN_NO_DATA <- structure(list(),class="statcan_no_data")
+
+statcan_no_data <- function(x) inherits(x,"statcan_no_data")
+
+perform_statcan_request <- function(req,path=NA,empty_status=integer(0)){
+  response <- tryCatch(if (is.na(path)) httr2::req_perform(req) else httr2::req_perform(req,path=path),
+                       error=function(e) e)
+  check_statcan_response(response,empty_status=empty_status)
+}
+
+# Shared failure handling for the GET and POST helpers. Takes what performing the request produced,
+# either a response or the condition raised when there was none, returns the response on success and
+# NULL on any failure, so that callers only ever have to check for NULL rather than inspect statuses.
+check_statcan_response <- function(response,empty_status=integer(0)){
+  if (inherits(response,"condition")) {
+    if ("curl_error_peer_failed_verification" %in% condition_classes(response)) {
       return(statcan_unavailable(
-        stringr::str_wrap(gsub(".+\\): ","",as.character(response$error)),80),"\n",
+        stringr::str_wrap(gsub(".+\\): ","",conditionMessage(response)),80),"\n",
         "This means that the authenticity of the StatCan API server can't be verified.\n",
         "Statistics Canada has a history of faulty SSL certificates on their API,\n",
         "if you are reasonably sure that your connection is not getting hijacked you\n",
         "can disable peer checking for the duration of the R session by typing\n\n",
-        "httr::set_config(httr::config(ssl_verifypeer=0,ssl_verifystatus=0))","\n\n","into the console."))
+        "options(cansim.disable_ssl_verification=TRUE)","\n\n","into the console."))
     }
-    if (retry>0) {
-      message("Got timeout from StatCan, trying again")
-      return(again(retry-1))
-    }
-    message("Got timeout from StatCan, giving up")
-    return(statcan_unavailable("Problem downloading data, multiple timeouts.\n",
+    return(statcan_unavailable("Problem downloading data, StatCan did not answer.\n",
                                "Please check your network connection. If your connection is fine then ",
-                               "StatCan servers might be down."))
+                               "StatCan servers might be down.\n",
+                               conditionMessage(response)))
   }
-
-  status_code <- response$result$status_code
-  if (is.null(status_code)) {
+  if (!inherits(response,"httr2_response")) {
     return(statcan_unavailable("Problem downloading data, StatCan did not return a response."))
   }
+
+  status_code <- httr2::resp_status(response)
+  # a status the caller asked for as meaning "nothing to report" rather than "something went wrong"
+  if (status_code %in% empty_status) return(STATCAN_NO_DATA)
   if (status_code!=200) {
     translation <- response_error_translation[[as.character(status_code)]]
-    detail <- statcan_response_message(response$result)
+    detail <- statcan_response_message(response)
     return(statcan_unavailable(if (is.null(translation)) "" else paste0(translation,"\n"),
                                "Problem downloading data, StatCan returned status code ",status_code,".",
                                if (is.null(detail)) "" else paste0("\n","StatCan says: ",detail)))
   }
-  response$result
+  response
 }
 
-get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA){
-  if (!is.na(path)) {
-    response <- purrr::safely(httr::GET)(url,encode="json",
-                                         httr::add_headers("Content-Type"="application/json"),
-                                         httr::timeout(timeout),
-                                         httr::write_disk(path,overwrite = TRUE))
-  } else {
-    response <- purrr::safely(httr::GET)(url,
-                                         encode="json",
-                                         httr::add_headers("Content-Type"="application/json"),
-                                         httr::timeout(timeout))
-  }
-  check_statcan_response(response,retry=retry,
-                         again=\(r)get_with_timeout_retry(url,timeout=timeout,retry=r,path=path))
+# `query` is given as a named list rather than pasted onto the url by the caller, because httr2 sends
+# a url exactly as handed to it. StatCan's vector-by-reference-period method takes its vector ids
+# quoted, and a raw double quote in a query string is answered with an HTTP 400, so the values have
+# to be percent-encoded on the way out.
+get_with_timeout_retry <- function(url,timeout=200,retry=3,path=NA,query=NULL,empty_status=integer(0)){
+  req <- statcan_request(url,timeout=timeout,retry=retry)
+  if (!is.null(query)) req <- httr2::req_url_query(req,!!!query)
+  perform_statcan_request(req,path=path,empty_status=empty_status)
 }
 
-post_with_timeout_retry <- function(url,body,timeout=200,retry=3){
-  response <- purrr::safely(httr::POST)(url,
-                                        body=body,
-                                        encode="json",
-                                        httr::add_headers("Content-Type"="application/json"),
-                                        httr::timeout(timeout))
-  check_statcan_response(response,retry=retry,
-                         again=\(r)post_with_timeout_retry(url,body=body,timeout=timeout,retry=r))
+post_with_timeout_retry <- function(url,body,timeout=200,retry=3,empty_status=integer(0)){
+  req <- statcan_request(url,timeout=timeout,retry=retry) %>%
+    httr2::req_body_raw(body,type="application/json")
+  perform_statcan_request(req,empty_status=empty_status)
 }
 
 
@@ -641,7 +743,7 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
     url='https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
     r<-get_with_timeout_retry(url)
     if (is.null(r)) return(NULL)
-    content <- httr::content(r)
+    content <- statcan_response_json(r)
     saveRDS(content,path)
   } else {
     content <- readRDS(path)

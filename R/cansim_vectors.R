@@ -193,6 +193,47 @@ extract_vector_metadata <- function(data1){
   result
 }
 
+# Every vector method answers with the same shape, so everything between the rows StatCan sent and
+# the table handed back is shared: the metadata each coordinate needs, the vector names as the caller
+# spelled them, and the value normalization. `warn_if_empty` is for the methods to which an empty
+# answer is expected rather than a sign that something went wrong.
+finalize_vector_data <- function(result,vectors,cleaned_language,factors,
+                                 default_month,default_day,warn_if_empty=TRUE){
+  # An empty result used to travel on to the metadata join below and surface there as a missing
+  # `cansimTableNumber` column, an error that says nothing about what actually happened.
+  if (nrow(result)==0) {
+    if (warn_if_empty) warn_no_vector_data()
+    attr(result,"language") <- cleaned_language
+    return(result)
+  }
+
+  attr(result,"language") <- cleaned_language
+  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
+
+  if (cleaned_language=="fra") { # need to rename columns
+    result <- result %>%
+      rename_columns_for_language("eng",cleaned_language)
+  }
+
+  metadata <- result %>%
+    select("cansimTableNumber",all_of(coordinate_column)) %>%
+    unique() %>%
+    group_by(.data$cansimTableNumber) %>%
+    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
+                                         coordinates=.x[[coordinate_column]],
+                                         language=cleaned_language)) %>%
+    bind_rows()
+
+  result <- result %>%
+    left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
+    rename_vectors(vectors)  %>%
+    normalize_cansim_values(replacement_value = "val_norm", factors = factors,
+                            default_month = default_month, default_day = default_day, internal=TRUE)
+
+  result %>%
+    mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
+}
+
 # The vector methods answer a request they have no data for with an empty list rather than with an
 # error, and `getDataFromVectorByReferencePeriodRange` does so for every vector at once during the
 # nightly window from midnight to 8:30am Eastern, where the other methods refuse with an HTTP 409.
@@ -232,7 +273,7 @@ rename_vectors <- function(data,vectors){
 #' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses StatisticsCanada's \code{releaseDate} value for filtering the specified vectors.
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
@@ -265,10 +306,13 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
     vecs <- batches[[batch_number]]
     if (use_ref_date){
       url = "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorByReferencePeriodRange"
-      vectors_string=paste0('vectorIds=',paste(lapply(as.character(vecs),function(x)paste0('"',x,'"')),collapse = ","),"")
-      time_string=paste0('startRefPeriod=',strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),
-                         '&endReferencePeriod=',strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE),'')
-      body=paste0(vectors_string,"&",time_string)
+      vector_ids=paste(lapply(as.character(vecs),function(x)paste0('"',x,'"')),collapse = ",")
+      start_period=strftime(start_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE)
+      end_period=strftime(end_time,"%Y-%m-%d",tz=STATCAN_TIMEZONE)
+      # kept in the shape they had when they were pasted onto the url, they key the cache below
+      vectors_string=paste0('vectorIds=',vector_ids,"")
+      time_string=paste0('startRefPeriod=',start_period,'&endReferencePeriod=',end_period,'')
+      query=list(vectorIds=vector_ids,startRefPeriod=start_period,endReferencePeriod=end_period)
     } else {
       url="https://www150.statcan.gc.ca/t1/wds/rest/getBulkVectorDataByRange"
       vectors_string=paste0('"vectorIds":[',paste(purrr::map(as.character(vecs),function(x)paste0('"',x,'"')),collapse = ", "),"]")
@@ -280,14 +324,14 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
     if (!file.exists(cache_path)||refresh) {
       message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
       if (use_ref_date){
-        response <- get_with_timeout_retry(paste0(url,"?",body),
+        response <- get_with_timeout_retry(url, query=query,
                                            timeout = timeout)
       } else {
         response <- post_with_timeout_retry(url, body=body,
                                             timeout = timeout)
       }
       if (is.null(response)) return(response)
-      data1 <- successful_wds_records(httr::content(response),"vector data")
+      data1 <- successful_wds_records(statcan_response_json(response),"vector data")
 
       if (length(data1)>0) {
         result_new <- extract_vector_data(data1)
@@ -306,44 +350,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   }
   result <- bind_rows(batch_results)
 
-  # An empty result used to travel on to the metadata join below and surface there as a missing
-  # `cansimTableNumber` column, an error that says nothing about what actually happened.
-  if (nrow(result)==0) {
-    warn_no_vector_data()
-    attr(result,"language") <- cleaned_language
-    return(result)
-  }
-
-  attr(result,"language") <- cleaned_language
-  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
-
-  if (cleaned_language=="fra") { # need to rename columns
-    result <- result %>%
-      rename_columns_for_language("eng",cleaned_language)
-  }
-
-  metadata <- result %>%
-    select("cansimTableNumber",all_of(coordinate_column)) %>%
-    unique() %>%
-    group_by(.data$cansimTableNumber) %>%
-    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
-                                         coordinates=.x[[coordinate_column]],
-                                         language=cleaned_language)) %>%
-    bind_rows()
-
-    #metadata_for_coordinates(attr(result,"cansimTableNumber"),coordinates=unique(result$COORDINATE),language=language)
-
-
-  if (nrow(result)>0) {
-    result <-  result %>%
-      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
-      rename_vectors(vectors)  %>%
-      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                              default_month = default_month, default_day = default_day, internal=TRUE)
-  }
-
-  result %>%
-    mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
+  finalize_vector_data(result,vectors,cleaned_language,factors,default_month,default_day)
 }
 
 #' Retrieve data for specified Statistics Canada data vector(s) for last N periods
@@ -360,7 +367,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
 #' @param periods Numeric value for number of latest periods to retrieve data for, but default all data is retrieved.
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
@@ -400,7 +407,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
       message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
       if (is.null(response)) return(response)
-      data1 <- successful_wds_records(httr::content(response),"vector data")
+      data1 <- successful_wds_records(statcan_response_json(response),"vector data")
 
       if (length(data1)>0) {
         result_new <- extract_vector_data(data1)
@@ -418,41 +425,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
   }
   result <- bind_rows(batch_results)
 
-  # An empty result used to travel on to the metadata join below and surface there as a missing
-  # `cansimTableNumber` column, an error that says nothing about what actually happened.
-  if (nrow(result)==0) {
-    warn_no_vector_data()
-    attr(result,"language") <- cleaned_language
-    return(result)
-  }
-
-  attr(result,"language") <- cleaned_language
-  coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
-
-  if (cleaned_language=="fra") { # need to rename columns
-    result <- result %>%
-      rename_columns_for_language("eng",cleaned_language)
-  }
-
-  metadata <- result %>%
-    select("cansimTableNumber",all_of(coordinate_column)) %>%
-    unique() %>%
-    group_by(.data$cansimTableNumber) %>%
-    group_map(~ metadata_for_coordinates(cansimTableNumber=.y$cansimTableNumber,
-                                         coordinates=.x[[coordinate_column]],
-                                         language=cleaned_language)) %>%
-    bind_rows()
-
-  if (nrow(result)>0) {
-    result <-  result %>%
-      left_join(metadata,by=c("cansimTableNumber",coordinate_column)) %>%
-      rename_vectors(vectors)  %>%
-      normalize_cansim_values(replacement_value = "val_norm", factors = factors,
-                              default_month = default_month, default_day = default_day, internal=TRUE)
-  }
-
-  result %>%
-    mutate(across(all_of(coordinate_column),~gsub("(\\.0)+$","",.x)))
+  finalize_vector_data(result,vectors,cleaned_language,factors,default_month,default_day)
 }
 
 
@@ -471,7 +444,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
 #' coordinate if tableCoordinates is a data frame, this argument will be ignored if that data frame as a "periods" column.
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
@@ -545,7 +518,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
       if (is.null(response)) {return(response)}
       # this function reports the coordinates it could not get below, with a note of its own for the
       # census tables, so the failed records are kept rather than handed to the shared reporting
-      records <- split_wds_records(httr::content(response))
+      records <- split_wds_records(statcan_response_json(response))
       data1 <- records$success
       new_failed_coordinates <- NULL
       if (length(records$failed)>0) {
@@ -659,7 +632,7 @@ get_cansim_vector_info <- function(vectors){
     if (is.null(response)){return(response)}
     # this method answers an invalid vector with SUCCESS and a responseStatusCode of 4, which used
     # to reach extract_vector_metadata() and come back as a row of NAs that looked like metadata
-    data1 <- successful_wds_records(httr::content(response),"vector metadata")
+    data1 <- successful_wds_records(statcan_response_json(response),"vector metadata")
     batch_results[[batch_number]] <- extract_vector_metadata(data1)
   }
 

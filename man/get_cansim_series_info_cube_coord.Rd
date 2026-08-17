@@ -16,7 +16,7 @@ get_cansim_series_info_cube_coord(
 
 \item{coordinates}{A vector of coordinates}
 
-\item{timeout}{Timeout for the API call}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the call is abandoned. This does not limit how long the call may take overall, a response that keeps arriving is left alone.}
 
 \item{refresh}{Refresh the data from the Statistics Canada API}
 }

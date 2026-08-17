@@ -105,7 +105,7 @@ scan_statcan_character_problems <- function(cansimTableNumber=NULL,batch_size=50
     response <- post_with_timeout_retry(CUBE_METADATA_SCAN_URL,body=body)
     if (is.null(response)) return(NULL)
 
-    data <- httr::content(response)
+    data <- statcan_response_json(response)
     succeeded <- Filter(function(x)x$status=="SUCCESS",data)
     for (x in succeeded) {
       scan <- scan_cube_object(x$object)

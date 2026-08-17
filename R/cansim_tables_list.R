@@ -100,7 +100,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
     r<-get_with_timeout_retry(url,retry=0)
     if (is.null(r)) return(NULL)
 
-    content <- httr::content(r)
+    content <- statcan_response_json(r)
 
     header <- content[[1]] %>%
       tibble::enframe() %>%
@@ -220,7 +220,7 @@ get_cansim_key_release_schedule <- function(){
   response <- get_with_timeout_retry(url)
   if (is.null(response)) return(NULL)
 
-  httr::content(response) %>%
+  statcan_response_json(response) %>%
     lapply(dplyr::as_tibble) %>%
     dplyr::bind_rows() %>%
     mutate(date=strftime(date,STATCAN_TIME_FORMAT_S,tz="UTC") %>% as.Date)

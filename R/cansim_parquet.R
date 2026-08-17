@@ -13,7 +13,7 @@
 #' to \code{TRUE}, forces a reload of data table, when set to \code{"auto"} it will refresh the table by downloading
 #' the newest version from StatCan if the table is out of date. If set to \code{FALSE} and the table is out of date
 #' a warning will be emitted to alert the user that the data is outdated.
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #' @param cache_path (Optional) Path to where to cache the table permanently. By default, the data is cached
 #' in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.
 #  Set to higher values for large tables and slow network connection. (Default is \code{1000}).
@@ -93,10 +93,11 @@ get_cansim_connection <- function(cansimTableNumber,
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
       message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
-    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cansimTableNumber,language),".zip")
+    # see the note in get_cansim(), StatCan is asked where the table lives rather than told
+    url <- get_cansim_table_url(cleaned_number, language=language)
 
     time_check <- Sys.time()
-    response <- get_with_timeout_retry(url,path=path,timeout=timeout)
+    response <- if (is.null(url)) NULL else get_with_timeout_retry(url,path=path,timeout=timeout)
     if (is.null(response)) {
       # a failed refresh leaves the previous download intact, serving that beats returning nothing
       if (!file.exists(db_path)) return(NULL)

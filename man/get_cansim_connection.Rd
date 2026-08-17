@@ -28,7 +28,7 @@ to \code{TRUE}, forces a reload of data table, when set to \code{"auto"} it will
 the newest version from StatCan if the table is out of date. If set to \code{FALSE} and the table is out of date
 a warning will be emitted to alert the user that the data is outdated.}
 
-\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.}
 
 \item{cache_path}{(Optional) Path to where to cache the table permanently. By default, the data is cached
 in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.}

@@ -208,10 +208,12 @@ CANSIM was the name of Statistics Canada's legacy socio-economic data repository
 
 ### Proxy issues
 
-Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the `httr` package. 
+Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. The package uses `httr2`, which picks up the standard proxy environment variables, so pointing it at a proxy is a matter of setting them before making requests.
 ```r
-httr::set_config(use_proxy(url=http_proxy, port=selected_port, username=your_username,password=your_pass))
+Sys.setenv(https_proxy="http://your_username:your_pass@proxy.example.com:8080")
+Sys.setenv(http_proxy="http://your_username:your_pass@proxy.example.com:8080")
 ```
+Setting these in your `.Renviron` file makes the configuration stick across sessions.
 
 ### Contributing
 

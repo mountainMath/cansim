@@ -237,7 +237,7 @@ download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
       return(invisible(TRUE))
     }
 
-    data1 <- successful_wds_records(httr::content(response),"cube metadata")
+    data1 <- successful_wds_records(statcan_response_json(response),"cube metadata")
 
     batch_downloaded <- purrr::map_chr(data1,\(x)cleaned_ndm_table_number(as.character(x$object$productId)))
     purrr::walk2(data1,batch_downloaded,\(d,tn)saveRDS(list(d), cube_metadata_path(tn)))
@@ -434,7 +434,7 @@ table_template_for_members <- function(member_info, cansimTableNumber, language)
 #'
 #' @param cansimTableNumber A new or old CANSIM/NDM table number, coordinates are specific to a single table
 #' @param coordinates A vector of coordinates
-#' @param timeout Timeout for the API call
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the call is abandoned. This does not limit how long the call may take overall, a response that keeps arriving is left alone.
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
 #' @return a tibble containing the series information for the given coordinates
@@ -474,7 +474,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
       # responseStatusCode of 2. That is the expected answer here rather than a problem worth
       # reporting, since callers such as add_cansim_vectors_to_template() use this method precisely
       # to find out which of the coordinates they hold are real.
-      data1 <- successful_wds_records(httr::content(response),"series information",ignore_codes=2)
+      data1 <- successful_wds_records(statcan_response_json(response),"series information",ignore_codes=2)
 
       info <- data1 %>%
         purrr::map_df(\(x){

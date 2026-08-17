@@ -422,7 +422,7 @@ NULL
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
@@ -449,7 +449,11 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
       message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
-    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cleaned_number,language),".zip")
+    # Asking StatCan where the table lives rather than assembling the address from the table number,
+    # which is guessing at a layout StatCan is free to change. The extra call is small next to the
+    # download it precedes.
+    url <- get_cansim_table_url(cleaned_number, language=language)
+    if (is.null(url)) return(NULL)
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
     if (is.null(response)) return(response)
     data <- NA
@@ -565,7 +569,7 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the table overview information
@@ -624,7 +628,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the table survey code and name
@@ -657,7 +661,7 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the table subject code and name.
@@ -694,7 +698,7 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the StatCan Notes for the table
@@ -739,7 +743,7 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble listing the column names of the StatCan table.
@@ -786,7 +790,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #' @param column the specified column for which to retrieve category information for
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with detailed information on StatCan table categories for the specified field
@@ -1002,7 +1006,7 @@ get_cansim_table_url <- function(cansimTableNumber, language = "english"){
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
   response <- get_with_timeout_retry(url)
   if (is.null(response)) return(NULL)
-  httr::content(response)$object
+  statcan_response_json(response)$object
 }
 
 #' Retrieve a list of modified tables since a given date
@@ -1022,9 +1026,12 @@ get_cansim_table_url <- function(cansimTableNumber, language = "english"){
 #' }
 #' @export
 get_cansim_changed_tables <- function(start_date,end_date=NULL){
-  last_available_date <- Sys.Date()
-  if (Sys.time()<as.POSIXct(paste0(Sys.Date()," 09:00:00"),tz="America/Toronto")) {
-    last_available_date = last_available_date  -1
+  # StatCan releases the day's changes at the end of its nightly update window, which closes at
+  # 8:30am Eastern. Both the date and the cutoff are Eastern, the date because asking StatCan about
+  # "today" from a machine set to another time zone would otherwise ask about the wrong day.
+  last_available_date <- as.Date(strftime(Sys.time(),"%Y-%m-%d",tz=STATCAN_TIMEZONE))
+  if (Sys.time()<as.POSIXct(paste0(last_available_date," 08:30:00"),tz=STATCAN_TIMEZONE)) {
+    last_available_date <- last_available_date - 1
   }
   if (start_date>last_available_date) {
     stop(paste0("Last available date is ",last_available_date,", please try with a start date on or before that date."),call.=FALSE)
@@ -1049,7 +1056,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
       response <- get_with_timeout_retry(url)
       if (is.null(response)) return(NULL)
-      httr::content(response)$object %>%
+      statcan_response_json(response)$object %>%
         map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
         bind_rows
     })
@@ -1068,7 +1075,7 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #' @return A tibble with table notes.
 #'
@@ -1157,7 +1164,7 @@ get_cansim_table_last_release_date <- function(cansimTableNumber){
   response <- get_with_timeout_retry(url)
   if (is.null(response)) return(NULL)
 
-  r <- httr::content(response)$result
+  r <- statcan_response_json(response)$result
   if (length(r)==0) {
     warning("Could not access release information for table ",cansimTableNumber,
             " (productID: ",pid,").",call.=FALSE)
