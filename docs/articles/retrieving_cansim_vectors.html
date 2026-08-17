@@ -135,7 +135,7 @@ and the date onwards from which we want to get vector results for.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 138 × 16</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 139 × 16</span></span></span>
 <span><span class="co">#&gt;    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2015-01-… 2015-01-01 Cana… All-items               124.     124. 2002… 17    </span></span>
@@ -148,7 +148,7 @@ and the date onwards from which we want to get vector results for.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2015-08-… 2015-08-01 Cana… All-items               127.     127. 2002… 17    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2015-09-… 2015-09-01 Cana… All-items               127.     127. 2002… 17    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2015-10-… 2015-10-01 Cana… All-items               127.     127. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 128 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 129 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Products and product groups`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 8 more variables: SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;, frequencyCode &lt;int&gt;,</span></span></span>
@@ -177,7 +177,7 @@ always dated to the first day of the month.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/get_cansim_vector.html">get_cansim_vector</a></span><span class="op">(</span><span class="va">vectors</span>, <span class="st">"2017-01-01"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Accessing CANSIM NDM vectors from Statistics Canada</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 228 × 16</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 230 × 16</span></span></span>
 <span><span class="co">#&gt;    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2017-01-… 2017-01-01 Cana… All-items               130.     130. 2002… 17    </span></span>
@@ -190,7 +190,7 @@ always dated to the first day of the month.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2017-08-… 2017-08-01 Cana… All-items               130.     130. 2002… 17    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2017-09-… 2017-09-01 Cana… All-items               131.     131. 2002… 17    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2017-10-… 2017-10-01 Cana… All-items               131.     131. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 218 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 220 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Products and product groups`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 8 more variables: SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;, frequencyCode &lt;int&gt;,</span></span></span>
@@ -213,16 +213,16 @@ irrespective of dates.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 16</span></span></span>
 <span><span class="co">#&gt;    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2021-07-… 2021-07-01 Cana… All-items               142.     142. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2021-08-… 2021-08-01 Cana… All-items               143.     143. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2021-09-… 2021-09-01 Cana… All-items               143.     143. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2021-10-… 2021-10-01 Cana… All-items               144.     144. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2021-11-… 2021-11-01 Cana… All-items               144.     144. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2021-12-… 2021-12-01 Cana… All-items               144      144  2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2022-01-… 2022-01-01 Cana… All-items               145.     145. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2022-02-… 2022-02-01 Cana… All-items               147.     147. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2022-03-… 2022-03-01 Cana… All-items               149.     149. 2002… 17    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2022-04-… 2022-04-01 Cana… All-items               150.     150. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2021-08-… 2021-08-01 Cana… All-items               143.     143. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 2021-09-… 2021-09-01 Cana… All-items               143.     143. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 2021-10-… 2021-10-01 Cana… All-items               144.     144. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 2021-11-… 2021-11-01 Cana… All-items               144.     144. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 2021-12-… 2021-12-01 Cana… All-items               144      144  2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 2022-01-… 2022-01-01 Cana… All-items               145.     145. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 2022-02-… 2022-02-01 Cana… All-items               147.     147. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 2022-03-… 2022-03-01 Cana… All-items               149.     149. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2022-04-… 2022-04-01 Cana… All-items               150.     150. 2002… 17    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2022-05-… 2022-05-01 Cana… All-items               152.     152. 2002… 17    </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ abbreviated name: ¹​`Products and product groups`</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 8 more variables: SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span></span>

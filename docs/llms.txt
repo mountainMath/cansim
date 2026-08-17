@@ -283,13 +283,18 @@ as a nostalgic reference.
 
 Some users have reported issues accessing and downloading Statistics
 Canada tables while behind a proxy as is sometimes the case in office
-environments. A quick fix for this requires specifying a proxy
-configuration for the `httr` package.
+environments. The package uses `httr2`, which picks up the standard
+proxy environment variables, so pointing it at a proxy is a matter of
+setting them before making requests.
 
 ``` r
 
-httr::set_config(use_proxy(url=http_proxy, port=selected_port, username=your_username,password=your_pass))
+Sys.setenv(https_proxy="http://your_username:your_pass@proxy.example.com:8080")
+Sys.setenv(http_proxy="http://your_username:your_pass@proxy.example.com:8080")
 ```
+
+Setting these in your `.Renviron` file makes the configuration stick
+across sessions.
 
 ### Contributing
 
@@ -363,12 +368,14 @@ Managing data in local database
 - [`collect_and_normalize()`](https://mountainmath.github.io/cansim/reference/collect_and_normalize.md)
   : Collect data from a parquet, feather or sqlite query and normalize
   cansim table output
+- [`disconnect_cansim_connection()`](https://mountainmath.github.io/cansim/reference/disconnect_cansim_connection.md)
+  : Disconnect from a cansim connection
 - [`list_cansim_cached_tables()`](https://mountainmath.github.io/cansim/reference/list_cansim_cached_tables.md)
   : List cached cansim arrow and SQlite databases
 - [`remove_cansim_cached_tables()`](https://mountainmath.github.io/cansim/reference/remove_cansim_cached_tables.md)
   : Remove cached cansim SQLite and parquet database
 - [`disconnect_cansim_sqlite()`](https://mountainmath.github.io/cansim/reference/disconnect_cansim_sqlite.md)
-  : Disconnect from a cansim database connection
+  : Disconnect from a cansim database connection (deprecated)
 - [`cansim_repartition_cached_table()`](https://mountainmath.github.io/cansim/reference/cansim_repartition_cached_table.md)
   : Repartitions a cached cansim table to a new partitioning scheme
 - [`set_cansim_cache_path()`](https://mountainmath.github.io/cansim/reference/set_cansim_cache_path.md)
@@ -390,6 +397,10 @@ Help with data discovery
   : Get the latest release data for a StatCan table, if available
 - [`get_cansim_key_release_schedule()`](https://mountainmath.github.io/cansim/reference/get_cansim_key_release_schedule.md)
   : Major economic indicator release schedule
+- [`get_cansim_changed_series_data_for_vectors()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_vectors.md)
+  : Retrieve data for series that changed, by vector
+- [`get_cansim_changed_series_data_for_coordinates()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_coordinates.md)
+  : Retrieve data for series that changed, by table and coordinate
 
 ## Metadata and information
 

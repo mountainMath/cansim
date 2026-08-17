@@ -31,7 +31,7 @@ get vector results for.
 
 get_cansim_vector("v41690973","2015-01-01")
 #> Accessing CANSIM NDM vectors from Statistics Canada
-#> # A tibble: 138 × 16
+#> # A tibble: 139 × 16
 #>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID
 #>    <chr>     <date>     <fct> <fct>                  <dbl>    <dbl> <chr> <chr> 
 #>  1 2015-01-… 2015-01-01 Cana… All-items               124.     124. 2002… 17    
@@ -44,7 +44,7 @@ get_cansim_vector("v41690973","2015-01-01")
 #>  8 2015-08-… 2015-08-01 Cana… All-items               127.     127. 2002… 17    
 #>  9 2015-09-… 2015-09-01 Cana… All-items               127.     127. 2002… 17    
 #> 10 2015-10-… 2015-10-01 Cana… All-items               127.     127. 2002… 17    
-#> # ℹ 128 more rows
+#> # ℹ 129 more rows
 #> # ℹ abbreviated name: ¹​`Products and product groups`
 #> # ℹ 8 more variables: SCALAR_ID <int>, VECTOR <chr>, cansimTableNumber <chr>,
 #> #   COORDINATE <chr>, SYMBOL <int>, releaseTime <chr>, frequencyCode <int>,
@@ -77,7 +77,7 @@ vectors <- c("v41690973","v41692462")
 
 get_cansim_vector(vectors, "2017-01-01")
 #> Accessing CANSIM NDM vectors from Statistics Canada
-#> # A tibble: 228 × 16
+#> # A tibble: 230 × 16
 #>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID
 #>    <chr>     <date>     <fct> <fct>                  <dbl>    <dbl> <chr> <chr> 
 #>  1 2017-01-… 2017-01-01 Cana… All-items               130.     130. 2002… 17    
@@ -90,7 +90,7 @@ get_cansim_vector(vectors, "2017-01-01")
 #>  8 2017-08-… 2017-08-01 Cana… All-items               130.     130. 2002… 17    
 #>  9 2017-09-… 2017-09-01 Cana… All-items               131.     131. 2002… 17    
 #> 10 2017-10-… 2017-10-01 Cana… All-items               131.     131. 2002… 17    
-#> # ℹ 218 more rows
+#> # ℹ 220 more rows
 #> # ℹ abbreviated name: ¹​`Products and product groups`
 #> # ℹ 8 more variables: SCALAR_ID <int>, VECTOR <chr>, cansimTableNumber <chr>,
 #> #   COORDINATE <chr>, SYMBOL <int>, releaseTime <chr>, frequencyCode <int>,
@@ -113,16 +113,16 @@ get_cansim_vector_for_latest_periods("v41690973", periods = 60)
 #> # A tibble: 60 × 16
 #>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID
 #>    <chr>     <date>     <fct> <fct>                  <dbl>    <dbl> <chr> <chr> 
-#>  1 2021-07-… 2021-07-01 Cana… All-items               142.     142. 2002… 17    
-#>  2 2021-08-… 2021-08-01 Cana… All-items               143.     143. 2002… 17    
-#>  3 2021-09-… 2021-09-01 Cana… All-items               143.     143. 2002… 17    
-#>  4 2021-10-… 2021-10-01 Cana… All-items               144.     144. 2002… 17    
-#>  5 2021-11-… 2021-11-01 Cana… All-items               144.     144. 2002… 17    
-#>  6 2021-12-… 2021-12-01 Cana… All-items               144      144  2002… 17    
-#>  7 2022-01-… 2022-01-01 Cana… All-items               145.     145. 2002… 17    
-#>  8 2022-02-… 2022-02-01 Cana… All-items               147.     147. 2002… 17    
-#>  9 2022-03-… 2022-03-01 Cana… All-items               149.     149. 2002… 17    
-#> 10 2022-04-… 2022-04-01 Cana… All-items               150.     150. 2002… 17    
+#>  1 2021-08-… 2021-08-01 Cana… All-items               143.     143. 2002… 17    
+#>  2 2021-09-… 2021-09-01 Cana… All-items               143.     143. 2002… 17    
+#>  3 2021-10-… 2021-10-01 Cana… All-items               144.     144. 2002… 17    
+#>  4 2021-11-… 2021-11-01 Cana… All-items               144.     144. 2002… 17    
+#>  5 2021-12-… 2021-12-01 Cana… All-items               144      144  2002… 17    
+#>  6 2022-01-… 2022-01-01 Cana… All-items               145.     145. 2002… 17    
+#>  7 2022-02-… 2022-02-01 Cana… All-items               147.     147. 2002… 17    
+#>  8 2022-03-… 2022-03-01 Cana… All-items               149.     149. 2002… 17    
+#>  9 2022-04-… 2022-04-01 Cana… All-items               150.     150. 2002… 17    
+#> 10 2022-05-… 2022-05-01 Cana… All-items               152.     152. 2002… 17    
 #> # ℹ 50 more rows
 #> # ℹ abbreviated name: ¹​`Products and product groups`
 #> # ℹ 8 more variables: SCALAR_ID <int>, VECTOR <chr>, cansimTableNumber <chr>,

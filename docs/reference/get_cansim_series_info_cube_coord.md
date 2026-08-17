@@ -26,7 +26,9 @@ get_cansim_series_info_cube_coord(
 
 - timeout:
 
-  Timeout for the API call
+  (Optional) Number of seconds StatCan is allowed to go without sending
+  data before the call is abandoned. This does not limit how long the
+  call may take overall, a response that keeps arriving is left alone.
 
 - refresh:
 
@@ -44,7 +46,6 @@ unavailable.
 ``` r
 # \donttest{
 get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
-#> # A tibble: 0 × 3
-#> # ℹ 3 variables: productId <int>, coordinate <chr>, vectorId <int>
+#> # A tibble: 0 × 0
 # }
 ```

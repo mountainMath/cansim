@@ -53,8 +53,14 @@ get_cansim_connection(
 
 - timeout:
 
-  (Optional) Timeout in seconds for downloading cansim table to work
-  around scenarios where StatCan servers drop the network connection.
+  (Optional) Number of seconds StatCan is allowed to go without sending
+  data before the download is abandoned, to work around scenarios where
+  StatCan servers drop the network connection. This does not limit how
+  long a download may take overall, a transfer that keeps delivering
+  data is left alone. StatCan prepares a whole response before sending
+  any of it, which for large requests can take the better part of a
+  minute, so values much below the default of 200 risk cutting off
+  legitimate requests.
 
 - cache_path:
 

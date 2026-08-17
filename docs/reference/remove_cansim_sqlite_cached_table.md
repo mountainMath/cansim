@@ -39,7 +39,7 @@ remove_cansim_sqlite_cached_table(
 ``` r
 if (FALSE) { # \dontrun{
 con <- get_cansim_connection("34-10-0013", format="sqlite")
-disconnect_cansim_sqlite(con)
+disconnect_cansim_connection(con)
 remove_cansim_cached_tables("34-10-0013", format="sqlite")
 } # }
 ```

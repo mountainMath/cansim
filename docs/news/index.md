@@ -29,7 +29,14 @@
   varies by member of that dimension, so the unit is resolved per
   coordinate. Tables that have no unit of measure, for example census
   tables, get no unit columns, matching the full table download
-  ([\#170](https://github.com/mountainMath/cansim/issues/170))
+  ([\#170](https://github.com/mountainMath/cansim/issues/170)). With the
+  unit known, percentage values retrieved by vector or by coordinate are
+  now normalized the same way as full table downloads: `val_norm`
+  carries the value divided by 100 and the unit of measure is relabelled
+  to `Rate` (`Taux` in French). Previously the same series normalized
+  differently depending on whether it was retrieved as a full table or
+  by vector, so scripts that fetch percentage vectors will see
+  `val_norm` change by a factor of 100
 
 - non-breaking spaces and control characters in names returned by
   StatCan are now replaced with regular spaces. These characters render
@@ -89,6 +96,110 @@
   the offending label and pointing at `refresh=TRUE`
   ([\#169](https://github.com/mountainMath/cansim/issues/169))
 
+- every call that sends StatCan a list of vectors, coordinates or tables
+  is now split into batches of at most 300 items. StatCan refuses a
+  longer list outright with an HTTP 416, which had gone unnoticed
+  because most of these calls already batched.
+  [`get_cansim_vector_info()`](https://mountainmath.github.io/cansim/reference/get_cansim_vector_info.md)
+  and the cube metadata download did not, so asking either for more than
+  300 items at a time failed rather than returning data
+
+- a vector or coordinate StatCan cannot answer for is no longer passed
+  off as data. StatCan signals a bad item two different ways depending
+  on the method, either marking the record `FAILED` or answering
+  `SUCCESS` and putting the reason in `responseStatusCode`, and the
+  package only checked the first. That let an invalid vector through
+  [`get_cansim_vector_info()`](https://mountainmath.github.io/cansim/reference/get_cansim_vector_info.md)
+  as a row of `NA`s indistinguishable from real metadata. Both are now
+  checked everywhere, and the items that carry no data are dropped and
+  reported by reason, naming the vectors or coordinates concerned
+
+- vector calls that come back with nothing now warn and return an empty
+  table. Previously the empty answer travelled on to the metadata join
+  and surfaced there as `Column 'cansimTableNumber' doesn't exist`,
+  which said nothing about what had happened. The warning names all
+  three things that produce it: vectors that do not exist, vectors with
+  no data in the requested time frame, and the daily window from
+  midnight to 8:30am Eastern in which StatCan does not serve vector data
+
+- when StatCan refuses a request it explains why in the response body,
+  and that explanation is now shown alongside the status code instead of
+  being discarded. An HTTP 409 says whether the product is simply not
+  released yet, and an HTTP 416 names the limit the request went past.
+  Those two status codes also got the plain-language translation the
+  other codes already had. The HTTP 504 message now says that StatCan
+  builds a whole response before sending any of it, so the way past a
+  gateway timeout is to ask for less at once rather than to retry the
+  same request
+
+- two new functions expose StatCan’s changed series data methods, which
+  report what changed at a finer grain than
+  [`get_cansim_changed_tables()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.md)
+  does.
+  [`get_cansim_changed_series_data_for_vectors()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_vectors.md)
+  and
+  [`get_cansim_changed_series_data_for_coordinates()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_coordinates.md)
+  retrieve the data points StatCan changed, in the same shape and with
+  the same metadata as the corresponding
+  [`get_cansim_vector()`](https://mountainmath.github.io/cansim/reference/get_cansim_vector.md)
+  and coordinate calls. Series that did not change simply contribute no
+  rows, and if none of the ones asked about changed the answer is an
+  empty table rather than an error. Like the other vector methods they
+  batch requests of more than 300 items. StatCan’s third changed series
+  method, the one listing every series that changed today, is
+  implemented but not exported. It regularly fails to answer at all:
+  StatCan works out the whole response before sending any of it, and
+  with the changed series numbering in the hundreds of thousands the
+  request outlives StatCan’s own gateway and comes back as an HTTP 504
+  after some nine minutes of silence. Exporting it will wait until it is
+  clear whether that is a fault or simply how the method behaves
+
+- the package now talks to StatCan through `httr2` rather than `httr`.
+  Requests that fail on a status StatCan recovers from within seconds,
+  an HTTP 429, 500, 502 or 504, are now retried with exponential backoff
+  and jitter and honour a `Retry-After` header, where the previous
+  retries went out back to back and stood a good chance of arriving
+  while the server was still busy. Requests are also throttled to the 25
+  per second StatCan documents as its per-IP limit, so a script asking
+  for many tables or vectors no longer risks being turned away for
+  asking too quickly, and they now identify themselves with a
+  `cansim/<version>` user agent. Statuses that will not improve on a
+  retry are deliberately not retried: an HTTP 416 carries more items
+  than StatCan accepts however often it is sent, an HTTP 409 is the
+  nightly update window, and an HTTP 503 is StatCan being down for
+  maintenance or an outage, which lasts far longer than any retry budget
+  worth spending. The 503 case says so, and says to try again later,
+  rather than appearing to hang while retries run down. Users behind a
+  proxy should note that `httr2` reads the standard `http_proxy` and
+  `https_proxy` environment variables instead of taking an
+  [`httr::set_config()`](https://httr.r-lib.org/reference/set_config.html)
+  call
+
+- the `timeout` argument now bounds how long StatCan may go without
+  sending anything, rather than how long the whole transfer may take. As
+  a cap on the total it could not tell a connection StatCan had stopped
+  answering on from a large table that was simply taking a while, and
+  cut both off alike, so a slow download could fail after two hundred
+  seconds with most of the data already in hand. A transfer that keeps
+  delivering is now left alone however long it runs, and one that goes
+  quiet for `timeout` seconds is dropped, which is the distinction the
+  argument was always described as making. Note that StatCan works out a
+  whole response before sending any of it, taking roughly a tenth of a
+  second per vector, so a request for a full batch of 300 is silent for
+  something like thirty five seconds before the first byte arrives; the
+  default of two hundred seconds leaves ample room for that, but a much
+  smaller value passed by hand will cut off large requests. Establishing
+  the connection is bounded separately and briefly, so an unreachable
+  host now fails in ten seconds instead of waiting out the full timeout
+
+- [`get_cansim()`](https://mountainmath.github.io/cansim/reference/get_cansim.md)
+  and
+  [`get_cansim_connection()`](https://mountainmath.github.io/cansim/reference/get_cansim_connection.md)
+  now ask StatCan where a table lives instead of assembling the download
+  address from the table number. The address the package built was a
+  guess at a layout StatCan is free to change, and the extra call that
+  replaces it is small next to the table download it precedes
+
 ### Deprecations
 
 - [`get_cansim_sqlite()`](https://mountainmath.github.io/cansim/reference/get_cansim_sqlite.md),
@@ -100,10 +211,21 @@
   `get_cansim_connection(..., format="sqlite")`,
   [`list_cansim_cached_tables()`](https://mountainmath.github.io/cansim/reference/list_cansim_cached_tables.md)
   and `remove_cansim_cached_tables(..., format="sqlite")` instead
+- [`disconnect_cansim_sqlite()`](https://mountainmath.github.io/cansim/reference/disconnect_cansim_sqlite.md)
+  is deprecated in favour of the new
+  [`disconnect_cansim_connection()`](https://mountainmath.github.io/cansim/reference/disconnect_cansim_connection.md),
+  which does the same thing under a name that does not claim a format.
+  It closes a sqlite connection and leaves parquet and feather
+  connections alone, so a connection can be closed without knowing which
+  format it came from. It was the last function still named for sqlite
+  that was not itself deprecated, and its own example demonstrated the
+  deprecated
+  [`get_cansim_sqlite()`](https://mountainmath.github.io/cansim/reference/get_cansim_sqlite.md)
 - the deprecated
   [`get_cansim_sqlite()`](https://mountainmath.github.io/cansim/reference/get_cansim_sqlite.md),
   [`list_cansim_sqlite_cached_tables()`](https://mountainmath.github.io/cansim/reference/list_cansim_sqlite_cached_tables.md),
   [`remove_cansim_sqlite_cached_table()`](https://mountainmath.github.io/cansim/reference/remove_cansim_sqlite_cached_table.md),
+  [`disconnect_cansim_sqlite()`](https://mountainmath.github.io/cansim/reference/disconnect_cansim_sqlite.md),
   [`list_cansim_tables()`](https://mountainmath.github.io/cansim/reference/list_cansim_tables.md)
   and
   [`search_cansim_tables()`](https://mountainmath.github.io/cansim/reference/search_cansim_tables.md)
@@ -111,6 +233,11 @@
 
 ### Performance
 
+- vector queries now collect their 300-vector API batches in a list and
+  combine them once, instead of repeatedly copying all previously
+  collected rows into every new batch. In an offline warm-cache
+  benchmark, combining 100 batches and 150,000 rows improved from 0.424s
+  to 0.227s
 - hierarchy building in metadata parsing no longer re-parses the growing
   hierarchy paths, hierarchies are built one ancestor level at a time
   across all members at once
@@ -164,6 +291,12 @@
   [`get_cansim_changed_tables()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.md)
   passing “days” to [`difftime()`](https://rdrr.io/r/base/difftime.html)
   as a time zone instead of a unit
+- [`get_cansim_changed_tables()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.md)
+  now takes both the current date and the cutoff after which the day’s
+  changes are available in Eastern time. It used to compare against 9am,
+  half an hour after StatCan actually closes its nightly update window,
+  and to take “today” from the local clock, so a machine set west of
+  Eastern could ask StatCan about a day that had not started there yet
 - [`get_cansim_connection()`](https://mountainmath.github.io/cansim/reference/get_cansim_connection.md)
   no longer fails when the release date of a table cannot be determined,
   the staleness check is skipped with a message instead
@@ -182,6 +315,28 @@
   “corrections” types
 - functions that only operate on a single table now fail with an
   informative message when given several table numbers
+- normalizing percentages now relabels the unit of measure to `Rate`, or
+  `Taux` in French tables, as the documentation always described; the
+  comparison doing the relabelling could never match before, so the unit
+  columns used to keep their original `Percent...` labels after the
+  values had been divided by 100
+- [`add_cansim_vectors_to_template()`](https://mountainmath.github.io/cansim/reference/add_cansim_vectors_to_template.md)
+  now finds vectors for coordinates whose member ids end in a zero,
+  trimming of trailing `.0` positions used to eat into member ids like
+  `10` and the affected rows came back with an `NA` vector
+- French connections no longer emit a spurious “Unknown table type”
+  warning on
+  [`collect_and_normalize()`](https://mountainmath.github.io/cansim/reference/collect_and_normalize.md),
+  an internal language comparison never matched the French setting
+- when refreshing a cached table fails because StatCan is unavailable,
+  [`get_cansim_connection()`](https://mountainmath.github.io/cansim/reference/get_cansim_connection.md)
+  now falls back to the previously cached version with a warning instead
+  of returning `NULL`. Refreshing cube metadata degrades the same way,
+  so the notes, column, overview and template functions keep working
+  from previously seen metadata when the servers are down
+- the duplicated-column error when caching a table now actually names
+  the offending columns and no longer blames SQLite for parquet and
+  feather connections
 
 ## cansim 0.4.4
 

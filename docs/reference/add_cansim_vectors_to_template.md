@@ -27,6 +27,9 @@ add_cansim_vectors_to_template(template, refresh = FALSE)
 
 a tibble containing the table template with added vector information
 
+Returns `NULL` if the data could not be retrieved because StatCan is
+unavailable.
+
 ## Examples
 
 ``` r

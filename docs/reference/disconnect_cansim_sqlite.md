@@ -1,6 +1,7 @@
-# Disconnect from a cansim database connection
+# Disconnect from a cansim database connection (deprecated)
 
-Disconnect from a cansim database connection
+This method is deprecated and will be removed in a future version,
+please use \`disconnect_cansim_connection()\` instead.
 
 ## Usage
 
@@ -22,7 +23,7 @@ disconnect_cansim_sqlite(connection)
 
 ``` r
 if (FALSE) { # \dontrun{
-con <- get_cansim_sqlite("34-10-0013")
-disconnect_cansim_sqlite(con)
+con <- get_cansim_connection("34-10-0013", format="sqlite")
+disconnect_cansim_connection(con)
 } # }
 ```

@@ -62,8 +62,14 @@ get_cansim_vector(
 
 - timeout:
 
-  (Optional) Timeout in seconds for downloading cansim table to work
-  around scenarios where StatCan servers drop the network connection.
+  (Optional) Number of seconds StatCan is allowed to go without sending
+  data before the download is abandoned, to work around scenarios where
+  StatCan servers drop the network connection. This does not limit how
+  long a download may take overall, a transfer that keeps delivering
+  data is left alone. StatCan prepares a whole response before sending
+  any of it, which for large requests can take the better part of a
+  minute, so values much below the default of 200 risk cutting off
+  legitimate requests.
 
 - factors:
 
@@ -93,7 +99,7 @@ unavailable.
 # \donttest{
 get_cansim_vector("v41690973","2015-01-01")
 #> Accessing CANSIM NDM vectors from Statistics Canada
-#> # A tibble: 138 × 16
+#> # A tibble: 139 × 16
 #>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID
 #>    <chr>     <date>     <fct> <fct>                  <dbl>    <dbl> <chr> <chr> 
 #>  1 2015-01-… 2015-01-01 Cana… All-items               124.     124. 2002… 17    
@@ -106,7 +112,7 @@ get_cansim_vector("v41690973","2015-01-01")
 #>  8 2015-08-… 2015-08-01 Cana… All-items               127.     127. 2002… 17    
 #>  9 2015-09-… 2015-09-01 Cana… All-items               127.     127. 2002… 17    
 #> 10 2015-10-… 2015-10-01 Cana… All-items               127.     127. 2002… 17    
-#> # ℹ 128 more rows
+#> # ℹ 129 more rows
 #> # ℹ abbreviated name: ¹​`Products and product groups`
 #> # ℹ 8 more variables: SCALAR_ID <int>, VECTOR <chr>, cansimTableNumber <chr>,
 #> #   COORDINATE <chr>, SYMBOL <int>, releaseTime <chr>, frequencyCode <int>,
