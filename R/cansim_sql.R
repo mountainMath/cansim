@@ -39,7 +39,7 @@ get_cansim_sqlite <- function(cansimTableNumber, language="english", refresh=FAL
                        cache_path=Sys.getenv('CANSIM_CACHE_PATH')){
   .Deprecated("get_cansim_connection",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use get_cansim_connection(..., format='sqlite'') instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use get_cansim_connection(..., format='sqlite') instead.")
 
   if (auto_refresh){
     refresh <- "auto"
@@ -124,7 +124,7 @@ list_cansim_sqlite_cached_tables <- function(cache_path=Sys.getenv('CANSIM_CACHE
 remove_cansim_sqlite_cached_table <- function(cansimTableNumber,language=NULL,cache_path=Sys.getenv('CANSIM_CACHE_PATH')){
   .Deprecated("remove_cansim_cached_tables",
               package="cansim",
-              msg="This function has been deprecated, it will be removed in future versions. Please use remove_cansim_cached_tables(..., format='sqlite'') instead.")
+              msg="This function has been deprecated, it will be removed in future versions. Please use remove_cansim_cached_tables(..., format='sqlite') instead.")
 
   remove_cansim_cached_tables(cansimTableNumber=cansimTableNumber,language=language,format="sqlite",cache_path=cache_path)
 }

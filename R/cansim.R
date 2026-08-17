@@ -47,6 +47,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
   uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
   percentage_string=ifelse(language=="fra","^Pourcent","^Percent")
+  rate_string=ifelse(language=="fra","Taux","Rate")
   classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
   hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
@@ -80,7 +81,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
-      mutate(!!as.name(uom_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),"Rate",!!as.name(uom_string)))
+      mutate(!!as.name(uom_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),rate_string,!!as.name(uom_string)))
   }
 
 
@@ -207,7 +208,11 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
             coordinate_lookup <- list(matrix=stringr::str_split_fixed(unique_coordinates,"\\.",coordinate_parts),
                                       index=match(coordinates,unique_coordinates))
           }
-          data$`...id` <- coordinate_lookup$matrix[coordinate_lookup$index,dimension_id]
+          if (dimension_id <= ncol(coordinate_lookup$matrix)) {
+            data$`...id` <- coordinate_lookup$matrix[coordinate_lookup$index,dimension_id]
+          } else { # coordinates that are shorter than the cube has dimensions carry nothing for this one
+            data$`...id` <- NA_character_
+          }
 
           data <- data %>%
             select(-all_of(field)) %>%
@@ -360,7 +365,11 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     # is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column_index))
 
-    member_ids_for_column <- coordinate_matrix[,column_index]
+    if (column_index <= ncol(coordinate_matrix)) {
+      member_ids_for_column <- coordinate_matrix[,column_index]
+    } else { # coordinates that are shorter than the cube has dimensions carry nothing for this one
+      member_ids_for_column <- rep(NA_character_,nrow(coordinate_matrix))
+    }
 
     if (is_geo_column) {
       hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
@@ -701,10 +710,7 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
   data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda5")
   if (!refresh && file.exists(data_path)) {
     notes <- readRDS(file=data_path)
-  } else if (!file.exists(data_path)) {
-    notes <- get_cansim_cube_metadata(cansimTableNumber,refresh=refresh,type="notes")
-  }
-  if (refresh || !file.exists(data_path)){
+  } else {
     notes <- get_cansim_cube_metadata(cansimTableNumber,refresh=refresh,type="notes")
     if (is.null(notes)) return(NULL)
     cleaned_language <- cleaned_ndm_language(language)
@@ -885,6 +891,7 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
   for (column in columns[[dimension_name_column]]) {
     text <- paste0(text,"\n","Column ",column)
     categories <- get_cansim_column_categories(cansimTableNumber,column,language=language,refresh=refresh)
+    if (is.null(categories)) return(invisible(NULL))
     text <- paste0(text, " (",nrow(categories),")","\n")
     text <- paste0(text, paste(utils::head(categories[[member_name_column]],10),collapse=", "))
     if (nrow(categories)>10) text <- paste0(text, ", ...")
@@ -1080,6 +1087,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=
   member_note_column <- ifelse(cleaned_language=="eng","Member Notes","Notes sur le membre")
   note_id_column <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
   notes <- get_cansim_table_short_notes(cansimTableNumber,language=language,refresh=refresh,timeout=timeout)
+  if (is.null(notes)) return(NULL)
   columns <- get_cansim_column_list(cansimTableNumber,language=language)
 
   if (dimenion_note_column %in% names(columns)) {

@@ -13,6 +13,8 @@ add_cansim_vectors_to_template(template, refresh = FALSE)
 }
 \value{
 a tibble containing the table template with added vector information
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves vector information for given table and coordinates. This can be used to query data by vectors, it only

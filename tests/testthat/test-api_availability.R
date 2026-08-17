@@ -53,10 +53,16 @@ test_that("erroring can be restored through an option", {
 test_that("every function that talks to StatCan returns NULL when StatCan is unreachable", {
   skip_on_cran()
 
-  # a cache path of its own, otherwise cached tables would legitimately satisfy some of these calls
+  # a cache path of its own, otherwise cached tables would legitimately satisfy some of these calls;
+  # get_cansim_connection() serves a cached table when a refresh download fails, and it reads the
+  # environment variable rather than the option, so that has to point at the private path too
   old <- options(cansim.cache_path=file.path(tempdir(),"cansim_unavailable_test"))
   dir.create(getOption("cansim.cache_path"), showWarnings=FALSE)
   on.exit(options(old), add=TRUE)
+  old_env <- Sys.getenv("CANSIM_CACHE_PATH", unset=NA)
+  Sys.setenv(CANSIM_CACHE_PATH=getOption("cansim.cache_path"))
+  on.exit(if (is.na(old_env)) Sys.unsetenv("CANSIM_CACHE_PATH") else
+    Sys.setenv(CANSIM_CACHE_PATH=old_env), add=TRUE)
 
   # a table no other test touches, so that nothing it needs is already sitting in the session cache
   TABLE <- "17-10-0005"

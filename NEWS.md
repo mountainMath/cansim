@@ -13,7 +13,12 @@
 * data retrieved by vector or by table/coordinate now carries `UOM` and `UOM_ID` columns, taken from the
   cube metadata. StatCan flags a single dimension of each cube as carrying the unit of measure and the unit
   varies by member of that dimension, so the unit is resolved per coordinate. Tables that have no unit of
-  measure, for example census tables, get no unit columns, matching the full table download (#170)
+  measure, for example census tables, get no unit columns, matching the full table download (#170).
+  With the unit known, percentage values retrieved by vector or by coordinate are now normalized the
+  same way as full table downloads: `val_norm` carries the value divided by 100 and the unit of
+  measure is relabelled to `Rate` (`Taux` in French). Previously the same series normalized
+  differently depending on whether it was retrieved as a full table or by vector, so scripts that
+  fetch percentage vectors will see `val_norm` change by a factor of 100
 * non-breaking spaces and control characters in names returned by StatCan are now replaced with regular
   spaces. These characters render as an ordinary space or as nothing at all, so a column whose name
   contained one could not be reached by typing or copy-pasting what the console displayed. The repair
@@ -101,6 +106,20 @@
   all tables is still retrieved in a single API call and cached per table
 * `get_cansim_cube_metadata()` adds a `cansimTableNumber` column for the "members", "notes" and "corrections" types
 * functions that only operate on a single table now fail with an informative message when given several table numbers
+* normalizing percentages now relabels the unit of measure to `Rate`, or `Taux` in French tables, as the
+  documentation always described; the comparison doing the relabelling could never match before, so the
+  unit columns used to keep their original `Percent...` labels after the values had been divided by 100
+* `add_cansim_vectors_to_template()` now finds vectors for coordinates whose member ids end in a zero,
+  trimming of trailing `.0` positions used to eat into member ids like `10` and the affected rows came
+  back with an `NA` vector
+* French connections no longer emit a spurious "Unknown table type" warning on `collect_and_normalize()`,
+  an internal language comparison never matched the French setting
+* when refreshing a cached table fails because StatCan is unavailable, `get_cansim_connection()` now falls
+  back to the previously cached version with a warning instead of returning `NULL`. Refreshing cube
+  metadata degrades the same way, so the notes, column, overview and template functions keep working
+  from previously seen metadata when the servers are down
+* the duplicated-column error when caching a table now actually names the offending columns and no longer
+  blames SQLite for parquet and feather connections
 
 # cansim 0.4.4
 ## Minor changes

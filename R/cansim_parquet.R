@@ -87,7 +87,8 @@ get_cansim_connection <- function(cansimTableNumber,
     }
   }
 
-  if (refresh || !file.exists(db_path)){
+  needs_download <- refresh || !file.exists(db_path)
+  if (needs_download){
     if (cleaned_language=="eng")
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
@@ -96,7 +97,15 @@ get_cansim_connection <- function(cansimTableNumber,
 
     time_check <- Sys.time()
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
-    if (is.null(response)) return(NULL)
+    if (is.null(response)) {
+      # a failed refresh leaves the previous download intact, serving that beats returning nothing
+      if (!file.exists(db_path)) return(NULL)
+      warning(paste0("Failed to download table ",cleaned_number,", proceeding with the previously cached version."),
+              call.=FALSE)
+      needs_download <- FALSE
+    }
+  }
+  if (needs_download){
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
     exdir=file.path(tempdir(),file_path_for_table_language(cansimTableNumber,language))
@@ -123,8 +132,8 @@ get_cansim_connection <- function(cansimTableNumber,
     parse_metadata(meta_lines,data_path = meta_base_path)
 
 
-    scale_string <- ifelse(language=="fr","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
-    value_string <- ifelse(language=="fr","VALEUR","VALUE")
+    scale_string <- ifelse(cleaned_language=="fra","IDENTIFICATEUR SCALAIRE","SCALAR_ID")
+    value_string <- ifelse(cleaned_language=="fra","VALEUR","VALUE")
 
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     geography_column <- ifelse(cleaned_language=="eng","Geography",paste0("G",intToUtf8(0x00E9),"ographie"))
@@ -187,10 +196,10 @@ get_cansim_connection <- function(cansimTableNumber,
     hd <- header[duplicated(toupper(header)) | duplicated(toupper(header), fromLast = TRUE)]
 
     if (length(hd)>0) {
-      dupes <- header[toupper(header) %in% hd]
+      dupes <- header[toupper(header) %in% toupper(hd)]
       unlink(exdir, recursive=TRUE)
-      stop(paste0("This table has duplicated columns names: ",paste0(dupes,collapse = ", "),
-                  ".\nThis is not allowed for SQLite databases, please use the 'get_cansim' method for this table."),call.=FALSE)
+      stop(paste0("This table has duplicated columns names: ",paste0(unique(dupes),collapse = ", "),
+                  ".\nThis is not supported for cached ",format," connections, please use the 'get_cansim' method for this table."),call.=FALSE)
     }
 
     if (format=="sqlite") {
@@ -292,39 +301,39 @@ get_cansim_connection <- function(cansimTableNumber,
       message(paste0("Lecture du produit ",cleaned_number)," de CANSIM NDM ",intToUtf8(0x00E0)," partir du ",format,".")
   }
 
-  if (have_custom_path||TRUE) {
-    meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
-    meta_grep_string <- basename(meta_base_path)
-    meta_dir_name <- dirname(meta_base_path)
-    meta_files <- dir(meta_dir_name,pattern=meta_grep_string)
+  # the metadata sits next to the cached table and gets copied into the session cache where the
+  # metadata helpers look for it, this is needed whether or not a custom cache path is set
+  meta_base_path <- paste0(base_path_for_table_language(cansimTableNumber,language,cache_path),".Rda")
+  meta_grep_string <- basename(meta_base_path)
+  meta_dir_name <- dirname(meta_base_path)
+  meta_files <- dir(meta_dir_name,pattern=meta_grep_string)
 
-    column_files <- meta_files[grepl("_column_",meta_files) & !grepl("_\\d+$",meta_files)]
+  column_files <- meta_files[grepl("_column_",meta_files) & !grepl("_\\d+$",meta_files)]
 
-    # legacy support for old column files
-    if (length(column_files)>0) {
-      meta2 <- readRDS(file.path(meta_dir_name,meta_files[grepl("\\.Rda2$",meta_files)]))
-      # Use column names instead of hardcoded indices
-      dimension_id_col <- names(meta2)[1]  # "Dimension ID" or French equivalent
-      dimension_name_col <- names(meta2)[2]  # "Dimension name" or French equivalent
-      for (f in column_files) {
-        nn <- gsub(".+_column_","",f)
-        id <- meta2[meta2[[dimension_name_col]]==nn, dimension_id_col] %>% as.character()
-        if (length(id)==1) {
-          new_name <- f %>% gsub("_column_.+$",paste0("_column_",id),x=.)
-          file.rename(file.path(meta_dir_name,f),file.path(meta_dir_name,new_name))
-        }
+  # legacy support for old column files
+  if (length(column_files)>0) {
+    meta2 <- readRDS(file.path(meta_dir_name,meta_files[grepl("\\.Rda2$",meta_files)]))
+    # Use column names instead of hardcoded indices
+    dimension_id_col <- names(meta2)[1]  # "Dimension ID" or French equivalent
+    dimension_name_col <- names(meta2)[2]  # "Dimension name" or French equivalent
+    for (f in column_files) {
+      nn <- gsub(".+_column_","",f)
+      id <- meta2[meta2[[dimension_name_col]]==nn, dimension_id_col] %>% as.character()
+      if (length(id)==1) {
+        new_name <- f %>% gsub("_column_.+$",paste0("_column_",id),x=.)
+        file.rename(file.path(meta_dir_name,f),file.path(meta_dir_name,new_name))
       }
-      meta_files <- dir(meta_dir_name,pattern=meta_grep_string)
     }
-
-
-    # the version marker sits next to the metadata, a cache that has none was built before 0.4.5
-    stale_cache <- cache_predates_value_repair(meta_dir_name)
-    stale_labels <- if (stale_cache) stale_cached_labels(meta_dir_name) else character(0)
-
-    meta_base_path <- table_base_path(cansimTableNumber)
-    for (f in meta_files) file.copy(file.path(meta_dir_name,f),file.path(meta_base_path,f))
+    meta_files <- dir(meta_dir_name,pattern=meta_grep_string)
   }
+
+
+  # the version marker sits next to the metadata, a cache that has none was built before 0.4.5
+  stale_cache <- cache_predates_value_repair(meta_dir_name)
+  stale_labels <- if (stale_cache) stale_cached_labels(meta_dir_name) else character(0)
+
+  meta_base_path <- table_base_path(cansimTableNumber)
+  for (f in meta_files) file.copy(file.path(meta_dir_name,f),file.path(meta_base_path,f))
 
   if (format %in% c("parquet","feather")) {
     partitioning_path <- file.path(dirname(db_path),paste0(basename(db_path),".partitioning"))
@@ -614,7 +623,7 @@ collect_and_normalize <- function(connection,
     }
   }
 
-  value_string <- ifelse(language=="fr","VALEUR","VALUE")
+  value_string <- ifelse(language=="fra","VALEUR","VALUE")
 
   data <- NULL
   if ("tbl_sql" %in% class(connection)) {
@@ -799,7 +808,7 @@ remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","f
   cache_path <- get_robust_cache_path(cache_path)
   format=tolower(format)
   if (length(setdiff(format,c("parquet","sqlite","feather")))>0) {
-    stop("Invalid format, must be a subset of 'parquet' (recommended), 'sqlite', or 'sqlite'.",call.=FALSE)
+    stop("Invalid format, must be a subset of 'parquet' (recommended), 'sqlite', or 'feather'.",call.=FALSE)
   }
   if (is.null(language)) language <- c("eng","fra")
   cleaned_language <- cleaned_ndm_language(language)
@@ -808,7 +817,7 @@ remove_cansim_cached_tables <- function(cansimTableNumber, format=c("parquet","f
   if (!have_custom_path) cache_path <- tempdir()
 
   if (is.data.frame(cansimTableNumber)) {
-    if (!sum(c("cansimTableNumber","language","dataFormat") %in% colnames(cansimTableNumber))) {
+    if (!all(c("cansimTableNumber","language","dataFormat") %in% colnames(cansimTableNumber))) {
       stop("cansimTableNumber must be a character vector or a (filtered) data frame as returned by list_cansim_cached_tables.",call.=FALSE)
     }
     # ensure that tables actually exist

@@ -107,7 +107,10 @@ parse_metadata <- function(meta,data_path){
     column_key <- as.character(column_index)
     column <- meta2_split[[column_key]]
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) & !(column[[dimension_name_column]] %in% column_names)
-    meta_x <- meta3_split[[column_key]] %>%
+    # a dimension without any member rows has no entry in the split, it still needs its file
+    meta_x <- meta3_split[[column_key]]
+    if (is.null(meta_x)) meta_x <- meta3[0,]
+    meta_x <- meta_x %>%
       add_hierarchy(parent_member_id_column=parent_member_id_column,
                     member_id_column=member_id_column,
                     hierarchy_column=hierarchy_column,
@@ -208,6 +211,9 @@ cube_metadata_path <- function(cansimTableNumber){
 # response for each table separately so that later calls can reuse individual tables.
 # Returns TRUE when the metadata for every requested table is cached and ready to be read, and
 # FALSE when StatCan could not be reached, so callers can hand back NULL rather than fail.
+# When a refresh download fails but every requested table still has a previously cached copy,
+# that copy is served with a warning instead, matching what get_cansim_connection() does for
+# the table data itself.
 download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
   needed <- cansimTableNumber[refresh | !file.exists(cube_metadata_path(cansimTableNumber))]
   if (length(needed)==0) return(invisible(TRUE))
@@ -218,7 +224,13 @@ download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
   url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
   body <- paste0("[",paste(paste0('{"productId":',table_ids,'}'),collapse = ", "),"]")
   response <- post_with_timeout_retry(url, body=body)
-  if (is.null(response)) return(invisible(FALSE))
+  if (is.null(response)) {
+    if (!all(file.exists(cube_metadata_path(needed)))) return(invisible(FALSE))
+    warning(paste0("Failed to download metadata for table",ifelse(length(needed)>1,"s ", " "),
+                   paste0(needed,collapse=", "),
+                   ", proceeding with the previously cached version."),call.=FALSE)
+    return(invisible(TRUE))
+  }
 
   data <- httr::content(response)
   data1 <- Filter(function(x)x$status=="SUCCESS",data)
@@ -305,7 +317,7 @@ cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=
     m4 <- d$correctionFootnote %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x)   %>%
-          mutate(across(is.integer,as.character))
+          mutate(across(where(is.integer),as.character))
       })
     saveRDS(m4, meta4_path)
   } else {
@@ -385,12 +397,15 @@ table_template_for_members <- function(member_info, cansimTableNumber, language)
   dimensions <- member_info %>%
     select("dimensionPositionId", "dimensionName") %>%
     unique() %>%
-    arrange(.data$dimensionPositionId)
+    arrange(as.integer(.data$dimensionPositionId))
+
+  # StatCan cubes can carry two dimensions with the same name, expand_grid below needs unique names
+  dimension_names <- make.unique(dimensions$dimensionName)
 
   # member names and ids per dimension, in dimension position order
   dim_data <- seq_len(nrow(dimensions)) %>%
     lapply(function(i) {
-      dim_name <- dimensions$dimensionName[i]
+      dim_name <- dimension_names[i]
       member_info %>%
         filter(.data$dimensionPositionId==dimensions$dimensionPositionId[i]) %>%
         select("memberId", "memberName") %>%
@@ -491,6 +506,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 #'
 #' @return a tibble containing the table template with added vector information
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' template <- get_cansim_table_template("34-10-0013")
@@ -521,10 +537,13 @@ add_cansim_vectors_to_template <- function(template, refresh=FALSE) {
     working_template <- template %>%
       filter(.data$cansimTableNumber==tn)
 
-    new_vector_info <- get_cansim_series_info_cube_coord(tn, working_template$COORDINATE, refresh=refresh) %>%
+    series_info <- get_cansim_series_info_cube_coord(tn, working_template$COORDINATE, refresh=refresh)
+    if (is.null(series_info)) return(NULL)
+
+    new_vector_info <- series_info %>%
       select(COORDINATE="coordinate", VECTOR=.data$vectorId) %>%
       mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
-      mutate(COORDINATE=gsub("(.0)+$","",.data$COORDINATE))
+      mutate(COORDINATE=gsub("(\\.0)+$","",.data$COORDINATE))
 
     vector_info <- bind_rows(vector_info, new_vector_info)
   }

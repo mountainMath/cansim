@@ -88,7 +88,8 @@ metadata_for_coordinates <- function(cansimTableNumber,coordinates,language) {
       }
 
       index <- match(member_ids,as.character(dm$memberId))
-      for (missing_id in unique(member_ids[is.na(index)])) {
+      # NA member ids come from coordinates that do not reach this dimension, only real ids are worth a warning
+      for (missing_id in setdiff(unique(member_ids[is.na(index)]),NA_character_)) {
         warning("Could not find metadata for dimension ",unique(dm$dimensionName)," member ",missing_id,
                 " in table ",cansimTableNumber)
       }
