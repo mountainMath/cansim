@@ -159,6 +159,14 @@
   cube metadata are reported once per member rather than once per coordinate that uses it
 
 ## Minor changes
+* asking `get_cansim_vector_for_latest_periods()` or `get_cansim_data_for_table_coord_periods()` for
+  all periods no longer sends an arbitrary round number as the period count. StatCan takes `latestN`
+  as a signed 32-bit integer, rejecting zero or less and anything past 2147483647, and quietly clamps
+  a count longer than the series to the whole series, so the default is now that bound as the
+  API itself enforces it, rather than a guess that happened to exceed the longest series. A period count larger than
+  the bound, or an infinite one, is capped instead of being silently coerced to `NA` and sent to
+  StatCan as `"latestN":NA`, and a count below one now fails immediately with a message instead of
+  earning an HTTP 406. This also applies to the per-coordinate `periods` column of a table template
 * an unrecognized `language` argument is now an error naming what was passed, instead of an `NA` that
   travelled on into a cache directory name or the tail of a StatCan URL and surfaced later as a
   download failure or a missing column. Either language can be named in either language, so

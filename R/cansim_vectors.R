@@ -1,4 +1,23 @@
-MAX_PERIODS = 1000000L
+# The latestN methods take the period count as a signed 32-bit integer. The API rejects zero or less
+# with "vector id or latest N is negative or zero" and anything above 2147483647 with a JSON syntax
+# error, while a count longer than the series is silently clamped to the whole series at no extra cost.
+# Asking for every period is therefore best expressed as the largest value the API will accept, which
+# is also the largest value R can hold in an integer, so as.integer() can never overshoot it. Neither
+# the bound nor the clamping is stated in the WDS user guide, which only requires latestN to be > 0.
+MAX_PERIODS <- .Machine$integer.max
+
+# Coerce a user supplied period count to something the latestN methods accept. Missing, infinite and
+# over-long counts all mean "every period there is"; a count below one has no reading that the API
+# would honour, so it is refused here rather than sent off to earn an HTTP 406.
+clean_periods <- function(periods) {
+  if (is.null(periods) || length(periods) == 0) return(MAX_PERIODS)
+  periods <- suppressWarnings(as.numeric(periods))
+  if (any(!is.na(periods) & periods < 1)) {
+    stop("The number of periods to retrieve must be at least 1.")
+  }
+  periods[is.na(periods) | periods > MAX_PERIODS] <- MAX_PERIODS
+  as.integer(periods)
+}
 STATCAN_TIMEZONE = "America/Toronto"
 STATCAN_TIME_FORMAT="%Y-%m-%dT%H:%M"
 STATCAN_TIME_FORMAT_S="%Y-%m-%dT%H:%M:%S"
@@ -384,8 +403,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
                                                language="english",
                                                refresh = FALSE, timeout = 200,
                                                factors = TRUE, default_month = "07", default_day = "01"){
-  if (is.null(periods) || is.na(periods)) {periods <- MAX_PERIODS}
-  periods <- as.integer(periods)
+  periods <- clean_periods(periods)
   cleaned_language <- cleaned_ndm_language(language)
 
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
@@ -462,8 +480,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
                                                   refresh = FALSE, timeout = 200,
                                                   factors=TRUE, default_month="07", default_day="01"){
   CENSUS_TABLE_STARTING_STRING <- "9810"
-  if (is.null(periods) || is.na(periods)) {periods <- MAX_PERIODS}
-  periods <- as.integer(periods)
+  periods <- clean_periods(periods)
 
   # pad coordinate if needed
   if ("list" %in% class(tableCoordinates)) {
@@ -485,7 +502,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
       mutate(periods = !!periods)
   } else {
     tableCoordinates <- tableCoordinates %>%
-      mutate(periods = coalesce(.data$periods, MAX_PERIODS))
+      mutate(periods = clean_periods(.data$periods))
   }
 
   tableCoordinates <- tableCoordinates %>%
