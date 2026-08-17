@@ -24,3 +24,4 @@ R-CMD-check-old.yaml
 ^\.claude$
 ^CLAUDE\.md$
 ^\.positai$
+^benchmarks$

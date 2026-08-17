@@ -240,7 +240,8 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
 
   batches <- split(vectors, ceiling(seq_along(vectors)/300))
-  result <- NULL
+  # Keep batches separate so the accumulated rows are copied only once.
+  batch_results <- vector("list", length(batches))
   for (batch_number in seq_along(batches)) {
     addition=""
     if (length(batches)>1) {
@@ -291,8 +292,9 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
       result_new <- readRDS(cache_path)
     }
 
-    result <- bind_rows(result,result_new)
+    batch_results[[batch_number]] <- result_new
   }
+  result <- bind_rows(batch_results)
 
   attr(result,"language") <- cleaned_language
   coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -365,7 +367,8 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
 
   batches <- split(vectors, ceiling(seq_along(vectors)/300))
-  result <- NULL
+  # Keep batches separate so the accumulated rows are copied only once.
+  batch_results <- vector("list", length(batches))
   for (batch_number in seq_along(batches)) {
     addition=""
     if (length(batches)>1) {
@@ -397,9 +400,10 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
       message(paste0("Reading CANSIM NDM vectors from temporary cache",addition))
       result_new <- readRDS(cache_path)
     }
-    result <- bind_rows(result,result_new)
+    batch_results[[batch_number]] <- result_new
 
   }
+  result <- bind_rows(batch_results)
 
   attr(result,"language") <- cleaned_language
   coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -636,5 +640,3 @@ get_cansim_vector_info <- function(vectors){
 
   extract_vector_metadata(data1)
 }
-
-

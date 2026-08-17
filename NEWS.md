@@ -70,6 +70,9 @@
   removal in a future release
 
 ## Performance
+* vector queries now collect their 300-vector API batches in a list and combine them once, instead of
+  repeatedly copying all previously collected rows into every new batch. In an offline warm-cache
+  benchmark, combining 100 batches and 150,000 rows improved from 0.424s to 0.227s
 * hierarchy building in metadata parsing no longer re-parses the growing hierarchy paths, hierarchies are built
   one ancestor level at a time across all members at once
 * coordinates are split once into a character matrix when folding in metadata and converting to factors
