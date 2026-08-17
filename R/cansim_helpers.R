@@ -317,6 +317,15 @@ base_path_for_table_language <- function(cansimTableNumber, language,base_dir = 
   file.path(base_dir,file_path_for_table_language(cansimTableNumber,language))
 }
 
+# StatCan rejects a request that carries more than this many items with an HTTP 416 that names the
+# limit, so every method taking a list of vectors, coordinates or tables is sent in batches of at
+# most this size. The limit is enforced by the API but is not stated in the WDS user guide.
+MAX_BATCH_SIZE <- 300L
+
+batch_items <- function(items,size=MAX_BATCH_SIZE){
+  unname(split(items,ceiling(seq_along(items)/size)))
+}
+
 response_status_code_translation <- list(
   "0"="Success",
   "1"="Invalid date",
@@ -330,11 +339,100 @@ response_status_code_translation <- list(
 )
 
 response_error_translation <- list(
+  "409"=paste0("StatCan is publishing this table right now, or the daily update window ",
+               "(midnight to 8:30am Eastern) has not finished, please try again later"),
+  "416"="The request asked for more items than StatCan accepts in a single call",
   "429"="StatCan is rate limiting requests, please try again later",
   "502"="StatCan website is currently unreachable",
   "503"="StatCan website is currently unavailable",
   "504"="StatCan website did not respond in time"
 )
+
+# A WDS method that takes a list of items answers with one record per item, each carrying its own
+# status, and the API does not signal a bad item the same way everywhere. Some methods mark the
+# record `"status":"FAILED"`, others answer `"status":"SUCCESS"` and put the reason in
+# `responseStatusCode`, where anything other than 0 means the record carries no data. Asking only
+# about `status` is what let an invalid vector through `get_cansim_vector_info()` as a row of NAs
+# that was indistinguishable from real metadata, so both are checked here.
+wds_record_code <- function(record){
+  object <- record$object
+  # a record that failed outright can carry a sentence in place of the object
+  if (!is.list(object)) return(NA_integer_)
+  code <- object$responseStatusCode
+  if (length(code)!=1) return(NA_integer_)
+  suppressWarnings(as.integer(code))
+}
+
+wds_record_succeeded <- function(record){
+  if (!identical(as.character(record$status),"SUCCESS")) return(FALSE)
+  code <- wds_record_code(record)
+  is.na(code) || code==0L
+}
+
+split_wds_records <- function(data){
+  if (length(data)==0) return(list(success=list(),failed=list()))
+  succeeded <- vapply(data,wds_record_succeeded,logical(1))
+  list(success=data[succeeded],failed=data[!succeeded])
+}
+
+wds_record_reason <- function(record){
+  object <- record$object
+  if (is.character(object) && length(object)==1) return(object)
+  code <- wds_record_code(record)
+  if (is.na(code)) return("no reason given")
+  translation <- response_status_code_translation[[as.character(code)]]
+  # the API emits codes that are not in its own wdsResponseStatus code set, such as the 9 it
+  # answers with when a request exceeds the item limit
+  if (is.null(translation)) return(paste0("StatCan response status code ",code))
+  translation
+}
+
+# Names the item a failed record answers for, so that a report can say which vector or coordinate
+# was dropped rather than only how many.
+wds_record_id <- function(record){
+  object <- record$object
+  if (!is.list(object)) return(NA_character_)
+  present <- function(x) length(x)==1 && !is.na(x) && x!=0
+  if (present(object$vectorId)) return(paste0("v",object$vectorId))
+  if (present(object$productId)) {
+    # spelled out rather than routed through cleaned_ndm_table_number(), which warns and messages
+    # on its own and has no business doing so from inside a failure report
+    product_id <- as.character(object$productId)
+    table_number <- paste0(substr(product_id,1,2),"-",substr(product_id,3,4),"-",substr(product_id,5,8))
+    if (length(object$coordinate)==1 && !is.na(object$coordinate)) {
+      return(paste0(table_number," ",gsub("(\\.0)+$","",object$coordinate)))
+    }
+    return(table_number)
+  }
+  NA_character_
+}
+
+report_failed_wds_records <- function(failed,context){
+  if (length(failed)==0) return(invisible(NULL))
+  reasons <- vapply(failed,wds_record_reason,character(1))
+  ids <- vapply(failed,wds_record_id,character(1))
+  message("Failed to load ",context," for ",length(failed)," of the requested items.")
+  # a batch of 300 bad vectors is one problem, not 300, so identical reasons are reported together
+  for (reason in unique(reasons)) {
+    named <- as.character(na.omit(ids[reasons==reason]))
+    shown <- head(named,5)
+    message("  ",reason,
+            if (length(shown)>0) paste0(" (",paste(shown,collapse=", "),
+                                        if (length(named)>length(shown)) ", ..." else "",")") else "")
+  }
+  invisible(NULL)
+}
+
+# Returns the records that carry data and reports on the rest. `ignore_codes` is for the callers to
+# which a given failure is an expected answer rather than a problem worth mentioning.
+successful_wds_records <- function(data,context,ignore_codes=integer(0)){
+  records <- split_wds_records(data)
+  if (length(records$failed)>0) {
+    reported <- Filter(\(record) !(wds_record_code(record) %in% ignore_codes),records$failed)
+    report_failed_wds_records(reported,context)
+  }
+  records$success
+}
 
 # StatCan servers time out, go down for maintenance, or serve error pages often enough that treating
 # it as a fatal error is the wrong default. Every failure to get a usable answer out of StatCan is
@@ -347,6 +445,20 @@ statcan_unavailable <- function(...){
   if (isTRUE(getOption("cansim.error_on_unavailable"))) stop(message,call.=FALSE)
   warning(message,call.=FALSE)
   NULL
+}
+
+# A response StatCan refuses carries a JSON body saying why, which the status code on its own does
+# not: the 409 served outside the daily release window explains that the product is not released
+# yet, and the 416 served for an oversized request names the item limit it went past. Anything that
+# is not JSON with a message in it, an HTML error page or a part-written download, yields NULL.
+statcan_response_message <- function(response){
+  parsed <- tryCatch(httr::content(response,as="parsed",type="application/json",encoding="UTF-8"),
+                     error=function(e) NULL)
+  if (!is.list(parsed)) return(NULL)
+  detail <- parsed$message
+  if (is.null(detail) && is.character(parsed$object)) detail <- parsed$object
+  if (length(detail)!=1 || !is.character(detail) || is.na(detail) || detail=="") return(NULL)
+  detail
 }
 
 # Shared failure handling for the GET and POST helpers. Returns the response on success, and NULL on
@@ -379,8 +491,10 @@ check_statcan_response <- function(response,retry,again){
   }
   if (status_code!=200) {
     translation <- response_error_translation[[as.character(status_code)]]
+    detail <- statcan_response_message(response$result)
     return(statcan_unavailable(if (is.null(translation)) "" else paste0(translation,"\n"),
-                               "Problem downloading data, StatCan returned status code ",status_code,"."))
+                               "Problem downloading data, StatCan returned status code ",status_code,".",
+                               if (is.null(detail)) "" else paste0("\n","StatCan says: ",detail)))
   }
   response$result
 }

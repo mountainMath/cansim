@@ -164,6 +164,8 @@ add_uom_for_coordinates <- function(data,cansimTableNumber,language) {
 }
 
 extract_vector_metadata <- function(data1){
+  # every vector of the request can be rejected, and the mutates below need columns to work on
+  if (length(data1)==0) return(tibble::tibble())
   vf=list("DECIMALS"="decimals",
           "VECTOR"="vectorId",
           "table"="productId",
@@ -189,6 +191,19 @@ extract_vector_metadata <- function(data1){
     dplyr::mutate(COORDINATE=gsub("(\\.0)+$","",.data$COORDINATE)) # strip trailing zeros
 
   result
+}
+
+# The vector methods answer a request they have no data for with an empty list rather than with an
+# error, and `getDataFromVectorByReferencePeriodRange` does so for every vector at once during the
+# nightly window from midnight to 8:30am Eastern, where the other methods refuse with an HTTP 409.
+# There is nothing in that answer to tell the three cases apart, so the warning names all of them.
+warn_no_vector_data <- function(){
+  warning(wrap_warning_text(
+    "StatCan returned no data for any of the requested vectors. This happens when none of the ",
+    "vectors exist, when none of them carry data in the requested time frame, and during the daily ",
+    "window from midnight to 8:30am Eastern in which StatCan does not serve vector data."),
+    call.=FALSE)
+  invisible(NULL)
 }
 
 rename_vectors <- function(data,vectors){
@@ -239,7 +254,7 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
   original_end_time=as.Date(end_time)
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
 
-  batches <- split(vectors, ceiling(seq_along(vectors)/300))
+  batches <- batch_items(vectors)
   # Keep batches separate so the accumulated rows are copied only once.
   batch_results <- vector("list", length(batches))
   for (batch_number in seq_along(batches)) {
@@ -272,21 +287,16 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
                                             timeout = timeout)
       }
       if (is.null(response)) return(response)
-      data <- httr::content(response)
-      data1 <- Filter(function(x)x$status=="SUCCESS",data)
-      data2 <- Filter(function(x)x$status!="SUCCESS",data)
-      if (length(data2)>0) {
-        message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-        data2 %>% purrr::map(function(x){
-          message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-        })
-      }
+      data1 <- successful_wds_records(httr::content(response),"vector data")
 
-      if (length(data1)>0)
+      if (length(data1)>0) {
         result_new <- extract_vector_data(data1)
-      else
+        saveRDS(result_new,cache_path)
+      } else {
+        # Nothing came back at all, which during the nightly window is true of every vector at
+        # once. Caching that would keep serving the empty answer for the rest of the session.
         result_new <- tibble::tibble()
-      saveRDS(result_new,cache_path)
+      }
     } else {
       message(paste0("Reading CANSIM NDM vectors from temporary cache",addition))
       result_new <- readRDS(cache_path)
@@ -295,6 +305,14 @@ get_cansim_vector<-function(vectors, start_time = as.Date("1800-01-01"), end_tim
     batch_results[[batch_number]] <- result_new
   }
   result <- bind_rows(batch_results)
+
+  # An empty result used to travel on to the metadata join below and surface there as a missing
+  # `cansimTableNumber` column, an error that says nothing about what actually happened.
+  if (nrow(result)==0) {
+    warn_no_vector_data()
+    attr(result,"language") <- cleaned_language
+    return(result)
+  }
 
   attr(result,"language") <- cleaned_language
   coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -366,7 +384,7 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getDataFromVectorsAndLatestNPeriods"
 
-  batches <- split(vectors, ceiling(seq_along(vectors)/300))
+  batches <- batch_items(vectors)
   # Keep batches separate so the accumulated rows are copied only once.
   batch_results <- vector("list", length(batches))
   for (batch_number in seq_along(batches)) {
@@ -382,20 +400,15 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
       message(paste0("Accessing CANSIM NDM vectors from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=vectors_string, timeout = timeout)
       if (is.null(response)) return(response)
-      data <- httr::content(response)
-      data1 <- Filter(function(x)x$status=="SUCCESS",data)
-      data2 <- Filter(function(x)x$status!="SUCCESS",data)
-      if (length(data2)>0) {
-        message(paste0("Failed to load data for ",length(data2)," vector(s)."))
-        data2 %>% purrr::map(function(x){
-          message(paste0("Problem downloading data: ",response_status_code_translation[as.character(x$object$responseStatusCode)]))
-        })
-      }
-      if (length(data1)>0)
+      data1 <- successful_wds_records(httr::content(response),"vector data")
+
+      if (length(data1)>0) {
         result_new <- extract_vector_data(data1)
-      else
+        saveRDS(result_new,cache_path)
+      } else {
+        # see the note in get_cansim_vector(), an empty answer is not worth caching
         result_new <- tibble::tibble()
-      saveRDS(result_new,cache_path)
+      }
     } else {
       message(paste0("Reading CANSIM NDM vectors from temporary cache",addition))
       result_new <- readRDS(cache_path)
@@ -404,6 +417,14 @@ get_cansim_vector_for_latest_periods<-function(vectors, periods=NULL,
 
   }
   result <- bind_rows(batch_results)
+
+  # An empty result used to travel on to the metadata join below and surface there as a missing
+  # `cansimTableNumber` column, an error that says nothing about what actually happened.
+  if (nrow(result)==0) {
+    warn_no_vector_data()
+    attr(result,"language") <- cleaned_language
+    return(result)
+  }
 
   attr(result,"language") <- cleaned_language
   coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -483,7 +504,7 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
     mutate(is_census_table=substr(.data$cansimTableNumber,1,4)==CENSUS_TABLE_STARTING_STRING) %>%
     mutate(batch=paste0(.data$is_census_table,"_",.data$cansimTableNumber)) %>%
     mutate(n=row_number(),.by="batch") %>%
-    mutate(b=(n-1) %% 300 == 0) %>%
+    mutate(b=(n-1) %% MAX_BATCH_SIZE == 0) %>%
     mutate(batch=paste0(.data$batch,"_",cumsum(.data$b)),.by="batch")
 
   if (!("periods") %in% names(tableCoordinates)) {
@@ -522,15 +543,18 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
       message(paste0("Accessing CANSIM NDM coordinates from Statistics Canada",addition))
       response <- post_with_timeout_retry(url, body=body_string, timeout = timeout)
       if (is.null(response)) {return(response)}
-      data <- httr::content(response)
-      data1 <- Filter(function(x)x$status=="SUCCESS",data)
-      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+      # this function reports the coordinates it could not get below, with a note of its own for the
+      # census tables, so the failed records are kept rather than handed to the shared reporting
+      records <- split_wds_records(httr::content(response))
+      data1 <- records$success
       new_failed_coordinates <- NULL
-      if (length(data2)>0) {
-        # message(paste0("Failed to load for ",length(data2)," coordinates "))
-        new_failed_coordinates <- data2 %>% purrr::map(function(x){x$object$coordinate}) %>% unlist()
+      if (length(records$failed)>0) {
+        # message(paste0("Failed to load for ",length(records$failed)," coordinates "))
+        # a record can carry a sentence in place of the object, and that has no coordinate in it
+        new_failed_coordinates <- purrr::map_chr(records$failed,\(x)
+          if (is.list(x$object) && length(x$object$coordinate)==1) x$object$coordinate else NA_character_)
         new_failed_coordinates <- tibble::tibble(cansimTableNumber=unique(working_data$cansimTableNumber),
-                                                 COORDINATE=new_failed_coordinates)
+                                                 COORDINATE=as.character(na.omit(new_failed_coordinates)))
 
         # if (substr(batch,7,10) == CENSUS_TABLE_STARTING_STRING) {
         #   warning(paste0("Table ",.data$cansimTableNumber,
@@ -625,18 +649,19 @@ get_cansim_data_for_table_coord_periods<-function(tableCoordinates, periods=NULL
 get_cansim_vector_info <- function(vectors){
   vectors=gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   url="https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromVector"
-  vectors_string=paste0("[",paste(purrr::map(as.character(vectors),function(x)paste0('{"vectorId":',x,'}')),collapse = ", "),"]")
-  response <- post_with_timeout_retry(url, body=vectors_string)
-  if (is.null(response)){return(response)}
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load metadata for ",length(data2)," tables "))
-    data2 %>% purrr::map(function(x){
-      message(x$object)
-    })
+
+  batches <- batch_items(vectors)
+  batch_results <- vector("list", length(batches))
+  for (batch_number in seq_along(batches)) {
+    vecs <- batches[[batch_number]]
+    vectors_string=paste0("[",paste(purrr::map(as.character(vecs),function(x)paste0('{"vectorId":',x,'}')),collapse = ", "),"]")
+    response <- post_with_timeout_retry(url, body=vectors_string)
+    if (is.null(response)){return(response)}
+    # this method answers an invalid vector with SUCCESS and a responseStatusCode of 4, which used
+    # to reach extract_vector_metadata() and come back as a row of NAs that looked like metadata
+    data1 <- successful_wds_records(httr::content(response),"vector metadata")
+    batch_results[[batch_number]] <- extract_vector_metadata(data1)
   }
 
-  extract_vector_metadata(data1)
+  bind_rows(batch_results)
 }

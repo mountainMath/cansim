@@ -55,6 +55,30 @@
   table to see whether its dimension names or member labels actually carry any. Only then does it
   warn, naming the offending label and pointing at `refresh=TRUE` (#169)
 
+* every call that sends StatCan a list of vectors, coordinates or tables is now split into batches of
+  at most 300 items. StatCan refuses a longer list outright with an HTTP 416, which had gone unnoticed
+  because most of these calls already batched. `get_cansim_vector_info()` and the cube metadata
+  download did not, so asking either for more than 300 items at a time failed rather than returning
+  data
+
+* a vector or coordinate StatCan cannot answer for is no longer passed off as data. StatCan signals a
+  bad item two different ways depending on the method, either marking the record `FAILED` or answering
+  `SUCCESS` and putting the reason in `responseStatusCode`, and the package only checked the first.
+  That let an invalid vector through `get_cansim_vector_info()` as a row of `NA`s indistinguishable
+  from real metadata. Both are now checked everywhere, and the items that carry no data are dropped and
+  reported by reason, naming the vectors or coordinates concerned
+
+* vector calls that come back with nothing now warn and return an empty table. Previously the empty
+  answer travelled on to the metadata join and surfaced there as `Column 'cansimTableNumber' doesn't
+  exist`, which said nothing about what had happened. The warning names all three things that produce
+  it: vectors that do not exist, vectors with no data in the requested time frame, and the daily window
+  from midnight to 8:30am Eastern in which StatCan does not serve vector data
+
+* when StatCan refuses a request it explains why in the response body, and that explanation is now
+  shown alongside the status code instead of being discarded. An HTTP 409 says whether the product is
+  simply not released yet, and an HTTP 416 names the limit the request went past. Those two status
+  codes also got the plain-language translation the other codes already had
+
 ## Deprecations
 * `get_cansim_sqlite()`, `list_cansim_sqlite_cached_tables()` and `remove_cansim_sqlite_cached_table()` are now
   also documented as deprecated, matching the deprecation warnings they already emit. Use

@@ -222,26 +222,27 @@ download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
 
   table_ids <- naked_ndm_table_number(needed)
   url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
-  body <- paste0("[",paste(paste0('{"productId":',table_ids,'}'),collapse = ", "),"]")
-  response <- post_with_timeout_retry(url, body=body)
-  if (is.null(response)) {
-    if (!all(file.exists(cube_metadata_path(needed)))) return(invisible(FALSE))
-    warning(paste0("Failed to download metadata for table",ifelse(length(needed)>1,"s ", " "),
-                   paste0(needed,collapse=", "),
-                   ", proceeding with the previously cached version."),call.=FALSE)
-    return(invisible(TRUE))
-  }
 
-  data <- httr::content(response)
-  data1 <- Filter(function(x)x$status=="SUCCESS",data)
-  data2 <- Filter(function(x)x$status!="SUCCESS",data)
-  if (length(data2)>0) {
-    message(paste0("Failed to load metadata for ",length(data2)," tables "))
-    purrr::walk(data2,\(x)message(x$object))
-  }
+  # StatCan refuses a request carrying more tables than it accepts at once with an HTTP 416, so a
+  # call asking for many tables at a time has to be split the way the vector methods are
+  downloaded <- character(0)
+  for (batch in batch_items(table_ids)) {
+    body <- paste0("[",paste(paste0('{"productId":',batch,'}'),collapse = ", "),"]")
+    response <- post_with_timeout_retry(url, body=body)
+    if (is.null(response)) {
+      if (!all(file.exists(cube_metadata_path(needed)))) return(invisible(FALSE))
+      warning(paste0("Failed to download metadata for table",ifelse(length(needed)>1,"s ", " "),
+                     paste0(needed,collapse=", "),
+                     ", proceeding with the previously cached version."),call.=FALSE)
+      return(invisible(TRUE))
+    }
 
-  downloaded <- purrr::map_chr(data1,\(x)cleaned_ndm_table_number(as.character(x$object$productId)))
-  purrr::walk2(data1,downloaded,\(d,tn)saveRDS(list(d), cube_metadata_path(tn)))
+    data1 <- successful_wds_records(httr::content(response),"cube metadata")
+
+    batch_downloaded <- purrr::map_chr(data1,\(x)cleaned_ndm_table_number(as.character(x$object$productId)))
+    purrr::walk2(data1,batch_downloaded,\(d,tn)saveRDS(list(d), cube_metadata_path(tn)))
+    downloaded <- c(downloaded,batch_downloaded)
+  }
 
   failed <- setdiff(needed,downloaded)
   if (length(failed)>0) {
@@ -454,8 +455,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 
   coordinates <- sort(normalize_coordinates(coordinates))
 
-  chuncksize <- 300
-  batches = split(coordinates, cumsum((1:length(coordinates)-1)%%chuncksize==0))
+  batches <- batch_items(coordinates)
 
   info <- purrr::map(batches, \(coordinates){
     body <- paste0("{\"productId\": ",productId,", \"coordinate\": \"",coordinates,"\"}") %>%
@@ -470,9 +470,11 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
       response <- post_with_timeout_retry(url, body=body, timeout=timeout)
       if (is.null(response)) return(NULL)
 
-      data <- httr::content(response)
-      data1 <- Filter(function(x)x$status=="SUCCESS",data)
-      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+      # A coordinate that names no series in the cube comes back as SUCCESS with a
+      # responseStatusCode of 2. That is the expected answer here rather than a problem worth
+      # reporting, since callers such as add_cansim_vectors_to_template() use this method precisely
+      # to find out which of the coordinates they hold are real.
+      data1 <- successful_wds_records(httr::content(response),"series information",ignore_codes=2)
 
       info <- data1 %>%
         purrr::map_df(\(x){
@@ -490,9 +492,10 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
   # a batch that could not be retrieved would quietly drop those coordinates from the result
   if (any(vapply(info,is.null,logical(1)))) return(NULL)
 
+  # invalid combinations were dropped above, `any_of` because every batch coming back empty leaves
+  # a table with no columns to name
   dplyr::bind_rows(info) %>%
-    filter(.data$responseStatusCode!=2) %>% # filter out invalid combinations
-    select(-"responseStatusCode")
+    select(-any_of("responseStatusCode"))
 }
 
 #' Retrieve series info for given table id and coordinates
