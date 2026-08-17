@@ -347,7 +347,10 @@ response_error_translation <- list(
   "503"=paste0("StatCan website is currently unavailable, either for scheduled maintenance or ",
                "because of an outage. This lasts longer than it is worth waiting for, so the ",
                "request was not retried, please try again later"),
-  "504"="StatCan website did not respond in time"
+  "504"=paste0("StatCan's own gateway gave up waiting for the servers behind it. StatCan works out a ",
+               "whole response before sending any of it, so this usually means the request was larger ",
+               "than it can put together in the time it allows itself, and asking for less at once ",
+               "may get through where retrying unchanged will not")
 )
 
 # A WDS method that takes a list of items answers with one record per item, each carrying its own

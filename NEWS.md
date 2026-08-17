@@ -77,17 +77,23 @@
 * when StatCan refuses a request it explains why in the response body, and that explanation is now
   shown alongside the status code instead of being discarded. An HTTP 409 says whether the product is
   simply not released yet, and an HTTP 416 names the limit the request went past. Those two status
-  codes also got the plain-language translation the other codes already had
+  codes also got the plain-language translation the other codes already had. The HTTP 504 message now
+  says that StatCan builds a whole response before sending any of it, so the way past a gateway
+  timeout is to ask for less at once rather than to retry the same request
 
-* three new functions expose StatCan's changed series methods, which report what changed at a finer
-  grain than `get_cansim_changed_tables()` does. `get_cansim_changed_series_list()` lists the series
-  StatCan changed today as vectors, with the table and coordinate each belongs to, and
-  `get_cansim_changed_series_data_for_vectors()` and
-  `get_cansim_changed_series_data_for_coordinates()` retrieve the changed data points themselves, in
+* two new functions expose StatCan's changed series data methods, which report what changed at a finer
+  grain than `get_cansim_changed_tables()` does. `get_cansim_changed_series_data_for_vectors()` and
+  `get_cansim_changed_series_data_for_coordinates()` retrieve the data points StatCan changed, in
   the same shape and with the same metadata as the corresponding `get_cansim_vector()` and
   coordinate calls. Series that did not change simply contribute no rows, and if none of the ones
   asked about changed the answer is an empty table rather than an error. Like the other vector
-  methods they batch requests of more than 300 items
+  methods they batch requests of more than 300 items.
+  StatCan's third changed series method, the one listing every series that changed today, is
+  implemented but not exported. It regularly fails to answer at all: StatCan works out the whole
+  response before sending any of it, and with the changed series numbering in the hundreds of
+  thousands the request outlives StatCan's own gateway and comes back as an HTTP 504 after some nine
+  minutes of silence. Exporting it will wait until it is clear whether that is a fault or simply how
+  the method behaves
 
 * the package now talks to StatCan through `httr2` rather than `httr`. Requests that fail on a status
   StatCan recovers from within seconds, an HTTP 429, 500, 502 or 504, are now retried with
