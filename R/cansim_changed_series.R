@@ -129,8 +129,10 @@ get_cansim_changed_series_data_for_vectors <- function(vectors, language="englis
   naked_vectors <- gsub("^v","",vectors) # allow for leading "v" by conditionally stripping it
   bodies <- paste0('{"vectorId":',naked_vectors,'}')
 
+  # the naked vectors, which keep their names through the gsub above, are what rename_vectors()
+  # further down expects; handing it the prefixed originals would look up "vv..." and label nothing
   changed_series_data("https://www150.statcan.gc.ca/t1/wds/rest/getChangedSeriesDataFromVector",
-                      bodies,vectors,language,timeout,factors,default_month,default_day)
+                      bodies,naked_vectors,language,timeout,factors,default_month,default_day)
 }
 
 #' Retrieve data for series that changed, by table and coordinate

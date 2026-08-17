@@ -138,3 +138,25 @@ test_that("requests are batched and shaped the way the API expects", {
   expect_match(bodies[1], '\\{"productId":34100013, "coordinate":"1\\.1\\.0\\.0\\.0\\.0\\.0\\.0\\.0\\.0"\\}')
   expect_match(bodies[1], '\\{"productId":34100013, "coordinate":"2\\.3\\.0\\.0\\.0\\.0\\.0\\.0\\.0\\.0"\\}')
 })
+
+test_that("vectors come back standardized and named vectors keep their labels", {
+  changed_for <- function(vectors) {
+    suppressMessages(with_mocked_bindings(
+      get_cansim_changed_series_data_for_vectors(vectors, factors=FALSE),
+      post_with_timeout_retry=function(...) structure(list(), class="httr2_response"),
+      statcan_response_json=function(response) list(mock_vector_data_record(vectorId=990000777)),
+      metadata_for_coordinates=mock_metadata_for_coordinates,
+      .package="cansim"))
+  }
+
+  # the caller may spell a vector with or without the "v" prefix, the result always carries it
+  expect_identical(changed_for("v990000777")$VECTOR, "v990000777")
+  expect_identical(changed_for("990000777")$VECTOR, "v990000777")
+  # and unnamed vectors get no label column
+  expect_false("label" %in% names(changed_for("v990000777")))
+
+  # rename_vectors() keys on the naked vector id, so both spellings of a named vector have to come
+  # out with the caller's label; the prefixed one used to look up "vv990000777" and label nothing
+  expect_identical(changed_for(c(foo="v990000777"))$label, "foo")
+  expect_identical(changed_for(c(foo="990000777"))$label, "foo")
+})
