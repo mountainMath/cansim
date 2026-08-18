@@ -4,23 +4,37 @@
 # rather than as the failure the shared handling would otherwise make of it.
 CHANGED_SERIES_NO_DATA_STATUS <- 404L
 
-# Retrieve the list of data series StatCan changed today, as vectors together with the table and
-# coordinate they belong to. StatCan serves this for the current day only and fills it during the
-# daily update window that ends at 8:30am Eastern. Unlike the changed tables method there is no way to
-# ask for an earlier day, StatCan answers a request naming a date with an HTTP 404.
-#
-# This is deliberately not exported yet. The method is frequently unable to answer at all: StatCan
-# works out the whole response before sending any of it, and the series changing on a given day can
-# number in the hundreds of thousands, so the request regularly outlives StatCan's own gateway and
-# comes back as an HTTP 504 after some nine minutes of silence. Raising `timeout` does not help, the
-# limit being exceeded is at StatCan's end. Until it is clear whether that is a fault worth working
-# around or simply how the method behaves, exporting it would be handing users something that mostly
-# does not work, and `get_cansim_changed_tables()` answers the coarser version of the same question in
-# a fraction of a second. The plan is to watch it for a while and export it in a later release once
-# there is a clear picture of what to expect.
-#
-# `timeout` is the number of seconds StatCan may go without sending data before the call is
-# abandoned, and is set high because this method is silent while it works.
+#' Retrieve the series that changed today
+#'
+#' Retrieve the list of data series Statistics Canada changed today, as vectors together with the
+#' table and coordinate they belong to. Where \code{get_cansim_changed_tables()} reports which tables
+#' were touched, this reports the individual series inside them, which is the finer grained way to
+#' decide what needs re-downloading.
+#'
+#' StatCan serves this for the current day only and fills it during the daily update window that ends
+#' at 8:30am Eastern. Unlike the changed tables method there is no way to ask for an earlier day,
+#' StatCan answers a request naming a date with an HTTP 404.
+#'
+#' How long this takes depends entirely on how much StatCan released that morning. The method takes no
+#' parameters, so there is no way to ask for a smaller slice of a busy day, and StatCan works out a
+#' whole response before sending any of it. On a quiet day the answer arrives in well under a second;
+#' on a heavy one the series changing can number in the hundreds of thousands and the request has been
+#' seen to outlive StatCan's own gateway, coming back as an HTTP 504 after some nine minutes of
+#' silence. That is a limit at StatCan's end which raising \code{timeout} cannot lift, so on such a day
+#' \code{get_cansim_changed_tables()} is the question worth asking instead.
+#'
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before
+#' the download is abandoned. The default is set high because this method is silent while it works.
+#'
+#' @return A tibble with one row per changed series, carrying the vector, the table number, the
+#' coordinate and the release time
+#'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
+#' @examples
+#' \dontrun{
+#' get_cansim_changed_series_list()
+#' }
+#' @export
 get_cansim_changed_series_list <- function(timeout=600){
   url <- "https://www150.statcan.gc.ca/t1/wds/rest/getChangedSeriesList"
 

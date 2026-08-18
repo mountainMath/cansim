@@ -36,6 +36,7 @@ reference:
     - get_cansim_changed_tables
     - get_cansim_table_last_release_date
     - get_cansim_key_release_schedule
+    - get_cansim_changed_series_list
     - get_cansim_changed_series_data_for_vectors
     - get_cansim_changed_series_data_for_coordinates
   - title: Metadata and information

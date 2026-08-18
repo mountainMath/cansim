@@ -81,19 +81,21 @@
   says that StatCan builds a whole response before sending any of it, so the way past a gateway
   timeout is to ask for less at once rather than to retry the same request
 
-* two new functions expose StatCan's changed series data methods, which report what changed at a finer
-  grain than `get_cansim_changed_tables()` does. `get_cansim_changed_series_data_for_vectors()` and
-  `get_cansim_changed_series_data_for_coordinates()` retrieve the data points StatCan changed, in
+* three new functions expose StatCan's changed series methods, which report what changed at a finer
+  grain than `get_cansim_changed_tables()` does. `get_cansim_changed_series_list()` lists the series
+  StatCan changed today as vectors, with the table and coordinate each belongs to, and
+  `get_cansim_changed_series_data_for_vectors()` and
+  `get_cansim_changed_series_data_for_coordinates()` retrieve the changed data points themselves, in
   the same shape and with the same metadata as the corresponding `get_cansim_vector()` and
   coordinate calls. Series that did not change simply contribute no rows, and if none of the ones
   asked about changed the answer is an empty table rather than an error. Like the other vector
-  methods they batch requests of more than 300 items.
-  StatCan's third changed series method, the one listing every series that changed today, is
-  implemented but not exported. It regularly fails to answer at all: StatCan works out the whole
-  response before sending any of it, and with the changed series numbering in the hundreds of
-  thousands the request outlives StatCan's own gateway and comes back as an HTTP 504 after some nine
-  minutes of silence. Exporting it will wait until it is clear whether that is a fault or simply how
-  the method behaves
+  methods the two data ones batch requests of more than 300 items.
+  How long the list method takes is entirely a matter of how much StatCan released that morning. It
+  takes no parameters, so a busy day cannot be asked about in smaller pieces, and on one heavy enough
+  the request has been seen to outlive StatCan's own gateway and come back as an HTTP 504 after some
+  nine minutes of silence. Its `timeout` defaults high to let that answer arrive as StatCan's own
+  rather than as a vaguer local abort, but the limit is at StatCan's end and raising it further will
+  not help; `get_cansim_changed_tables()` is the question to ask on such a day
 
 * the package now talks to StatCan through `httr2` rather than `httr`. Requests that fail on a status
   StatCan recovers from within seconds, an HTTP 429, 500, 502 or 504, are now retried with

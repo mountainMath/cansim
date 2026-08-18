@@ -41,7 +41,7 @@ test_that("both record shapes of the changed series list are read", {
 
   read <- function(payload) {
     with_mocked_bindings(
-      cansim:::get_cansim_changed_series_list(),
+      get_cansim_changed_series_list(),
       get_with_timeout_retry=function(...) structure(list(), class="httr2_response"),
       statcan_response_json=function(response) payload,
       .package="cansim")
@@ -79,7 +79,7 @@ test_that("nothing having changed is an empty table rather than a failure", {
   # the list method says the same when StatCan answers with no series, which it reports in the body
   # rather than through a status
   listed <- with_mocked_bindings(
-    cansim:::get_cansim_changed_series_list(),
+    get_cansim_changed_series_list(),
     get_with_timeout_retry=function(...) structure(list(), class="httr2_response"),
     statcan_response_json=function(response) list(status="SUCCESS", object=list()),
     .package="cansim")
@@ -93,7 +93,7 @@ test_that("the list method does not ask for a 404 to be read as nothing having c
   # rather than being passed off as a quiet day
   empty_status <- NULL
   with_mocked_bindings(
-    cansim:::get_cansim_changed_series_list(),
+    get_cansim_changed_series_list(),
     get_with_timeout_retry=function(url, ...) { empty_status <<- list(...)$empty_status; NULL },
     .package="cansim")
 
@@ -103,7 +103,7 @@ test_that("the list method does not ask for a 404 to be read as nothing having c
 test_that("StatCan being unavailable still yields NULL", {
   unavailable <- function(...) NULL
 
-  expect_null(with_mocked_bindings(cansim:::get_cansim_changed_series_list(),
+  expect_null(with_mocked_bindings(get_cansim_changed_series_list(),
                                    get_with_timeout_retry=unavailable, .package="cansim"))
   expect_null(suppressMessages(
     with_mocked_bindings(get_cansim_changed_series_data_for_vectors("v1"),
