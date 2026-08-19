@@ -14,20 +14,22 @@ get_cansim_column_list(
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
-\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.}
 }
 \value{
 A tibble listing the column names of the StatCan table.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_column_list("34-10-0013")
 }
 }

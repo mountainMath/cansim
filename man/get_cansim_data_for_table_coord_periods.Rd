@@ -23,11 +23,11 @@ get_cansim_data_for_table_coord_periods(
 Alternatively this can be specified by
 coordinate if tableCoordinates is a data frame, this argument will be ignored if that data frame as a "periods" column.}
 
-\item{language}{\code{"eng"} or \code{"english"} for English and \code{"fra"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
-\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.}
 
 \item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).}
 
@@ -37,6 +37,8 @@ coordinate if tableCoordinates is a data frame, this argument will be ignored if
 }
 \value{
 A tibble with data matching specified coordinate and period input arguments
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Allows for the retrieval of data for a Statistics Canada data table with specific table and coordinates.
@@ -46,7 +48,7 @@ The StatCan API can only process 300 coordinates at a time,
 if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_data_for_table_coord_periods(list("35-10-0003"=c("1.1","1.12")),periods=3)
 }
 }

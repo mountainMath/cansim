@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{remove_cansim_sqlite_cached_table}
 \alias{remove_cansim_sqlite_cached_table}
-\title{Remove cached cansim SQLite database}
+\title{Remove cached cansim SQLite database (deprecated)}
 \usage{
 remove_cansim_sqlite_cached_table(
   cansimTableNumber,
@@ -13,8 +13,8 @@ remove_cansim_sqlite_cached_table(
 \arguments{
 \item{cansimTableNumber}{Number of the table to be removed}
 
-\item{language}{Language for which to remove the cached data. If unspecified (`NULL`) tables for all languages
-will be removed}
+\item{language}{Language for which to remove the cached data, named as in \code{get_cansim()}. If
+unspecified (`NULL`) tables for all languages will be removed}
 
 \item{cache_path}{Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`}
 }
@@ -22,12 +22,13 @@ will be removed}
 `NULL``
 }
 \description{
-Remove cached cansim SQLite database
+This method is deprecated and will be removed in a future version, please use
+`remove_cansim_cached_tables(..., format="sqlite")` instead.
 }
 \examples{
 \dontrun{
 con <- get_cansim_connection("34-10-0013", format="sqlite")
-disconnect_cansim_sqlite(con)
+disconnect_cansim_connection(con)
 remove_cansim_cached_tables("34-10-0013", format="sqlite")
 }
 }

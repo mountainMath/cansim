@@ -34,25 +34,22 @@ parse_metadata <- function(meta,data_path){
     while (meta_part[length(meta_part)]=="") {
       meta_part <- meta_part[-length(meta_part)]
     }
-    if (TRUE) {
-      # This is a workaround for problems with StatCan Metadata found in Table 17-10-0016
-      if (length(grep("\u201C|\u201D",meta_part))>0){
-        meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
-      }
-      d<-utils::read.delim(text=meta_part,sep=table_delim,header=FALSE,stringsAsFactors=FALSE,
-                        quote="\"",na.strings="",
-                 colClasses="character",check.names=FALSE) %>%
-        as_tibble()
-      if (nrow(d>1)) {
-        nn <- as.character(d[1,])
-        d <- d %>%
-          select(which(!is.na(nn))) %>%
-          setNames(na.omit(nn)) %>%
-          slice(-1)
-      }
-    } else {
-      d<- suppressWarnings(readr::read_delim(paste0(meta_part,collapse="\n"),
-                                         delim=table_delim, col_types = readr::cols(.default="c")))
+    # This is a workaround for problems with StatCan Metadata found in Table 17-10-0016
+    if (length(grep("\u201C|\u201D",meta_part))>0){
+      meta_part <- meta_part %>% gsub("\u201C|\u201D",'"',x=.)
+    }
+    d<-utils::read.delim(text=meta_part,sep=table_delim,header=FALSE,stringsAsFactors=FALSE,
+                      quote="\"",na.strings="",
+               colClasses="character",check.names=FALSE) %>%
+      as_tibble()
+    # the section is read without a header so that its first line can be taken as the column names
+    # here, which is what lets the unnamed trailing columns StatCan pads its metadata with be dropped
+    if (nrow(d)>0) {
+      nn <- as.character(d[1,])
+      d <- d %>%
+        select(which(!is.na(nn))) %>%
+        setNames(na.omit(nn)) %>%
+        slice(-1)
     }
     d
   }
@@ -68,18 +65,24 @@ parse_metadata <- function(meta,data_path){
                            quote="\"",na.strings="",
                            colClasses="character",check.names=FALSE) %>%
       names()
-    notes <- tibble(!!h[1]:=meta_part[-1] %>% lapply(\(x)gsub(",.+","",x)) %>% unlist(),
-                    !!h[2]:=meta_part[-1] %>% lapply(\(x)gsub("^\\d+,","",x) %>% gsub("^\"|\"$","",.)) %>% unlist())
+    notes <- tibble(!!h[1]:=gsub(",.+", "", meta_part[-1]),
+                    !!h[2]:=gsub("^\"|\"$", "", gsub("^\\d+,", "", meta_part[-1])))
 
   }
 
   cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
 
-  meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)])
+  # Dimension and member names have to be repaired the same way as the column names of the data
+  # itself, otherwise the two no longer match and metadata stops folding in. The repair is silent
+  # here, the caller has already reported on the column names of this table.
+  meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)]) %>%
+    repair_statcan_columns(cube_title_column)
   saveRDS(meta1,file=paste0(data_path,"1"))
-  meta2 <- read_meta(meta[seq(cut_indices[1],cut_indices[2]-1)])
+  meta2 <- read_meta(meta[seq(cut_indices[1],cut_indices[2]-1)]) %>%
+    repair_statcan_columns(dimension_name_column)
   saveRDS(meta2,file=paste0(data_path,"2"))
-  meta3 <- read_meta(meta[seq(cut_indices[2],cut_indices[3]-1)])
+  meta3 <- read_meta(meta[seq(cut_indices[2],cut_indices[3]-1)]) %>%
+    repair_statcan_columns(member_name_column)
   saveRDS(meta3,file=paste0(data_path,"2m"))
   correction_index <- grep(paste0('^"',correction_id_grepl_field,'"'),meta)
   if (length(correction_index)==0) correction_index=length(meta)
@@ -95,11 +98,19 @@ parse_metadata <- function(meta,data_path){
 
   column_ids <- dplyr::pull(meta2,dimension_id_column)
   column_names <- dplyr::pull(meta2,dimension_name_column)
+
+  # P2: Pre-split meta3 by dimension_id for O(1) lookup instead of O(n) filter per column
+  meta3_split <- split(meta3, meta3[[dimension_id_column]])
+  meta2_split <- split(meta2, meta2[[dimension_id_column]])
+
   for (column_index in column_ids) { # iterate through columns for which we have meta data
-    column <- meta2 %>% dplyr::filter(.data[[dimension_id_column]]==column_index)
+    column_key <- as.character(column_index)
+    column <- meta2_split[[column_key]]
     is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) & !(column[[dimension_name_column]] %in% column_names)
-    meta_x <- meta3 %>%
-      dplyr::filter(.data[[dimension_id_column]]==column_index) %>%
+    # a dimension without any member rows has no entry in the split, it still needs its file
+    meta_x <- meta3_split[[column_key]]
+    if (is.null(meta_x)) meta_x <- meta3[0,]
+    meta_x <- meta_x %>%
       add_hierarchy(parent_member_id_column=parent_member_id_column,
                     member_id_column=member_id_column,
                     hierarchy_column=hierarchy_column,
@@ -115,32 +126,37 @@ parse_metadata <- function(meta,data_path){
 
 add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierarchy_column,exceeded_hierarchy_warning_message){
   meta_x <- meta_x %>% mutate(across(all_of(c(member_id_column,parent_member_id_column)),as.character))
-  parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],meta_x[[member_id_column]])
-  current_top <- function(c){
-    strsplit(c,"\\.") %>%
-      purrr::map(dplyr::first) %>%
-      unlist
+  member_ids <- meta_x[[member_id_column]]
+  parent_lookup <- rlang::set_names(meta_x[[parent_member_id_column]],member_ids)
+
+  # all hierarchies are grown one ancestor level at a time, so the number of passes is the
+  # depth of the tree rather than the number of members. The topmost id of each path is
+  # carried in its own vector, which avoids re-splitting the growing paths to find it.
+  hierarchy_paths <- member_ids
+  tops <- member_ids
+  max_depth <- 100
+  depth <- 0
+  exceeded <- FALSE
+
+  repeat {
+    # single bracket so that a parent that is not itself a member yields NA rather than an error
+    parents <- unname(parent_lookup[tops])
+    growing <- !is.na(parents)
+    if (!any(growing)) break
+    if (depth>=max_depth) {
+      exceeded <- TRUE
+      break
+    }
+    hierarchy_paths[growing] <- paste0(parents[growing],".",hierarchy_paths[growing])
+    tops <- parents
+    depth <- depth+1
   }
-  parent_for_current_top <- function(c){
-    as.character(parent_lookup[current_top(c)])
-  }
-  meta_x <- meta_x %>%
-    dplyr::mutate(!!as.name(hierarchy_column):=.data[[member_id_column]])
-  added=TRUE
-  max_depth=100
-  count=0
-  while (added & count<max_depth) { # generate hierarchy data from member id and parent member id data
-    old <- meta_x[[hierarchy_column]]
-    meta_x <- meta_x %>%
-      dplyr::mutate(p=parent_for_current_top(.data[[hierarchy_column]])) %>%
-      dplyr::mutate(!!as.name(hierarchy_column):=ifelse(is.na(.data$p),.data[[hierarchy_column]],paste0(.data$p,".",.data[[hierarchy_column]]))) %>%
-      dplyr::select(-"p")
-    added <- sum(old != meta_x[[hierarchy_column]])>0
-    count=count+1
-  }
-  if (added) {
+
+  if (exceeded) {
     warning(exceeded_hierarchy_warning_message)
   }
+
+  meta_x[[hierarchy_column]] <- hierarchy_paths
   meta_x
 }
 
@@ -154,10 +170,13 @@ add_hierarchy <- function(meta_x,parent_member_id_column,member_id_column,hierar
 #' @param type Which type of metadata to get, options are "overview", "members", "notes", or "corrections".
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table metadata
+#' @return a tibble containing the table metadata. When several table numbers are given, the metadata for
+#' all tables is retrieved in a single API call and the results are stacked. Types other than "overview" carry
+#' no table identifier of their own, for those a `cansimTableNumber` column is added to identify the table.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_cube_metadata("34-10-0013")
 #' }
 #' @export
@@ -166,37 +185,77 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   if (!(type %in% c("overview", "members", "notes", "corrections"))) {
     stop("type must be one of 'overview', 'members', 'notes', or 'corrections'",call.=FALSE)
   }
-  tmp_base <- table_base_path(cansimTableNumber)
-  if (!dir.exists(tmp_base)) dir.create(tmp_base)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-  tmp <- file.path(tmp_base, paste0(cansimTableNumber,"_metadata", ".Rda"))
-  if (!file.exists(tmp) || refresh) {
-    table_id <- naked_ndm_table_number(cansimTableNumber)
-    url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
-    response <- httr::POST(url,
-                           #body=jsonlite::toJSON(list("productId"=table_id),auto_unbox =TRUE),
-                           body=paste0("[",paste(paste0('{"productId":',table_id,'}'),collapse = ", "),"]"),
-                           encode="json",
-                           httr::add_headers("Content-Type"="application/json")
-    )
-    if (response$status_code!=200) {
-      stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-    }
-    data <- httr::content(response)
-    data1 <- Filter(function(x)x$status=="SUCCESS",data)
-    data2 <- Filter(function(x)x$status!="SUCCESS",data)
-    if (length(data2)>0) {
-      message(paste0("Failed to load metadata for ",length(data2)," tables "))
-      data2 %>% purrr::map(function(x){
-        message(x$object)
-      })
-    }
-    d <- data[[1]]$object
-    saveRDS(data1, tmp)
+
+  # metadata for all tables not yet cached is downloaded in a single API call
+  if (!download_cube_metadata(cansimTableNumber, refresh=refresh)) return(NULL)
+
+  result <- cansimTableNumber %>%
+    rlang::set_names() %>%
+    purrr::map(\(t)cube_metadata_for_table(t, type=type, refresh=refresh))
+
+  if (type=="overview") {
+    dplyr::bind_rows(result)
   } else {
-    data1 <- readRDS(tmp)
+    # member, footnote and correction metadata carry no table identifier of their own
+    dplyr::bind_rows(result, .id="cansimTableNumber")
   }
-  d <- data1[[1]]$object
+}
+
+cube_metadata_path <- function(cansimTableNumber){
+  file.path(table_base_path(cansimTableNumber),
+            paste0(cleaned_ndm_table_number(cansimTableNumber),"_metadata",".Rda"))
+}
+
+# Downloads cube metadata for one or several tables in a single API call, caching the
+# response for each table separately so that later calls can reuse individual tables.
+# Returns TRUE when the metadata for every requested table is cached and ready to be read, and
+# FALSE when StatCan could not be reached, so callers can hand back NULL rather than fail.
+# When a refresh download fails but every requested table still has a previously cached copy,
+# that copy is served with a warning instead, matching what get_cansim_connection() does for
+# the table data itself.
+download_cube_metadata <- function(cansimTableNumber, refresh=FALSE){
+  needed <- cansimTableNumber[refresh | !file.exists(cube_metadata_path(cansimTableNumber))]
+  if (length(needed)==0) return(invisible(TRUE))
+
+  purrr::walk(table_base_path(needed),\(p)if (!dir.exists(p)) dir.create(p,recursive=TRUE))
+
+  table_ids <- naked_ndm_table_number(needed)
+  url <- "https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata"
+
+  # StatCan refuses a request carrying more tables than it accepts at once with an HTTP 416, so a
+  # call asking for many tables at a time has to be split the way the vector methods are
+  downloaded <- character(0)
+  for (batch in batch_items(table_ids)) {
+    body <- paste0("[",paste(paste0('{"productId":',batch,'}'),collapse = ", "),"]")
+    response <- post_with_timeout_retry(url, body=body)
+    if (is.null(response)) {
+      if (!all(file.exists(cube_metadata_path(needed)))) return(invisible(FALSE))
+      warning(paste0("Failed to download metadata for table",ifelse(length(needed)>1,"s ", " "),
+                     paste0(needed,collapse=", "),
+                     ", proceeding with the previously cached version."),call.=FALSE)
+      return(invisible(TRUE))
+    }
+
+    data1 <- successful_wds_records(statcan_response_json(response),"cube metadata")
+
+    batch_downloaded <- purrr::map_chr(data1,\(x)cleaned_ndm_table_number(as.character(x$object$productId)))
+    purrr::walk2(data1,batch_downloaded,\(d,tn)saveRDS(list(d), cube_metadata_path(tn)))
+    downloaded <- c(downloaded,batch_downloaded)
+  }
+
+  failed <- setdiff(needed,downloaded)
+  if (length(failed)>0) {
+    stop("Could not retrieve metadata for table",ifelse(length(failed)>1,"s ", " "),
+         paste0(failed,collapse=", "),call.=FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+cube_metadata_for_table <- function(cansimTableNumber, type="overview", refresh=FALSE){
+  tmp_base <- table_base_path(cansimTableNumber)
+  d <- readRDS(cube_metadata_path(cansimTableNumber))[[1]]$object
 
 
   meta1_path <- file.path(tmp_base, paste0(cansimTableNumber, "_cubemeta1.Rda"))
@@ -208,11 +267,13 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 
   if (!file.exists(meta1_path)||refresh) {
     m1 <- d %>% tibble::enframe() %>%
-      mutate(l=lapply(.data$value,class) %>% unlist()) %>%
+      mutate(l=vapply(.data$value, function(x) class(x)[1], character(1))) %>%
       filter(.data$l!="list" | .data$name %in% c("surveyCode","subjectCode")) %>%
       select(-"l") %>%
       tidyr::pivot_wider() %>%
-      mutate_all(\(x)paste0(unlist(x), collapse=", "))
+      mutate_all(\(x)paste0(unlist(x), collapse=", ")) %>%
+      repair_statcan_columns(c("cubeTitleEn","cubeTitleFr"),
+                             context=paste0("the title of table ",cansimTableNumber))
     saveRDS(m1, meta1_path)
   } else {
     m1 <- readRDS(meta1_path)
@@ -226,7 +287,9 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
           tidyr::unnest_wider("member")  %>%
           mutate(across(where(is.integer),as.character))
       }) %>%
-      arrange(as.integer(.data$dimensionPositionId),as.integer(.data$memberId))
+      arrange(as.integer(.data$dimensionPositionId),as.integer(.data$memberId)) %>%
+      repair_statcan_columns(c("dimensionNameEn","dimensionNameFr","memberNameEn","memberNameFr"),
+                             context=paste0("dimension or member names for table ",cansimTableNumber))
     saveRDS(m2, meta2_path)
   } else {
     m2 <- readRDS(meta2_path)
@@ -255,7 +318,7 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
     m4 <- d$correctionFootnote %>%
       purrr::map_df(\(x){
         tibble::as_tibble(x)   %>%
-          mutate(across(is.integer,as.character))
+          mutate(across(where(is.integer),as.character))
       })
     saveRDS(m4, meta4_path)
   } else {
@@ -263,60 +326,14 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
   }
 
 
-  if (FALSE) {
-    short_language <- c("eng"="En","fra"="Fr")[[language]]
-
-    m1_renames <- c(
-      "Cube Title"=paste0("cubeTitle",short_language),
-      "Product Id"="productId",
-      "CANSIM Id"="cansimId",
-      "URL"="URL",
-      "Cube Notes"="cubeNotes",
-      "Archive Status"=paste0("archiveStatus",short_language),
-      "Frequency"=paste0("frequencyDesc",short_language),
-      "Start Reference Period"="cubeStartDate",
-      "End Reference Period"="cubeEndDate",
-      "Total number of dimensions"="nbDatapointsCube"
-    )
-
-    frequency_codes <- get_cansim_code_set("frequency")
-
-    meta1 <- m1 %>%
-      left_join(frequency_codes,by="frequencyCode") %>%
-      mutate(URL=paste0("https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=",productId)) %>%
-      mutate(cubeNotes=m3 %>% filter(dimensionPositionId==0,memberId==0) %>% pull(footnoteId) %>% paste0(collapse=", ")) %>%
-      rename(!!!m1_renames) %>%
-      relocate(names(m1_renames))
-
-    writeRDS(meta1, paste0(base_path_for_table_language(cansimTableNumber, language), ".Rda1"))
-  }
 
   if (type=="overview") {
 
-    if (FALSE) { # experimental code
-    fields <- c("productId", "cansimId", "cubeTitleEn", "cubeTitleFr", "cubeStartDate", "cubeEndDate", "nbSeriesCube",
-                "nbDatapointsCube",  "archiveStatusCode", "archiveStatusEn",   "archiveStatusFr",   "subjectCode",
-                "surveyCode",  "dimension","releaseTime")
-    result <- lapply(fields, function(field){
-      purrr::map(data1,function(d){
-        dd<-d$object[[field]]
-        if (typeof(dd)=="list") dd <- dd %>% unlist %>% as.character() %>% paste(collapse = ",")
-        dd
-      }) %>% as.character()
-    }) %>%
-      purrr::set_names(fields) %>%
-      tibble::as_tibble() %>%
-      dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
-      dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
-                                                      format=STATCAN_TIME_FORMAT,
-                                                      locale=readr::locale(tz=STATCAN_TIMEZONE)))
-    } else {
     result <- m1 %>%
       dplyr::mutate(productId=cleaned_ndm_table_number(.data$productId)) %>%
       dplyr::mutate(releaseTime=readr::parse_datetime(.data$releaseTime,
                                                       format=STATCAN_TIME_FORMAT,
                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))
-    }
   } else if (type=="notes") {
     result <- m3
   } else if (type=="members") {
@@ -334,22 +351,40 @@ get_cansim_cube_metadata <- function(cansimTableNumber, type="overview",refresh=
 #' the `add_cansim_vectors_to_template` function can be used.
 #'
 #' @param cansimTableNumber A new or old CANSIM/NDM table number or a vector of table numbers
-#' @param language Language for the dimension and member names, either "eng" or "fra"
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table template
+#' @return a tibble containing the table template, with a `cansimTableNumber` column identifying the table.
+#' When several table numbers are given, the templates are stacked and columns for dimensions that only appear
+#' in some of the tables are filled with `NA` for the other tables.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_template("34-10-0013")
 #' }
 #' @export
 get_cansim_table_template <- function(cansimTableNumber, language="english",refresh=FALSE){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-  member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
-
   language <- cleaned_ndm_language(language)
 
+  # member metadata for all tables is retrieved in a single API call
+  member_info <- get_cansim_cube_metadata(cansimTableNumber, type="members", refresh=refresh)
+  if (is.null(member_info)) return(NULL)
+
+  result <- cansimTableNumber %>%
+    purrr::map(\(tn)table_template_for_members(member_info %>% filter(.data$cansimTableNumber==tn),
+                                               tn, language)) %>%
+    dplyr::bind_rows()
+
+  attr(result, "cansimTableNumber") <- cansimTableNumber
+  attr(result, "language") <- language
+
+  result
+}
+
+# builds the template for a single table from its member metadata
+table_template_for_members <- function(member_info, cansimTableNumber, language){
   if (language=="fra") {
     member_info <- member_info %>%
       select("dimensionPositionId",dimensionName="dimensionNameFr","memberId",memberName="memberNameFr",
@@ -363,36 +398,33 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
   dimensions <- member_info %>%
     select("dimensionPositionId", "dimensionName") %>%
     unique() %>%
-    arrange("dimensionPositionId")
+    arrange(as.integer(.data$dimensionPositionId))
 
-  result <- tibble(...link="link",COORDINATE="")
+  # StatCan cubes can carry two dimensions with the same name, expand_grid below needs unique names
+  dimension_names <- make.unique(dimensions$dimensionName)
 
-  for (i in seq_len(nrow(dimensions))) {
-    dim <- dimensions[i,]
-    dim_name <- dim$dimensionName
-    member <- member_info %>%
-      filter(.data$dimensionPositionId==dim$dimensionPositionId) %>%
-      select("memberId", "memberName") %>%
-      unique() %>%
-      arrange("memberId") %>%
-      rename(!!dim_name:="memberName") %>%
-      mutate(...link="link")
+  # member names and ids per dimension, in dimension position order
+  dim_data <- seq_len(nrow(dimensions)) %>%
+    lapply(function(i) {
+      dim_name <- dimension_names[i]
+      member_info %>%
+        filter(.data$dimensionPositionId==dimensions$dimensionPositionId[i]) %>%
+        select("memberId", "memberName") %>%
+        unique() %>%
+        rename(!!dim_name:="memberName") %>%
+        select(!!dim_name, !!paste0("...mid",i):="memberId")
+    })
 
-    result <- result %>%
-      full_join(member, by="...link",
-                relationship = "many-to-many") %>%
-      mutate(COORDINATE=ifelse(.data$COORDINATE=="", .data$memberId, paste0(.data$COORDINATE, ".", .data$memberId))) %>%
-      select(-any_of("memberId"))
-  }
+  # the cartesian product over all dimensions in one step, last dimension varying fastest
+  result <- do.call(tidyr::expand_grid, dim_data)
 
-  result <- result %>%
-    select(-any_of("...link")) %>%
-    mutate(cansimTableNumber=!!cansimTableNumber,.before="COORDINATE")
+  member_id_columns <- paste0("...mid",seq_len(nrow(dimensions)))
 
-  attr(result, "cansimTableNumber") <- cansimTableNumber
-  attr(result, "langauge") <- language
-
-  result
+  result %>%
+    mutate(cansimTableNumber=!!cansimTableNumber,
+           COORDINATE=do.call(paste, c(unname(as.list(result[member_id_columns])), sep=".")),
+           .before=1) %>%
+    select(-any_of(member_id_columns))
 }
 
 
@@ -400,28 +432,32 @@ get_cansim_table_template <- function(cansimTableNumber, language="english",refr
 #'
 #' Retrieves series information by coordinates
 #'
-#' @param cansimTableNumber A new or old CANSIM/NDM table number or a vector of table numbers
+#' @param cansimTableNumber A new or old CANSIM/NDM table number, coordinates are specific to a single table
 #' @param coordinates A vector of coordinates
-#' @param timeout Timeout for the API call
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the call is abandoned. This does not limit how long the call may take overall, a response that keeps arriving is left alone.
 #' @param refresh Refresh the data from the Statistics Canada API
 #'
-#' @return a tibble containing the table template
+#' @return a tibble containing the series information for the given coordinates
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
-#' get_cansim_table_template("34-10-0013")
+#' \donttest{
+#' get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
 #' }
 #' @export
 get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, timeout=1000, refresh=FALSE){
+  if (length(cansimTableNumber)!=1) {
+    stop("Coordinates are specific to a single table, `cansimTableNumber` needs to be a single table number.",
+         call.=FALSE)
+  }
 
   productId <- naked_ndm_table_number(cansimTableNumber)
 
   coordinates <- sort(normalize_coordinates(coordinates))
 
-  chuncksize <- 300
-  batches = split(coordinates, cumsum((1:length(coordinates)-1)%%chuncksize==0))
+  batches <- batch_items(coordinates)
 
-  info <- purrr::map_dfr(batches, \(coordinates){
+  info <- purrr::map(batches, \(coordinates){
     body <- paste0("{\"productId\": ",productId,", \"coordinate\": \"",coordinates,"\"}") %>%
       paste0(.,collapse=", ") %>%
       paste0("[",.,"]")
@@ -431,18 +467,14 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 
     if (!file.exists(tmp) || refresh) {
       url <- "https://www150.statcan.gc.ca/t1/wds/rest/getSeriesInfoFromCubePidCoord"
-      response <- httr::POST(url,
-                             body=body,
-                             encode="json",
-                             httr::add_headers("Content-Type"="application/json"),
-                             httr::timeout(timeout)
-      )
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
-      data <- httr::content(response)
-      data1 <- Filter(function(x)x$status=="SUCCESS",data)
-      data2 <- Filter(function(x)x$status!="SUCCESS",data)
+      response <- post_with_timeout_retry(url, body=body, timeout=timeout)
+      if (is.null(response)) return(NULL)
+
+      # A coordinate that names no series in the cube comes back as SUCCESS with a
+      # responseStatusCode of 2. That is the expected answer here rather than a problem worth
+      # reporting, since callers such as add_cansim_vectors_to_template() use this method precisely
+      # to find out which of the coordinates they hold are real.
+      data1 <- successful_wds_records(statcan_response_json(response),"series information",ignore_codes=2)
 
       info <- data1 %>%
         purrr::map_df(\(x){
@@ -457,9 +489,13 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
     info
   })
 
-  info  %>%
-    filter(.data$responseStatusCode!=2) %>% # filter out invalid combinations
-    select(-"responseStatusCode")
+  # a batch that could not be retrieved would quietly drop those coordinates from the result
+  if (any(vapply(info,is.null,logical(1)))) return(NULL)
+
+  # invalid combinations were dropped above, `any_of` because every batch coming back empty leaves
+  # a table with no columns to name
+  dplyr::bind_rows(info) %>%
+    select(-any_of("responseStatusCode"))
 }
 
 #' Retrieve series info for given table id and coordinates
@@ -473,6 +509,7 @@ get_cansim_series_info_cube_coord <- function(cansimTableNumber,coordinates, tim
 #'
 #' @return a tibble containing the table template with added vector information
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' template <- get_cansim_table_template("34-10-0013")
@@ -503,10 +540,13 @@ add_cansim_vectors_to_template <- function(template, refresh=FALSE) {
     working_template <- template %>%
       filter(.data$cansimTableNumber==tn)
 
-    new_vector_info <- get_cansim_series_info_cube_coord(tn, working_template$COORDINATE, refresh=refresh) %>%
+    series_info <- get_cansim_series_info_cube_coord(tn, working_template$COORDINATE, refresh=refresh)
+    if (is.null(series_info)) return(NULL)
+
+    new_vector_info <- series_info %>%
       select(COORDINATE="coordinate", VECTOR=.data$vectorId) %>%
       mutate(VECTOR=paste0("v",.data$VECTOR)) %>%
-      mutate(COORDINATE=gsub("(.0)+$","",.data$COORDINATE))
+      mutate(COORDINATE=gsub("(\\.0)+$","",.data$COORDINATE))
 
     vector_info <- bind_rows(vector_info, new_vector_info)
   }

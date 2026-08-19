@@ -4,10 +4,10 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/cansim)](https://CRAN.R-project.org/package=cansim)
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/cansim)](https://cranlogs.r-pkg.org/badges/cansim)
 [![R-CMD-check](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml)
-[![DOI](https://img.shields.io/badge/doi-10.32614/CRAN.package.cansim-#d2b24a.svg)](https://doi.org/10.32614/CRAN.package.cansim)
+[![DOI](https://img.shields.io/badge/DOI-10.32614/CRAN.package.cansim-d2b24a.svg)](https://doi.org/10.32614/CRAN.package.cansim)
 <!-- badges: end -->
 
-<a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
+<a href="https://mountainmath.github.io/cansim/index.html"><img id="readme-logo" src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width = "25%" height = "25%"/></a>
 
 An R package to retrieve and work with public Statistics Canada data tables.
 
@@ -208,10 +208,12 @@ CANSIM was the name of Statistics Canada's legacy socio-economic data repository
 
 ### Proxy issues
 
-Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the `httr` package. 
+Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. The package uses `httr2`, which picks up the standard proxy environment variables, so pointing it at a proxy is a matter of setting them before making requests.
 ```r
-httr::set_config(use_proxy(url=http_proxy, port=selected_port, username=your_username,password=your_pass))
+Sys.setenv(https_proxy="http://your_username:your_pass@proxy.example.com:8080")
+Sys.setenv(http_proxy="http://your_username:your_pass@proxy.example.com:8080")
 ```
+Setting these in your `.Renviron` file makes the configuration stick across sessions.
 
 ### Contributing
 
@@ -231,7 +233,7 @@ If you want to get in touch, we are pretty good at responding via email or via t
 
 If you wish to cite the `cansim` package in your work:
 
-  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.4. DOI: 10.32614/CRAN.package.cansim
+  von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.5.0. DOI: 10.32614/CRAN.package.cansim
 
 A BibTeX entry for LaTeX users is
 
@@ -241,7 +243,7 @@ A BibTeX entry for LaTeX users is
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.4},
+    note = {R package version 0.5.0},
     url = {https://mountainmath.github.io/cansim/}
   }
 ```

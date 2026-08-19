@@ -17,6 +17,8 @@ To refresh the code list during a running R session set to \code{TRUE}}
 \value{
 A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
 start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Generates an overview table containing metadata of available Statistics Canada data cubes.

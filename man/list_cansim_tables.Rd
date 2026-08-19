@@ -11,6 +11,8 @@ list_cansim_tables(refresh = FALSE)
 }
 \value{
 A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 This method is deprecated, please use `list_cansim_cubes` instead.

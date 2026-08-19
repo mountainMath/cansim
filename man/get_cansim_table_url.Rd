@@ -4,21 +4,23 @@
 \alias{get_cansim_table_url}
 \title{Retrieve a Statistics Canada data table URL given a table number}
 \usage{
-get_cansim_table_url(cansimTableNumber, language = "en")
+get_cansim_table_url(cansimTableNumber, language = "english")
 }
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 }
 \value{
 String object containing URL for specified table number
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieve URL of a table from the API given a table number. Offers a more stable approach than manually guessing the URL of the table.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_url("34-10-0013")
 get_cansim_table_url("34-10-0013", language = "fr")
 }

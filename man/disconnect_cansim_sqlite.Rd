@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{disconnect_cansim_sqlite}
 \alias{disconnect_cansim_sqlite}
-\title{Disconnect from a cansim database connection}
+\title{Disconnect from a cansim database connection (deprecated)}
 \usage{
 disconnect_cansim_sqlite(connection)
 }
@@ -13,11 +13,13 @@ disconnect_cansim_sqlite(connection)
 `NULL``
 }
 \description{
-Disconnect from a cansim database connection
+This method is deprecated and will be removed in a future version, please use
+`disconnect_cansim_connection()` instead.
 }
 \examples{
 \dontrun{
-con <- get_cansim_sqlite("34-10-0013")
-disconnect_cansim_sqlite(con)
+con <- get_cansim_connection("34-10-0013", format="sqlite")
+disconnect_cansim_connection(con)
 }
 }
+\keyword{internal}

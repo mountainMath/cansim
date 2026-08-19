@@ -11,9 +11,9 @@
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Partial table data download">
@@ -38,11 +38,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,6 +86,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/mountainMath/cansim/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -184,7 +192,7 @@ all available data.</p>
 <span><span class="co">#&gt; This occurs when combinations of coordinates aren't available in the data table, values can safely be assumed to be NA.</span></span>
 <span></span>
 <span><span class="va">bp_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,584 × 17</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1,584 × 19</span></span></span>
 <span><span class="co">#&gt;    REF_DATE   Date       GEO         `Type of building` `Type of work` Variables</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 2017-01-01 2017-01-01 Montréal, … Total demolitions  Demolitions f… Number o…</span></span>
@@ -198,16 +206,16 @@ all available data.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 2017-09-01 2017-09-01 Montréal, … Total demolitions  Demolitions f… Number o…</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 2017-10-01 2017-10-01 Montréal, … Total demolitions  Demolitions f… Number o…</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1,574 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more variables: `Seasonal adjustment, value type` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;, frequencyCode &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   DECIMALS &lt;int&gt;</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 13 more variables: `Seasonal adjustment, value type` &lt;fct&gt;, VALUE &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   val_norm &lt;dbl&gt;, UOM &lt;chr&gt;, UOM_ID &lt;chr&gt;, SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   cansimTableNumber &lt;chr&gt;, COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   frequencyCode &lt;int&gt;, DECIMALS &lt;int&gt;</span></span></span></code></pre></div>
 <p>We then aggregate it to annual data and plot it by year and area,
 separating out dwellings newly created, created through conversion,
 those lost to deconversions and those demolished.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bp_data</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span> <span class="co"># count demolitions and deconversions as negative</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span> <span class="co"># count demolitions and deconversions as negative</span></span>
 <span>    <span class="va">Variables</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Number of dwelling-units demolished"</span>,<span class="st">"Number of dwelling-units lost"</span><span class="op">)</span> <span class="op">~</span> <span class="op">-</span> <span class="va">val_norm</span>,</span>
 <span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">val_norm</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -225,7 +233,7 @@ those lost to deconversions and those demolished.</p>
 <span>       x<span class="op">=</span><span class="cn">NULL</span>,</span>
 <span>       fill<span class="op">=</span><span class="st">"Metric"</span>,</span>
 <span>       caption<span class="op">=</span><span class="st">"StatCan Table 34-10-0285"</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="partial_table_data_download_files/figure-html/unnamed-chunk-4-1.png" alt="Vignette example plot, building and demolition permits" width="672"></p>
+<p><img src="partial_table_data_download_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="Vignette example plot, building and demolition permits" width="672"></p>
 <div class="section level2">
 <h2 id="using-vectors-instead-of-coordinates">Using vectors instead of coordinates<a class="anchor" aria-label="anchor" href="#using-vectors-instead-of-coordinates"></a>
 </h2>
@@ -252,7 +260,7 @@ affect the results. For completeness we plot the vector data and obtain
 an identical graph.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bp_data_vector</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span> <span class="co"># count demolitions and deconversions as negative</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value<span class="op">=</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span> <span class="co"># count demolitions and deconversions as negative</span></span>
 <span>    <span class="va">Variables</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Number of dwelling-units demolished"</span>,<span class="st">"Number of dwelling-units lost"</span><span class="op">)</span> <span class="op">~</span> <span class="op">-</span> <span class="va">val_norm</span>,</span>
 <span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">val_norm</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -270,7 +278,7 @@ an identical graph.</p>
 <span>       x<span class="op">=</span><span class="cn">NULL</span>,</span>
 <span>       fill<span class="op">=</span><span class="st">"Metric"</span>,</span>
 <span>       caption<span class="op">=</span><span class="st">"StatCan Table 34-10-0285"</span><span class="op">)</span> </span></code></pre></div>
-<p><img src="partial_table_data_download_files/figure-html/unnamed-chunk-6-1.png" alt="Vignette example plot, building and demolition permits" width="672"></p>
+<p><img src="partial_table_data_download_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="Vignette example plot, building and demolition permits" width="672"></p>
 </div>
   </main>
 </div>
@@ -282,7 +290,7 @@ an identical graph.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

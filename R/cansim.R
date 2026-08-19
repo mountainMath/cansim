@@ -2,13 +2,13 @@
 #'
 #' Facilitates working with Statistics Canada data table values retrieved using the package by setting all units to counts/dollars instead of millions, etc. If "replacement_value" is not set, it will replace the \code{VALUE} field with normalized values and drop the \code{scale} column. Otherwise it will keep the scale columns and create a new column named replacement_value with the normalized value. It will attempt to parse the \code{REF_DATE} field and create an R date variable. This is currently experimental.
 #'
-#' @param data A retrieved data table as returned from \code{get_cansim()} pr \code{get_cansim_ndm()}
+#' @param data A retrieved data table as returned from \code{get_cansim()} or \code{get_cansim_ndm()}
 #' @param replacement_value (Optional) the name of the column the manipulated value should be returned in. Defaults to "val_norm"
 #' @param normalize_percent (Optional) When \code{TRUE} (the default) normalizes percentages by changing them to rates
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "01")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
-#' @param strip_classification_code (strip_classification_code) Logical value indicating if classification code should be stripped
+#' @param strip_classification_code Logical value indicating if classification code should be stripped
 #' from names. (Default set to \code{FALSE}, if \code{factors=TRUE} this is overridden and set to \code{TRUE}).
 #' @param cansimTableNumber (Optional) Only needed when operating on results of SQLite connections.
 #' @param internal (Optional) Flag to indicate that this function is called internally.
@@ -47,6 +47,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   scale_string2 <- ifelse(language=="fra","FACTEUR SCALAIRE","SCALAR_FACTOR")
   uom_string=ifelse(language=="fra",paste0("UNIT",intToUtf8(0x00C9)," DE MESURE"),"UOM")
   percentage_string=ifelse(language=="fra","^Pourcent","^Percent")
+  rate_string=ifelse(language=="fra","Taux","Rate")
   classification_prefix <- ifelse(language=="fra","Code de classification pour ","Classification Code for ")
   hierarchy_prefix <- ifelse(language=="fra",paste0("Hi",intToUtf8(0x00E9),"rarchie pour "),"Hierarchy for ")
   replacement_value_string = ifelse(is.na(replacement_value),value_string,replacement_value)
@@ -61,7 +62,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     return (data)
   }
 
-  data <- data %>% as_tibble()
+  # P10: Avoid unnecessary tibble conversion if data is already a tibble
+  if (!tibble::is_tibble(data)) data <- as_tibble(data)
 
   attr(data,"cansimTableNumber") <- cansimTableNumber
   attr(data,"language") <- language
@@ -79,7 +81,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
     # divide numbers that are percentages by 100 and convert the unit field to "rate"
     data <- data %>%
       mutate(!!as.name(replacement_value_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),!!as.name(replacement_value_string)/100,!!as.name(replacement_value_string))) %>%
-      mutate(!!as.name(uom_string):=ifelse(!!as.name(uom_string)==percentage_string,"Rate",!!as.name(uom_string)))
+      mutate(!!as.name(uom_string):=ifelse(grepl(percentage_string,!!as.name(uom_string)),rate_string,!!as.name(uom_string)))
   }
 
 
@@ -87,8 +89,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 
   sample_date <- data[1:10,date_field] %>% pull(date_field) %>% na.omit() %>% first()
   if (is.na(sample_date)) {
-    sample_date <- pull(date_field) %>% na.omit() %>% first()
-
+    sample_date <- data %>% pull(date_field) %>% na.omit() %>% first()
   }
   # sample_date <- data[[date_field]] %>%
   #   na.omit %>%
@@ -98,20 +99,37 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   if (!trad_cansim) {
     # do nothing
   } else if (grepl("^\\d{4}$",sample_date)) {
-    # year
-    data <- data %>%
-      mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_month,"-",default_day)))
+    # year - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(paste0(unique_dates, "-", default_month, "-", default_day)),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   } else if (grepl("^\\d{4}/\\d{4}$",sample_date)) {
-    # year range, use second year as anchor
-    data <- data %>%
-      mutate(Date=as.Date(paste0(gsub("^\\d{4}/","",!!as.name(date_field)),"-",default_month,"-",default_day)))
+    # year range, use second year as anchor - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(paste0(gsub("^\\d{4}/", "", unique_dates), "-", default_month, "-", default_day)),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   } else if (grepl("^\\d{4}-\\d{2}$",sample_date)) {
-    # year and month
-    data <- data %>% mutate(Date=as.Date(paste0(!!as.name(date_field),"-",default_day)))
+    # year and month - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(paste0(unique_dates, "-", default_day)),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   } else if (grepl("^\\d{4}-\\d{2}-\\d{2}$",sample_date)) {
-    # year, month and day
-    data <- data %>%
-      mutate(Date=as.Date(!!as.name(date_field)))
+    # year, month and day - use lookup table for efficiency
+    unique_dates <- unique(data[[date_field]])
+    date_lookup <- setNames(
+      as.Date(unique_dates),
+      unique_dates
+    )
+    data$Date <- unname(date_lookup[data[[date_field]]])
   }
 
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
@@ -138,23 +156,34 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
   }
 
   if (strip_classification_code){
-    for (field in fields) {
-      if (sum(!is.na(data[[paste0(classification_prefix,field)]]))>0) {
-        data <- data %>%
-          mutate(!!field:=gsub(" \\[.+\\]$","",!!as.name(field)))
-      }
+    # Identify fields that have classification codes to strip (non-NA values in classification column)
+    fields_to_strip <- fields[vapply(fields, function(field) {
+      cc_col <- paste0(classification_prefix, field)
+      cc_col %in% names(data) && sum(!is.na(data[[cc_col]])) > 0
+    }, logical(1))]
+
+    if (length(fields_to_strip) > 0) {
+      # Use across() to strip all classification codes in a single pass
+      data <- data %>%
+        mutate(across(all_of(fields_to_strip), ~gsub(" \\[.+\\]$", "", .x)))
     }
   }
 
   if (factors){
     if (!is.null(getOption("cansim.debug"))) message('Converting to factors')
 
+    # Coordinates are split once into a character matrix and reused for all dimensions, built
+    # lazily since only dimensions with duplicate member names need it. Only the unique
+    # coordinates are split and rows are read back through an index, a table repeats each
+    # coordinate once per reference period so the unique set is a small fraction of the rows.
+    coordinate_lookup <- NULL
+
     for (field in fields) {
       if (!is.null(getOption("cansim.debug"))) message(paste0('Converting ',field,' to factors'))
       tryCatch({
+        # get_deduped_column_level_data now returns pre-sorted data, no need for arrange()
         level_table <- get_deduped_column_level_data(cansimTableNumber = cansimTableNumber,
-                                                     language=language,column=field) %>%
-          arrange(as.integer(.data$`...dim`),as.integer(.data$`...id`))
+                                                     language=language,column=field)
         if (!(field %in% names(data))) {
           geography_column <- ifelse(cleaned_language=="eng","Geography|Geographic name",paste0("G",intToUtf8(0x00E9),"ographie|Nom g",intToUtf8(0x00E9),"ographique"))
           data_geography_column <- ifelse(language=="eng","GEO",paste0("G",intToUtf8(0x00C9),"O"))
@@ -172,9 +201,18 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
           column_position <- which(names(data)==field)
           column_before <- names(data)[column_position-1]
 
-          data$`...id` <- stringr::str_split(data[[coordinate_column]],"\\.") %>%
-            lapply(\(x)x[dimension_id]) %>%
-            unlist()
+          if (is.null(coordinate_lookup)) {
+            coordinates <- data[[coordinate_column]]
+            unique_coordinates <- unique(coordinates)
+            coordinate_parts <- max(c(0,stringr::str_count(unique_coordinates,"\\.")),na.rm=TRUE)+1
+            coordinate_lookup <- list(matrix=stringr::str_split_fixed(unique_coordinates,"\\.",coordinate_parts),
+                                      index=match(coordinates,unique_coordinates))
+          }
+          if (dimension_id <= ncol(coordinate_lookup$matrix)) {
+            data$`...id` <- coordinate_lookup$matrix[coordinate_lookup$index,dimension_id]
+          } else { # coordinates that are shorter than the cube has dimensions carry nothing for this one
+            data$`...id` <- NA_character_
+          }
 
           data <- data %>%
             select(-all_of(field)) %>%
@@ -191,8 +229,8 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
                          "than with StatCan, or if this problem can't be resolved, please flag this as an issue in the\n",
                          "{cansim} repository at https://github.com/mountainMath/cansim/issues."))
         } else {
-          data <- data %>%
-            mutate(!!field:=factor(!!as.name(field),levels=level_table$...name))
+          # Use base R for factor conversion - faster than dplyr's mutate for this operation
+          data[[field]] <- factor(data[[field]], levels = level_table$...name)
         }
 
       },
@@ -234,9 +272,7 @@ normalize_cansim_values <- function(data, replacement_value="val_norm", normaliz
 #' @return A character string with the new-format NDM table number
 #'
 #' @examples
-#' \dontrun{
 #' cansim_old_to_new("026-0018")
-#' }
 #' @export
 cansim_old_to_new <- function(oldCansimTableNumber){
   # cache the file as data, old table numbers should not change
@@ -299,9 +335,13 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
 
 
   if (!is.null(getOption("cansim.debug"))) message('Generating base hierarchy')
-  hierarchy_data <- tibble(X=pull(data,coordinate_column) %>% unique) %>%
-    setNames(coordinate_column) %>%
-    mutate(...pos=strsplit(!!as.name(coordinate_column),"\\."))
+  # the unique coordinates are split once into a character matrix, member ids for each
+  # dimension are then read off as whole columns rather than element by element
+  unique_coordinates <- pull(data,coordinate_column) %>% unique()
+  coordinate_parts <- max(c(0,stringr::str_count(unique_coordinates,"\\.")),na.rm=TRUE)+1
+  coordinate_matrix <- stringr::str_split_fixed(unique_coordinates,"\\.",coordinate_parts)
+
+  hierarchy_data <- tibble(!!coordinate_column:=unique_coordinates)
 
   for (column_name in column_names) {
     if (!is.null(getOption("cansim.debug"))) message(paste0("Generating ",column_name," hierarchy"))
@@ -325,6 +365,12 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     # is_geo_column <- grepl(geography_column,column[[dimension_name_column]]) &  !(column[[dimension_name_column]] %in% names(data))
     meta_x=readRDS(paste0(data_path,"_column_",column_index))
 
+    if (column_index <= ncol(coordinate_matrix)) {
+      member_ids_for_column <- coordinate_matrix[,column_index]
+    } else { # coordinates that are shorter than the cube has dimensions carry nothing for this one
+      member_ids_for_column <- rep(NA_character_,nrow(coordinate_matrix))
+    }
+
     if (is_geo_column) {
       hierarchy_name <- paste0(hierarchy_prefix," ", data_geography_column)
       join_column <- meta_x %>%
@@ -333,7 +379,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,"GeoUID",hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
+        mutate(!!member_id_column:=member_ids_for_column) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else if (column[[dimension_name_column]] %in% names(data)){
@@ -345,7 +391,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
         select(setdiff(c(member_id_column,classification_name,hierarchy_name),names(data)))
 
       hierarchy_data <- hierarchy_data %>%
-        mutate(!!member_id_column:=lapply(.data$...pos,function(d)d[column_index]) %>% unlist) %>%
+        mutate(!!member_id_column:=member_ids_for_column) %>%
         dplyr::left_join(join_column,by=member_id_column) %>%
         dplyr::select(-!!as.name(member_id_column))
     } else {
@@ -356,7 +402,7 @@ fold_in_metadata_for_columns <- function(data,data_path,column_names){
     }
   }
   if (!is.null(getOption("cansim.debug"))) message('Folding in hierarchy')
-  data %>% dplyr::left_join(hierarchy_data %>% dplyr::select(-"...pos"), by=coordinate_column)
+  data %>% dplyr::left_join(hierarchy_data, by=coordinate_column)
 }
 
 #' The correspondence file for old to new StatCan table numbers is included in the package
@@ -374,9 +420,9 @@ NULL
 #' Retrieves a data table using an NDM catalogue number as a tidy data frame. Retrieved table data is cached for the duration of the current R session only by default.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #' @param factors (Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).
 #' @param default_month The default month that should be used when creating Date objects for annual data (default set to "07")
 #' @param default_day The default day of the month that should be used when creating Date objects for monthly data (default set to "01")
@@ -385,6 +431,7 @@ NULL
 #' @return A tibble with StatCan Table data and added \code{Date} column with inferred date objects and
 #' added \code{val_norm} column with normalized value from the \code{VALUE} column.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' get_cansim("34-10-0013")
@@ -402,7 +449,11 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       message(paste0("Accessing CANSIM NDM product ", cleaned_number, " from Statistics Canada"))
     else
       message(paste0("Acc",intToUtf8(0x00E9),"der au produit ", cleaned_number, " CANSIM NDM de Statistique Canada"))
-    url=paste0("https://www150.statcan.gc.ca/n1/tbl/csv/",file_path_for_table_language(cleaned_number,language),".zip")
+    # Asking StatCan where the table lives rather than assembling the address from the table number,
+    # which is guessing at a layout StatCan is free to change. The extra call is small next to the
+    # download it precedes.
+    url <- get_cansim_table_url(cleaned_number, language=language)
+    if (is.null(url)) return(NULL)
     response <- get_with_timeout_retry(url,path=path,timeout=timeout)
     if (is.null(response)) return(response)
     data <- NA
@@ -429,15 +480,20 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
                                                       grouping_mark = "."),
                                  col_types = list(.default = "c"),
                                  col_names = FALSE) %>%
-      as.character()
+      as.character() %>%
+      repair_statcan_names(context=paste0("column names for table ",cleaned_number))
 
-    symbols <- which(header=="Symbol")
+    symbols <- which(header=="Symbol" | header=="Symbole")
     if (length(symbols)==0) {
-      symbols <- which(header=="Symbols"|header=="Symboles")
+      symbols <- which(header=="Symbols"| header=="Symboles")
     }
 
     if (length(symbols)>1) {
-      header[symbols] <- paste0("Symbol ",seq(1,length(symbols)))
+      if (cleaned_language=="fra") {
+        header[symbols] <- paste0("Symbole ",seq(1,length(symbols)))
+      } else {
+        header[symbols] <- paste0("Symbol ",seq(1,length(symbols)))
+      }
     }
 
     coordinate_column <- ifelse(cleaned_language=="eng","COORDINATE",paste0("COORDONN",intToUtf8(0x00C9),"ES"))
@@ -475,7 +531,9 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
       parse_metadata(meta_lines,data_path)
       meta2 <- readRDS(paste0(data_path,"2"))
       dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
-      data <- fold_in_metadata_for_columns(data,data_path,pull(meta2,dimension_name_column))
+      data <- data %>%
+        repair_statcan_dimension_values(pull(meta2,dimension_name_column),cleaned_language) %>%
+        fold_in_metadata_for_columns(data_path,pull(meta2,dimension_name_column))
     }, error = function(e) {
       warning("Could not fold in metadata")
       if (nrow(data)==0) warning(paste0("StatCan returned zero rows of data for table ",cleaned_number,
@@ -509,15 +567,16 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
 #' Returns table information given an NDM table catalogue number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the table overview information
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_info("34-10-0013")
 #' }
 #' @export
@@ -539,6 +598,7 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
     archived_column <- "Archive Status"
 
     d <- get_cansim_cube_metadata(cansimTableNumber, type="overview",refresh=refresh)
+    if (is.null(d)) return(NULL)
 
     if (cleaned_language=="fra") {
       result <- d %>%
@@ -566,15 +626,16 @@ get_cansim_table_info <- function(cansimTableNumber, language="english", refresh
 #' Returns table survey detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the table survey code and name
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_survey("34-10-0013")
 #' }
 #' @export
@@ -586,7 +647,9 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
   } else {
     cleaned_language <- cleaned_ndm_language(language)
     survey_code_grepl_field <- ifelse(cleaned_language=="eng","Survey Code",paste0("Code d'enqu",intToUtf8(0x00EA),"te"))
-    result<-get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh) %>% select(!!survey_code_grepl_field:=.data$surveyCode)
+    d <- get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh)
+    if (is.null(d)) return(NULL)
+    result<-d %>% select(!!survey_code_grepl_field:=.data$surveyCode)
   }
   result
 }
@@ -596,15 +659,16 @@ get_cansim_table_survey <- function(cansimTableNumber, language="english", refre
 #' Returns table subject detail given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the table subject code and name.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_subject("34-10-0013")
 #' }
 #' @export
@@ -616,7 +680,9 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
   } else {
     cleaned_language <- cleaned_ndm_language(language)
     subject_code_grepl_field <- ifelse(cleaned_language=="eng","Subject Code","Code du sujet")
-    result<-get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh) %>%
+    d <- get_cansim_cube_metadata(cansimTableNumber,type="overview",refresh=refresh)
+    if (is.null(d)) return(NULL)
+    result<-d %>%
       select(.data$subjectCode) %>%
       mutate(subjectCode=strsplit(.data$subjectCode,", ")) %>%
       tidyr::unnest_longer(.data$subjectCode) %>%
@@ -630,15 +696,16 @@ get_cansim_table_subject <- function(cansimTableNumber, language="english", refr
 #' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with the StatCan Notes for the table
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_short_notes("34-10-0013")
 #' }
 #' @export
@@ -647,11 +714,9 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
   data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda5")
   if (!refresh && file.exists(data_path)) {
     notes <- readRDS(file=data_path)
-  } else if (!file.exists(data_path)) {
+  } else {
     notes <- get_cansim_cube_metadata(cansimTableNumber,refresh=refresh,type="notes")
-  }
-  if (refresh || !file.exists(data_path)){
-    notes <- get_cansim_cube_metadata(cansimTableNumber,refresh=refresh,type="notes")
+    if (is.null(notes)) return(NULL)
     cleaned_language <- cleaned_ndm_language(language)
     note_id_grepl_field <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
 
@@ -676,15 +741,16 @@ get_cansim_table_short_notes <- function(cansimTableNumber, language="english", 
 #' Returns table column details given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble listing the column names of the StatCan table.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_column_list("34-10-0013")
 #' }
 #' @export
@@ -698,6 +764,7 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
     dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
     dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
     d <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh=refresh)
+    if (is.null(d)) return(NULL)
 
     if (cleaned_language=="fra") {
      result <- d %>%
@@ -721,15 +788,16 @@ get_cansim_column_list <- function(cansimTableNumber, language="english", refres
 #'
 #' @param cansimTableNumber the NDM table number to load
 #' @param column the specified column for which to retrieve category information for
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #'
 #' @return A tibble with detailed information on StatCan table categories for the specified field
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_column_categories("34-10-0013", "Geography")
 #' }
 #' @export
@@ -746,7 +814,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
       dplyr::pull(!!as.name(dimension_id_column))
     data_path <- paste0(base_path_for_table_language(cleaned_number,language),".Rda_column_",column_index)
     if (!file.exists(data_path)){
-      stop(paste0("Unkown column ",column),call.=FALSE)
+      stop(paste0("Unknown column ",column),call.=FALSE)
     }
     result <- readRDS(file=data_path)
   } else {
@@ -761,6 +829,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
     exceeded_hierarchy_warning_message <- ifelse(cleaned_language=="eng","Exceeded max depth for hierarchy, hierarchy information may be faulty.",
                                                  paste0("Profondeur maximale d",intToUtf8(0x00E9),"pass",intToUtf8(0x00E9),"e pour la hi",intToUtf8(0x00E9),"rarchie, les informations de hi",intToUtf8(0x00E9),"rarchie peuvent ",intToUtf8(0x00EA),"tre erron",intToUtf8(0x00E9),"es."))
     d <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh=refresh)
+    if (is.null(d)) return(NULL)
 
     if (cleaned_language=="fra") {
       result <- d %>%
@@ -781,7 +850,7 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
                     exceeded_hierarchy_warning_message=exceeded_hierarchy_warning_message)
 
     if (nrow(result)==0){
-      stop(paste0("Unkown column ",column),call.=FALSE)
+      stop(paste0("Unknown column ",column),call.=FALSE)
     }
   }
 
@@ -793,19 +862,21 @@ get_cansim_column_categories <- function(cansimTableNumber, column, language="en
 #' Prints table overview information as console output. In order to display table overview information, the selected CANSIM table must be loaded entirely to display overview information. Overview information is printed in console an in English or French, as specified.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #'
 #' @return none
 #'
+#' Nothing is printed if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_overview("34-10-0013")
 #' }
 #' @export
 get_cansim_table_overview <- function(cansimTableNumber, language="english", refresh=FALSE){
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   info <- get_cansim_table_info(cansimTableNumber,language=language,refresh=refresh)
+  if (is.null(info)) return(invisible(NULL))
   #refresh=FALSE
   cleaned_language <- cleaned_ndm_language(language)
   cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
@@ -820,9 +891,11 @@ get_cansim_table_overview <- function(cansimTableNumber, language="english", ref
                  end_period_column,": ",info[[end_period_column]],", ",
                  frequency_column,": ",info[[frequency_column]],"\n")
   columns <- get_cansim_column_list(cansimTableNumber,language=language,refresh=refresh)
+  if (is.null(columns)) return(invisible(NULL))
   for (column in columns[[dimension_name_column]]) {
     text <- paste0(text,"\n","Column ",column)
     categories <- get_cansim_column_categories(cansimTableNumber,column,language=language,refresh=refresh)
+    if (is.null(categories)) return(invisible(NULL))
     text <- paste0(text, " (",nrow(categories),")","\n")
     text <- paste0(text, paste(utils::head(categories[[member_name_column]],10),collapse=", "))
     if (nrow(categories)>10) text <- paste0(text, ", ...")
@@ -853,7 +926,7 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
   hierarchy_name=paste0("Hierarchy for ",column_name)
   h <- data %>% dplyr::select(column_name,hierarchy_name) %>%
     unique %>%
-    dplyr::mutate(hierarchy_level=(strsplit(!!as.name(hierarchy_name),"\\.") %>% lapply(length) %>% unlist)-1)
+    dplyr::mutate(hierarchy_level=lengths(strsplit(!!as.name(hierarchy_name),"\\."))-1)
   max_level=max(h$hierarchy_level,na.rm = TRUE)
   if (is.na(level) | level>max_level) level=max_level
   h <- h %>%
@@ -893,11 +966,12 @@ categories_for_level <- function(data,column_name, level=NA, strict=FALSE, remov
 #' @export
 view_cansim_webpage <- function(cansimTableNumber = NULL){
   browser <- getOption("browser")
+  if (!is.null(cansimTableNumber)) validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- tolower(cansimTableNumber)
 
-  if (is.null(cansimTableNumber)) {
+  if (is.null(cansimTableNumber) || length(cansimTableNumber) == 0) {
     url <- 'https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action#tables'
-  } else if (grepl("^v\\d+$",cansimTableNumber)) {
+  } else if (grepl("^v\\d+$", tolower(cansimTableNumber))) {
     url <- paste0("https://www150.statcan.gc.ca/t1/tbl1/en/sbv.action?vectorNumbers=",cansimTableNumber)
   } else {
     cansimTableNumber <- paste0(gsub("-","",cleaned_ndm_table_number(cansimTableNumber)),"01")
@@ -914,25 +988,25 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' Retrieve URL of a table from the API given a table number. Offers a more stable approach than manually guessing the URL of the table.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #'
 #' @return String object containing URL for specified table number
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_url("34-10-0013")
 #' get_cansim_table_url("34-10-0013", language = "fr")
 #' }
 #' @export
-get_cansim_table_url <- function(cansimTableNumber, language = "en"){
+get_cansim_table_url <- function(cansimTableNumber, language = "english"){
+  validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   l <- cleaned_ndm_language(language) %>% substr(1,2)
   url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getFullTableDownloadCSV/",naked_ndm_table_number(cansimTableNumber),"/",l)
-  response <- httr::GET(url)
-  if (response$status_code!=200) {
-    stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-  }
-  httr::content(response)$object
+  response <- get_with_timeout_retry(url)
+  if (is.null(response)) return(NULL)
+  statcan_response_json(response)$object
 }
 
 #' Retrieve a list of modified tables since a given date
@@ -945,15 +1019,19 @@ get_cansim_table_url <- function(cansimTableNumber, language = "en"){
 #'
 #' @return A tibble with Statistics Canada data table product ids and their release times
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_changed_tables("2018-08-01")
 #' }
 #' @export
 get_cansim_changed_tables <- function(start_date,end_date=NULL){
-  last_available_date <- Sys.Date()
-  if (Sys.time()<as.POSIXct(paste0(Sys.Date()," 09:00:00"),tz="America/Toronto")) {
-    last_available_date = last_available_date  -1
+  # StatCan releases the day's changes at the end of its nightly update window, which closes at
+  # 8:30am Eastern. Both the date and the cutoff are Eastern, the date because asking StatCan about
+  # "today" from a machine set to another time zone would otherwise ask about the wrong day.
+  last_available_date <- as.Date(strftime(Sys.time(),"%Y-%m-%d",tz=STATCAN_TIMEZONE))
+  if (Sys.time()<as.POSIXct(paste0(last_available_date," 08:30:00"),tz=STATCAN_TIMEZONE)) {
+    last_available_date <- last_available_date - 1
   }
   if (start_date>last_available_date) {
     stop(paste0("Last available date is ",last_available_date,", please try with a start date on or before that date."),call.=FALSE)
@@ -969,21 +1047,24 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
     start_date <- end_date
     end_date <-d
   }
-  if (difftime(end_date,start_date,"days")>31) {
+  # the third argument of difftime is the time zone, the unit has to be named
+  if (difftime(end_date,start_date,units="days")>31) {
     message("Querying for long time intervals may be slow.")
   }
-  seq(as.Date(start_date),as.Date(end_date),"days") %>%
+  changes <- seq(as.Date(start_date),as.Date(end_date),"days") %>%
     lapply(function(date){
       url=paste0("https://www150.statcan.gc.ca/t1/wds/rest/getChangedCubeList/",strftime(date,"%Y-%m-%d"))
-      response <- httr::GET(url)
-      if (response$status_code!=200) {
-        stop("Problem downloading data, status code ",response$status_code,"\n",httr::content(response),call.=FALSE)
-      }
-      httr::content(response)$object %>%
+      response <- get_with_timeout_retry(url)
+      if (is.null(response)) return(NULL)
+      statcan_response_json(response)$object %>%
         map(function(o)tibble(productId=o$productId,releaseTime=o$releaseTime)) %>%
         bind_rows
-    }) %>%
-    bind_rows
+    })
+
+  # a single unavailable day makes the result silently incomplete, which is worse than no result
+  if (any(vapply(changes,is.null,logical(1)))) return(NULL)
+
+  bind_rows(changes)
 }
 
 
@@ -992,18 +1073,19 @@ get_cansim_changed_tables <- function(start_date,end_date=NULL){
 #' Returns table notes given an NDM table number in English or French. Retrieved table information data is cached for the duration of the R session only.
 #'
 #' @param cansimTableNumber the NDM table number to load
-#' @param language \code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (default set to English)
+#' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
-#' @param timeout (Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.
+#' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.
 #  Set to higher values for large tables and slow network connection. (Default is \code{200}).
 #' @return A tibble with table notes.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_notes("34-10-0013")
 #' }
 #' @export
-get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE, timeout = 200) {
+get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=FALSE, timeout = 200) {
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   cleaned_language <- cleaned_ndm_language(language)
   dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
@@ -1012,6 +1094,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
   member_note_column <- ifelse(cleaned_language=="eng","Member Notes","Notes sur le membre")
   note_id_column <- ifelse(cleaned_language=="eng","Note ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la note"))
   notes <- get_cansim_table_short_notes(cansimTableNumber,language=language,refresh=refresh,timeout=timeout)
+  if (is.null(notes)) return(NULL)
   columns <- get_cansim_column_list(cansimTableNumber,language=language)
 
   if (dimenion_note_column %in% names(columns)) {
@@ -1034,6 +1117,7 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
   } else {
     full_notes <- get_cansim_cube_metadata(cansimTableNumber,type="notes",refresh=refresh)
     members <- get_cansim_cube_metadata(cansimTableNumber,type="members",refresh = refresh)
+    if (is.null(full_notes) || is.null(members)) return(NULL)
 
     if (cleaned_language=="fra") {
       members <- members %>%
@@ -1066,33 +1150,30 @@ get_cansim_table_notes <- function(cansimTableNumber,language="en",refresh=FALSE
 #' @param cansimTableNumber the NDM table number
 #' @return A datetime object if a release data is available, NULL otherwise.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_table_last_release_date("34-10-0013")
 #' }
 #' @export
 get_cansim_table_last_release_date <- function(cansimTableNumber){
+  validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
   pid <- paste0(naked_ndm_table_number(cansimTableNumber),"01")
-  url <- "https://www150.statcan.gc.ca/n1/en/metadata.json"
-  response <- purrr::safely(httr::GET)(url,query=list(productid=pid))
-  if (!is.null(response$error) || response$result$status_code!=200) {
-    warning(paste0("Could not access information for table ",cansimTableNumber,
-                   " (productID: ",pid,").\n",
-                   response$error))
-    release_date <- NA
-  } else {
-    c <- httr::content(response$result)
-    r<-c$result
-    if (length(r)>0) {
-      rd <- unique(unlist(lapply(r,function(rr)rr$releasedate)))
-      release_date <- strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
-        max()
-    } else {
-      release_date <- NA
-    }
+  url <- paste0("https://www150.statcan.gc.ca/n1/en/metadata.json?productid=",pid)
+  response <- get_with_timeout_retry(url)
+  if (is.null(response)) return(NULL)
+
+  r <- statcan_response_json(response)$result
+  if (length(r)==0) {
+    warning("Could not access release information for table ",cansimTableNumber,
+            " (productID: ",pid,").",call.=FALSE)
+    return(NA)
   }
-  release_date
+
+  rd <- unique(unlist(lapply(r,function(rr)rr$releasedate)))
+  strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
+    max()
   #get_cansim_cube_metadata(cansimTableNumber) %>% pull(releaseTime)
 }
 

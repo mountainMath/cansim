@@ -17,7 +17,7 @@ get_cansim_connection(
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{format}{(Optional) The format of the data table to retrieve. Either \code{"parquet"}, \code{"feather"}, or \code{sqlite} (default is \code{"parquet"}).}
 
@@ -28,7 +28,7 @@ to \code{TRUE}, forces a reload of data table, when set to \code{"auto"} it will
 the newest version from StatCan if the table is out of date. If set to \code{FALSE} and the table is out of date
 a warning will be emitted to alert the user that the data is outdated.}
 
-\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.}
 
 \item{cache_path}{(Optional) Path to where to cache the table permanently. By default, the data is cached
 in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.}
@@ -36,6 +36,8 @@ in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Othe
 \value{
 A database connection to a local parquet, feather, or sqlite database with the StatCan Table data. The data
 frames after calling `collect()` or `collect_and_normalize()` are identical up to possibly different row order.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves a data table using an NDM catalogue number as parquet, feather, or SQLite database connection. Retrieved table data is

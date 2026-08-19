@@ -21,3 +21,7 @@ fix_meta.sh
 ^CRAN-SUBMISSION$
 ^\.github$
 R-CMD-check-old.yaml
+^\.claude$
+^CLAUDE\.md$
+^\.positai$
+^benchmarks$

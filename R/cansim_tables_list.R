@@ -7,6 +7,7 @@
 #'
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description, and geography
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' list_cansim_tables()
@@ -19,14 +20,17 @@ list_cansim_tables <- function(refresh=FALSE){
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use list_cansim_cubes(...) instead.")
 
-  list_cansim_cubes(lite=FALSE,refresh=refresh) %>%
+  cube_list <- list_cansim_cubes(lite=FALSE,refresh=refresh)
+  if (is.null(cube_list)) return(NULL)
+
+  cube_list %>%
     mutate(title=.data$cubeTitleEn,
            subject=.data$subjectEn,
            date_published=as.Date(.data$releaseTime)) %>%
-    rename(title_en=.data$cubeTitleEn,
-           title_fr=.data$cubeTitleFr,
-           time_period_coverage_start=.data$cubeStartDate,
-           time_period_coverage_end=.data$cubeEndDate)
+    rename(title_en="cubeTitleEn",
+           title_fr="cubeTitleFr",
+           time_period_coverage_start="cubeStartDate",
+           time_period_coverage_end="cubeEndDate")
 }
 
 #' Search through Statistics Canada data tables (deprecated)
@@ -40,6 +44,7 @@ list_cansim_tables <- function(refresh=FALSE){
 #'
 #' @return A tibble with available Statistics Canada data tables, listing title, Statistics Canada data table catalogue number, deprecated CANSIM table number, description and geography that match the search term.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' search_cansim_tables("Labour force")
@@ -52,14 +57,17 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
               package="cansim",
               msg="This function has been deprecated, it will be removed in future versions. Please use search_cansim_cubes(...) instead.")
 
-  search_cansim_cubes(search_term = search_term, refresh=refresh) %>%
+  cube_list <- search_cansim_cubes(search_term = search_term, refresh=refresh)
+  if (is.null(cube_list)) return(NULL)
+
+  cube_list %>%
     mutate(title=.data$cubeTitleEn,
            subject=.data$subjectEn,
            date_published=as.Date(.data$releaseTime)) %>%
-    rename(title_en=.data$cubeTitleEn,
-           title_fr=.data$cubeTitleFr,
-           time_period_coverage_start=.data$cubeStartDate,
-           time_period_coverage_end=.data$cubeEndDate)
+    rename(title_en="cubeTitleEn",
+           title_fr="cubeTitleFr",
+           time_period_coverage_start="cubeStartDate",
+           time_period_coverage_end="cubeEndDate")
 }
 
 
@@ -75,6 +83,7 @@ search_cansim_tables <- function(search_term, search_fields = "both", refresh=FA
 #' @return A tibble with available Statistics Canada data cubes, including NDM table number, cube title,
 #' start and end dates, achieve status, subject and survey codes, frequency codes and a list of cube dimensions.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' list_cansim_cubes()
@@ -88,67 +97,70 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
   if (refresh | !file.exists(path)) {
     if (!quiet) message("Retrieving cube information from StatCan servers...")
     url=ifelse(lite,"https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesListLite","https://www150.statcan.gc.ca/t1/wds/rest/getAllCubesList")
-    r<-get_with_timeout_retry(url,retry=0,warn_only=TRUE)
-    if (r$status_code==200) {
-      content <- httr::content(r)
+    r<-get_with_timeout_retry(url,retry=0)
+    if (is.null(r)) return(NULL)
 
-      header <- content[[1]] %>%
-        tibble::enframe() %>%
-        t() %>%
-        as.data.frame() %>%
-        slice(1) %>%
-        unlist() %>%
-        as.character()
+    content <- statcan_response_json(r)
 
-      # if ("dimesions" %in% header)
-      #   header <- c(setdiff(header,"dimensions"),"dimensionNameEn","dimensionNameFr")
+    header <- content[[1]] %>%
+      tibble::enframe() %>%
+      t() %>%
+      as.data.frame() %>%
+      slice(1) %>%
+      unlist() %>%
+      as.character()
 
-      h1 <- setdiff(header,"dimensions")
+    # if ("dimesions" %in% header)
+    #   header <- c(setdiff(header,"dimensions"),"dimensionNameEn","dimensionNameFr")
 
-      surveys <- get_cansim_code_set("survey")
-      surveys_en <- setNames(surveys$surveyEn,surveys$surveyCode)
-      surveys_fr <- setNames(surveys$surveyFr,surveys$surveyCode)
-      subjects <- get_cansim_code_set("subject")
-      subjects_en <- setNames(subjects$subjectEn,subjects$subjectCode)
-      subjects_fr <- setNames(subjects$subjectEn,subjects$subjectCode)
+    h1 <- setdiff(header,"dimensions")
 
-      if (lite) {
-        r<-content %>%
-          lapply(function(l){
-            lapply(l,function(d)paste0(unlist(d),collapse=", ")) %>%
-              as_tibble()
-          }) %>%
-          bind_rows()
-      } else {
-        r<-content %>%
-          lapply(function(l){
-            lapply(l[h1],function(d)paste0(unlist(d),collapse=", ")) %>%
-              as_tibble() %>%
-              bind_cols(tibble(
-                dimensionNameEn=lapply(l[["dimensions"]],function(d)d["dimensionNameEn"]) %>% unlist %>% paste0(.,collapse = ", "),
-                dimensionNameFr=lapply(l[["dimensions"]],function(d)d["dimensionNameFr"]) %>% unlist %>% paste0(.,collapse = ", ")))
-          }) %>%
-          bind_rows()
-      }
+    surveys <- get_cansim_code_set("survey")
+    subjects <- get_cansim_code_set("subject")
+    if (is.null(surveys) || is.null(subjects)) return(NULL)
+    surveys_en <- setNames(surveys$surveyEn,surveys$surveyCode)
+    surveys_fr <- setNames(surveys$surveyFr,surveys$surveyCode)
+    subjects_en <- setNames(subjects$subjectEn,subjects$subjectCode)
+    subjects_fr <- setNames(subjects$subjectFr,subjects$subjectCode)
 
-      data <- r %>%
-        mutate_at(vars(ends_with("Date")),as.Date) %>%
-        mutate_at(vars(matches("releaseTime")),function(d)readr::parse_datetime(d,
-                                                                                #format=STATCAN_TIME_FORMAT,
-                                                                                locale=readr::locale(tz=STATCAN_TIMEZONE))) %>%
-        mutate(archived=.data$archived==1) %>%
-        mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
-        select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
-               setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
-        mutate(surveyEn=lapply(.data$surveyCode,function(d)surveys_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(surveyFr=lapply(.data$surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(subjectEn=lapply(.data$subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
-        mutate(subjectFr=lapply(.data$subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist)
-
-      saveRDS(data,path)
+    if (lite) {
+      r<-content %>%
+        lapply(function(l){
+          lapply(l,function(d)paste0(unlist(d),collapse=", ")) %>%
+            as_tibble()
+        }) %>%
+        bind_rows()
     } else {
-      warning("Could not retrieve cube list from StatCan servers.")
+      r<-content %>%
+        lapply(function(l){
+          lapply(l[h1],function(d)paste0(unlist(d),collapse=", ")) %>%
+            as_tibble() %>%
+            bind_cols(tibble(
+              dimensionNameEn=lapply(l[["dimensions"]],function(d)d["dimensionNameEn"]) %>% unlist %>% paste0(.,collapse = ", "),
+              dimensionNameFr=lapply(l[["dimensions"]],function(d)d["dimensionNameFr"]) %>% unlist %>% paste0(.,collapse = ", ")))
+        }) %>%
+        bind_rows()
     }
+
+    data <- r %>%
+      # M11: Replace deprecated mutate_at/vars with across()
+      mutate(across(ends_with("Date"), as.Date)) %>%
+      mutate(across(matches("releaseTime"), \(d) readr::parse_datetime(d,
+                                                                       locale=readr::locale(tz=STATCAN_TIMEZONE)))) %>%
+      mutate(archived=.data$archived==1) %>%
+      mutate(cansim_table_number=cleaned_ndm_table_number(.data$productId)) %>%
+      select(c("cansim_table_number","cubeTitleEn","cubeTitleFr"),
+             setdiff(names(.),c("cansim_table_number","cubeTitleEn","cubeTitleFr"))) %>%
+      mutate(surveyEn=lapply(.data$surveyCode,function(d)surveys_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+      mutate(surveyFr=lapply(.data$surveyCode,function(d)surveys_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+      mutate(subjectEn=lapply(.data$subjectCode,function(d)subjects_en[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+      mutate(subjectFr=lapply(.data$subjectCode,function(d)subjects_fr[unlist(strsplit(d,", "))] %>% paste0(collapse="; ")) %>% unlist) %>%
+      # the cube list doubles as an internal lookup, for example when checking whether a cached
+      # table is out of date, so it only reports on repairs when called on the user's behalf
+      repair_statcan_columns(c("cubeTitleEn","cubeTitleFr","dimensionNameEn","dimensionNameFr"),
+                             context=if (quiet) NULL else "table titles or dimension names")
+
+    saveRDS(data,path)
   } else {
     if (!quiet) message("Retrieving cube information from temporary cache.")
     data <- readRDS(path)
@@ -166,6 +178,7 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
 #'
 #' @return A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
 #' \dontrun{
 #' search_cansim_cubes("Labour force")
@@ -173,7 +186,9 @@ list_cansim_cubes <- function(lite=FALSE,refresh=FALSE,quiet=FALSE){
 #'
 #' @export
 search_cansim_cubes <- function(search_term, refresh=FALSE){
-  list_cansim_cubes(refresh = refresh) %>%
+  cube_list <- list_cansim_cubes(refresh = refresh)
+  if (is.null(cube_list)) return(NULL)
+  cube_list %>%
     filter(grepl(search_term,.data$cubeTitleEn,ignore.case = TRUE) |
              grepl(search_term,.data$cubeTitleFr,ignore.case = TRUE) |
              grepl(search_term,.data$surveyEn,ignore.case = TRUE) |
@@ -193,8 +208,9 @@ search_cansim_cubes <- function(search_term, refresh=FALSE){
 #'
 #' @return a tibble with data, and details for major economic indicator release
 #'
+#' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' get_cansim_key_release_schedule()
 #' }
 #'
@@ -202,12 +218,9 @@ search_cansim_cubes <- function(search_term, refresh=FALSE){
 get_cansim_key_release_schedule <- function(){
   url <- "https://www150.statcan.gc.ca/n1/dai-quo/ssi/homepage/schedule-key_indicators-eng.json"
   response <- get_with_timeout_retry(url)
+  if (is.null(response)) return(NULL)
 
-  if (response$status_code!=200){
-    stop("Problem accessing release schedule.",call.=FALSE)
-  }
-
-  httr::content(response) %>%
+  statcan_response_json(response) %>%
     lapply(dplyr::as_tibble) %>%
     dplyr::bind_rows() %>%
     mutate(date=strftime(date,STATCAN_TIME_FORMAT_S,tz="UTC") %>% as.Date)

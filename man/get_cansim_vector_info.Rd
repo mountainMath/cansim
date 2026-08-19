@@ -11,12 +11,14 @@ get_cansim_vector_info(vectors)
 }
 \value{
 A tibble with metadata for selected vectors
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Allows for the retrieval of metadata for Statistics Canada data vectors
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_vector_info("v41690973")
 }
 }

@@ -11,12 +11,14 @@ get_cansim_table_last_release_date(cansimTableNumber)
 }
 \value{
 A datetime object if a release data is available, NULL otherwise.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 This can be used to check when a table has last been updated.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_table_last_release_date("34-10-0013")
 }
 }

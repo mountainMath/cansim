@@ -12,22 +12,24 @@ get_cansim_series_info_cube_coord(
 )
 }
 \arguments{
-\item{cansimTableNumber}{A new or old CANSIM/NDM table number or a vector of table numbers}
+\item{cansimTableNumber}{A new or old CANSIM/NDM table number, coordinates are specific to a single table}
 
 \item{coordinates}{A vector of coordinates}
 
-\item{timeout}{Timeout for the API call}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the call is abandoned. This does not limit how long the call may take overall, a response that keeps arriving is left alone.}
 
 \item{refresh}{Refresh the data from the Statistics Canada API}
 }
 \value{
-a tibble containing the table template
+a tibble containing the series information for the given coordinates
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Retrieves series information by coordinates
 }
 \examples{
-\dontrun{
-get_cansim_table_template("34-10-0013")
+\donttest{
+get_cansim_series_info_cube_coord("34-10-0013", c("1.1.1.1.1.1", "2.1.1.1.1.1"))
 }
 }

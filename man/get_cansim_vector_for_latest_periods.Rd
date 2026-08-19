@@ -20,11 +20,11 @@ get_cansim_vector_for_latest_periods(
 
 \item{periods}{Numeric value for number of latest periods to retrieve data for, but default all data is retrieved.}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
-\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.}
 
 \item{factors}{(Optional) Logical value indicating if dimensions should be converted to factors. (Default set to \code{TRUE}).}
 
@@ -34,6 +34,8 @@ get_cansim_vector_for_latest_periods(
 }
 \value{
 A tibble with data for specified vector(s) for the last N periods
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Allows for the retrieval of data for specified vector series for the N most-recently released periods.
@@ -45,7 +47,7 @@ The StatCan API can only process 300 coordinates at a time,
 if more than 300 coordinates are specified the function will batch the requests to the API.
 }
 \examples{
-\dontrun{
+\donttest{
 get_cansim_vector_for_latest_periods("v41690973",10)
 }
 }

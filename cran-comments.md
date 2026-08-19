@@ -1,9 +1,23 @@
 ## Test environments
-* local OS X install, R 4.3.2
-* GitHub Action macOS-latest, windows-lastest (3.6), ubuntu-20.04 (devel, release)
+* local macOS install, R 4.6.0
+* GitHub Actions macOS-latest (release), windows-latest (release), ubuntu-latest (devel, release, oldrel-1)
 
 ## R CMD check results
-There were no ERRORs or WARNINGs or NOTEs. 
+There were no ERRORs or WARNINGs or NOTEs, with `--as-cran --run-donttest`.
+
+## Notes on examples
+
+This package retrieves data from Statistics Canada web services. Their servers
+time out or go down for maintenance from time to time, which has caused checks
+of this package to fail in the past through no fault of the package. As of
+version 0.4.5 no function aborts when Statistics Canada cannot be reached, it
+emits a warning and returns `NULL` instead. Examples that make a single
+lightweight API call are therefore wrapped in `\donttest{}` and complete without
+error whether or not Statistics Canada is reachable, which we verified by
+running them with all requests to Statistics Canada blocked. The remaining
+`\dontrun{}` examples are the ones that download an entire data table or the
+full table catalogue, they are excluded because of their run time, not because
+they might fail.
 
 ## Changes from version 0.2.1
 
@@ -151,3 +165,18 @@ There were no ERRORs or WARNINGs or NOTEs.
 * fix a problem with metadata parsing does not work properly for table names
 * make documentations more consistent wrt default langauge names
 * add convenience functions for setting cache paths for data accessed via get_cansim_connection
+
+# cansim 0.4.5
+## Major changes
+* Statistics Canada being unavailable no longer aborts with an error, timeouts, connection failures and
+  error responses are reported with a warning and the function returns `NULL`
+* examples that make a single lightweight API call are now `\donttest{}` rather than `\dontrun{}`
+* data retrieved by vector or by table/coordinate now carries unit of measure columns
+* non-breaking spaces and control characters in names returned by Statistics Canada are replaced with
+  regular spaces so that the resulting column names can be typed
+## Minor changes
+* fix a `case_when()` deprecation warning emitted by dplyr 1.2.0
+* fix `get_cansim_changed_tables()` passing "days" to `difftime()` as a time zone instead of a unit
+* `get_cansim_connection()` no longer fails when the release date of a table cannot be determined
+* performance improvements in metadata parsing and table template generation
+

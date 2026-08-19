@@ -13,6 +13,8 @@ search_cansim_cubes(search_term, refresh = FALSE)
 }
 \value{
 A tibble with available Statistics Canada data cubes, listing title, Statistics Canada data cube catalogue number, deprecated CANSIM table number, survey and subject.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
 Searches through Statistics Canada data cubes using a search term.

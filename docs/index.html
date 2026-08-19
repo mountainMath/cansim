@@ -11,9 +11,9 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
-<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Retrieve and work with public Statistics Canada data tables in R">
@@ -36,11 +36,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,6 +84,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/mountainMath/cansim/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -98,7 +106,7 @@
 </div>
 <!-- badges: start -->
 
-<p><a href="https://mountainmath.github.io/cansim/index.html"><img src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width="25%" height="25%"></a></p>
+<p><a href="https://mountainmath.github.io/cansim/index.html"><img id="readme-logo" src="https://raw.githubusercontent.com/mountainMath/cansim/master/images/cansim-sticker.png" alt="cansim logo" align="right" width="25%" height="25%"></a></p>
 <p>An R package to retrieve and work with public Statistics Canada data tables.</p>
 <p>This package:</p>
 <ul>
@@ -246,9 +254,11 @@ In doing any of the above, you shall:
 <div class="section level3">
 <h3 id="proxy-issues">Proxy issues<a class="anchor" aria-label="anchor" href="#proxy-issues"></a>
 </h3>
-<p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. A quick fix for this requires specifying a proxy configuration for the <code>httr</code> package.</p>
+<p>Some users have reported issues accessing and downloading Statistics Canada tables while behind a proxy as is sometimes the case in office environments. The package uses <code>httr2</code>, which picks up the standard proxy environment variables, so pointing it at a proxy is a matter of setting them before making requests.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/set_config.html" class="external-link">set_config</a></span><span class="op">(</span><span class="fu">use_proxy</span><span class="op">(</span>url<span class="op">=</span><span class="va">http_proxy</span>, port<span class="op">=</span><span class="va">selected_port</span>, username<span class="op">=</span><span class="va">your_username</span>,password<span class="op">=</span><span class="va">your_pass</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>https_proxy<span class="op">=</span><span class="st">"http://your_username:your_pass@proxy.example.com:8080"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>http_proxy<span class="op">=</span><span class="st">"http://your_username:your_pass@proxy.example.com:8080"</span><span class="op">)</span></span></code></pre></div>
+<p>Setting these in your <code>.Renviron</code> file makes the configuration stick across sessions.</p>
 </div>
 <div class="section level3">
 <h3 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
@@ -269,14 +279,14 @@ In doing any of the above, you shall:
 <h3 id="cite-cansim">Cite cansim<a class="anchor" aria-label="anchor" href="#cite-cansim"></a>
 </h3>
 <p>If you wish to cite the <code>cansim</code> package in your work:</p>
-<p>von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.4.4. DOI: 10.32614/CRAN.package.cansim</p>
+<p>von Bergmann, J., Dmitry Shkolnik (2024). cansim: functions and convenience tools for accessing Statistics Canada data tables. v0.5.0. DOI: 10.32614/CRAN.package.cansim</p>
 <p>A BibTeX entry for LaTeX users is</p>
 <pre><code>  @Manual{cansim,
     author = {Jens {von Bergmann} and Dmitry Shkolnik},
     title = {cansim: functions and convenience tools for accessing Statistics Canada data tables},
     year = {2025},
     doi = {10.32614/CRAN.package.cansim},
-    note = {R package version 0.4.4},
+    note = {R package version 0.5.0},
     url = {https://mountainmath.github.io/cansim/}
   }</code></pre>
 </div>
@@ -322,7 +332,7 @@ In doing any of the above, you shall:
 <li><a href="https://CRAN.R-project.org/package=cansim" class="external-link"><img src="https://www.r-pkg.org/badges/version/cansim" alt="CRAN status"></a></li>
 <li><a href="https://cranlogs.r-pkg.org/badges/cansim" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/cansim" alt="CRAN_Downloads_Badge"></a></li>
 <li><a href="https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mountainMath/cansim/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://doi.org/10.32614/CRAN.package.cansim" class="external-link"><img src="https://img.shields.io/badge/doi-10.32614/CRAN.package.cansim-#d2b24a.svg" alt="DOI"></a></li>
+<li><a href="https://doi.org/10.32614/CRAN.package.cansim" class="external-link"><img src="https://img.shields.io/badge/DOI-10.32614/CRAN.package.cansim-d2b24a.svg" alt="DOI"></a></li>
 </ul>
 </div>
 
@@ -335,7 +345,7 @@ In doing any of the above, you shall:
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

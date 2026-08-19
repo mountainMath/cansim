@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_sql.R
 \name{get_cansim_sqlite}
 \alias{get_cansim_sqlite}
-\title{Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection}
+\title{Retrieve a Statistics Canada data table using NDM catalogue number as SQLite database connection (deprecated)}
 \usage{
 get_cansim_sqlite(
   cansimTableNumber,
@@ -16,21 +16,25 @@ get_cansim_sqlite(
 \arguments{
 \item{cansimTableNumber}{the NDM table number to load}
 
-\item{language}{\code{"en"} or \code{"english"} for English and \code{"fr"} or \code{"french"} for French language versions (defaults to English)}
+\item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 
 \item{refresh}{(Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})}
 
 \item{auto_refresh}{(Optional) When set to \code{TRUE}, it will reload of data table if a new version is available (default is \code{FALSE})}
 
-\item{timeout}{(Optional) Timeout in seconds for downloading cansim table to work around scenarios where StatCan servers drop the network connection.}
+\item{timeout}{(Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.}
 
 \item{cache_path}{(Optional) Path to where to cache the table permanently. By default, the data is cached
 in the path specified by `Sys.getenv('CANSIM_CACHE_PATH')`, if this is set. Otherwise it will use `tempdir()`.}
 }
 \value{
 A database connection to a local SQLite database with the StatCan Table data.
+
+Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }
 \description{
+This method is deprecated and will be removed in a future version, please use
+`get_cansim_connection(..., format="sqlite")` instead.
 Retrieves a data table using an NDM catalogue number as an SQLite table. Retrieved table data is
 cached permanently if a cache path is supplied or for duration of the current R session.
 The function will check against the latest release data for the table and emit a warning message
@@ -41,9 +45,9 @@ if the cached table is out of date.
 con <- get_cansim_connection("34-10-0013", format="sqlite")
 
 # Work with the data connection
-gplimpse(con)
+glimpse(con)
 
-disconnect_cansim_sqlite(con)
+disconnect_cansim_connection(con)
 }
 }
 \keyword{internal}
