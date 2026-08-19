@@ -132,27 +132,33 @@
   gateway timeout is to ask for less at once rather than to retry the
   same request
 
-- two new functions expose StatCan’s changed series data methods, which
+- three new functions expose StatCan’s changed series methods, which
   report what changed at a finer grain than
   [`get_cansim_changed_tables()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.md)
   does.
+  [`get_cansim_changed_series_list()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_list.md)
+  lists the series StatCan changed today as vectors, with the table and
+  coordinate each belongs to, and
   [`get_cansim_changed_series_data_for_vectors()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_vectors.md)
   and
   [`get_cansim_changed_series_data_for_coordinates()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_coordinates.md)
-  retrieve the data points StatCan changed, in the same shape and with
-  the same metadata as the corresponding
+  retrieve the changed data points themselves, in the same shape and
+  with the same metadata as the corresponding
   [`get_cansim_vector()`](https://mountainmath.github.io/cansim/reference/get_cansim_vector.md)
   and coordinate calls. Series that did not change simply contribute no
   rows, and if none of the ones asked about changed the answer is an
-  empty table rather than an error. Like the other vector methods they
-  batch requests of more than 300 items. StatCan’s third changed series
-  method, the one listing every series that changed today, is
-  implemented but not exported. It regularly fails to answer at all:
-  StatCan works out the whole response before sending any of it, and
-  with the changed series numbering in the hundreds of thousands the
-  request outlives StatCan’s own gateway and comes back as an HTTP 504
-  after some nine minutes of silence. Exporting it will wait until it is
-  clear whether that is a fault or simply how the method behaves
+  empty table rather than an error. Like the other vector methods the
+  two data ones batch requests of more than 300 items. How long the list
+  method takes is entirely a matter of how much StatCan released that
+  morning. It takes no parameters, so a busy day cannot be asked about
+  in smaller pieces, and on one heavy enough the request has been seen
+  to outlive StatCan’s own gateway and come back as an HTTP 504 after
+  some nine minutes of silence. Its `timeout` defaults high to let that
+  answer arrive as StatCan’s own rather than as a vaguer local abort,
+  but the limit is at StatCan’s end and raising it further will not
+  help;
+  [`get_cansim_changed_tables()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_tables.md)
+  is the question to ask on such a day
 
 - the package now talks to StatCan through `httr2` rather than `httr`.
   Requests that fail on a status StatCan recovers from within seconds,
@@ -261,6 +267,21 @@
 
 ### Minor changes
 
+- asking
+  [`get_cansim_vector_for_latest_periods()`](https://mountainmath.github.io/cansim/reference/get_cansim_vector_for_latest_periods.md)
+  or
+  [`get_cansim_data_for_table_coord_periods()`](https://mountainmath.github.io/cansim/reference/get_cansim_data_for_table_coord_periods.md)
+  for all periods no longer sends an arbitrary round number as the
+  period count. StatCan takes `latestN` as a signed 32-bit integer,
+  rejecting zero or less and anything past 2147483647, and quietly
+  clamps a count longer than the series to the whole series, so the
+  default is now that bound as the API itself enforces it, rather than a
+  guess that happened to exceed the longest series. A period count
+  larger than the bound, or an infinite one, is capped instead of being
+  silently coerced to `NA` and sent to StatCan as `"latestN":NA`, and a
+  count below one now fails immediately with a message instead of
+  earning an HTTP 406. This also applies to the per-coordinate `periods`
+  column of a table template
 - an unrecognized `language` argument is now an error naming what was
   passed, instead of an `NA` that travelled on into a cache directory
   name or the tail of a StatCan URL and surfaced later as a download

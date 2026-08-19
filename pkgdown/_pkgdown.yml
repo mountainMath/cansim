@@ -86,6 +86,7 @@ authors:
     href: https://dshkol.com
 template:
   bootstrap: 5
+  light-switch: true
   params:
     ganalytics: UA-107390160-2
   opengraph:

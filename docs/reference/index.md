@@ -55,6 +55,8 @@ Help with data discovery
   : Get the latest release data for a StatCan table, if available
 - [`get_cansim_key_release_schedule()`](https://mountainmath.github.io/cansim/reference/get_cansim_key_release_schedule.md)
   : Major economic indicator release schedule
+- [`get_cansim_changed_series_list()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_list.md)
+  : Retrieve the series that changed today
 - [`get_cansim_changed_series_data_for_vectors()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_vectors.md)
   : Retrieve data for series that changed, by vector
 - [`get_cansim_changed_series_data_for_coordinates()`](https://mountainmath.github.io/cansim/reference/get_cansim_changed_series_data_for_coordinates.md)
