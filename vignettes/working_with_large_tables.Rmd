@@ -47,7 +47,7 @@ When accessing cached data the package automatically checks if newer versions ar
 
 If data is not cached the function will download the data first and convert it to the specified format. The package is designed so that the differences in database formats are mostly abstracted away.
 
-::: {.panel-tabset .nav-pills}
+::: {.panel-tabset .tabset-pills}
 
 ### parquet {.active}
 
@@ -73,7 +73,7 @@ connection.sqlite <- get_cansim_connection("20-10-0001", format='sqlite')
 glimpse(connection.sqlite)
 ```
 
-</div>
+:::
 
 
 To make good use of the data we will have to look at the metadata and inspect the member columns and variables available.
