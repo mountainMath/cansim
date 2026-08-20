@@ -1,6 +1,9 @@
-pre, code {
+/* Match pkgdown's code styling, but only in light mode. Setting these
+   unconditionally would override the dark theme's `pre`/`code` colours and
+   leave light syntax highlighting on a light background. */
+:root:not([data-bs-theme="dark"]) pre,
+:root:not([data-bs-theme="dark"]) code {
   background-color: #f8f8f8;
-  size: 70%;
   color: #333;
 }
 
