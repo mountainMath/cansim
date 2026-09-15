@@ -166,3 +166,18 @@ test_that("repairing warns about what was changed", {
   on.exit(options(old), add=TRUE)
   expect_no_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
 })
+
+test_that("table downloads warn about repaired member names", {
+  skip_on_cran()
+
+  # 13-10-0383 has clean column names but four province labels with a non-breaking space, so the
+  # only place the download can report them is the member names of the metadata
+  warning <- warning_text(get_cansim("13-10-0383", refresh=TRUE))
+  expect_match(warning, "member names for table 13-10-0383", fixed=TRUE)
+  expect_match(warning, "Newfoundland<U+00A0>and Labrador", fixed=TRUE)
+  expect_match(warning, "Repaired 4 names", fixed=TRUE)
+
+  old <- options(cansim.suppress_repair_warnings=TRUE)
+  on.exit(options(old), add=TRUE)
+  expect_no_warning(get_cansim("13-10-0383", refresh=TRUE))
+})

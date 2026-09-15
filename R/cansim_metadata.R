@@ -7,7 +7,9 @@
 #' @return NULL
 #' @keywords internal
 parse_metadata <- function(meta,data_path){
+  # the cache file is named after the table and the language, `13100383-eng.Rda`
   cleaned_language <- basename(data_path) %>% gsub("^.+-|\\..+$","",.)
+  cansimTableNumber <- basename(data_path) %>% gsub("-.+$","",.) %>% cleaned_ndm_table_number()
   cube_title_column <- ifelse(cleaned_language=="eng","Cube Title","Titre du cube")
   dimension_id_column <- ifelse(cleaned_language=="eng","Dimension ID",paste0("Num",intToUtf8(0x00E9),"ro d'identification de la dimension"))
   dimension_name_column <- ifelse(cleaned_language=="eng","Dimension name","Nom de la dimension")
@@ -73,8 +75,10 @@ parse_metadata <- function(meta,data_path){
   cut_indices <- setdiff(which(grepl(paste0('^"',dimension_id_column,'"|^',symbol_legend_grepl_field,''),meta)),length(meta))
 
   # Dimension and member names have to be repaired the same way as the column names of the data
-  # itself, otherwise the two no longer match and metadata stops folding in. The repair is silent
-  # here, the caller has already reported on the column names of this table.
+  # itself, otherwise the two no longer match and metadata stops folding in. The dimension names are
+  # repaired silently, they are the column names of the data and the caller has already reported on
+  # those. The member names are reported here, they surface as the labels in the dimension columns
+  # and nothing else looks at them before they are repaired.
   meta1 <- read_meta(meta[seq(1,cut_indices[1]-1)]) %>%
     repair_statcan_columns(cube_title_column)
   saveRDS(meta1,file=paste0(data_path,"1"))
@@ -82,7 +86,8 @@ parse_metadata <- function(meta,data_path){
     repair_statcan_columns(dimension_name_column)
   saveRDS(meta2,file=paste0(data_path,"2"))
   meta3 <- read_meta(meta[seq(cut_indices[2],cut_indices[3]-1)]) %>%
-    repair_statcan_columns(member_name_column)
+    repair_statcan_columns(member_name_column,
+                           context=paste0("member names for table ",cansimTableNumber))
   saveRDS(meta3,file=paste0(data_path,"2m"))
   correction_index <- grep(paste0('^"',correction_id_grepl_field,'"'),meta)
   if (length(correction_index)==0) correction_index=length(meta)
