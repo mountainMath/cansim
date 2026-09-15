@@ -258,7 +258,7 @@ finalize_vector_data <- function(result,vectors,cleaned_language,factors,
 # nightly window from midnight to 8:30am Eastern, where the other methods refuse with an HTTP 409.
 # There is nothing in that answer to tell the three cases apart, so the warning names all of them.
 warn_no_vector_data <- function(){
-  warning(wrap_warning_text(
+  warning(warning_sentences(
     "StatCan returned no data for any of the requested vectors. This happens when none of the ",
     "vectors exist, when none of them carry data in the requested time frame, and during the daily ",
     "window from midnight to 8:30am Eastern in which StatCan does not serve vector data."),

@@ -148,13 +148,30 @@ test_that("the offending characters are shown by code point", {
   expect_true(endsWith(long, "<U+00A0>31"))
 })
 
+test_that("warnings break between sentences and nowhere else", {
+  text <- warning_sentences("Repaired \"Nova<U+00A0>Scotia\". Nothing on your end causes this. ",
+                            "Tracked at https://github.com/mountainMath/cansim/issues/169. ",
+                            "Set options(cansim.suppress_repair_warnings=TRUE) to silence this.")
+  lines <- strsplit(text,"\n")[[1]]
+  expect_length(lines, 4)
+  expect_equal(lines[1], "Repaired \"Nova<U+00A0>Scotia\".")
+  expect_equal(lines[4], "Set options(cansim.suppress_repair_warnings=TRUE) to silence this.")
+
+  # the layout does not depend on the width R believes the console has, that is what put breaks in
+  # the middle of sentences when the window was a different size
+  old <- options(width=40)
+  on.exit(options(old), add=TRUE)
+  expect_equal(warning_sentences("Built by cansim 0.4.4 or earlier, before repair. Pass `refresh=TRUE` to fix it."),
+               "Built by cansim 0.4.4 or earlier, before repair.\nPass `refresh=TRUE` to fix it.")
+})
+
 test_that("repairing warns about what was changed", {
   skip_on_cran()
 
   # the warning has to show the name as StatCan sent it, a repaired name would hide the problem
   expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
                  "Characteristics<U+00A0>", fixed=TRUE)
-  # the warning is wrapped to the console width, so it is matched on the collapsed text
+  # the warning starts each sentence on its own line, so it is matched on the collapsed text
   warning <- warning_text(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
   expect_match(warning, "non-breaking spaces or control characters", fixed=TRUE)
   # the reader has to be told this is StatCan's to fix, and where to watch for it being fixed

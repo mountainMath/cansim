@@ -1,6 +1,6 @@
-# Repair warnings are wrapped to the console width, so a phrase that is checked for can be split
-# across two lines. Collapsing the whitespace lets a test match on the wording rather than on where
-# the console happened to break it.
+# Warnings built from several sentences start each sentence on its own line, so a phrase that spans
+# two sentences is split across two lines. Collapsing the whitespace lets a test match on the wording
+# rather than on the layout.
 warning_text <- function(expr) {
   messages <- character(0)
   withCallingHandlers(expr,
