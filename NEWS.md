@@ -1,4 +1,12 @@
-# cansim 0.4.5
+# cansim 0.5.1
+## Minor changes
+* table downloads now warn about repaired member labels the same way they warn about repaired column
+  names. A table whose column names are clean but whose labels carry a non-breaking space, for example
+  the province names in 13-10-0383, was repaired silently because the metadata parser assumed the
+  column name warning had already covered it. Every download path reports it once now, and the
+  warning is silenced by the same `options(cansim.suppress_repair_warnings=TRUE)` (#169)
+
+# cansim 0.5.0
 ## Major changes
 * StatCan being unavailable no longer aborts with an error. Timeouts, connection failures and error
   responses are now reported with a loud warning and the function returns `NULL`, so that a script or a
@@ -35,10 +43,7 @@
   names, 53 of 500 sampled tables carry at least one. Repairing only the metadata side would have left
   the labels in the data unable to match their own factor levels, so every row carrying an affected
   label would have become `NA`. Labels are now also identical whichever way the data is retrieved, so
-  a table can be joined to template, vector or coordinate data on its dimension columns. Table
-  downloads warn about repaired member labels the same way they warn about repaired column names,
-  the labels are the more common place for these characters and a table can carry them in its
-  labels alone (#169)
+  a table can be joined to template, vector or coordinate data on its dimension columns (#169)
 
 * an internal `scan_statcan_character_problems()` reads the cube metadata straight off the API,
   without the repair applied, and reports every title, dimension name and member name StatCan
