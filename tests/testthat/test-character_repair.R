@@ -175,7 +175,7 @@ test_that("repairing warns about what was changed", {
   warning <- warning_text(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
   expect_match(warning, "non-breaking spaces or control characters", fixed=TRUE)
   # the reader has to be told this is StatCan's to fix, and where to watch for it being fixed
-  expect_match(warning, "This warning will disappear on its own once StatCan stops sending them",
+  expect_match(warning, "this warning will disappear on its own once StatCan stops sending them",
                fixed=TRUE)
   expect_match(warning, "https://github.com/mountainMath/cansim/issues/169", fixed=TRUE)
 
