@@ -46,7 +46,7 @@ get_cansim_vector(
 - use_ref_date:
 
   Optional, `TRUE` by default. When set to `TRUE`, uses `REF_DATE` of
-  vector data to filter, otherwise it uses StatisticsCanada's
+  vector data to filter, otherwise it uses Statistics Canada's
   `releaseDate` value for filtering the specified vectors.
 
 - language:

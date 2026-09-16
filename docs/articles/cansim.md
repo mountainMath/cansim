@@ -154,7 +154,7 @@ get_cansim_vector(c("Metro Van Apartment Construction Price Index"="v44176267",
 Larger tables, or tables that update infrequently can be cached in
 database form for faster access and better performance. The
 `get_cansim_connection` function facilitates this, it works mostly
-identitcal to the `get_cansim` function, but returns a database
+identical to the `get_cansim` function, but returns a database
 connection to a local database with the StatCan Table data. Calling
 `collect_and_normalize`, after possibly filtering data, adds metadata
 and loads data into memory in a form that is identical to the data

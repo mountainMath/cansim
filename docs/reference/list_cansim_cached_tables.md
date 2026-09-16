@@ -1,6 +1,6 @@
-# List cached cansim arrow and SQlite databases
+# List cached cansim arrow and SQLite databases
 
-List cached cansim arrow and SQlite databases
+List cached cansim arrow and SQLite databases
 
 ## Usage
 
