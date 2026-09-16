@@ -1,3 +1,9 @@
+## Resubmission
+The first submission of 0.5.1 failed the incoming pretest because two of the restored vignettes
+carried inline R expressions that evaluated regardless of the chunk-level `eval` guard, one of
+which made a network request. Those expressions now fall back to fixed text unless the vignettes
+are compiled locally, and the package has been rebuilt and checked with the guard variable unset.
+
 ## Test environments
 * local macOS install, R 4.6.0
 * GitHub Actions macOS-latest (release), windows-latest (release), ubuntu-latest (devel, release, oldrel-1)
