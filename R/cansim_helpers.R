@@ -69,9 +69,8 @@ warn_statcan_repairs <- function(original_values,context) {
             "copy-pasted, the package has replaced them with regular spaces. ",
             if (length(original_values)==1) paste0("Repaired \"",example,"\".")
             else paste0("Repaired ",length(original_values)," names, for example \"",example,"\"."),
-            " Nothing on your end causes this and nothing on your end can fix it, the characters are ",
-            "in the data StatCan publishes. This warning will disappear on its own once StatCan stops ",
-            "sending them, which is tracked at ",ISSUE_169_URL,". ",
+            " The characters are in the data StatCan publishes, this warning will disappear on its own once StatCan stops ",
+            "sending them. Refer to this GitHub issue for context and progress tracking: ",ISSUE_169_URL,". ",
             "Set options(cansim.suppress_repair_warnings=TRUE) to silence this."),
           call.=FALSE)
   invisible(NULL)
