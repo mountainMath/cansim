@@ -380,7 +380,7 @@ get_cansim_connection <- function(cansimTableNumber,
       !isTRUE(getOption("cansim.suppress_repair_warnings"))) {
     cached_version <- read_cache_version(dirname(db_path))
     example <- c(stale_names,stale_labels)[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
-    warning(wrap_warning_text(
+    warning(warning_sentences(
               "The cached copy of table ",cleaned_number," was built by cansim ",
               ifelse(is.null(cached_version),"0.4.4 or earlier",as.character(cached_version)),
               ", before non-breaking spaces and control characters were repaired, and it has ",
@@ -664,7 +664,7 @@ collect_and_normalize <- function(connection,
 }
 
 
-#' List cached cansim arrow and SQlite databases
+#' List cached cansim arrow and SQLite databases
 #'
 #' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`.
 #' @param refresh Optional, refresh the last updated date of cached cansim tables

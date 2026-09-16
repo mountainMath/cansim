@@ -46,7 +46,7 @@ get_cansim_vector(
 - use_ref_date:
 
   Optional, `TRUE` by default. When set to `TRUE`, uses `REF_DATE` of
-  vector data to filter, otherwise it uses StatisticsCanada's
+  vector data to filter, otherwise it uses Statistics Canada's
   `releaseDate` value for filtering the specified vectors.
 
 - language:
@@ -99,7 +99,7 @@ unavailable.
 # \donttest{
 get_cansim_vector("v41690973","2015-01-01")
 #> Accessing CANSIM NDM vectors from Statistics Canada
-#> # A tibble: 139 × 16
+#> # A tibble: 140 × 16
 #>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID
 #>    <chr>     <date>     <fct> <fct>                  <dbl>    <dbl> <chr> <chr> 
 #>  1 2015-01-… 2015-01-01 Cana… All-items               124.     124. 2002… 17    
@@ -112,7 +112,7 @@ get_cansim_vector("v41690973","2015-01-01")
 #>  8 2015-08-… 2015-08-01 Cana… All-items               127.     127. 2002… 17    
 #>  9 2015-09-… 2015-09-01 Cana… All-items               127.     127. 2002… 17    
 #> 10 2015-10-… 2015-10-01 Cana… All-items               127.     127. 2002… 17    
-#> # ℹ 129 more rows
+#> # ℹ 130 more rows
 #> # ℹ abbreviated name: ¹​`Products and product groups`
 #> # ℹ 8 more variables: SCALAR_ID <int>, VECTOR <chr>, cansimTableNumber <chr>,
 #> #   COORDINATE <chr>, SYMBOL <int>, releaseTime <chr>, frequencyCode <int>,

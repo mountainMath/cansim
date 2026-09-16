@@ -148,21 +148,53 @@ test_that("the offending characters are shown by code point", {
   expect_true(endsWith(long, "<U+00A0>31"))
 })
 
+test_that("warnings break between sentences and nowhere else", {
+  text <- warning_sentences("Repaired \"Nova<U+00A0>Scotia\". Nothing on your end causes this. ",
+                            "Tracked at https://github.com/mountainMath/cansim/issues/169. ",
+                            "Set options(cansim.suppress_repair_warnings=TRUE) to silence this.")
+  lines <- strsplit(text,"\n")[[1]]
+  expect_length(lines, 4)
+  expect_equal(lines[1], "Repaired \"Nova<U+00A0>Scotia\".")
+  expect_equal(lines[4], "Set options(cansim.suppress_repair_warnings=TRUE) to silence this.")
+
+  # the layout does not depend on the width R believes the console has, that is what put breaks in
+  # the middle of sentences when the window was a different size
+  old <- options(width=40)
+  on.exit(options(old), add=TRUE)
+  expect_equal(warning_sentences("Built by cansim 0.4.4 or earlier, before repair. Pass `refresh=TRUE` to fix it."),
+               "Built by cansim 0.4.4 or earlier, before repair.\nPass `refresh=TRUE` to fix it.")
+})
+
 test_that("repairing warns about what was changed", {
   skip_on_cran()
 
   # the warning has to show the name as StatCan sent it, a repaired name would hide the problem
   expect_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE),
                  "Characteristics<U+00A0>", fixed=TRUE)
-  # the warning is wrapped to the console width, so it is matched on the collapsed text
+  # the warning starts each sentence on its own line, so it is matched on the collapsed text
   warning <- warning_text(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
   expect_match(warning, "non-breaking spaces or control characters", fixed=TRUE)
   # the reader has to be told this is StatCan's to fix, and where to watch for it being fixed
-  expect_match(warning, "This warning will disappear on its own once StatCan stops sending them",
+  expect_match(warning, "this warning will disappear on its own once StatCan stops sending them",
                fixed=TRUE)
   expect_match(warning, "https://github.com/mountainMath/cansim/issues/169", fixed=TRUE)
 
   old <- options(cansim.suppress_repair_warnings=TRUE)
   on.exit(options(old), add=TRUE)
   expect_no_warning(get_cansim_cube_metadata("13-10-0397", type="members", refresh=TRUE))
+})
+
+test_that("table downloads warn about repaired member names", {
+  skip_on_cran()
+
+  # 13-10-0383 has clean column names but four province labels with a non-breaking space, so the
+  # only place the download can report them is the member names of the metadata
+  warning <- warning_text(get_cansim("13-10-0383", refresh=TRUE))
+  expect_match(warning, "member names for table 13-10-0383", fixed=TRUE)
+  expect_match(warning, "Newfoundland<U+00A0>and Labrador", fixed=TRUE)
+  expect_match(warning, "Repaired 4 names", fixed=TRUE)
+
+  old <- options(cansim.suppress_repair_warnings=TRUE)
+  on.exit(options(old), add=TRUE)
+  expect_no_warning(get_cansim("13-10-0383", refresh=TRUE))
 })

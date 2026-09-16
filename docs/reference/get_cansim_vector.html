@@ -25,7 +25,7 @@ if more than 300 coordinates are specified the function will batch the requests 
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,7 +122,7 @@ if more than 300 coordinates are specified the function will batch the requests 
 
 
 <dt id="arg-use-ref-date">use_ref_date<a class="anchor" aria-label="anchor" href="#arg-use-ref-date"></a></dt>
-<dd><p>Optional, <code>TRUE</code> by default. When set to <code>TRUE</code>, uses <code>REF_DATE</code> of vector data to filter, otherwise it uses StatisticsCanada's <code>releaseDate</code> value for filtering the specified vectors.</p></dd>
+<dd><p>Optional, <code>TRUE</code> by default. When set to <code>TRUE</code>, uses <code>REF_DATE</code> of vector data to filter, otherwise it uses Statistics Canada's <code>releaseDate</code> value for filtering the specified vectors.</p></dd>
 
 
 <dt id="arg-language">language<a class="anchor" aria-label="anchor" href="#arg-language"></a></dt>
@@ -160,7 +160,7 @@ if more than 300 coordinates are specified the function will batch the requests 
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">get_cansim_vector</span><span class="op">(</span><span class="st">"v41690973"</span>,<span class="st">"2015-01-01"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Accessing CANSIM NDM vectors from Statistics Canada</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 139 × 16</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 140 × 16</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 2015-01-… 2015-01-01 Cana… All-items               124.     124. 2002… 17    </span>
@@ -173,7 +173,7 @@ if more than 300 coordinates are specified the function will batch the requests 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 2015-08-… 2015-08-01 Cana… All-items               127.     127. 2002… 17    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 2015-09-… 2015-09-01 Cana… All-items               127.     127. 2002… 17    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 2015-10-… 2015-10-01 Cana… All-items               127.     127. 2002… 17    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 129 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 130 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ abbreviated name: ¹​`Products and product groups`</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: SCALAR_ID &lt;int&gt;, VECTOR &lt;chr&gt;, cansimTableNumber &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   COORDINATE &lt;chr&gt;, SYMBOL &lt;int&gt;, releaseTime &lt;chr&gt;, frequencyCode &lt;int&gt;,</span></span>

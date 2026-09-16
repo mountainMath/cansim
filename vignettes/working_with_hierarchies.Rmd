@@ -34,7 +34,7 @@ get_cansim_table_overview(table_id)
 ```
 
 ### Accessing table data
-We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Prices))$Prices)`". 
+We see that data set come with three different measures and 307 different NAICS values. Let's load the data and focus on just "`r if (exists("table_id", inherits=FALSE)) unique(dplyr::filter(get_cansim(table_id),grepl("Chained",.data$Prices))$Prices) else "Chained (2017) dollars"`". 
 ```{r}
 library(dplyr, warn.conflicts = FALSE)
 
@@ -81,7 +81,7 @@ cut_data <- data %>% filter(
 # How many are NAICS categories left? 
 n <- length(cut_data$`North American Industry Classification System (NAICS)` %>% unique)
 ```
-There are still `r n` level 1 categories, too many to sensibly visualize at the same time. We can use `dplyr` functions to identify the top categories and group the rest so that we can have a plot that is easier to understand. 
+There are still `r if (exists("n", inherits=FALSE)) n else 22` level 1 categories, too many to sensibly visualize at the same time. We can use `dplyr` functions to identify the top categories and group the rest so that we can have a plot that is easier to understand. 
 ```{r fig.height=6, fig.width=9}
 # Specify which regions and period we want to look at 
 regions = "British Columbia"

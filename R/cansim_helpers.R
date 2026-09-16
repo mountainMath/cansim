@@ -47,10 +47,14 @@ abbreviate_around_escape <- function(x,width=60) {
 }
 
 # R prints a warning as it was assembled, so a message built from several sentences arrives as one
-# long line. Wrapping it to the console width the way ordinary console output is wrapped keeps it
-# readable. Only for messages that are plain prose, anything laid out by hand keeps its own breaks.
-wrap_warning_text <- function(...) {
-  paste(strwrap(paste0(...),width=max(40,getOption("width",80))),collapse="\n")
+# long line. Wrapping it to `getOption("width")` looked right only when that matched the window the
+# warning was read in, RStudio panes, knitted documents and resized terminals broke lines mid
+# sentence at the wrong width. Starting each sentence on its own line gives the message structure
+# and leaves the wrapping to the window, which knows its own width. A sentence ends at a period,
+# question mark or exclamation mark, optionally followed by a closing quote, before a capitalized
+# word, so the messages passed here have to avoid abbreviations such as "e.g." in front of one.
+warning_sentences <- function(...) {
+  gsub("([.?!][\"']?) (?=[A-Z])","\\1\n",paste0(...),perl=TRUE)
 }
 
 ISSUE_169_URL <- "https://github.com/mountainMath/cansim/issues/169"
@@ -59,15 +63,14 @@ ISSUE_169_URL <- "https://github.com/mountainMath/cansim/issues/169"
 warn_statcan_repairs <- function(original_values,context) {
   if (length(original_values)==0 || isTRUE(getOption("cansim.suppress_repair_warnings"))) return(invisible(NULL))
   example <- original_values[1] %>% escape_statcan_characters() %>% abbreviate_around_escape()
-  warning(wrap_warning_text(
+  warning(warning_sentences(
             "StatCan returned ",context," containing non-breaking spaces or control characters. ",
             "These render as an ordinary space or as nothing at all, so the names cannot be typed or ",
             "copy-pasted, the package has replaced them with regular spaces. ",
             if (length(original_values)==1) paste0("Repaired \"",example,"\".")
             else paste0("Repaired ",length(original_values)," names, for example \"",example,"\"."),
-            " Nothing on your end causes this and nothing on your end can fix it, the characters are ",
-            "in the data StatCan publishes. This warning will disappear on its own once StatCan stops ",
-            "sending them, which is tracked at ",ISSUE_169_URL,". ",
+            " The characters are in the data StatCan publishes, this warning will disappear on its own once StatCan stops ",
+            "sending them. Refer to this GitHub issue for context and progress tracking: ",ISSUE_169_URL,". ",
             "Set options(cansim.suppress_repair_warnings=TRUE) to silence this."),
           call.=FALSE)
   invisible(NULL)
