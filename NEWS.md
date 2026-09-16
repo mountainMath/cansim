@@ -10,6 +10,9 @@
   raised. That width matched the window only by luck, so the text broke in the middle of sentences in
   RStudio panes, knitted documents and resized terminals. Each sentence now starts on its own line
   and the window wraps the rest at its actual width
+* the vignettes on listing tables, retrieving vectors and working with hierarchies ship with the
+  package again. They had been excluded from the CRAN build since 2018 and were only reachable on the
+  pkgdown site
 
 # cansim 0.5.0
 ## Major changes
