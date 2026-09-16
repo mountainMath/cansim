@@ -21,7 +21,7 @@ unavailable.
 ``` r
 # \donttest{
 get_cansim_key_release_schedule()
-#> # A tibble: 2,881 × 5
+#> # A tibble: 2,882 × 5
 #>    date       type    title                                    description url  
 #>    <date>     <chr>   <chr>                                    <chr>       <chr>
 #>  1 2012-03-16 meeting Canada's international transactions in … "January 2… /dai…
@@ -34,6 +34,6 @@ get_cansim_key_release_schedule()
 #>  8 2012-03-29 meeting National tourism indicators              "Fourth qu… /dai…
 #>  9 2012-03-30 meeting Gross domestic product by industry       "January 2… /dai…
 #> 10 2012-03-30 meeting Payroll employment, earnings and hours,… "January 2… /dai…
-#> # ℹ 2,871 more rows
+#> # ℹ 2,872 more rows
 # }
 ```

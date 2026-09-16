@@ -1,6 +1,28 @@
 # Changelog
 
-## cansim 0.4.5
+## cansim 0.5.1
+
+### Minor changes
+
+- table downloads now warn about repaired member labels the same way
+  they warn about repaired column names. A table whose column names are
+  clean but whose labels carry a non-breaking space, for example the
+  province names in 13-10-0383, was repaired silently because the
+  metadata parser assumed the column name warning had already covered
+  it. Every download path reports it once now, and the warning is
+  silenced by the same `options(cansim.suppress_repair_warnings=TRUE)`
+  ([\#169](https://github.com/mountainMath/cansim/issues/169))
+- the repair warnings, the warning about a cache built before the repair
+  and the warning about vector requests that return no data are no
+  longer hard-wrapped to the width R reports at the time they are
+  raised. That width matched the window only by luck, so the text broke
+  in the middle of sentences in RStudio panes, knitted documents and
+  resized terminals. Each sentence now starts on its own line and the
+  window wraps the rest at its actual width
+
+## cansim 0.5.0
+
+CRAN release: 2026-08-19
 
 ### Major changes
 

@@ -90,16 +90,16 @@ get_cansim_vector_for_latest_periods("v41690973",10)
 #> # A tibble: 10 × 16
 #>    REF_DATE  Date       GEO   Products and product…¹ VALUE val_norm UOM   UOM_ID
 #>    <chr>     <date>     <fct> <fct>                  <dbl>    <dbl> <chr> <chr> 
-#>  1 2025-10-… 2025-10-01 Cana… All-items               165.     165. 2002… 17    
-#>  2 2025-11-… 2025-11-01 Cana… All-items               165.     165. 2002… 17    
-#>  3 2025-12-… 2025-12-01 Cana… All-items               165      165  2002… 17    
-#>  4 2026-01-… 2026-01-01 Cana… All-items               165      165  2002… 17    
-#>  5 2026-02-… 2026-02-01 Cana… All-items               166.     166. 2002… 17    
-#>  6 2026-03-… 2026-03-01 Cana… All-items               167.     167. 2002… 17    
-#>  7 2026-04-… 2026-04-01 Cana… All-items               168      168  2002… 17    
-#>  8 2026-05-… 2026-05-01 Cana… All-items               170.     170. 2002… 17    
-#>  9 2026-06-… 2026-06-01 Cana… All-items               169      169  2002… 17    
-#> 10 2026-07-… 2026-07-01 Cana… All-items               170.     170. 2002… 17    
+#>  1 2025-11-… 2025-11-01 Cana… All-items               165.     165. 2002… 17    
+#>  2 2025-12-… 2025-12-01 Cana… All-items               165      165  2002… 17    
+#>  3 2026-01-… 2026-01-01 Cana… All-items               165      165  2002… 17    
+#>  4 2026-02-… 2026-02-01 Cana… All-items               166.     166. 2002… 17    
+#>  5 2026-03-… 2026-03-01 Cana… All-items               167.     167. 2002… 17    
+#>  6 2026-04-… 2026-04-01 Cana… All-items               168      168  2002… 17    
+#>  7 2026-05-… 2026-05-01 Cana… All-items               170.     170. 2002… 17    
+#>  8 2026-06-… 2026-06-01 Cana… All-items               169      169  2002… 17    
+#>  9 2026-07-… 2026-07-01 Cana… All-items               170.     170. 2002… 17    
+#> 10 2026-08-… 2026-08-01 Cana… All-items               170.     170. 2002… 17    
 #> # ℹ abbreviated name: ¹​`Products and product groups`
 #> # ℹ 8 more variables: SCALAR_ID <int>, VECTOR <chr>, cansimTableNumber <chr>,
 #> #   COORDINATE <chr>, SYMBOL <int>, releaseTime <chr>, frequencyCode <int>,

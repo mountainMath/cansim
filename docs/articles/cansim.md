@@ -108,14 +108,11 @@ search by survey name, keyword or title.
 
 search_cansim_cubes("housing price indexes")
 #> Retrieving cube information from StatCan servers...
-#> Warning: StatCan returned table titles or dimension names containing non-breaking spaces
-#> or control characters. These render as an ordinary space or as nothing at all,
-#> so the names cannot be typed or copy-pasted, the package has replaced them with
-#> regular spaces. Repaired 120 names, for example "… end of the fiscal year
-#> ending closest to December<U+00A0>31". Nothing on your end causes this and
-#> nothing on your end can fix it, the characters are in the data StatCan
-#> publishes. This warning will disappear on its own once StatCan stops sending
-#> them, which is tracked at https://github.com/mountainMath/cansim/issues/169.
+#> Warning: StatCan returned table titles or dimension names containing non-breaking spaces or control characters.
+#> These render as an ordinary space or as nothing at all, so the names cannot be typed or copy-pasted, the package has replaced them with regular spaces.
+#> Repaired 124 names, for example "… end of the fiscal year ending closest to December<U+00A0>31".
+#> The characters are in the data StatCan publishes, this warning will disappear on its own once StatCan stops sending them.
+#> Refer to this GitHub issue for context and progress tracking: https://github.com/mountainMath/cansim/issues/169.
 #> Set options(cansim.suppress_repair_warnings=TRUE) to silence this.
 #> # A tibble: 2 × 20
 #>   cansim_table_number cubeTitleEn   cubeTitleFr productId cansimId cubeStartDate

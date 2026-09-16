@@ -42,7 +42,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cansim</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -210,14 +210,11 @@ or search by survey name, keyword or title.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_cansim_cubes.html">search_cansim_cubes</a></span><span class="op">(</span><span class="st">"housing price indexes"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Retrieving cube information from StatCan servers...</span></span>
-<span><span class="co">#&gt; Warning: StatCan returned table titles or dimension names containing non-breaking spaces</span></span>
-<span><span class="co">#&gt; or control characters. These render as an ordinary space or as nothing at all,</span></span>
-<span><span class="co">#&gt; so the names cannot be typed or copy-pasted, the package has replaced them with</span></span>
-<span><span class="co">#&gt; regular spaces. Repaired 120 names, for example "… end of the fiscal year</span></span>
-<span><span class="co">#&gt; ending closest to December&lt;U+00A0&gt;31". Nothing on your end causes this and</span></span>
-<span><span class="co">#&gt; nothing on your end can fix it, the characters are in the data StatCan</span></span>
-<span><span class="co">#&gt; publishes. This warning will disappear on its own once StatCan stops sending</span></span>
-<span><span class="co">#&gt; them, which is tracked at https://github.com/mountainMath/cansim/issues/169.</span></span>
+<span><span class="co">#&gt; Warning: StatCan returned table titles or dimension names containing non-breaking spaces or control characters.</span></span>
+<span><span class="co">#&gt; These render as an ordinary space or as nothing at all, so the names cannot be typed or copy-pasted, the package has replaced them with regular spaces.</span></span>
+<span><span class="co">#&gt; Repaired 124 names, for example "… end of the fiscal year ending closest to December&lt;U+00A0&gt;31".</span></span>
+<span><span class="co">#&gt; The characters are in the data StatCan publishes, this warning will disappear on its own once StatCan stops sending them.</span></span>
+<span><span class="co">#&gt; Refer to this GitHub issue for context and progress tracking: https://github.com/mountainMath/cansim/issues/169.</span></span>
 <span><span class="co">#&gt; Set options(cansim.suppress_repair_warnings=TRUE) to silence this.</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 20</span></span></span>
 <span><span class="co">#&gt;   cansim_table_number cubeTitleEn   cubeTitleFr productId cansimId cubeStartDate</span></span>
