@@ -10,7 +10,7 @@ There were no ERRORs or WARNINGs or NOTEs, with `--as-cran --run-donttest`.
 This package retrieves data from Statistics Canada web services. Their servers
 time out or go down for maintenance from time to time, which has caused checks
 of this package to fail in the past through no fault of the package. As of
-version 0.4.5 no function aborts when Statistics Canada cannot be reached, it
+version 0.5.0 no function aborts when Statistics Canada cannot be reached, it
 emits a warning and returns `NULL` instead. Examples that make a single
 lightweight API call are therefore wrapped in `\donttest{}` and complete without
 error whether or not Statistics Canada is reachable, which we verified by
@@ -166,7 +166,7 @@ they might fail.
 * make documentations more consistent wrt default langauge names
 * add convenience functions for setting cache paths for data accessed via get_cansim_connection
 
-# cansim 0.4.5
+# cansim 0.5.0
 ## Major changes
 * Statistics Canada being unavailable no longer aborts with an error, timeouts, connection failures and
   error responses are reported with a warning and the function returns `NULL`
@@ -180,3 +180,15 @@ they might fail.
 * `get_cansim_connection()` no longer fails when the release date of a table cannot be determined
 * performance improvements in metadata parsing and table template generation
 
+# cansim 0.5.1
+## Minor changes
+* table downloads now warn about repaired member labels the same way they warn about repaired column
+  names, so every download path reports non-breaking spaces and control characters in the data
+  Statistics Canada publishes exactly once. The warning is silenced by the same
+  `options(cansim.suppress_repair_warnings=TRUE)`
+* warnings are no longer hard-wrapped to a guessed console width, each sentence starts on its own line
+  and the terminal wraps the rest
+* the vignettes on listing tables, retrieving vectors and working with hierarchies ship with the
+  package again. They had been excluded from the CRAN build since 2018 and were only reachable on
+  the package website. All vignettes evaluate their code only when the `COMPILE_VIG` environment
+  variable is set, so building them on CRAN makes no network requests

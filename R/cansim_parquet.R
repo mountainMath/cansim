@@ -664,7 +664,7 @@ collect_and_normalize <- function(connection,
 }
 
 
-#' List cached cansim arrow and SQlite databases
+#' List cached cansim arrow and SQLite databases
 #'
 #' @param cache_path Optional, default value is `Sys.getenv('CANSIM_CACHE_PATH')`.
 #' @param refresh Optional, refresh the last updated date of cached cansim tables

@@ -289,7 +289,7 @@ rename_vectors <- function(data,vectors){
 #' @param vectors The list of vectors to retrieve
 #' @param start_time Starting date in \code{YYYY-MM-DD} format, applies to \code{REF_DATE} or \code{releaseTime}, depending on \code{use_ref_date} parameter
 #' @param end_time Set an optional end time filter in \code{YYYY-MM-DD} format (defaults to current system time)
-#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses StatisticsCanada's \code{releaseDate} value for filtering the specified vectors.
+#' @param use_ref_date Optional, \code{TRUE} by default. When set to \code{TRUE}, uses \code{REF_DATE} of vector data to filter, otherwise it uses Statistics Canada's \code{releaseDate} value for filtering the specified vectors.
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #' @param refresh (Optional) When set to \code{TRUE}, forces a reload of data table (default is \code{FALSE})
 #' @param timeout (Optional) Number of seconds StatCan is allowed to go without sending data before the download is abandoned, to work around scenarios where StatCan servers drop the network connection. This does not limit how long a download may take overall, a transfer that keeps delivering data is left alone. StatCan prepares a whole response before sending any of it, which for large requests can take the better part of a minute, so values much below the default of 200 risk cutting off legitimate requests.

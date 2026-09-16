@@ -2,7 +2,7 @@
 % Please edit documentation in R/cansim_parquet.R
 \name{list_cansim_cached_tables}
 \alias{list_cansim_cached_tables}
-\title{List cached cansim arrow and SQlite databases}
+\title{List cached cansim arrow and SQLite databases}
 \usage{
 list_cansim_cached_tables(
   cache_path = Sys.getenv("CANSIM_CACHE_PATH"),
@@ -18,7 +18,7 @@ list_cansim_cached_tables(
 A tibble with the list of all tables that are currently cached at the given cache path.
 }
 \description{
-List cached cansim arrow and SQlite databases
+List cached cansim arrow and SQLite databases
 }
 \examples{
 \dontrun{
