@@ -1,3 +1,9 @@
+# cansim 0.5.2
+## Minor changes
+* an outage or maintenance page that StatCan serves with HTTP status 200 is now reported like any
+  other unavailability, with a warning naming the page title and a `NULL` return, instead of failing
+  with an opaque JSON parse error or a failed unzip (#174)
+
 # cansim 0.5.1
 ## Minor changes
 * table downloads now warn about repaired member labels the same way they warn about repaired column

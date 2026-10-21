@@ -35,6 +35,28 @@ test_that("failures are reported as warnings and yield NULL", {
   expect_equal(result, ok)
 })
 
+test_that("an HTML page served with status 200 is reported as unavailability", {
+  # StatCan's maintenance page comes back as a 200, which used to reach the JSON parser (#174)
+  page <- paste0("<!--Last modified Dec 16, 2021 -->\n<!DOCTYPE html><html><head>",
+                 "<title>Statistics Canada - Maintenance</title></head><body></body></html>")
+  expect_warning(result <- cansim:::check_statcan_response(statcan_response(200, page)),
+                 "web page instead of data")
+  expect_null(result)
+  expect_warning(cansim:::check_statcan_response(statcan_response(200, page)),
+                 "Statistics Canada - Maintenance")
+
+  # the same page written to disk, as table downloads are
+  path <- withr::local_tempfile()
+  writeLines(page, path)
+  on_disk <- httr2::response(status_code=200, body=structure(path, class="httr2_path"))
+  expect_warning(result <- cansim:::check_statcan_response(on_disk), "web page instead of data")
+  expect_null(result)
+
+  # data never starts with "<", so JSON passes through untouched
+  ok <- statcan_response(200, '[{"status":"SUCCESS"}]')
+  expect_no_warning(expect_equal(cansim:::check_statcan_response(ok), ok))
+})
+
 test_that("the reason StatCan gives for refusing is passed on", {
   # the status code alone does not say which of the two things a 409 means
   expect_warning(cansim:::check_statcan_response(

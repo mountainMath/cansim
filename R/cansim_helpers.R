@@ -614,7 +614,40 @@ check_statcan_response <- function(response,empty_status=integer(0)){
                                "Problem downloading data, StatCan returned status code ",status_code,".",
                                if (is.null(detail)) "" else paste0("\n","StatCan says: ",detail)))
   }
+  # StatCan's outage and maintenance pages are sometimes served with a 200, so a successful status
+  # does not guarantee the body is the JSON, zip or parquet file asked for. Without this check the
+  # page reaches the JSON parser or unzip() and surfaces as an opaque parse error.
+  html_title <- statcan_html_page_title(response)
+  if (!is.null(html_title)) {
+    return(statcan_unavailable("Problem downloading data, StatCan returned a web page instead of data.\n",
+                               "StatCan servers might be down or undergoing maintenance.",
+                               if (nzchar(html_title)) paste0("\n","Page title: ",html_title) else ""))
+  }
   response
+}
+
+# Returns NULL when the body does not look like an HTML page, otherwise the page's <title> (or "").
+# Sniffs the first bytes of the body rather than trusting the Content-Type header, which StatCan does
+# not set reliably. Every legitimate answer starts with "{" or "[" (JSON), "PK" (zip) or "PAR1"
+# (parquet), never with "<".
+statcan_html_page_title <- function(response){
+  body <- response$body
+  head <- if (inherits(body,"httr2_path")) {
+    if (!file.exists(body)) return(NULL)
+    readBin(body,"raw",n=4096)
+  } else if (is.raw(body)) {
+    body[seq_len(min(length(body),4096))]
+  } else {
+    return(NULL)
+  }
+  head <- head[head!=as.raw(0)]
+  if (length(head)==0) return(NULL)
+  text <- iconv(rawToChar(head),from="UTF-8",to="UTF-8",sub="")
+  text <- sub("^\ufeff","",text)
+  if (is.na(text) || !grepl("^\\s*<",text)) return(NULL)
+  title <- regmatches(text,regexpr("(?is)<title[^>]*>.*?</title>",text,perl=TRUE))
+  if (length(title)==0) return("")
+  trimws(gsub("\\s+"," ",gsub("(?is)</?title[^>]*>","",title,perl=TRUE)))
 }
 
 # `query` is given as a named list rather than pasted onto the url by the caller, because httr2 sends
