@@ -643,7 +643,7 @@ statcan_html_page_title <- function(response){
   head <- head[head!=as.raw(0)]
   if (length(head)==0) return(NULL)
   text <- iconv(rawToChar(head),from="UTF-8",to="UTF-8",sub="")
-  text <- sub("^﻿","",text)
+  text <- sub("^\ufeff","",text)
   if (is.na(text) || !grepl("^\\s*<",text)) return(NULL)
   title <- regmatches(text,regexpr("(?is)<title[^>]*>.*?</title>",text,perl=TRUE))
   if (length(title)==0) return("")

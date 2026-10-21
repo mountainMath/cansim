@@ -1,4 +1,4 @@
-# cansim (development version)
+# cansim 0.5.2
 ## Minor changes
 * an outage or maintenance page that StatCan serves with HTTP status 200 is now reported like any
   other unavailability, with a warning naming the page title and a `NULL` return, instead of failing
