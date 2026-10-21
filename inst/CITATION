@@ -1,10 +1,15 @@
 citHeader("To cite 'cansim' in publications please use:")
 
+# Version and year follow the installed release, so a citation names the version actually used.
+# Date/Publication is only set on CRAN builds, development installs fall back to the current year.
+year <- if (!is.null(meta$`Date/Publication`)) substr(meta$`Date/Publication`, 1, 4) else format(Sys.Date(), "%Y")
+
 bibentry(
   "Manual",
-  year = {2026},
-  author = "Jens von Bergmann and Dmitry Shkolnik",
-  title = "cansim: Accessing Statistics Canada Data Table and Vectors",
-  url = "https://CRAN.R-project.org/package=cansim",
-  textVersion = "von Bergmann and Shkolnik (2026). cansim: Accessing Statistics Canada Data Table and Vectors. https://CRAN.R-project.org/package=cansim"
+  author = c(person("Jens", "von Bergmann"), person("Dmitry", "Shkolnik")),
+  title = "cansim: functions and convenience tools for accessing Statistics Canada data tables",
+  year = year,
+  note = sprintf("R package version %s", meta$Version),
+  doi = "10.32614/CRAN.package.cansim",
+  url = "https://mountainmath.github.io/cansim/"
 )
