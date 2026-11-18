@@ -1,4 +1,13 @@
 # cansim (development version)
+## Major changes
+* StatCan has put the full table downloads behind a Cloudflare browser check (#176), so `get_cansim()`
+  and `get_cansim_connection()` were answered with an HTTP 403. When the 'safeconduct' package is
+  installed they now send a real Chrome through the check: headless, with a window to click in only
+  when the check asks for it. The clearance is kept for the session, so later tables download without
+  a browser. Without 'safeconduct' the warning says what happened and how to get past it. The plain
+  request still goes first, so nothing changes should StatCan drop the check again. 'safeconduct' is
+  not on CRAN yet, install it with `pak::pak("mountainMath/safeconduct")`
+
 ## Minor changes
 * `get_cansim_table_last_release_date()`, and with it `get_cansim_connection(refresh="auto")`, reads
   the release time from the WDS API's cube metadata. The `metadata.json` feed it used to read is now
