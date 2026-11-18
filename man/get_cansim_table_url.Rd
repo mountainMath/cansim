@@ -12,7 +12,10 @@ get_cansim_table_url(cansimTableNumber, language = "english")
 \item{language}{\code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored}
 }
 \value{
-String object containing URL for specified table number
+String object containing URL for specified table number. StatCan has put these
+downloads behind a Cloudflare browser check, so the URL may not serve the file to a plain
+request; \code{get_cansim()} and \code{get_cansim_connection()} get through it with the
+'safeconduct' package when it is installed.
 
 Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 }

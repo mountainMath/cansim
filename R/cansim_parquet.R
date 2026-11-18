@@ -97,7 +97,7 @@ get_cansim_connection <- function(cansimTableNumber,
     url <- get_cansim_table_url(cleaned_number, language=language)
 
     time_check <- Sys.time()
-    response <- if (is.null(url)) NULL else get_with_timeout_retry(url,path=path,timeout=timeout)
+    response <- if (is.null(url)) NULL else download_statcan_table(url,path=path,timeout=timeout)
     if (is.null(response)) {
       # a failed refresh leaves the previous download intact, serving that beats returning nothing
       if (!file.exists(db_path)) return(NULL)

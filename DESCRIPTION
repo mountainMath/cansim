@@ -1,7 +1,7 @@
 Package: cansim
 Type: Package
 Title: Accessing Statistics Canada Data Table and Vectors
-Version: 0.5.2
+Version: 0.5.2.9000
 Authors@R: c(
     person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("aut","cre")),
     person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
@@ -38,11 +38,13 @@ Suggests:
     rmarkdown,
     ggplot2,
     scales,
+    safeconduct,
     testthat (>= 3.0.0),
     withr
+Remotes: mountainMath/safeconduct
 URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
 BugReports: https://github.com/mountainMath/cansim/issues
 VignetteBuilder: knitr
 Language: en-CA
 Config/testthat/edition: 3
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

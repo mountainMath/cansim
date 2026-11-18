@@ -666,6 +666,55 @@ post_with_timeout_retry <- function(url,body,timeout=200,retry=3,empty_status=in
   perform_statcan_request(req,empty_status=empty_status)
 }
 
+# StatCan has put the full table downloads, www150.statcan.gc.ca/n1/tbl/csv/*.zip, behind a Cloudflare
+# browser check (#176), while the WDS API that hands out their addresses is still served to plain
+# requests. Cloudflare marks every such check with a `cf-mitigated: challenge` header, whatever the
+# status and the page that comes with it.
+statcan_browser_check <- function(response){
+  inherits(response,"httr2_response") &&
+    identical(tolower(httr2::resp_header(response,"cf-mitigated",default="")),"challenge")
+}
+
+# Wrapped so that tests can pretend safeconduct is or is not installed, and stand in for the browser.
+safeconduct_available <- function() requireNamespace("safeconduct",quietly=TRUE)
+safeconduct_fetch <- function(url,path) safeconduct::fetch(url,path)
+
+# Downloads a full table zip to `path`. A plain request goes first, so nothing changes for anyone
+# should StatCan drop the check again. When Cloudflare answers with its check instead, the safeconduct
+# package sends a real Chrome through it: headless, with a window only when the check asks a person to
+# click and there is a display to show it on. The clearance the browser is given is then handed to
+# curl, and safeconduct keeps it for the rest of the session, so only the first table needs a browser.
+# Returns the response on success and NULL on any failure, as get_with_timeout_retry() does.
+download_statcan_table <- function(url,path,timeout=200){
+  response <- tryCatch(httr2::req_perform(statcan_request(url,timeout=timeout),path=path),
+                       error=function(e) e)
+  if (!statcan_browser_check(response)) return(check_statcan_response(response))
+
+  # what was written to `path` is the check's page, not the table
+  unlink(path)
+  manually <- paste0("The table can be downloaded by hand in a web browser from\n",url)
+  if (!safeconduct_available()) {
+    return(statcan_unavailable(
+      "StatCan answered the table download with a Cloudflare browser check, which only a web browser ",
+      "can pass.\n",
+      "Installing the safeconduct package and Google Chrome lets cansim send a browser through it:\n\n",
+      "pak::pak(\"mountainMath/safeconduct\")\n\n",
+      "Data for individual vectors or table coordinates comes from StatCan's API, which has no such ",
+      "check, see get_cansim_vector() and get_cansim_data_for_table_coord_periods().\n",
+      manually))
+  }
+  fetched <- tryCatch(safeconduct_fetch(url,path),error=function(e) e)
+  if (inherits(fetched,"condition")) {
+    unlink(path)
+    return(statcan_unavailable(
+      "StatCan answered the table download with a Cloudflare browser check, and sending a browser ",
+      "through it failed.\n",conditionMessage(fetched),"\n",manually))
+  }
+  # through the same checks as a plain download, an outage page would get past the browser too
+  check_statcan_response(httr2::response(status_code=200,url=url,
+                                         body=structure(path,class="httr2_path")))
+}
+
 
 
 short_prov.en <- c(
