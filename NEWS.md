@@ -4,6 +4,11 @@
   with an HTTP 200 carrying `"status":"FAILED"` and a `GENERIC_REQUEST_FAILED` message, which was
   saved and served for the rest of the session. Such answers are now retried a few times, a warning
   is given if they keep failing, and a failed answer already in the cache is refetched (#178)
+* `get_cansim_table_last_release_date()`, and with it `get_cansim_connection(refresh="auto")`, reads
+  the release time from the WDS API's cube metadata. The `metadata.json` feed it used to read is now
+  behind a Cloudflare browser check that no script gets past, so the release date came back `NULL`
+  with a warning about a status 403 and an auto-refresh could not tell a stale table from a current
+  one (#176)
 * an outage or maintenance page that StatCan serves with HTTP status 200 is now reported like any
   other unavailability, with a warning naming the page title and a `NULL` return, instead of failing
   with an opaque JSON parse error or a failed unzip (#174)
