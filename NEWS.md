@@ -1,3 +1,11 @@
+# cansim (development version)
+## Minor changes
+* `get_cansim_table_last_release_date()`, and with it `get_cansim_connection(refresh="auto")`, reads
+  the release time from the WDS API's cube metadata. The `metadata.json` feed it used to read is now
+  behind a Cloudflare browser check that no script gets past, so the release date came back `NULL`
+  with a warning about a status 403 and an auto-refresh could not tell a stale table from a current
+  one (#176)
+
 # cansim 0.5.2
 ## Minor changes
 * an outage or maintenance page that StatCan serves with HTTP status 200 is now reported like any
