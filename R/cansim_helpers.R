@@ -614,7 +614,40 @@ check_statcan_response <- function(response,empty_status=integer(0)){
                                "Problem downloading data, StatCan returned status code ",status_code,".",
                                if (is.null(detail)) "" else paste0("\n","StatCan says: ",detail)))
   }
+  # StatCan's outage and maintenance pages are sometimes served with a 200, so a successful status
+  # does not guarantee the body is the JSON, zip or parquet file asked for. Without this check the
+  # page reaches the JSON parser or unzip() and surfaces as an opaque parse error.
+  html_title <- statcan_html_page_title(response)
+  if (!is.null(html_title)) {
+    return(statcan_unavailable("Problem downloading data, StatCan returned a web page instead of data.\n",
+                               "StatCan servers might be down or undergoing maintenance.",
+                               if (nzchar(html_title)) paste0("\n","Page title: ",html_title) else ""))
+  }
   response
+}
+
+# Returns NULL when the body does not look like an HTML page, otherwise the page's <title> (or "").
+# Sniffs the first bytes of the body rather than trusting the Content-Type header, which StatCan does
+# not set reliably. Every legitimate answer starts with "{" or "[" (JSON), "PK" (zip) or "PAR1"
+# (parquet), never with "<".
+statcan_html_page_title <- function(response){
+  body <- response$body
+  head <- if (inherits(body,"httr2_path")) {
+    if (!file.exists(body)) return(NULL)
+    readBin(body,"raw",n=4096)
+  } else if (is.raw(body)) {
+    body[seq_len(min(length(body),4096))]
+  } else {
+    return(NULL)
+  }
+  head <- head[head!=as.raw(0)]
+  if (length(head)==0) return(NULL)
+  text <- iconv(rawToChar(head),from="UTF-8",to="UTF-8",sub="")
+  text <- sub("^\ufeff","",text)
+  if (is.na(text) || !grepl("^\\s*<",text)) return(NULL)
+  title <- regmatches(text,regexpr("(?is)<title[^>]*>.*?</title>",text,perl=TRUE))
+  if (length(title)==0) return("")
+  trimws(gsub("\\s+"," ",gsub("(?is)</?title[^>]*>","",title,perl=TRUE)))
 }
 
 # `query` is given as a named list rather than pasted onto the url by the caller, because httr2 sends
@@ -723,6 +756,32 @@ add_provincial_abbreviations <- function(data){
 }
 
 
+code_sets_succeeded <- function(content){
+  is.list(content) && identical(content$status,"SUCCESS") && is.list(content$object)
+}
+
+# getCodeSets sometimes answers with an HTTP 200 whose body is
+# {"status":"FAILED","object":"getCodeSets threw unhandled exception. Error code = GENERIC_REQUEST_FAILED"},
+# which the status-code based retry in statcan_request() cannot see. The failure is transient, so
+# the request is tried again a few times here, and a failed answer is never cached, since the cache
+# would otherwise serve it for the rest of the session.
+CODE_SET_ATTEMPTS <- 3
+
+fetch_cansim_code_sets <- function(attempts=CODE_SET_ATTEMPTS){
+  url <- 'https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
+  detail <- NULL
+  for (attempt in seq_len(attempts)) {
+    if (attempt>1) Sys.sleep(2^(attempt-2))
+    r <- get_with_timeout_retry(url)
+    if (is.null(r)) return(NULL)
+    content <- tryCatch(statcan_response_json(r),error=function(e) NULL)
+    if (code_sets_succeeded(content)) return(content)
+    detail <- if (is.list(content) && is.character(content$object)) content$object
+  }
+  statcan_unavailable("StatCan failed to return the code sets after ",attempts," attempts",
+                      if (length(detail)==1) paste0(": ",detail) else ".")
+}
+
 #' Get NDM code sets
 #'
 #' Useful to get a list of surveys  or subjects and used internally
@@ -745,14 +804,12 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
     stop(paste0("Invalid code set, code_set must be one of ",paste0(code_sets,collapse=", ")),call.=FALSE)
   }
   path=file.path(tempdir(),"cansim_code_sets.Rmd")
-  if (refresh | !file.exists(path)) {
-    url='https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
-    r<-get_with_timeout_retry(url)
-    if (is.null(r)) return(NULL)
-    content <- statcan_response_json(r)
+  content <- if (!refresh && file.exists(path)) tryCatch(readRDS(path),error=function(e) NULL)
+  # a cache written before failed answers were screened out may hold one, so it is checked as well
+  if (!code_sets_succeeded(content)) {
+    content <- fetch_cansim_code_sets()
+    if (is.null(content)) return(NULL)
     saveRDS(content,path)
-  } else {
-    content <- readRDS(path)
   }
   m<-do.call(rbind, content$object[[code_set]])
   m[m=="NULL"] <- NA

@@ -1159,22 +1159,25 @@ get_cansim_table_notes <- function(cansimTableNumber,language="english",refresh=
 get_cansim_table_last_release_date <- function(cansimTableNumber){
   validate_single_table_number(cansimTableNumber)
   cansimTableNumber <- cleaned_ndm_table_number(cansimTableNumber)
-  pid <- paste0(naked_ndm_table_number(cansimTableNumber),"01")
-  url <- paste0("https://www150.statcan.gc.ca/n1/en/metadata.json?productid=",pid)
-  response <- get_with_timeout_retry(url)
+  # Asked of the WDS API rather than of the www150.statcan.gc.ca/n1/en/metadata.json feed this used to
+  # read, which StatCan has put behind a Cloudflare browser check that not even a real browser's
+  # clearance gets a script past. The cube metadata carries the release time and is small, a few
+  # kilobytes even for large tables. It is requested directly rather than through
+  # get_cansim_cube_metadata(), whose session cache would answer with the release time as it was when
+  # first asked, which is the one thing a staleness check cannot use.
+  body <- paste0('[{"productId":',naked_ndm_table_number(cansimTableNumber),'}]')
+  response <- post_with_timeout_retry("https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata",body=body)
   if (is.null(response)) return(NULL)
 
-  r <- statcan_response_json(response)$result
-  if (length(r)==0) {
-    warning("Could not access release information for table ",cansimTableNumber,
-            " (productID: ",pid,").",call.=FALSE)
+  record <- statcan_response_json(response)
+  release_time <- if (length(record)==1 && wds_record_succeeded(record[[1]])) record[[1]]$object$releaseTime
+  if (length(release_time)!=1 || !is.character(release_time) || is.na(release_time)) {
+    warning("Could not access release information for table ",cansimTableNumber,".",call.=FALSE)
     return(NA)
   }
 
-  rd <- unique(unlist(lapply(r,function(rr)rr$releasedate)))
-  strptime(rd,format = STATCAN_TIME_FORMAT,tz="UTC") %>%
-    max()
-  #get_cansim_cube_metadata(cansimTableNumber) %>% pull(releaseTime)
+  # WDS gives the release time in Eastern time, unlike the feed, which gave it in UTC
+  as.POSIXct(strptime(release_time,format=STATCAN_TIME_FORMAT,tz=STATCAN_TIMEZONE))
 }
 
 
