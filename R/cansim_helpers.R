@@ -756,6 +756,32 @@ add_provincial_abbreviations <- function(data){
 }
 
 
+code_sets_succeeded <- function(content){
+  is.list(content) && identical(content$status,"SUCCESS") && is.list(content$object)
+}
+
+# getCodeSets sometimes answers with an HTTP 200 whose body is
+# {"status":"FAILED","object":"getCodeSets threw unhandled exception. Error code = GENERIC_REQUEST_FAILED"},
+# which the status-code based retry in statcan_request() cannot see. The failure is transient, so
+# the request is tried again a few times here, and a failed answer is never cached, since the cache
+# would otherwise serve it for the rest of the session.
+CODE_SET_ATTEMPTS <- 3
+
+fetch_cansim_code_sets <- function(attempts=CODE_SET_ATTEMPTS){
+  url <- 'https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
+  detail <- NULL
+  for (attempt in seq_len(attempts)) {
+    if (attempt>1) Sys.sleep(2^(attempt-2))
+    r <- get_with_timeout_retry(url)
+    if (is.null(r)) return(NULL)
+    content <- tryCatch(statcan_response_json(r),error=function(e) NULL)
+    if (code_sets_succeeded(content)) return(content)
+    detail <- if (is.list(content) && is.character(content$object)) content$object
+  }
+  statcan_unavailable("StatCan failed to return the code sets after ",attempts," attempts",
+                      if (length(detail)==1) paste0(": ",detail) else ".")
+}
+
 #' Get NDM code sets
 #'
 #' Useful to get a list of surveys  or subjects and used internally
@@ -778,14 +804,12 @@ get_cansim_code_set <- function(code_set=c("scalar", "frequency", "symbol", "sta
     stop(paste0("Invalid code set, code_set must be one of ",paste0(code_sets,collapse=", ")),call.=FALSE)
   }
   path=file.path(tempdir(),"cansim_code_sets.Rmd")
-  if (refresh | !file.exists(path)) {
-    url='https://www150.statcan.gc.ca/t1/wds/rest/getCodeSets'
-    r<-get_with_timeout_retry(url)
-    if (is.null(r)) return(NULL)
-    content <- statcan_response_json(r)
+  content <- if (!refresh && file.exists(path)) tryCatch(readRDS(path),error=function(e) NULL)
+  # a cache written before failed answers were screened out may hold one, so it is checked as well
+  if (!code_sets_succeeded(content)) {
+    content <- fetch_cansim_code_sets()
+    if (is.null(content)) return(NULL)
     saveRDS(content,path)
-  } else {
-    content <- readRDS(path)
   }
   m<-do.call(rbind, content$object[[code_set]])
   m[m=="NULL"] <- NA

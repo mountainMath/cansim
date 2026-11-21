@@ -1,5 +1,9 @@
 # cansim 0.5.2
 ## Minor changes
+* `get_cansim_code_set()` no longer caches a failed answer. StatCan's getCodeSets sometimes answers
+  with an HTTP 200 carrying `"status":"FAILED"` and a `GENERIC_REQUEST_FAILED` message, which was
+  saved and served for the rest of the session. Such answers are now retried a few times, a warning
+  is given if they keep failing, and a failed answer already in the cache is refetched (#178)
 * an outage or maintenance page that StatCan serves with HTTP status 200 is now reported like any
   other unavailability, with a warning naming the page title and a `NULL` return, instead of failing
   with an opaque JSON parse error or a failed unzip (#174)
