@@ -200,3 +200,45 @@ test_that("every function that talks to StatCan returns NULL when StatCan is unr
     }
   })
 })
+
+# What Cloudflare answers a table download with since StatCan put a browser check in front of it (#176)
+browser_check <- function(path) {
+  writeLines("<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>", path)
+  httr2::response(status_code=403,
+                  headers=list(`cf-mitigated`="challenge",`content-type`="text/html; charset=UTF-8"),
+                  body=structure(path,class="httr2_path"))
+}
+
+test_that("a Cloudflare browser check is told apart from other refusals", {
+  path <- withr::local_tempfile()
+  expect_true(cansim:::statcan_browser_check(browser_check(path)))
+  expect_false(cansim:::statcan_browser_check(statcan_response(403)))
+  expect_false(cansim:::statcan_browser_check(statcan_response(200, '{"status":"SUCCESS"}')))
+  expect_false(cansim:::statcan_browser_check(connection_failure()))
+})
+
+test_that("a table download behind a browser check goes through safeconduct", {
+  path <- withr::local_tempfile(fileext=".zip")
+  url <- "https://www150.statcan.gc.ca/n1/tbl/csv/34100013-eng.zip"
+  local_mocked_bindings(req_perform=function(req, path=NULL, ...) browser_check(path), .package="httr2")
+
+  # without safeconduct the warning says how to get past the check, and nothing is left behind
+  local_mocked_bindings(safeconduct_available=function() FALSE)
+  expect_warning(result <- cansim:::download_statcan_table(url, path), "safeconduct")
+  expect_null(result)
+  expect_false(file.exists(path))
+
+  # with it, the browser's download is what comes back
+  local_mocked_bindings(safeconduct_available=function() TRUE,
+                        safeconduct_fetch=function(url, path) writeBin(charToRaw("PK\003\004"), path))
+  expect_no_warning(result <- cansim:::download_statcan_table(url, path))
+  expect_s3_class(result, "httr2_response")
+  expect_true(file.exists(path))
+
+  # a browser that does not get through is reported like any other unavailability
+  local_mocked_bindings(safeconduct_fetch=function(url, path)
+    stop(rlang::error_cnd(c("safeconduct_not_passed","safeconduct_error"), message="check not passed")))
+  expect_warning(result <- cansim:::download_statcan_table(url, path), "check not passed")
+  expect_null(result)
+  expect_false(file.exists(path))
+})

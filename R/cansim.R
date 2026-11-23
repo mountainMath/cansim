@@ -454,7 +454,7 @@ get_cansim <- function(cansimTableNumber, language="english", refresh=FALSE, tim
     # download it precedes.
     url <- get_cansim_table_url(cleaned_number, language=language)
     if (is.null(url)) return(NULL)
-    response <- get_with_timeout_retry(url,path=path,timeout=timeout)
+    response <- download_statcan_table(url,path=path,timeout=timeout)
     if (is.null(response)) return(response)
     data <- NA
     na_strings=c("<NA>",NA,"NA","","F")
@@ -990,7 +990,10 @@ view_cansim_webpage <- function(cansimTableNumber = NULL){
 #' @param cansimTableNumber the NDM table number to load
 #' @param language \code{"english"} (the default) or \code{"french"}. Short forms such as \code{"en"}, \code{"eng"}, \code{"fr"} or \code{"fra"} are accepted, as are the French names \code{"anglais"} and \code{"francais"}; case and accents are ignored
 #'
-#' @return String object containing URL for specified table number
+#' @return String object containing URL for specified table number. StatCan has put these
+#' downloads behind a Cloudflare browser check, so the URL may not serve the file to a plain
+#' request; \code{get_cansim()} and \code{get_cansim_connection()} get through it with the
+#' 'safeconduct' package when it is installed.
 #'
 #' Returns \code{NULL} if the data could not be retrieved because StatCan is unavailable.
 #' @examples
